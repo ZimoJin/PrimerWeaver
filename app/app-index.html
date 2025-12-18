@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrimerWeaver App Module</title>
+    <link rel="preload" href="app-style.css" as="style">
+    <link rel="stylesheet" href="app-style.css">
+    <!-- Module preload hints (fetch early, execute later) -->
+    <link rel="modulepreload" href="app-module-loader.js">
+    <link rel="modulepreload" href="modules/scripts/core_v1.0.1.js">
+    <link rel="modulepreload" href="modules/scripts/bio_visuals_v1.0.1.js">
+    <!-- Default landing module -->
+    <link rel="modulepreload" href="modules/scripts/golden_gate_v1.0.1.js">
+    <!-- PDF export libs removed to speed up initial load -->
+</head>
+<body>
+    <main id="module-content">
+        </main>
+
+    <!-- Common features DB is loaded on-demand (see app-main.js) -->
+    <script type="module" src="app-main.js"></script>
+</body>
+</html>

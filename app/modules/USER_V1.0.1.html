@@ -1,0 +1,195 @@
+<section class="pane" id="user-cloning-pane">
+  <div class="grid cols-2" id="top-grid" style="align-items:stretch">
+    <div id="left-panel" style="display:flex;flex-direction:column">
+      <label style="display:flex;align-items:center;gap:8px">
+        <strong>Vector sequence (FASTA)</strong>
+      </label>
+      <textarea id="vector-seq" placeholder=">pESC-His&#10;GAGCAGACAA..." style="min-height:220px;flex:1;margin-bottom:6px"></textarea>
+      <div class="row end" id="left-upload-row" style="gap:8px">
+        <input type="file" id="vector-file" accept=".fa,.fasta,.fas,.txt" style="display:none">
+        <button class="btn demo" id="vector-flip-btn" type="button" title="Reverse complement the vector sequence">Reverse complement</button>
+        <button class="btn demo" id="vector-demo-btn" type="button">Demo</button>
+        <button class="ghost btn" id="vector-upload-btn" type="button">Upload</button>
+      </div>
+    </div>
+
+    <div id="right-panel" style="display:flex;flex-direction:column">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom: 8px;">
+        <label style="display:flex;align-items:center;gap:8px; margin:0">
+          <strong>Assembly plan (FASTA)</strong>
+          <span class="help-icon" tabindex="0" aria-label="Help: Assembly plan">
+            <span>?</span>
+            <span class="help-tooltip">
+              <strong style="display:block;margin-bottom:6px;">Insert sequences</strong>
+              Add inserts in order (FASTA supported). The tool designs primers for USER cloning and generates an assembly diagram and gel simulation for the final product.
+            </span>
+          </span>
+        </label>
+        <div style="display:flex; gap:8px; align-items:center; flex-shrink:0;">
+          <button class="demo btn" id="user-demo-set" type="button">Demo Set</button>
+          <button class="ghost btn" id="global-reset" type="button">Reset</button>
+        </div>
+      </div>
+      <div class="row" style="justify-content:space-between;margin-bottom:6px;gap:6px;align-items:center">
+        <div></div>
+        <div class="row" style="gap:6px;align-items:center">
+          <button class="ghost btn" id="flip-order-btn" type="button" title="Reverse the order of inserts without changing sequences">Flip order</button>
+          <button class="ghost btn" id="add-insert-btn" type="button">+ Add insert</button>
+        </div>
+      </div>
+      <div id="inserts-container" style="flex:1;overflow-y:auto">
+        <div class="insert-row" data-index="0">
+          <div class="insert-label">Insert #1:</div>
+          <div class="insert-body">
+            <textarea class="insert-seq" placeholder=">yeGFP&#10;ATGTCTAAAG..." style="min-height:100px"></textarea>
+            <div style="display: flex; flex-direction: column; margin-top: 6px;">
+              <div class="row end">
+                <input type="file" class="insert-file" accept=".fa,.fasta,.fas,.txt" style="display: none;">
+                <button class="btn demo xs insert-flip-btn" type="button">Reverse complement</button>
+                <button class="btn demo xs insert-demo-btn" type="button">Demo</button>
+                <button class="ghost btn xs insert-upload-btn" type="button">Upload</button>
+              </div>
+            </div>
+          </div>
+          <div></div>
+          <div class="insert-controls" style="width: 100%;">
+            <button class="ghost btn sm insert-move-up-btn" type="button" title="Move up" style="width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">▲</button>
+            <button class="ghost btn sm insert-move-down-btn" type="button" title="Move down" style="width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">▼</button>
+            <button class="ghost btn sm remove-insert-btn" type="button" title="Delete" style="display: none; width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">×</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid cols-2" style="margin-top:16px;align-items:stretch">
+    <div class="box" id="vector-preview-box">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <div>
+          <h3 style="margin:0">Vector Preview</h3>
+          <div class="aside">Auto-draws circular plasmid map from vector sequence</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span class="aside">Rotate</span>
+          <input type="range" id="vector-map-rotation" min="0" max="360" value="0" step="1" style="width:130px">
+          <span id="vector-map-rot-label" class="aside">0°</span>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:center;">
+        <canvas id="vector-map-canvas" width="500" height="320" class="asm-figure"></canvas>
+      </div>
+      <div id="vector-map-stats" class="aside" style="margin-top:4px;text-align:center">Paste vector above</div>
+    </div>
+
+    <div class="box" id="settings-box">
+      <h3 style="display:flex;align-items:center;gap:8px">
+        Vector Linearization Mode
+        <span class="help-icon" tabindex="0" aria-label="Help: Vector Linearization Mode">
+          <span>?</span>
+          <span class="help-tooltip">
+            <strong style="display:block;margin-bottom:6px;">Inverse PCR Linearization</strong>
+            Input a pair of primers for PCR linearization of the vector. The insert will replace the sequence between the 5' ends of the two primers.
+          </span>
+        </span>
+      </h3>
+      <div class="grid cols-2" style="margin-top:12px;gap:12px">
+        <div>
+          <label for="pcr-forward" class="aside">Vector PCR forward primer (5′→3′)</label>
+          <input type="text" id="pcr-forward" placeholder="e.g., ATG... or ...U..." class="mono">
+          <div class="aside" style="margin-top:4px">Enter primer with or without U base. Format with U: overlap+U+core</div>
+        </div>
+        <div>
+          <label for="pcr-reverse" class="aside">Vector PCR reverse primer (5′→3′)</label>
+          <input type="text" id="pcr-reverse" placeholder="e.g., TCA... or ...U..." class="mono">
+          <div class="aside" style="margin-top:4px">Enter primer with or without U base. Format with U: overlap+U+core</div>
+        </div>
+      </div>
+      <div id="pcr-fragments-info" style="margin-top:12px">
+        <label for="backbone-select-u" class="aside">Select backbone PCR product</label>
+        <select id="backbone-select-u" style="margin-top:6px">
+          <option value="">Please enter PCR primers first</option>
+        </select>
+        <span id="pcr-fragments-summary" class="aside" style="margin-left:8px"></span>
+      </div>
+
+      <h3 style="margin-top:24px;margin-bottom:12px">Primer Design Parameters</h3>
+      <div class="grid cols-3" style="margin-top:10px;gap:12px">
+        <div>
+          <label for="target-tm" class="aside">Target core Tm (°C)</label>
+          <input type="number" id="target-tm" value="55" min="50" max="70" step="1">
+        </div>
+        <div>
+          <label for="overlap-tm" class="aside">Overlap Tm (°C)</label>
+          <input type="number" id="overlap-tm" value="10" min="10" max="60" step="1">
+        </div>
+        <div>
+          <label for="overlap-len" class="aside">Overlap (bp)</label>
+          <input type="number" id="overlap-len" value="9" min="5" max="30" step="1">
+        </div>
+      </div>
+      <div class="grid cols-3" style="margin-top:12px;gap:12px">
+        <div>
+          <label for="primer-conc" class="aside">Primer conc. (nM)</label>
+          <input type="number" id="primer-conc" value="500" min="100" max="2000" step="50">
+        </div>
+        <div>
+          <label for="na-conc" class="aside">Na⁺ (mM)</label>
+          <input type="number" id="na-conc" value="50" min="0" max="200" step="10">
+        </div>
+        <div>
+          <label for="mg-conc" class="aside">Mg²⁺ (mM)</label>
+          <input type="number" id="mg-conc" value="2.0" min="0" max="10" step="0.5">
+        </div>
+      </div>
+      <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
+        <div class="row" style="gap:8px;flex-wrap:nowrap">
+          <button class="btn" id="design-btn">Design USER Primers</button>
+          <select id="download-type" class="ghost btn" style="min-width: 110px; width: auto;">
+            <option value="primers">primers.txt</option>
+            <option value="fasta">assembled.fasta</option>
+          </select>
+          <button class="ghost btn" id="download-btn">Download</button>
+        </div>
+      </div>
+      <button class="ghost btn" id="clear-btn" style="margin-left: auto; margin-top: auto;">Clear</button>
+    </div>
+  </div>
+
+  <div id="results-wrap" style="display:none">
+    <div id="results-content" class="results"></div>
+
+    <div id="gg-gel-section" class="box" style="display:none; margin-top:0px;">
+      <div class="ggx-header" style="margin-top:0px;margin-bottom:5px; display: flex; justify-content: flex-end; align-items: center; gap: 8px;">
+        <h3>Simulated Gel</h3>
+        <div style="display: flex; align-items: center; gap: 4px;">
+          <h4 style="margin:0;">Marker:</h4>
+          <select id="ggx-ladder" style="width:auto;font-size:12px">
+            <option value="neb1kbplus">NEB 1kb Plus DNA Ladder (default)</option>
+            <option value="neb1kb">NEB 1kb DNA Ladder</option>
+            <option value="thermo1kbruler">GeneRuler 1kb DNA Ladder</option>
+            <option value="thermo1kbplus">GeneRuler 1kb Plus DNA Ladder</option>
+          </select>
+        </div>
+      </div>
+      <canvas id="gg-gel-canvas" width="850" height="580"></canvas>
+      <div id="ggx-legend" class="ggx-legend"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Warning Modal -->
+<div id="warning-modal" class="warning-modal" style="display: none;">
+  <div class="warning-modal-overlay"></div>
+  <div class="warning-modal-content">
+    <div class="warning-modal-header">
+      <span class="warning-icon">⚠️</span>
+      <h3>Warning</h3>
+    </div>
+    <div class="warning-modal-body">
+      <p id="warning-message"></p>
+    </div>
+    <div class="warning-modal-footer">
+      <button class="btn" id="warning-ok-btn">OK</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,452 @@
+<style>
+  /* Module-specific styles only */
+  /* Tooltip styles */
+  .help-icon {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+    z-index: 1;
+    flex-shrink: 0;
+    overflow: visible;
+  }
+  .help-icon:hover .help-tooltip,
+  .help-icon:focus-within .help-tooltip {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+  .help-icon:hover span:first-child {
+    background: #4b5563;
+  }
+  .help-icon span:first-child {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+    text-align: center;
+    border-radius: 50%;
+    background: #6b7280;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: bold;
+    transition: background 0.2s;
+    position: relative;
+    z-index: 1;
+  }
+  .help-tooltip {
+    word-wrap: break-word;
+    z-index: 999999 !important;
+    position: absolute !important;
+    padding: 12px;
+    background: #1f2937;
+    color: #fff;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    pointer-events: none;
+    white-space: normal;
+    max-width: 350px;
+  }
+  .help-icon:hover {
+    z-index: 999998 !important;
+  }
+  
+  .mut-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+    font-size: 0.85rem;
+  }
+  .mut-table th, .mut-table td {
+    border: 1px solid #e0e0ea;
+    padding: 4px 6px;
+    text-align: center;
+  }
+  .mut-table th {
+    background: #fafafa;
+    font-weight: 600;
+  }
+  .mut-table input, .mut-table select {
+    width: 100%;
+    padding: 4px 6px;
+    font-size: 0.85rem;
+    border: 1px solid #d0d0dd;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  .aa-block {
+    font-size: 0.8rem;
+    white-space: pre-wrap;
+    word-break: break-all;
+    background: #f9fafb;
+    border-radius: 8px;
+    padding: 8px;
+    border: 1px solid #e5e7eb;
+    font-family: monospace;
+  }
+  .mut-aa {
+    background: #f97316;
+    color: #fff;
+    padding: 0 1px;
+    border-radius: 3px;
+  }
+  .mut-primer {
+    background: #22c55e33;
+    border-radius: 3px;
+    padding: 0 1px;
+  }
+  .section-title {
+    font-size: 0.95rem;
+    margin-top: 12px;
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+  .mono {
+    font-family: "SF Mono", ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.8rem;
+    word-break: break-all;
+  }
+  .results-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+    font-size: 0.8rem;
+  }
+  .results-table th, .results-table td {
+    border: 1px solid #e3e3ed;
+    padding: 4px 6px;
+    vertical-align: top;
+  }
+  .results-table th {
+    background: #f3f4ff;
+    font-weight: 600;
+  }
+  /* QC Badge Styles */
+  .qc-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .qc-ok {
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #6ee7b7;
+  }
+  .qc-weak {
+    background: #dbeafe;
+    color: #1e40af;
+    border: 1px solid #93c5fd;
+  }
+  .qc-warn {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fcd34d;
+  }
+  .qc-bad {
+    background: #fee2e2;
+    color: #7f1d1d;
+    border: 1px solid #fca5a5;
+  }
+  .qc-row {
+    background: #f9fafb;
+    font-size: 0.8rem;
+  }
+  .qc-row td {
+    padding: 6px !important;
+  }
+  /* Codon option styles */
+  .codon-prefer {
+    background: #d1fae5;
+    color: #065f46;
+  }
+  .codon-rare {
+    background: #fef3c7;
+    color: #92400e;
+  }
+</style>
+
+<section class="pane" style="position: relative; overflow: visible;">
+  <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px; width:100%;">
+    <div style="font-weight:700; display:flex; align-items:center; gap:8px;">
+      <span>Target DNA sequence</span>
+      <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
+        <span style="display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.7rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
+        <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 450px; padding: 14px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.6; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
+          <p style="margin: 0 0 8px 0;">Paste or upload a DNA sequence (FASTA or plain text). Coding or non-coding regions are supported; ORFs and reading frames are detected automatically. Use Reverse complement if the input is from the reverse strand. Whitespace and line breaks are ignored.</p>
+          <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
+        </span>
+      </span>
+    </div>
+    <div style="display:flex; gap:8px; align-items:center; flex-shrink:0;">
+      <button class="demo btn" id="mut-demo-set" type="button">Demo Set</button>
+      <button class="ghost btn" id="global-reset" type="button">Reset</button>
+    </div>
+  </div>
+
+  <textarea id="template-seq" placeholder=">yeGFP&#10;ATGTCTAAAG..." style="font-family: monospace;"></textarea>
+  <div class="row end" style="margin-top:8px; gap: 8px;">
+    <input type="file" id="mut-file-upload" accept=".fa,.fasta,.fas,.txt" style="display:none">
+    <button type="button" class="btn demo" id="mut-rc-btn">Reverse complement</button>
+    <button type="button" class="btn demo" id="mut-demo-btn">Demo</button>
+    <button class="ghost btn" id="mut-upload-btn" type="button">Upload</button>
+  </div>
+
+  <!-- Mode toggle -->
+  <div style="margin-top:12px; padding:12px; background:#f5f5f5; border-radius:4px; display:flex; gap:16px; align-items:center; flex-wrap: wrap;">
+    <strong>Mutation mode:</strong>
+    <label style="display:flex; align-items:center; gap:6px; cursor:pointer; margin:0;">
+      <input type="radio" id="mode-cds" name="mutation-mode" value="cds" checked style="width: auto; margin: 0;">
+      <span style="color:#27ae60; font-weight:500;">✓ CDS protein mutation</span>
+      <span class="aside">(amino acid position & codon)</span>
+    </label>
+    <label style="display:flex; align-items:center; gap:6px; cursor:pointer; margin:0;">
+      <input type="radio" id="mode-dna" name="mutation-mode" value="dna" style="width: auto; margin: 0;">
+      <span style="color:#2980b9; font-weight:500;">DNA sequence editing</span>
+      <span class="aside">(any position & operation)</span>
+    </label>
+  </div>
+
+  <!-- CDS Mode: Host organism and ORF selection -->
+  <div id="cds-mode-section" style="display:block; margin-top:12px;">
+    <div class="grid cols-2" style="gap:16px;">
+      <div>
+        <label class="aside">Host organism (for codon choice)</label>
+        <select id="host-select"></select>
+      </div>
+      <div>
+        <label class="aside">Reading frame (auto-detected ORFs)</label>
+        <select id="orf-select">
+          <option value="">Enter sequence to detect ORFs...</option>
+        </select>
+        <div id="orf-info" class="aside" style="margin-top:4px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CDS Mode: Amino-acid mutations -->
+  <div id="cds-mutations-section" style="display:block; margin-top:16px;">
+    <h3 style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible; margin-top:0;">
+      <span>Amino-acid edits</span>
+      <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
+        <span style="display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.7rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
+        <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 500px; padding: 14px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.6; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
+          <p style="margin: 0 0 8px 0;"><strong>Positions are 1-based in the translated ORF.</strong></p>
+          <p style="margin: 0 0 8px 0;"><strong>Examples:</strong></p>
+          <ul style="margin: 4px 0 8px 20px; padding: 0; list-style: disc;">
+            <li style="margin-bottom: 4px;"><strong>V55A</strong>: Start=55, New=A (single AA swap)</li>
+            <li style="margin-bottom: 4px;"><strong>V55ASA</strong>: Start=55, New=ASA (1 AA → 3 AAs)</li>
+            <li style="margin-bottom: 4px;"><strong>VKL[55-57]→GA</strong>: Start=55, End=57, New=GA (3 AAs → 2 AAs)</li>
+            <li style="margin-bottom: 4px;"><strong>Insert after 55</strong>: Operation=Insertion, Start=55, New=GGG</li>
+            <li style="margin-bottom: 0;"><strong>Delete 55-60</strong>: Operation=Deletion, Start=55, End=60</li>
+          </ul>
+          <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
+        </span>
+      </span>
+    </h3>
+
+    <table class="mut-table" id="aa-edits-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Operation</th>
+          <th>Start pos</th>
+          <th>End pos</th>
+          <th>Current AA</th>
+          <th>New AA(s)</th>
+          <th>Codon preference</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="aa-edits-tbody">
+        <!-- Rows will be generated dynamically, starting with 5 default rows -->
+      </tbody>
+    </table>
+    <button id="add-aa-row-btn" type="button" class="btn ghost" style="margin-top:8px;">+ Add row</button>
+  </div>
+
+  <!-- DNA Mode: DNA sequence editing -->
+  <div id="dna-mutations-section" style="display:none; margin-top:16px;">
+    <h3 style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible; margin-top:0;">
+      <span>DNA sequence edits</span>
+      <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
+        <span style="display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.7rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
+        <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 400px; padding: 14px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.6; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
+          <p style="margin: 0 0 8px 0;"><strong>Positions are 1-based in the input DNA sequence.</strong></p>
+          <p style="margin: 0 0 8px 0;">Use <strong>Deletion</strong>, <strong>Replacement</strong>, or <strong>Insertion</strong>. The “Current sequence” column previews what is at the selected range in the current template.</p>
+          <p style="margin: 0 0 8px 0;"><strong>Examples:</strong></p>
+          <ul style="margin: 4px 0 8px 20px; padding: 0; list-style: disc;">
+            <li style="margin-bottom: 4px;"><strong>Deletion</strong>: Start=100, End=107 (removes 8 bp)</li>
+            <li style="margin-bottom: 4px;"><strong>Replacement</strong>: Start=100, End=107, New=ATGC (replaces 8 bp with 4 bp)</li>
+            <li style="margin-bottom: 0;"><strong>Insertion</strong>: Start=100, New=ATGC (inserts after position 100; End can be blank)</li>
+          </ul>
+          <p style="margin: 0; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.2);"><strong>Display note:</strong> For insertions, the original sequence view shows highlighted <code>--</code> placeholders to indicate the inserted segment position.</p>
+          <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
+        </span>
+      </span>
+    </h3>
+
+    <table class="mut-table" id="dna-edits-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Operation</th>
+          <th>Start pos</th>
+          <th>End pos</th>
+          <th>Current sequence</th>
+          <th>New sequence (if replacement/insertion)</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="dna-edits-tbody">
+        <!-- Rows will be generated dynamically, starting with 5 default rows -->
+      </tbody>
+    </table>
+    <button id="add-dna-row-btn" type="button" class="btn ghost" style="margin-top:8px;">+ Add row</button>
+  </div>
+
+  <div style="margin-top:24px;">
+    <h2 style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible;">
+      <span>Primer Design Parameters</span>
+    </h2>
+    <div class="grid cols-5" style="margin-top:10px; position: relative; overflow: visible;">
+      <div style="position: relative; overflow: visible;">
+        <label class="aside" style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible;">
+          <span>Core primers Tm (°C)</span>
+          <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
+            <span style="display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.7rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
+            <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 280px; padding: 12px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.5; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
+              <p style="margin: 0;">Target melting temperature for the core primer region that binds to the template DNA. Typical range: 50-65°C.</p>
+              <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
+            </span>
+          </span>
+        </label>
+        <input type="number" id="outer-tm" value="55" min="40" max="80" step="1">
+      </div>
+      <div style="position: relative; overflow: visible;">
+        <label class="aside" style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible;">
+          <span>Overlap primers Tm (°C)</span>
+          <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
+            <span style="display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.7rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
+            <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 280px; padding: 12px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.5; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
+              <p style="margin: 0;">Target melting temperature for the overlap region that allows fragments to anneal. Typically similar to core Tm. Typical range: 50-65°C.</p>
+              <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
+            </span>
+          </span>
+        </label>
+        <input type="number" id="overlap-tm" value="55" min="40" max="80" step="1">
+      </div>
+      <div style="position: relative; overflow: visible;">
+        <label class="aside" style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible;">
+          <span>Primer conc. (nM)</span>
+          <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
+            <span style="display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.7rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
+            <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 280px; padding: 12px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.5; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
+              <p style="margin: 0;">Effective primer concentration assumed for in silico Tm calculation. Typical range: 25-1000 nM.</p>
+              <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
+            </span>
+          </span>
+        </label>
+        <input type="number" id="primer-conc" value="500" min="50" max="2000" step="50">
+      </div>
+      <div style="position: relative; overflow: visible;">
+        <label class="aside" style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible;">
+          <span>Na⁺ (mM)</span>
+          <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
+            <span style="display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.7rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
+            <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 280px; padding: 12px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.5; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
+              <p style="margin: 0;">Monovalent cation concentration used for salt-corrected Tm calculation. Typical range: 10-200 mM.</p>
+              <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
+            </span>
+          </span>
+        </label>
+        <input type="number" id="primer-na" value="50" min="0" max="200" step="5">
+      </div>
+      <div style="position: relative; overflow: visible;">
+        <label class="aside" style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible;">
+          <span>Mg²⁺ (mM)</span>
+          <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
+            <span style="display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.7rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
+            <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 280px; padding: 12px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.5; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
+              <p style="margin: 0;">Divalent cation concentration used for Tm calculation. Set to 0 if Mg²⁺ is absent from reaction. Typical range: 0.5-5 mM.</p>
+              <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
+            </span>
+          </span>
+        </label>
+        <input type="number" id="primer-mg" value="2.0" min="0" max="10" step="0.5">
+      </div>
+    </div>
+    <div class="grid cols-2" style="margin-top:12px;">
+      <div style="position: relative; overflow: visible;">
+        <label class="aside" style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible;">
+          <span>Forward primer overlap sequence (optional)</span>
+          <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
+            <span style="display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.7rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
+            <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 350px; padding: 12px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.5; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
+              <p style="margin: 0 0 8px 0;">Optional sequence to append to the 5' end of the forward primer for the first fragment. This sequence will be added to the beginning of F1 primer.</p>
+              <p style="margin: 0; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.2);"><strong>Note:</strong> The overlap sequence does not participate in Tm calculation. Tm is calculated based on the core primer sequence only.</p>
+              <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
+            </span>
+          </span>
+        </label>
+        <input type="text" id="f-overlap-seq" placeholder="e.g., ATGCGATCG" style="font-family: monospace;">
+      </div>
+      <div style="position: relative; overflow: visible;">
+        <label class="aside" style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible;">
+          <span>Reverse primer overlap sequence (optional)</span>
+          <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
+            <span style="display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.7rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
+            <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 350px; padding: 12px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.5; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
+              <p style="margin: 0 0 8px 0;">Optional sequence to append to the 5' end of the reverse primer for the last fragment. This sequence will be added to the beginning of R2 primer.</p>
+              <p style="margin: 0; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.2);"><strong>Note:</strong> The overlap sequence does not participate in Tm calculation. Tm is calculated based on the core primer sequence only.</p>
+              <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
+            </span>
+          </span>
+        </label>
+        <input type="text" id="r-overlap-seq" placeholder="e.g., CGATCGCTA" style="font-family: monospace;">
+      </div>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top:16px; justify-content: space-between;">
+    <button id="design-btn" class="btn" type="button">Design primers</button>
+    <div style="display: flex; gap: 8px;">
+      <select id="download-type" class="ghost btn" style="min-width:140px;width:auto;border:1px solid var(--line);color:#0b1220;background:#ffffff">
+        <option value="primers">primers.txt</option>
+        <option value="fasta">mutant.fasta</option>
+      </select>
+      <button id="download-btn" class="btn ghost" type="button">Download</button>
+      <button id="clear-btn" class="btn ghost" type="button">Clear</button>
+    </div>
+  </div>
+
+  <div id="results-section" style="margin-top:24px; display: none;">
+    <h3>Results</h3>
+    <div style="margin-top:12px;">
+      <strong>Original protein (from template)</strong>
+      <div id="aa-original" class="aa-block" style="margin-top:4px;"></div>
+    </div>
+
+    <div style="margin-top:16px;">
+      <strong>Final mutated protein</strong>
+      <div id="aa-translation" class="aa-block" style="margin-top:4px;"></div>
+    </div>
+
+    <div style="margin-top:16px;">
+      <strong>Mutation summary</strong>
+      <div id="summary" class="aside" style="margin-top:4px;"></div>
+    </div>
+
+    <div style="margin-top:16px;">
+      <strong>Primer sets (OE-PCR)</strong>
+      <div id="results-table" style="margin-top:4px;"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Script will be loaded by app-main.js -->

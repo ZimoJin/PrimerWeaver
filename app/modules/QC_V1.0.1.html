@@ -1,0 +1,302 @@
+<section id="p-pqc" class="pane" style="position: relative; overflow: visible;">
+  <div class="grid cols-2">
+    <label style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible; margin-bottom: 8px;">
+      <strong>Forward primer (5'→3')</strong>
+      <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
+        <span style="display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.7rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
+        <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 600px; padding: 14px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.6; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
+          <p style="margin: 0 0 8px 0;">Input or upload forward primers (FASTA format or raw sequences, one per line).</p>
+          <p style="margin: 0 0 8px 0;"><strong>Supported primer name formats:</strong></p>
+          <ul style="margin: 4px 0 8px 20px; padding: 0; list-style: disc;">
+            <li style="margin-bottom: 4px;">Target1-F / Target1-R (with dash)</li>
+            <li style="margin-bottom: 4px;">Target1_F / Target1_R (with underscore)</li>
+            <li style="margin-bottom: 4px;">Target1F / Target1R (no separator)</li>
+            <li style="margin-bottom: 4px;">Target1-Forward / Target1-Reverse (full words)</li>
+            <li style="margin-bottom: 4px;">Target1_Forward / Target1_Reverse (full words with underscore)</li>
+            <li style="margin-bottom: 4px;">Target1-fwd / Target1-rev (abbreviated)</li>
+            <li style="margin-bottom: 4px;">Target1_FWD / Target1_REV (uppercase abbreviated)</li>
+          </ul>
+          <p style="margin: 8px 0 0 0; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.2);">The tool will perform quality checks on each primer set.</p>
+          <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
+        </span>
+      </span>
+    </label>
+    <div style="display:flex; align-items:center; justify-content:space-between; gap: 8px;">
+      <label style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible; margin-bottom: 8px; margin: 0;">
+        <strong>Reverse primer (5'→3')</strong>
+        <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
+          <span style="display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.7rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
+          <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 600px; padding: 14px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.6; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
+            <p style="margin: 0 0 8px 0;">Input or upload reverse primers (FASTA format or raw sequences, one per line).</p>
+            <p style="margin: 0 0 8px 0;"><strong>Supported primer name formats:</strong></p>
+            <ul style="margin: 4px 0 8px 20px; padding: 0; list-style: disc;">
+              <li style="margin-bottom: 4px;">Target1-F / Target1-R (with dash)</li>
+              <li style="margin-bottom: 4px;">Target1_F / Target1_R (with underscore)</li>
+              <li style="margin-bottom: 4px;">Target1F / Target1R (no separator)</li>
+              <li style="margin-bottom: 4px;">Target1-Forward / Target1-Reverse (full words)</li>
+              <li style="margin-bottom: 4px;">Target1_Forward / Target1_Reverse (full words with underscore)</li>
+              <li style="margin-bottom: 4px;">Target1-fwd / Target1-rev (abbreviated)</li>
+              <li style="margin-bottom: 4px;">Target1_FWD / Target1_REV (uppercase abbreviated)</li>
+            </ul>
+            <p style="margin: 8px 0 0 0; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.2);">The tool will perform quality checks on each primer set.</p>
+            <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
+          </span>
+        </span>
+      </label>
+      <div style="display:flex; gap:8px; align-items:center; flex-shrink: 0;">
+        <button class="demo btn" id="demo-set-btn" type="button">Demo Set</button>
+        <button class="ghost btn" id="global-reset" type="button">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid cols-2" style="margin-top: 10px;">
+    <div>
+      <textarea id="fwd" placeholder=">primer1-F&#10;ATGGTGAGRAAGGGCGAGGAG&#10;>primer2-F&#10;GCTACCGTAACTGCGTAGCAA"></textarea>
+      <div class="row end" style="margin-top:6px">
+        <input type="file" id="file-fwd" accept=".fa,.fasta,.fas,.txt" style="display:none">
+        <button type="button" class="btn demo" id="fwdRC">Reverse complement</button>
+        <button class="btn demo" id="btn-fwd-demo" type="button">Demo</button>
+        <button class="ghost btn" id="btn-fwd-upload" type="button">Upload</button>
+      </div>
+    </div>
+    <div>
+      <textarea id="rev" placeholder=">primer1-R&#10;CTTGTACAGCTCGTCCATGCC&#10;>primer2-R&#10;TTGCTACGCAGTTACGGTAGC"></textarea>
+      <div class="row end" style="margin-top:6px">
+        <input type="file" id="file-rev" accept=".fa,.fasta,.fas,.txt" style="display:none">
+        <button type="button" class="btn demo" id="revRC">Reverse complement</button>
+        <button class="btn demo" id="btn-rev-demo" type="button">Demo</button>
+        <button class="ghost btn" id="btn-rev-upload" type="button">Upload</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid cols-4" style="margin-top:10px; position: relative; overflow: visible;">
+    <div style="position: relative; overflow: visible;">
+      <label class="aside" style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible;">
+
+
+
+
+
+        <span>Na⁺ (mM)</span>
+        <span class="help-icon">
+          <span>?</span>
+          <span class="help-tooltip" style="top: calc(100% + 10px); left: 0; width: 280px;">
+            <p style="margin: 0;">Monovalent cation concentration used for salt-corrected Tm calculation. Typical range: 10-200 mM.</p>
+            <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
+          </span>
+        </span>
+      </label>
+      <input id="na" type="number" value="50">
+    </div>
+    <div style="position: relative; overflow: visible;">
+      <label class="aside" style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible;">
+
+
+        <span>Mg²⁺ (mM)</span>
+        <span class="help-icon">
+          <span>?</span>
+          <span class="help-tooltip" style="top: calc(100% + 10px); left: 0; width: 280px;">
+            <p style="margin: 0;">Divalent cation concentration used for Tm calculation. Set to 0 if Mg²⁺ is absent from reaction. Typical range: 0.5-5 mM.</p>
+            <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
+          </span>
+        </span>
+      </label>
+      <input id="mg" type="number" value="2.0" step="0.1">
+    </div>
+    <div style="position: relative; overflow: visible;">
+      <label class="aside" style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible;">
+
+        <span>Primer conc. (nM)</span>
+        <span class="help-icon">
+          <span>?</span>
+          <span class="help-tooltip" style="top: calc(100% + 10px); left: 0; width: 280px;">
+            <p style="margin: 0;">Effective primer concentration assumed for in silico Tm calculation. Typical range: 25-1000 nM.</p>
+            <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
+          </span>
+        </span>
+      </label>
+      <input id="conc" type="number" value="500">
+    </div>
+    <div style="position: relative; overflow: visible;">
+      <label class="aside" style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible;">
+
+
+
+
+        <span>Target Tm (°C)</span>
+        <span class="help-icon">
+          <span>?</span>
+          <span class="help-tooltip" style="top: calc(100% + 10px); left: 0; width: 280px;">
+            <p style="margin: 0;">Target melting temperature for evaluation. Tm values of evaluated primers are compared against this reference to assess annealing compatibility. Typical range: 50-65°C.</p>
+            <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
+          </span>
+        </span>
+      </label>
+      <input id="tmTarget" type="number" value="55">
+    </div>
+  </div>
+
+  <div class="row" style="margin-top:20px; justify-content: space-between;">
+    <button class="btn" id="run">Run QC</button>
+    <button class="btn ghost" id="clear">Clear</button>
+  </div>
+
+  <div id="results" style="margin-top:12px;"></div>
+</section>
+
+<style>
+:root{
+  --ok:#16a34a;
+  --warn:#d97706;
+  --danger:#b91c1c;
+}
+.badge{
+  display:inline-block;
+  border-radius:999px;
+  padding:2px 8px;
+  font-size:11px;
+  font-weight:600;
+  border:1px solid transparent;
+  white-space:nowrap;
+}
+.badge.ok{background:#ecfdf3;color:var(--ok);border-color:#bbf7d0;}
+.badge.warn{background:#fffbeb;color:var(--warn);border-color:#fed7aa;}
+.badge.bad{background:#fef2f2;color:var(--danger);border-color:#fecaca;}
+.help-icon {
+  position: relative;
+  display: inline-block;
+  cursor: help;
+  z-index: 1;
+  flex-shrink: 0;
+  overflow: visible;
+}
+.help-icon:hover .help-tooltip,
+.help-icon:focus-within .help-tooltip {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+.help-icon:hover span:first-child {
+  background: #4b5563;
+}
+.help-icon span:first-child {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  text-align: center;
+  border-radius: 50%;
+  background: #6b7280;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  transition: background 0.2s;
+  position: relative;
+  z-index: 1;
+}
+.help-tooltip {
+  word-wrap: break-word;
+  z-index: 999999 !important;
+  position: absolute !important;
+  padding: 12px;
+  background: #1f2937;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  pointer-events: none;
+  white-space: normal;
+  max-width: 350px;
+}
+.help-icon:hover {
+  z-index: 999998 !important;
+}
+.score-row{display:flex;align-items:baseline;gap:10px;}
+.score{
+  font-size:28px;
+  font-weight:700;
+}
+.score.good{color:var(--ok);}
+.score.mid{color:var(--warn);}
+.score.bad{color:var(--danger);}
+.score-caption{
+  font-size:11px;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  margin-bottom:2px;
+}
+.section-title{
+  margin-top:16px;
+  font-size:14px;
+  font-weight:600;
+}
+pre.align{
+  margin:6px 0 0;
+  background:#ffffff;
+  color:#0b1220;
+  border-radius:10px;
+  padding:8px 10px;
+  font-size:12px;
+  overflow:auto;
+  line-height: 1.4;
+}
+.struct-block{
+  margin-top:8px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  padding:8px 10px;
+  background:#ffffff;
+}
+.qc-card{
+  margin-top:12px;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:#ffffff;
+}
+.qc-card table {
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.qc-card table th,
+.qc-card table td {
+  padding: 8px;
+  text-align: left;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  border: none;
+}
+.qc-card table thead th {
+  border-bottom: 1px solid var(--line);
+}
+.qc-card table th:nth-child(1),
+.qc-card table td:nth-child(1) { width: 12%; }
+.qc-card table th:nth-child(2),
+.qc-card table td:nth-child(2) { width: 6%; }
+.qc-card table th:nth-child(3),
+.qc-card table td:nth-child(3) { width: 8%; }
+.qc-card table th:nth-child(4),
+.qc-card table td:nth-child(4) { width: 10%; }
+.qc-card table th:nth-child(5),
+.qc-card table td:nth-child(5) { width: 10%; }
+.qc-card table th:nth-child(6),
+.qc-card table td:nth-child(6) { width: 10%; }
+.qc-card table th:nth-child(7),
+.qc-card table td:nth-child(7) { width: 10%; }
+.qc-card table th:nth-child(8),
+.qc-card table td:nth-child(8) { width: 12%; }
+.qc-card table th:nth-child(9),
+.qc-card table td:nth-child(9) { width: 11%; }
+.qc-card table th:nth-child(10),
+.qc-card table td:nth-child(10) { width: 11%; text-align: center; }
+</style>

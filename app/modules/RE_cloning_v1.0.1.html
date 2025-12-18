@@ -1,0 +1,312 @@
+<section class="pane" id="re-cloning-pane">
+      <div class="grid cols-2" id="top-grid">
+        <div id="left-panel">
+          <label style="margin-bottom:13px;display:flex;align-items:center;gap:8px">
+            <strong>Vector sequence (FASTA)</strong>
+            <span class="help-icon" tabindex="0" aria-label="Help: Vector sequence">
+              <span>?</span>
+              <span class="help-tooltip">
+                <strong style="display:block;margin-bottom:6px;">Vector sequence input</strong>
+                Paste your vector/plasmid DNA sequence in FASTA format (header line starting with <code>&gt;</code> is optional). Line breaks and spaces are ignored.
+                Use the buttons below to upload a FASTA/text file or to reverse-complement the sequence.
+              </span>
+            </span>
+          </label>
+          <textarea id="gg-vector" placeholder=">pESC-His&#10;GAGCAGACAA..." style="min-height:100px"></textarea>
+          <div class="row end fasta-actions">
+            <input type="file" id="file-vector" accept=".fa,.fasta,.fas,.txt" style="display:none">
+            <button type="button" class="btn demo" id="vector-flip-btn">Reverse complement</button>
+            <button class="btn demo" id="btn-vector-demo" type="button" data-sample="vector">Demo</button>
+            <button class="ghost btn" id="btn-vector-upload" type="button">Upload</button>
+          </div>
+        </div>
+        <div id="right-panel">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:13px;">
+            <label style="display:flex;align-items:center;gap:8px; margin:0">
+              <strong>Insert sequence (FASTA)</strong>
+              <span class="help-icon" tabindex="0" aria-label="Help: Insert sequence">
+                <span>?</span>
+                <span class="help-tooltip">
+                  <strong style="display:block;">Insert sequence input</strong>
+                  Paste your insert DNA sequence in FASTA format (header optional). The tool designs primers to amplify the insert with restriction sites compatible with the selected enzymes.
+                </span>
+              </span>
+            </label>
+            <div style="display:flex; gap:8px; align-items:center; flex-shrink:0;">
+              <button class="demo btn" id="gg-demo-set" type="button">Demo Set</button>
+              <button class="ghost btn" id="global-reset" type="button">Reset</button>
+            </div>
+          </div>
+          <div id="inserts-container">
+            <div class="insert-row" data-index="0" style="display:flex;gap:8px;">
+              <div class="insert-label" style="flex-shrink: 0; white-space: nowrap; margin-top: 0;">Insert #1:</div>
+              <div class="insert-body" style="flex: 1;">
+                <textarea class="insert-seq" placeholder=">yeGFP&#10;ATGTCTAAAG..." style="min-height:100px"></textarea>
+                <div class="row end fasta-actions">
+                  <input type="file" class="insert-file" accept=".fa,.fasta,.fas,.txt" style="display:none;">
+                  <button type="button" class="btn demo insert-flip-btn">Reverse complement</button>
+                  <button class="btn demo insert-demo-btn" type="button" data-sample="insert">Demo</button>
+                  <button class="ghost btn insert-upload-btn" type="button">Upload</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+  <div class="grid cols-2" style="margin-top:16px;align-items:stretch">
+    <div class="box" id="vector-preview-box">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <div>
+          <h3 style="margin:0">Vector map preview</h3>
+          <div class="aside">Auto-draws circular plasmid map from vector sequence</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span class="aside">Rotate</span>
+          <input type="range" id="vector-map-rotation" min="0" max="360" value="0" step="1" style="width:130px">
+          <span id="vector-map-rot-label" class="aside">0°</span>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:center;">
+        <canvas id="vector-map-canvas" width="520" height="320" class="asm-figure"></canvas>
+      </div>
+      <div id="vector-map-stats" class="aside" style="margin-top:4px;text-align:center">Paste vector sequence above to update preview.</div>
+    </div>
+
+    <div class="box" id="settings-box">
+      <h3>Restriction enzyme settings</h3>
+      <div class="grid cols-2" style="margin-top:8px;gap:12px">
+        <div>
+          <label class="aside">Restriction enzyme 1</label>
+          <input id="re-enzyme1" list="re-enzyme-list" placeholder="Type enzyme name e.g. BamHI">
+<datalist id="re-enzyme-list">
+            <option value="AatII" label="AatII (GACGTC)"></option>
+            <option value="Acc65I" label="Acc65I (GGTACC)"></option>
+            <option value="AclI" label="AclI (AACGTT)"></option>
+            <option value="AfeI" label="AfeI (AGCGCT)"></option>
+            <option value="AflII" label="AflII (CTTAAG)"></option>
+            <option value="AgeI" label="AgeI (ACCGGT)"></option>
+            <option value="AluI" label="AluI (AGCT)"></option>
+            <option value="ApaI" label="ApaI (GGGCCC)"></option>
+            <option value="ApaLI" label="ApaLI (GTGCAC)"></option>
+            <option value="AscI" label="AscI (GGCGCGCC)"></option>
+            <option value="AseI" label="AseI (ATTAAT)"></option>
+            <option value="AsiSI" label="AsiSI (GCGATCGC)"></option>
+            <option value="AvrII" label="AvrII (CCTAGG)"></option>
+            <option value="BamHI" label="BamHI (GGATCC)"></option>
+            <option value="BclI" label="BclI (TGATCA)"></option>
+            <option value="BglII" label="BglII (AGATCT)"></option>
+            <option value="BmtI" label="BmtI (GCTAGC)"></option>
+            <option value="BsiWI" label="BsiWI (CGTACG)"></option>
+            <option value="BspDI" label="BspDI (ATCGAT)"></option>
+            <option value="BspEI" label="BspEI (TCCGGA)"></option>
+            <option value="BspHI" label="BspHI (TCATGA)"></option>
+            <option value="BsrGI" label="BsrGI (TGTACA)"></option>
+            <option value="BssHII" label="BssHII (GCGCGC)"></option>
+            <option value="BstBI" label="BstBI (TTCGAA)"></option>
+            <option value="BstUI" label="BstUI (CGCG)"></option>
+            <option value="ClaI" label="ClaI (ATCGAT)"></option>
+            <option value="DraI" label="DraI (TTTAAA)"></option>
+            <option value="EagI" label="EagI (CGGCCG)"></option>
+            <option value="Eco53kI" label="Eco53kI (GAGCTC)"></option>
+            <option value="EcoRI" label="EcoRI (GAATTC)"></option>
+            <option value="EcoRV" label="EcoRV (GATATC)"></option>
+            <option value="FseI" label="FseI (GGCCGGCC)"></option>
+            <option value="FspI" label="FspI (TGCGCA)"></option>
+            <option value="HaeIII" label="HaeIII (GGCC)"></option>
+            <option value="HhaI" label="HhaI (GCGC)"></option>
+            <option value="HindIII" label="HindIII (AAGCTT)"></option>
+            <option value="HpaI" label="HpaI (GTTAAC)"></option>
+            <option value="HpaII" label="HpaII (CCGG)"></option>
+            <option value="HpyCH4IV" label="HpyCH4IV (ACGT)"></option>
+            <option value="HpyCH4V" label="HpyCH4V (TGCA)"></option>
+            <option value="KasI" label="KasI (GGCGCC)"></option>
+            <option value="KpnI" label="KpnI (GGTACC)"></option>
+            <option value="MauBI" label="MauBI (CGCGCGCG)"></option>
+            <option value="MfeI" label="MfeI (CAATTG)"></option>
+            <option value="MluI" label="MluI (ACGCGT)"></option>
+            <option value="MreI" label="MreI (CGCCGGCG)"></option>
+            <option value="MscI" label="MscI (TGGCCA)"></option>
+            <option value="MseI" label="MseI (TTAA)"></option>
+            <option value="MspI" label="MspI (CCGG)"></option>
+            <option value="NaeI" label="NaeI (GCCGGC)"></option>
+            <option value="NarI" label="NarI (GGCGCC)"></option>
+            <option value="NcoI" label="NcoI (CCATGG)"></option>
+            <option value="NdeI" label="NdeI (CATATG)"></option>
+            <option value="NgoMIV" label="NgoMIV (GCCGGC)"></option>
+            <option value="NheI" label="NheI (GCTAGC)"></option>
+            <option value="NotI" label="NotI (GCGGCCGC)"></option>
+            <option value="NruI" label="NruI (TCGCGA)"></option>
+            <option value="NsiI" label="NsiI (ATGCAT)"></option>
+            <option value="PacI" label="PacI (TTAATTAA)"></option>
+            <option value="PaeR7I" label="PaeR7I (CTCGAG)"></option>
+            <option value="PciI" label="PciI (ACATGT)"></option>
+            <option value="PhoI" label="PhoI (GGCC)"></option>
+            <option value="PluTI" label="PluTI (GGCGCC)"></option>
+            <option value="PmeI" label="PmeI (GTTTAAAC)"></option>
+            <option value="PmlI" label="PmlI (CACGTG)"></option>
+            <option value="PsiI" label="PsiI (TTATAA)"></option>
+            <option value="PspOMI" label="PspOMI (GGGCCC)"></option>
+            <option value="PstI" label="PstI (CTGCAG)"></option>
+            <option value="PvuI" label="PvuI (CGATCG)"></option>
+            <option value="PvuII" label="PvuII (CAGCTG)"></option>
+            <option value="RsaI" label="RsaI (GTAC)"></option>
+            <option value="SacI" label="SacI (GAGCTC)"></option>
+            <option value="SacII" label="SacII (CCGCGG)"></option>
+            <option value="SalI" label="SalI (GTCGAC)"></option>
+            <option value="SbfI" label="SbfI (CCTGCAGG)"></option>
+            <option value="ScaI" label="ScaI (AGTACT)"></option>
+            <option value="SfoI" label="SfoI (GGCGCC)"></option>
+            <option value="SgrAI" label="SgrAI (CRCCGGYG)"></option>
+            <option value="SmaI" label="SmaI (CCCGGG)"></option>
+            <option value="SmlI" label="SmlI (CTYRAG)"></option>
+            <option value="SnaBI" label="SnaBI (TACGTA)"></option>
+            <option value="SphI" label="SphI (GCATGC)"></option>
+            <option value="SrfI" label="SrfI (GCCCGGGC)"></option>
+            <option value="SspI" label="SspI (AATATT)"></option>
+            <option value="StuI" label="StuI (AGGCCT)"></option>
+            <option value="SwaI" label="SwaI (ATTTAAAT)"></option>
+            <option value="TaqI" label="TaqI (TCGA)"></option>
+            <option value="TauI" label="TauI (GCSGC)"></option>
+            <option value="TspMI" label="TspMI (CCCGGG)"></option>
+            <option value="XbaI" label="XbaI (TCTAGA)"></option>
+            <option value="XhoI" label="XhoI (CTCGAG)"></option>
+            <option value="XmaI" label="XmaI (CCCGGG)"></option>
+            <option value="ZraI" label="ZraI (GACGTC)"></option>
+          </datalist>
+        </div>
+        <div>
+          <label class="aside">Restriction enzyme 2</label>
+          <input id="re-enzyme2" list="re-enzyme-list" placeholder="Type enzyme name e.g. KpnI">
+        </div>
+      </div>
+
+      <div id="re-fragments-info" style="margin-top:8px">
+        <label for="re-backbone-select" class="aside">Vector backbone fragment</label>
+        <select id="re-backbone-select" style="margin-top:6px">
+          <option value="">No fragments available</option>
+        </select>
+        <span id="re-fragments-summary" class="aside" style="margin-left:8px;"></span>
+      </div>
+
+      <h3 style="margin-top:16px;margin-bottom:12px">Primer Design Parameters</h3>
+      <div class="grid cols-3" style="margin-top:10px; gap: 12px;">
+        <div>
+          <label class="aside" style="display:flex;align-items:center;gap:6px">
+            <span>Protective base (5' clamp)</span>
+            <span class="help-icon" tabindex="0" aria-label="Help: Protective base">
+              <span>?</span>
+              <span class="help-tooltip">Extra bases added to the 5' end of primers to improve restriction enzyme digestion efficiency. Typical values: 2–6.</span>
+            </span>
+          </label>
+          <input id="gg-clamp" type="number" value="5" min="0" max="10" step="1">
+        </div>
+        <div>
+          <label class="aside" style="display:flex;align-items:center;gap:6px">
+            <span>Target Tm (°C)</span>
+            <span class="help-icon" tabindex="0" aria-label="Help: Target Tm">
+              <span>?</span>
+              <span class="help-tooltip">Target melting temperature for the core (annealing) region of each primer. Primers are optimized to be close to this value.</span>
+            </span>
+          </label>
+          <input id="gg-tmTarget" type="number" value="55" step="0.1">
+        </div>
+        <div>
+          <label class="aside" style="display:flex;align-items:center;gap:6px">
+            <span>Primer conc. (nM)</span>
+            <span class="help-icon" tabindex="0" aria-label="Help: Primer concentration">
+              <span>?</span>
+              <span class="help-tooltip">Effective primer concentration assumed for in silico Tm calculation. Typical range: 25-1000 nM.</span>
+            </span>
+          </label>
+          <input id="gg-conc" type="number" value="500" step="10">
+        </div>
+      </div>
+      <div class="grid cols-2" style="margin-top:12px; gap: 12px;">
+        <div>
+          <label class="aside" style="display:flex;align-items:center;gap:6px">
+            <span>Na⁺ (mM)</span>
+            <span class="help-icon" tabindex="0" aria-label="Help: Na+ concentration">
+              <span>?</span>
+              <span class="help-tooltip">Monovalent cation concentration used for salt-corrected Tm calculation. Typical range: 10-200 mM.</span>
+            </span>
+          </label>
+          <input id="gg-na" type="number" value="50" step="1">
+        </div>
+        <div>
+          <label class="aside" style="display:flex;align-items:center;gap:6px">
+            <span>Mg²⁺ (mM)</span>
+            <span class="help-icon" tabindex="0" aria-label="Help: Mg2+ concentration">
+              <span>?</span>
+              <span class="help-tooltip">Divalent cation concentration used for Tm calculation. Set to 0 if Mg²⁺ is absent from reaction. Typical range: 0.5-5 mM.</span>
+            </span>
+          </label>
+          <input id="gg-mg" type="number" value="2.0" min="0" max="10" step="0.5">
+        </div>
+      </div>
+      <div style="margin-top:10px;">
+        <div class="row" style="gap:8px;">
+          <button class="btn" id="gg-run">Design RE cloning primers</button>
+          <select id="gg-download-type" class="ghost btn">
+            <option value="primers">primer.txt</option>
+            <option value="fasta">assembled.fasta</option>
+          </select>
+          <button class="ghost btn" id="gg-download-btn">Download</button>
+        </div>
+      </div>
+      <button class="ghost btn" id="gg-clear" style="margin-left: auto; margin-top: auto;">Clear</button>
+    </div>
+  </div>
+
+      <div id="results-wrap" class="results" style="display:none">
+        <div id="cell-primers" class="box" style="margin-top:10px;">
+          <h3>Primer sets</h3>
+          <div id="primer-table"></div>
+        </div>
+
+        <div id="cell-qc" class="box" style="display:none">
+          <h3>QC</h3>
+          <div id="qc-out" class="aside"></div>
+        </div>
+
+        <div id="cell-asm">
+          <div class="asm-card box">
+            <div class="asm-title">Assembled diagram</div>
+            <div style="text-align: center;">
+              <img id="asm-img" class="asm-figure" src="" style="width:95%;display:none;margin:5px auto;">
+              <div class="legend" id="asm-legend" style="display:block;text-align:center;"></div>
+            </div>
+          </div>
+          <div class="box oh-table" style="margin-top:10px">
+            <h3>Sticky end table</h3>
+            <div id="oh-table"></div>
+          </div>
+
+          <div id="warnings-box" class="warnings-box" style="margin-top:10px"></div>
+        </div>
+
+        <div id="gg-gel-section" class="box" style="display:none; margin-top:0px;">
+          <div class="ggx-header" style="margin-top:0px;margin-bottom:5px; display: flex; justify-content: flex-end; align-items: center; gap: 8px;">
+            <h3>Simulated Gel</h3>
+            <div style="display: flex; align-items: center; gap: 4px;">
+              <h4 style="margin:0;">Marker:</h4>
+              <select id="ggx-ladder" style="width:auto;font-size:12px">
+                <option value="neb1kbplus">NEB 1kb Plus DNA Ladder (default)</option>
+                <option value="neb1kb">NEB 1kb DNA Ladder</option>
+                <option value="thermo1kbruler">GeneRuler 1kb DNA Ladder</option>
+                <option value="thermo1kbplus">GeneRuler 1kb Plus DNA Ladder</option>
+              </select>
+            </div>
+          </div>
+          <canvas id="gg-gel-canvas" width="850" height="625"></canvas>
+          <div id="ggx-legend" class="ggx-legend"></div>
+        </div>
+      </div>
+</section>
+
+<div id="gg-modal" class="modal-overlay">
+  <div class="modal-card">
+    <p id="gg-modal-text">Please design primers first.</p>
+    <button class="btn" type="button" id="gg-modal-ok">OK</button>
+  </div>
+</div>

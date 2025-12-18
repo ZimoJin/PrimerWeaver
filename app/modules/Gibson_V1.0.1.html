@@ -1,0 +1,233 @@
+<section class="pane" id="gibson-pane">
+  <div class="grid cols-2" id="top-grid">
+    <div id="left-panel">
+      <label><strong>Vector sequence (FASTA)</strong></label>
+      <textarea id="vector-seq" placeholder="pESC-His&#10;GAGCAGACAA..."></textarea>
+      <div class="row end" id="left-upload-row">
+        <input type="file" id="vector-file" accept=".fa,.fasta,.fas,.txt" style="display:none">
+        <button class="btn demo" id="vector-flip-btn" type="button">Reverse complement</button>
+        <button class="btn demo" id="btn-vector-demo" type="button">Demo</button>
+        <button class="ghost btn" id="vector-upload-btn" type="button">Upload</button>
+      </div>
+    </div>
+    <div id="right-panel">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom: 8px;">
+        <label style="display:flex;align-items:center;gap:8px; margin:0">
+          <strong>Assembly plan (FASTA)</strong>
+          <span class="help-icon" tabindex="0" aria-label="Help: Assembly plan">
+            <span>?</span>
+            <span class="help-tooltip">
+              <strong style="display:block;margin-bottom:6px;">Insert sequences</strong>
+              Add inserts in order (FASTA supported). The tool designs Gibson overlaps and primers for assembly, and can optionally codon-optimize amino-acid linkers using the selected host organism.
+            </span>
+          </span>
+        </label>
+        <div style="display:flex; gap:8px; align-items:center; flex-shrink:0;">
+          <button class="demo btn" id="demo-set-btn" type="button">Demo Set</button>
+          <button class="ghost btn" id="global-reset" type="button">Reset</button>
+        </div>
+      </div>
+      <div class="row" id="gibson-host-row" style="justify-content:space-between;margin-bottom:6px;gap:6px;align-items:center">
+        <div class="row" style="gap:6px;align-items:center">
+          <label for="host-organism" class="aside" style="white-space: nowrap; margin: 0;">Host organism:</label>
+          <select id="host-organism" style="width:auto;min-width:180px"></select>
+        </div>
+        <div class="row" style="gap:6px;align-items:center">
+          <button class="ghost btn" id="flip-order-btn" type="button" title="Reverse the order of inserts without changing sequences">Flip order</button>
+          <button class="ghost btn" id="add-insert-btn" type="button">+ Add insert</button>
+        </div>
+      </div>
+      <div id="inserts-container">
+        <div class="insert-row" data-index="0">
+          <div class="insert-label">Insert #1:</div>
+          <div class="insert-body">
+            <textarea class="insert-seq" placeholder=">yeGFP&#10;ATGTCTAAAG..."></textarea>
+            <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 6px;">
+              <div class="row" style="gap: 4px;">
+                <input type="text" class="insert-linker" placeholder="Linker and tag (optional)" list="linker-suggestions-0" style="flex: 1; font-family: monospace; font-size: 0.85rem;" autocomplete="off">
+                <datalist id="linker-suggestions-0">
+                  <option value="GS">GS</option>
+              	  <option value="GSGS">2x(GS)</option>
+             	  <option value="GSGSGS">3x(GS)</option>
+              	  <option value="GSGSGSGS">4x(GS)</option>
+               	  <option value="GSGSGSGSGS">5x(GS)</option>
+              	  <option value="GGS">GGS</option>
+              	  <option value="GGGGS">GGGGS</option>
+              	  <option value="GGGGGS">GGGGGS</option>
+              	  <option value="GGGGSGGGGS">2x(G4S)</option>
+              	  <option value="GGGGSGGGGSGGGGS">3x(G4S)</option>
+              	  <option value="GGGGSGGGGSGGGGSGGGGS">4x(G4S)</option>
+              	  <option value="GGGGSGGGGSGGGGSGGGGSGGGGS">5x(G4S)</option>
+              	  <option value="EAAAK">EAAAK</option>
+              	  <option value="EAAAKEAAAK">2x(EAAAK)</option>
+              	  <option value="EAAAKEAAAKEAAAK">3x(EAAAK)</option>
+              	  <option value="HHHHHH">His-tag (6xHis affinity tag)</option>
+              	  <option value="HHHHHHHH">His-tag (8xHis affinity tag)</option>
+              	  <option value="DYKDDDDK">FLAG-tag</option>
+              	  <option value="YPYDVPDYA">HA-tag</option>
+              	  <option value="EQKLISEEDL">c-Myc-tag</option>
+              	  <option value="WSHPQFEK">Strep-tag II</option>
+                </datalist>
+                <button type="button" class="linker-type-btn" data-type="AA" style="padding: 4px 8px; border: 1px solid var(--line); border-radius: 4px; background: #e0f2fe; cursor: pointer; font-size: 0.8rem; white-space: nowrap; color: #0369a1;">AA</button>
+              </div>
+              <div class="row end" style="gap: 6px;">
+                <input type="file" class="insert-file" accept=".fa,.fasta,.fas,.txt" style="display: none;">
+                <button class="btn demo xs insert-flip-btn" type="button">Reverse complement</button>
+                <button class="btn demo xs insert-demo-btn" type="button">Demo</button>
+                <button class="ghost btn xs insert-upload-btn" type="button">Upload</button>
+              </div>
+            </div>
+          </div>
+          <div></div>
+          <div class="insert-controls" style="width: 100%;">
+            <button class="ghost btn sm insert-move-up-btn" type="button" title="Move up" style="width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">▲</button>
+            <button class="ghost btn sm insert-move-down-btn" type="button" title="Move down" style="width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">▼</button>
+            <button class="ghost btn sm remove-insert-btn" type="button" title="Delete" style="display: none; width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">✕</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid cols-2" style="margin-top: 16px; align-items: stretch;">
+    <div class="box" id="vector-preview-box">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+        <div>
+          <h3 style="margin:0;">Vector map preview</h3>
+          <div class="aside">Auto-draws circular plasmid map from vector sequence</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <span class="aside">Rotate</span>
+          <input type="range" id="vector-map-rotation" min="0" max="360" value="0" step="1" style="width:130px;">
+          <span id="vector-map-rot-label" class="aside">0°</span>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:center;">
+        <canvas id="vector-map-canvas" width="520" height="320" class="asm-figure"></canvas>
+      </div>
+      <div id="vector-map-stats" class="aside" style="margin-top:4px;text-align:center">Paste vector sequence above to update preview.</div>
+    </div>
+
+    <div class="box" id="settings-box">
+      <h3>Assembly settings</h3>
+      <div style="margin-top:8px">
+        <label class="aside">Vector linearization mode</label>
+        <div class="radio-group" style="margin-top:4px">
+          <label>
+            <input type="radio" name="linearization-mode" value="enzyme" checked>
+            <span>Restriction enzyme linearization</span>
+          </label>
+          <label>
+            <input type="radio" name="linearization-mode" value="pcr">
+            <span>PCR linearization</span>
+          </label>
+        </div>
+      </div>
+
+      <datalist id="enzyme-list"></datalist>
+
+      <div id="enzyme-block" style="margin-top:8px">
+        <div class="grid cols-3" style="gap:12px">
+          <div>
+            <label for="enzyme1" class="aside">Restriction enzyme 1:</label>
+            <input type="text" id="enzyme1" list="enzyme-list" placeholder="please choose a enzyme">
+          </div>
+          <div>
+            <label for="enzyme2" class="aside">Restriction enzyme 2:</label>
+            <input type="text" id="enzyme2" list="enzyme-list" placeholder="please choose a enzyme">
+          </div>
+          <div>
+            <label for="keep-sites" class="aside">Keep recognition sites?</label>
+            <select id="keep-sites">
+              <option value="yes">Yes (default)</option>
+              <option value="no">No (delete sites)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div id="pcr-block" style="display: none; margin-top:8px">
+        <div class="grid cols-2" style="gap:12px">
+          <div>
+            <label for="pcr-forward" class="aside">Vector PCR forward primer (5′→3′):</label>
+            <input type="text" id="pcr-forward" placeholder="e.g., ATG..." class="mono">
+          </div>
+          <div>
+            <label for="pcr-reverse" class="aside">Vector PCR reverse primer (5′→3′):</label>
+            <input type="text" id="pcr-reverse" placeholder="e.g., TCA..." class="mono">
+          </div>
+        </div>
+      </div>
+
+      <div id="fragments-info" style="margin-top:8px">
+        <label for="backbone-select" class="aside">Vector backbone fragment</label>
+        <select id="backbone-select" style="margin-top:6px">
+          <option value="">No fragments available</option>
+        </select>
+        <span id="fragments-summary" class="aside" style="margin-left:8px;"></span>
+      </div>
+
+      <!-- Parameters row -->
+      <div class="grid cols-3" style="margin-top:10px; gap: 12px;">
+        <div>
+          <label for="target-tm" class="aside">Target Tm (°C)</label>
+          <input type="number" id="target-tm" value="55" min="55" max="65" step="0.5">
+        </div>
+        <div>
+          <label for="delta-tm" class="aside">ΔTm (°C)</label>
+          <input type="number" id="delta-tm" value="2.5" min="0" max="10" step="0.1">
+        </div>
+        <div>
+          <label for="overlap-len" class="aside">Overlap (bp)</label>
+          <input type="number" id="overlap-len" value="25" min="20" max="30" step="1">
+        </div>
+        <div style="margin-top: 10px;">
+          <label for="primer-conc" class="aside">Primer conc. (nM)</label>
+          <input type="number" id="primer-conc" value="500" min="100" max="2000" step="50">
+        </div>
+        <div style="margin-top: 10px;">
+          <label for="na-conc" class="aside">Na⁺ (mM)</label>
+          <input type="number" id="na-conc" value="50" min="0" max="200" step="10">
+        </div>
+        <div style="margin-top: 10px;">
+          <label for="mg-conc" class="aside">Mg²⁺ (mM)</label>
+          <input type="number" id="mg-conc" value="2.0" min="0" max="10" step="0.5">
+        </div>
+      </div>
+      <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
+        <div class="row" style="gap:8px;flex-wrap:nowrap">
+          <button class="btn" id="design-btn">Design Gibson Primers</button>
+          <select id="download-type" class="ghost btn" style="min-width:140px;width:auto">
+            <option value="primers">primer.txt</option>
+            <option value="fasta">assembled.fasta</option>
+          </select>
+          <button class="ghost btn" id="download-btn">Download</button>
+        </div>
+      </div>
+      <div class="row" style="margin-top:auto;justify-content:flex-end">
+        <button class="ghost btn" id="clear-btn">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="results-wrap" style="display:none">
+    <div id="results-content" class="results" style="margin-top:10px;"></div>
+  </div>
+</section>
+
+<!-- Warning Modal -->
+<div id="warning-modal" class="warning-modal" style="display: none;">
+  <div class="warning-modal-overlay"></div>
+  <div class="warning-modal-content">
+    <div class="warning-modal-header">
+      <span class="warning-icon">⚠️</span>
+      <h3>Warning</h3>
+    </div>
+    <div class="warning-modal-body">
+      <p id="warning-message"></p>
+    </div>
+    <div class="warning-modal-footer">
+      <button class="btn" id="warning-ok-btn">OK</button>
+    </div>
+  </div>
+</div>

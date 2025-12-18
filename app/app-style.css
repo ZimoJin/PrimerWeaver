@@ -1,0 +1,796 @@
+/* app-style.css */
+body {
+  /* THIS IS THE FIX: Makes the app background blend in */
+  background-color: transparent !important;
+  
+  /* These are sensible defaults */
+  padding: 1rem;
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  color: #0b1220; /* --ink */
+  
+  /* Always show scrollbar to prevent content shift */
+  overflow-y: scroll;
+  /* Prevent horizontal scroll from overflowing tooltips/elements */
+  overflow-x: hidden;
+}
+
+/*
+  ALL THE STYLES BELOW ARE COPIED FROM Golden_Gate_v2.html
+*/
+:root{--line:#e5e7eb;--muted:#475569;--ink:#0b1220;--brand:#2563eb;--bg:#f6f7fb;--card:#ffffff;
+      --c1:#60a5fa; --c2:#fda4af; --c3:#34d399; --c4:#fbbf24; --c5:#a78bfa; --c6:#f472b6;}
+*{box-sizing:border-box}
+/* body rule removed from here and put at top */
+.container{max-width:1200px;margin:0 auto}
+.card{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:14px;box-shadow:0 8px 24px rgba(2,6,23,.06)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0;justify-content:space-between;align-items:center}
+.pane{display:block;margin-top:4px}
+textarea,select,input{width:100%;border:1px solid var(--line);border-radius:10px;padding:8px;background:#fff;font:inherit;margin:0}
+button{font:inherit}
+textarea{min-height:120px;resize:vertical}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row.end{justify-content:flex-end}
+.btn{border:0;border-radius:8px;padding:5px 10px;font-size:14px;background:var(--brand);color:#fff;cursor:pointer}
+.ghost{background:#eef2f7;color:#0f172a}
+
+/* OE-PCR Show Linker button - amber outline style */
+#toggle-linker{background:transparent;color:#d97706;border:1.5px solid #d97706}
+#toggle-linker:hover{background:#fffbeb}
+
+/* Unbold buttons inside table header */
+#toggle-linker,#flip-order,#add-fragment-row{font-weight:normal}
+
+.grid{display:grid;column-gap:16px;row-gap:10px}
+.grid>*{min-width:0}
+@media(min-width:980px){.cols-2{grid-template-columns:1fr 1fr} .cols-3{grid-template-columns:repeat(3,1fr)} .cols-4{grid-template-columns:repeat(4,1fr)}}
+
+/* RE cloning: top FASTA layout (scoped) */
+#re-cloning-pane{--re-fasta-height:clamp(160px,22vh,240px);--re-actions-gap:6px}
+#re-cloning-pane #top-grid{align-items:start}
+#re-cloning-pane #gg-vector,
+#re-cloning-pane #inserts-container .insert-seq{
+  height:var(--re-fasta-height) !important;
+  min-height:var(--re-fasta-height) !important;
+}
+#re-cloning-pane #inserts-container .insert-row{display:flex;gap:8px;align-items:flex-start}
+#re-cloning-pane #inserts-container .insert-label{flex:0 0 auto;white-space:nowrap;margin:0;line-height:1;padding-top:4px}
+#re-cloning-pane #inserts-container .insert-body{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:0}
+#re-cloning-pane .fasta-actions{
+  margin-top:var(--re-actions-gap) !important;
+  padding-top:0 !important;
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  flex-wrap:nowrap !important;
+}
+#re-cloning-pane .fasta-actions .btn{white-space:nowrap}
+
+/* USER cloning: increase input→output spacing */
+#user-cloning-pane #results-content{margin-top:10px}
+#user-cloning-pane #gg-gel-section{margin-top:10px !important}
+
+/* Vector textarea: add spacing below header */
+#user-cloning-pane #vector-seq{margin-top:20px !important}
+#gibson-pane #vector-seq{margin-top:20px !important}
+#golden-gate-pane #gg-vector{margin-top:20px !important}
+
+/* Gibson: keep host organism + actions on one row */
+#gibson-pane #gibson-host-row{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;justify-content:space-between}
+#gibson-pane #gibson-host-row > .row:first-child{flex:1 1 auto;min-width:0;flex-wrap:nowrap}
+#gibson-pane #gibson-host-row > .row:first-child label{flex:0 0 auto}
+#gibson-pane #gibson-host-row #host-organism{flex:1 1 auto;min-width:0;width:100%;max-width:100%}
+#gibson-pane #gibson-host-row > .row:last-child{flex:0 0 auto;flex-wrap:nowrap;justify-content:flex-end;margin-left:auto}
+
+.aside{color:var(--muted);font-size:12px}
+.info-box{background:#eff6ff;border-left:4px solid #3b82f6;padding:12px 14px;margin:8px 0;border-radius:4px;font:inherit}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{border-bottom:1px solid #eef2f7;padding:8px;text-align:left;font-size:14px;vertical-align:middle}
+th, td{white-space:nowrap}
+td.seqcell{white-space:normal;word-break:break-all}
+
+/* Primer set tables: keep columns aligned across multiple blocks (USER/GG/Gibson) */
+#cell-primers table{table-layout:fixed;width:100%}
+#cell-primers table th{white-space:normal;line-height:1.15}
+#cell-primers table td:nth-child(n+6){white-space:normal}
+#cell-primers table th:nth-child(1),#cell-primers table td:nth-child(1){width:12%}
+#cell-primers table th:nth-child(2),#cell-primers table td:nth-child(2){width:34%}
+#cell-primers table th:nth-child(3),#cell-primers table td:nth-child(3){width:5%}
+#cell-primers table th:nth-child(4),#cell-primers table td:nth-child(4){width:5%}
+#cell-primers table th:nth-child(5),#cell-primers table td:nth-child(5){width:14%}
+#cell-primers table th:nth-child(6),#cell-primers table td:nth-child(6){width:10%}
+#cell-primers table th:nth-child(7),#cell-primers table td:nth-child(7){width:7%}
+#cell-primers table th:nth-child(8),#cell-primers table td:nth-child(8){width:7%}
+#cell-primers table th:nth-child(9),#cell-primers table td:nth-child(9){width:6%}
+
+/* Center numeric + QC columns (Len/GC/Tm + status pills) */
+th:nth-child(n+3),td:nth-child(n+3){text-align:center}
+
+/* --- Help tooltip (modules) --- */
+.help-icon{
+  position: relative;
+  display: inline-block;
+  cursor: help;
+  z-index: 10;
+  flex-shrink: 0;
+  overflow: visible;
+}
+.help-icon:focus-within .help-tooltip,
+.help-icon:hover .help-tooltip{
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+.help-icon span:first-child{
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  text-align: center;
+  border-radius: 50%;
+  background: #6b7280;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  transition: background 0.2s;
+  position: relative;
+  z-index: 1;
+}
+.help-icon:hover span:first-child{
+  background: #4b5563;
+}
+.help-tooltip{
+  z-index: 999999 !important;
+  position: absolute !important;
+  top: calc(100% + 10px);
+  left: 0;
+  padding: 12px 14px;
+  background: #1f2937;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  pointer-events: none;
+  white-space: normal;
+  width: 420px;
+  max-width: min(420px, calc(100vw - 48px));
+}
+.help-tooltip::before{
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 20px;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 6px solid #1f2937;
+}
+
+/* Right-align tooltips in right-side panels to prevent overflow */
+#right-panel .help-tooltip,
+#gg-settings-box .help-tooltip,
+#settings-box .help-tooltip {
+  left: auto;
+  right: 0;
+}
+#right-panel .help-tooltip::before,
+#gg-settings-box .help-tooltip::before,
+#settings-box .help-tooltip::before {
+  left: auto;
+  right: 20px;
+}
+
+.frag-row{display:grid;grid-template-columns:84px 1fr 10px 40px;column-gap:0;row-gap:6px;align-items:start;margin-bottom:12px;padding-bottom:2px}
+.frag-label{font-weight:700;line-height:1}
+.frag-body{display:flex;flex-direction:column;gap:6px}
+.frag-seq{min-height:110px}
+.frag-tools{display:flex;justify-content:flex-end;gap:6px;flex-wrap:wrap}
+.frag-actions{display:grid;grid-template-columns:1fr;grid-auto-rows:minmax(22px,auto);gap:6px;align-content:start}
+
+.results{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"primers primers" "left gel";column-gap:16px;row-gap:12px;margin-top:2px;align-items:start}
+#cell-primers{grid-area:primers}
+.results-left{grid-area:left;display:flex;flex-direction:column;gap:12px;min-width:0}
+/* Let the assembly diagram fill more of the card width */
+.results-left .box:first-child{padding-left:6px;padding-right:6px}
+#cell-gel{grid-area:gel}
+#cell-gel{
+  height:100%;
+  display:flex;
+  flex-direction:column;
+}
+/* Keep two columns for most layouts; collapse only on small screens */
+@media(max-width:600px){ 
+  .results{grid-template-columns:1fr;grid-template-areas:"primers" "left" "gel"} 
+}
+.box{border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff}
+.box h3{margin:0 0 6px 0;font-size:15px}
+.swatch{display:inline-block;width:12px;height:12px;border-radius:3px;border:1px solid #0001;margin-right:6px;vertical-align:middle}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:#334155}
+
+.oh-table table td:first-child{white-space:nowrap}
+.oh-chip{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;border:1px solid var(--line);border-radius:999px}
+.oh-seq{font-family:ui-monospace,Menlo,Consolas,monospace}
+
+/* Gel */
+#gg-gel-section{border:1px solid var(--line);border-radius:12px;background:#fff;padding:12px;overflow:hidden}
+.ggx-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.ggx-inline{display:flex;align-items:center;gap:2px;font-weight:500}
+#ggx-lanes{position:relative;text-align:center;font-weight:600;height:20px;margin:2px 18px 0}
+#ggx-svg{width:100%;height:400px;display:block;margin:0;line-height:0;}
+#gg-gel-canvas{max-width:100%;height:auto;display:block;margin:0 auto}
+.gel-sep{stroke:#1f2937;stroke-width:1}
+.gel-band{fill:rgba(173,216,230,.92)}
+.gel-band.bold{height:3.4px}
+#ggx-legend{color:#334155;margin-top:12px;font-size:.95rem}
+#ggx-legend div{margin:5px 0}
+
+@media (max-width:1100px){.cols-5{grid-template-columns:repeat(auto-fit,minmax(180px,1fr));}}
+
+.cols-5{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+
+/* compact the 5-param row and remove stray spacing */
+.cols-5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.cols-5 .aside{margin-bottom:4px}
+.cols-5 input,.cols-5 select{width:100%}
+/* tighten spacing before the buttons */
+.cols-5{margin-bottom:8px !important}
+
+/* Keep flip button in header (safe for JS), but float it right like it's above the arrows */
+#gg-inserts-head{display:flex;justify-content:space-between;align-items:center}
+#gg-inserts-head #flip-order{margin-left:auto}
+
+/* Keyframe animation for fading button focus outline */
+@keyframes fadeOutline {
+  0%, 90% { 
+    outline: 2px solid #000;
+    outline-offset: 2px;
+  }
+  100% { 
+    outline: none;
+    outline-offset: 2px;
+  }
+}
+
+/* Button focus states - black outline that fades after 1s */
+.btn:focus,
+.btn:active,
+button:focus,
+button:active {
+  animation: fadeOutline 0.7s forwards;
+}
+
+/* Also add focus-visible for better keyboard navigation */
+.btn:focus-visible,
+button:focus-visible {
+  animation: fadeOutline 0.7s forwards;
+}
+
+/* ===== Golden Gate v3.3 New Styles ===== */
+
+/* Modal overlay */
+.modal-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(15,23,42,.45);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:50;
+}
+.modal-card{
+  background:#fff;
+  border-radius:16px;
+  padding:18px 22px;
+  box-shadow:0 18px 45px rgba(15,23,42,.35);
+  max-width:320px;
+  width:80%;
+  text-align:center;
+}
+.modal-card p{
+  margin:0 0 12px 0;
+  font-size:14px;
+}
+
+/* Vector map preview box - Golden Gate */
+#gg-map-box{
+  min-height:420px;
+  text-align:left;
+}
+#gg-map-canvas{
+  width:100%;
+  max-width:520px;
+  display:block;
+  margin:0 auto;
+}
+#gg-map-stats{
+  text-align:center;
+}
+
+/* Restriction cloning and other modules vector map preview */
+#vector-preview-box{
+  text-align:left;
+}
+#vector-map-canvas{
+  display:block;
+  margin:0 auto;
+}
+#vector-map-stats{
+  text-align:center;
+}
+
+/* Assembly settings box */
+#gg-settings-box{
+  display:flex;
+  flex-direction:column;
+  min-height:420px;
+}
+
+/* Download dropdown width */
+  #gg-download-type{
+    width:auto;
+    min-width:220px;
+    display:inline-block;
+    font-size: 0.875rem;
+    font-family: inherit;
+    padding:5px 10px;
+  }
+
+/* Rotate label fixed width */
+#gg-map-rot-label {
+  display: inline-block;
+  min-width: 36px;
+  text-align: right;
+}
+
+/* Design button - prevent text wrapping */
+#gg-run {
+  white-space: nowrap;
+}
+
+/* Download button - darker gray shade and width for alignment */
+#gg-download-btn {
+  background: #d1d5db !important;
+  color: #1f2937 !important;
+  white-space: nowrap;
+  min-width: 110px;
+}
+
+#gg-download-btn:hover {
+  background: #c5cad1 !important;
+}
+
+/* Clear Design buttons - warning style (apply to all modules) */
+#gg-clear,
+#clear,
+#pqc-clear,
+#re-clear,
+#clear-btn {
+  background: #fef2f2 !important;
+  color: #dc2626 !important;
+  border: 1px solid #fecaca !important;
+}
+
+#gg-clear:hover,
+#clear:hover,
+#pqc-clear:hover,
+#re-clear:hover,
+#clear-btn:hover {
+  background: #fee2e2 !important;
+  border-color: #fca5a5 !important;
+}
+
+/* Demo button styling */
+.btn.demo {
+  background: #14b8a6;
+  color: #fff;
+}
+.btn.demo:hover {
+  background: #0d9488;
+}
+
+/* QC badges */
+.badge{
+  display:inline-block;
+  border-radius:999px;
+  padding:2px 6px;
+  font-size:11px;
+  font-weight:600;
+  border:1px solid transparent;
+  white-space:nowrap;
+}
+.badge.ok{
+  background:#dcfce7;
+  color:#166534;
+  border-color:#bbf7d0;
+}
+.badge.warn{
+  background:#fffbeb;
+  color:#92400e;
+  border-color:#fed7aa;
+}
+.badge.bad{
+  background:#fef2f2;
+  color:#b91c1c;
+  border-color:#fecaca;
+}
+
+/* QC badge styles (for Gibson module) */
+.qc-badge{
+  display:inline-block;
+  border-radius:999px;
+  padding:2px 6px;
+  font-size:11px;
+  font-weight:600;
+  border:1px solid transparent;
+  white-space:nowrap;
+}
+.qc-badge.qc-ok{
+  background:#dcfce7;
+  color:#166534;
+  border-color:#bbf7d0;
+}
+.qc-badge.qc-warn{
+  background:#fffbeb;
+  color:#92400e;
+  border-color:#fed7aa;
+}
+.qc-badge.qc-bad{
+  background:#fef2f2;
+  color:#b91c1c;
+  border-color:#fecaca;
+}
+.qc-badge.qc-weak{
+  background:#e0e7ff;
+  color:#3730a3;
+  border-color:#c7d2fe;
+}
+
+/* Section title */
+.section-title{
+  margin-top:8px;
+  font-size:13px;
+  font-weight:600;
+}
+
+/* Assembled figure (for PNG images) */
+.asm-figure{
+  display:block;
+  margin:0px 0 0px;
+  width:100%;
+  max-width:none;
+  height:auto;
+}
+
+/* Cell layout enhancements */
+#cell-asm{
+  display:flex;
+  flex-direction:column;
+  height:100%;
+}
+#cell-asm .asm-card{
+  margin-bottom:10px;
+}
+#cell-asm .oh-table{
+  flex:1 1 auto;
+  display:flex;
+  flex-direction:column;
+}
+#cell-asm .oh-table > h3{
+  margin-bottom:6px;
+}
+#cell-asm .oh-table > div{
+  flex:1 1 auto;
+}
+
+/* QC cell overflow */
+#cell-qc {
+  overflow-x: auto;
+}
+
+/* ===== v5.0 UI Enhancements ===== */
+
+/* 6-column grid for parameters */
+.cols-6{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:10px;
+}
+.cols-6 .aside{
+  margin-bottom:4px;
+}
+.cols-6 input,.cols-6 select{
+  width:100%;
+}
+@media (max-width:1100px){
+  .cols-6{
+    grid-template-columns:repeat(3,1fr);
+  }
+}
+@media (max-width:700px){
+  .cols-6{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
+/* Enzyme info display */
+#gg-enzyme-info{
+  font-size:12px;
+  min-height:18px;
+}
+
+/* Locked enzyme and backbone selector */
+#gg-enzyme-locked,
+#gg-backbone-select{
+  background-color:#f8fafc;
+}
+#gg-enzyme-locked:disabled,
+#gg-backbone-select:disabled{
+  color:#64748b;
+  cursor:not-allowed;
+}
+
+/* Combined assembled + overhang box */
+#cell-asm{
+  display:block;
+}
+#cell-asm h3{
+  margin:0 0 8px 0;
+}
+
+/* Gel section in box */
+#gg-gel-section.box{
+  padding:12px;
+}
+#gg-gel-section h3{
+  margin:0 0 4px 0;
+}
+.gel-sg{
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:transparent;
+  padding:12px;
+  overflow:hidden;
+}
+.asm-title{
+  font-weight:600;
+  margin-bottom:8px;
+}
+.asm-card{
+  margin-bottom:10px;
+}
+
+/* ===== Gibson Assembly Specific Styles ===== */
+
+/* Insert row layout */
+.insert-row{
+  display:grid;
+  grid-template-columns:84px 1fr 10px 40px;
+  column-gap:0;
+  row-gap:6px;
+  margin-bottom:2px;
+  padding-bottom:2px;
+  align-items:start;
+}
+.insert-row:last-child{
+  border-bottom:none;
+}
+.insert-label{
+  font-weight:700;
+  line-height:1;
+}
+.insert-body{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.insert-seq{
+  min-height:110px;
+}
+.insert-controls{
+  display:grid;
+  grid-template-columns:1fr;
+  grid-auto-rows:minmax(22px,auto);
+  gap:6px;
+  align-content:start;
+}
+
+/* Radio group */
+.radio-group{
+  display:flex;
+  gap:16px;
+  margin:8px 0;
+}
+.radio-group label{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-weight:normal;
+}
+.radio-group input[type="radio"]{
+  width:auto;
+}
+
+/* Linker display */
+.linker-display{
+  background:#fef3c7;
+  color:#92400e;
+  padding:2px 4px;
+  border-radius:3px;
+  font-weight:500;
+}
+
+/* Vector map canvas */
+#vector-map-canvas{
+  display:block;
+  margin:0;
+  width:100%;
+  max-width:600px;
+  height:auto;
+}
+
+/* Vector preview and settings boxes */
+#vector-preview-box{
+  display:flex;
+  flex-direction:column;
+  min-height:350px;
+}
+#settings-box{
+  display:flex;
+  flex-direction:column;
+  min-height:350px;
+  padding-bottom: 6px;
+}
+
+/* Warning Modal */
+.warning-modal{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  z-index:1000000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.warning-modal-overlay{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.5);
+  backdrop-filter:blur(4px);
+}
+.warning-modal-content{
+  position:relative;
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.3);
+  max-width:500px;
+  width:90%;
+  max-height:80vh;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  animation:modalSlideIn 0.3s ease-out;
+}
+@keyframes modalSlideIn{
+  from{
+    opacity:0;
+    transform:translateY(-20px) scale(0.95);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+}
+.warning-modal-header{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:20px 24px;
+  background:#fff7ed;
+  border-bottom:1px solid #fde68a;
+}
+.warning-icon{
+  font-size:1.5rem;
+  line-height:1;
+}
+.warning-modal-header h3{
+  margin:0;
+  font-size:1.2rem;
+  color:#92400e;
+  font-weight:600;
+}
+.warning-modal-body{
+  padding:24px;
+  flex:1;
+  overflow-y:auto;
+}
+.warning-modal-body p{
+  margin:0;
+  font-size:0.95rem;
+  line-height:1.6;
+  color:#374151;
+  white-space:pre-line;
+}
+.warning-modal-footer{
+  padding:16px 24px;
+  border-top:1px solid var(--line);
+  display:flex;
+  justify-content:flex-end;
+  background:#f9fafb;
+}
+.warning-modal-footer .btn{
+  min-width:80px;
+}
+
+/* USER Cloning specific styles */
+.uracil-highlight{
+  background:#fef3c7;
+  color:#92400e;
+  font-weight:600;
+  padding:2px 4px;
+  border-radius:3px;
+}
+.overlap-display{
+  background:#e0f2fe;
+  color:#0369a1;
+  padding:2px 4px;
+  border-radius:3px;
+  font-weight:500;
+}
+
+.warnings-box {
+  background: #fffbeb; /* Light amber background */
+  border-left: 4px solid #f59e0b; /* Amber left border */
+  padding: 12px 14px;
+  margin: 8px 0;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: #92400e; /* Dark amber text */
+  line-height: 1.5;
+}
+
+/* Restriction Cloning: center sticky-end table values */
+#cell-asm #oh-table table th,
+#cell-asm #oh-table table td{ text-align:center; }
+#cell-asm #oh-table table th:first-child,
+#cell-asm #oh-table table td:first-child{ text-align:left; }
+
+/* Golden Gate: center overhang table values */
+#golden-gate-pane .oh-table table th,
+#golden-gate-pane .oh-table table td{ text-align:center; }
+#golden-gate-pane .oh-table table th:first-child,
+#golden-gate-pane .oh-table table td:first-child{ text-align:left; }
+
+/* Restriction Cloning: gel header align like Golden Gate */
+#re-cloning-pane #gg-gel-section .ggx-header{
+  justify-content:flex-start !important;
+  flex-direction:column;
+  align-items:flex-start !important;
+  gap:6px !important;
+}
+
+/* USER / Golden Gate: ensure control icons render correctly (avoid encoding issues) */
+#user-cloning-pane .insert-controls .insert-move-up-btn,
+#user-cloning-pane .insert-controls .insert-move-down-btn,
+#user-cloning-pane .insert-controls .remove-insert-btn,
+#golden-gate-pane .frag-actions .up,
+#golden-gate-pane .frag-actions .down,
+#golden-gate-pane .frag-actions .del{
+  font-size:0;
+  line-height:0;
+}
+#user-cloning-pane .insert-controls .insert-move-up-btn::before,
+#golden-gate-pane .frag-actions .up::before{content:'▲';font-size:14px;line-height:1}
+#user-cloning-pane .insert-controls .insert-move-down-btn::before,
+#golden-gate-pane .frag-actions .down::before{content:'▼';font-size:14px;line-height:1}
+#user-cloning-pane .insert-controls .remove-insert-btn::before,
+#golden-gate-pane .frag-actions .del::before{content:'×';font-size:16px;line-height:1}

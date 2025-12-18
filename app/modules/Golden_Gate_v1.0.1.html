@@ -1,0 +1,173 @@
+<section class="pane" id="golden-gate-pane">
+  <div class="grid cols-2" id="top-grid">
+    <div id="left-panel">
+      <label style="display:flex;align-items:center;gap:8px">
+        <strong>Vector sequence (FASTA)</strong>
+        <span class="help-icon" tabindex="0" aria-label="Help: Vector sequence">
+          <span>?</span>
+          <span class="help-tooltip">
+            <strong style="display:block;margin-bottom:6px;">Vector sequence input</strong>
+            Paste your vector/plasmid DNA sequence in FASTA format (header optional). Line breaks and spaces are ignored. Use Upload or Reverse complement as needed.
+          </span>
+        </span>
+      </label>
+      <textarea id="gg-vector" placeholder=">>pSEV2&#10;TTGAGATCCT..." style="min-height:220px"></textarea>
+      <div class="row end" id="left-upload-row">
+        <input type="file" id="file-vector" accept=".fa,.fasta,.fas,.txt" style="display:none">
+          <button class="btn demo" id="btn-vector-rc" type="button">Reverse complement</button>
+          <button class="btn demo" id="btn-vector-demo" type="button">Demo</button>
+          <button class="ghost btn" id="btn-vector-upload" type="button">Upload</button>
+      </div>
+    </div>
+    <div id="right-panel">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom: 8px;">
+        <label style="display:flex;align-items:center;gap:8px; margin:0">
+          <strong>Assembly plan (FASTA)</strong>
+          <span class="help-icon" tabindex="0" aria-label="Help: Assembly plan">
+            <span>?</span>
+            <span class="help-tooltip">
+              <strong style="display:block;margin-bottom:6px;">Insert sequences</strong>
+              Add insert fragments in order (FASTA supported). The tool designs primers and overhangs for Golden Gate assembly using the selected Type IIS enzyme.
+            </span>
+          </span>
+        </label>
+        <div style="display:flex; gap:8px; align-items:center; flex-shrink:0;">
+          <button class="demo btn" id="demo-set-btn" type="button">Demo Set</button>
+          <button class="ghost btn" id="global-reset" type="button">Reset</button>
+        </div>
+      </div>
+      <div class="row" style="justify-content:flex-end;margin-bottom:6px;gap:6px">
+        <button class="ghost btn" id="flip-order" type="button"
+          title="Reverse the order of inserts without changing sequences">Flip order</button>
+        <button class="ghost btn" id="frag-add" type="button">+ Add insert</button>
+      </div>
+      <div id="frag-list">
+        <div class="frag-row" data-frag-id="0">
+          <div class="frag-label">Insert #1</div>
+          <div class="frag-body">
+            <textarea class="frag-seq" placeholder=">insert&#10;ATG..." style="min-height:100px"></textarea>
+            <div class="frag-tools" style="display: flex; flex-direction: column; margin-top: 6px;">
+              <div class="row end">
+                <input type="file" class="file-frag" accept=".fa,.fasta,.fas,.txt" style="display:none">
+                <button class="btn demo btn-frag-flip" type="button" title="Reverse-complement this insert">Reverse complement</button>
+                <button class="btn demo btn-frag-demo" type="button">Demo</button>
+                <button class="ghost btn btn-frag-upload" type="button">Upload</button>
+              </div>
+            </div>
+          </div>
+          <div></div>
+          <div class="frag-actions" style="width: 100%;">
+            <button class="ghost btn sm up" type="button" title="Move up" style="width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">▲</button>
+            <button class="ghost btn sm down" type="button" title="Move down" style="width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">▼</button>
+            <button class="ghost btn sm del" type="button" title="Delete" style="width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">×</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vector Map Preview and Assembly Settings - New 2-column layout -->
+  <div class="grid cols-2" style="margin-top:16px;align-items:flex-start;gap:16px">
+    <div class="box" id="gg-map-box">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+        <div>
+          <h3 style="margin:0;">Vector map preview</h3>
+          <div class="aside">Auto-draws circular plasmid map from vector sequence</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <span class="aside">Rotate</span>
+          <input id="gg-map-rotation" type="range" min="-180" max="180" value="0" step="1" style="width:130px;">
+          <span id="gg-map-rot-label" class="aside">0°</span>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:center;">
+        <canvas id="gg-map-canvas" width="520" height="320" class="asm-figure"></canvas>
+      </div>
+      <div id="gg-map-stats" class="aside" style="margin-top:4px;text-align:center">Paste vector sequence above to update preview.</div>
+    </div>
+    <div class="box" id="gg-settings-box">
+      <h3>Assembly settings</h3>
+      <!-- Enzyme selection row -->
+      <div class="grid cols-2" style="margin-top:8px;gap:12px">
+        <div>
+          <label class="aside">Type IIS enzyme</label>
+          <select id="gg-enzyme">
+            <option value="">Please select enzyme...</option>
+            <option value="BsaI">BsaI (GGTCTC)</option>
+            <option value="Esp3I">Esp3I / BsmBI / Eco31I (CGTCTC)</option>
+            <option value="BbsI">BbsI (GAAGAC)</option>
+            <option value="PaqCI">PaqCI (CACCTGC)</option>
+          </select>
+        </div>
+        <div>
+          <label class="aside">Detected enzyme (locked)</label>
+          <select id="gg-enzyme-locked" disabled>
+            <option value="">Please select enzyme...</option>
+            <option value="BsaI">BsaI (GGTCTC)</option>
+            <option value="Esp3I">Esp3I (CGTCTC)</option>
+            <option value="BbsI">BbsI (GAAGAC)</option>
+            <option value="PaqCI">PaqCI (CACCTGC)</option>
+          </select>
+        </div>
+      </div>
+      <!-- Backbone fragment selector -->
+      <div style="margin-top:8px">
+        <label class="aside">Vector backbone fragment</label>
+        <select id="gg-backbone-select" disabled>
+          <option value="">Analyze vector first...</option>
+        </select>
+      </div>
+      <!-- Enzyme info display -->
+      <div id="gg-enzyme-info" class="aside" style="margin-top:6px;color:var(--brand)"></div>
+      <!-- Parameters row -->
+      <div class="grid cols-3" style="margin-top:10px;gap:12px">
+        <div>
+          <label class="aside">Protective (5′)</label>
+          <input id="gg-clamp" type="number" value="5" min="0" max="10" step="1"/>
+        </div>
+        <div>
+          <label class="aside">Target Tm (°C)</label>
+          <input id="gg-tmTarget" type="number" value="55" step="0.1"/>
+        </div>
+        <div>
+          <label class="aside">Primer conc. (nM)</label>
+          <input id="gg-conc" type="number" value="500" step="10"/>
+        </div>
+      </div>
+      <div class="grid cols-2" style="margin-top:12px;gap:12px">
+        <div>
+          <label class="aside">Na⁺ (mM)</label>
+          <input id="gg-na" type="number" value="50" step="1"/>
+        </div>
+        <div>
+          <label class="aside">Mg²⁺ (mM)</label>
+          <input id="gg-mg" type="number" value="2.0" min="0" step="0.5"/>
+        </div>
+      </div>
+      <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
+        <div class="row" style="gap:8px;flex-wrap:nowrap">
+          <button class="btn" id="gg-run">Design Golden Gate Primers</button>
+          <select id="gg-download-type" class="ghost btn" style="min-width: 110px; width: auto;">
+            <option value="primers">Primer.txt</option>
+            <option value="fasta">Assembled.fasta</option>
+          </select>
+          <button class="ghost btn" id="gg-download-btn">Download</button>
+        </div>
+      </div>
+      <button class="ghost btn" id="gg-clear" style="margin-left: auto; margin-top: auto;">Clear</button>
+    </div>
+  </div>
+
+  <div id="results-wrap" style="display:none">
+    <div id="results-content" class="results" style="margin-top:10px;">
+      <div id="warnings-box" class="warnings-box" style="display: none; margin-top: 10px;"></div></div>
+  </div>
+</section>
+
+<!-- Modal Dialog -->
+<div id="gg-modal" class="modal-overlay">
+  <div class="modal-card">
+    <p id="gg-modal-text">Please design primers first.</p>
+    <button class="btn" type="button" id="gg-modal-ok">OK</button>
+  </div>
+</div>
