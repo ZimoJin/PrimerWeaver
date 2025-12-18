@@ -1,0 +1,2133 @@
+:root {
+    --bg: #f8fafc;
+    --ink: #0b1220;
+    --muted: #475569;
+    --card: #ffffff;
+    --line: #e2e8f0;
+    --brand: #2563eb;
+    --brand-ink: #0b3ea8;
+    --accent: #06b6d4;
+    --radius: 16px;
+    --focus: #f59e0b;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #0b1220;
+        --ink: #e5eefc;
+        --muted: #9fb0c9;
+        --card: #0f172a;
+        --line: #1f2a44;
+        --brand: #60a5fa;
+        --brand-ink: #93c5fd;
+        --accent: #22d3ee;
+    }
+
+    body {
+        background: linear-gradient(180deg, #0c1222, #0b1220)
+    }
+}
+
+* {
+    box-sizing: border-box
+}
+
+html {
+    height: 100%
+}
+
+body {
+    margin: 0;
+    min-height: 100%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    font: 18px/1.55 system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    background-image: linear-gradient(180deg, #e6f6ff, #fdfdff);
+    background-color: #fdfdff;
+    /* Sets the solid white color for the rest of the page */
+    background-repeat: no-repeat;
+    /* Stops the gradient from repeating */
+}
+
+/* While the welcome overlay is shown, scroll ONLY inside the overlay. */
+body.welcome-active {
+    overflow: hidden;
+}
+
+a {
+    color: var(--brand);
+    text-decoration: none
+}
+
+a:not(.btn):not(.cta):hover {
+    text-decoration: underline
+}
+
+.wrap {
+    max-width: 90%;
+    margin: 0 auto;
+    padding: 18px 18px calc(var(--footer-offset, 48px) + 18px);
+}
+
+.visually-hidden {
+    position: absolute !important;
+    width: 1px;
+    height: 1px;
+    clip: rect(1px, 1px, 1px, 1px);
+    overflow: hidden;
+    white-space: nowrap
+}
+
+.welcome-image {
+    display: block;
+    margin: 0 auto clamp(1.5rem, 4vh, 2.5rem);
+    /* Height-based spacing: 24px to 40px */
+    max-width: 100%;
+    max-height: clamp(280px, 50vh, 700px);
+    /* Increased by 40%: 280px to 700px, scales with height */
+    width: auto;
+    /* Maintain aspect ratio and center */
+    border-radius: 0;
+    box-shadow: none;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    backface-visibility: hidden;
+    will-change: transform;
+    animation: dynamicPopIn 0.7s ease-out 0.2s both;
+}
+
+.welcome-image:hover {
+    transform: scale(1.02);
+    /* Subtle scale on hover */
+    opacity: 0.95;
+    /* Slight fade for elegance */
+}
+
+.h1-primer {
+    color: #3a0c5f;
+    font-size: 24px;
+}
+
+.h1-weaver {
+    color: #1ca4b6;
+    font-size: 24px;
+}
+
+.brand:hover .logo-img {
+    /* This will make the logo grow 5% and tilt 10 degrees counter-clockwise */
+    transform: scale(1.05) rotate(-10deg);
+}
+
+.brand:hover .h1-primer,
+.brand:hover .h1-weaver {
+    /* This will make the text "breathe" or expand slightly */
+    letter-spacing: 0.5px;
+}
+
+.info-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    /* Mobile-first: single column */
+    gap: 24px;
+}
+
+.info-sidebar {
+    /* On mobile, this will be at the top */
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 12px;
+    background: var(--card);
+    box-shadow: 0 12px 28px rgba(2, 6, 23, .06);
+    align-self: start;
+    /* Don't stretch */
+}
+
+.info-sidebar h3 {
+    margin-top: 4px;
+    margin-bottom: 12px;
+    font-size: 18px;
+    padding-left: 8px;
+    color: var(--brand-ink);
+}
+
+.info-sidebar a {
+    display: block;
+    padding: 10px 12px;
+    border-radius: 10px;
+    color: var(--muted);
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease-out;
+}
+
+.info-sidebar a:hover {
+    background: rgba(99, 102, 241, 0.06);
+    color: var(--brand);
+}
+
+.info-sidebar a.is-active {
+    background: linear-gradient(180deg, #eaf2ff, #e6f6ff);
+    color: var(--brand-ink);
+    font-weight: 550;
+    box-shadow: 0 3px 8px rgba(2, 6, 23, .08);
+}
+
+.info-content {
+    /* This is just the .card, but we keep the class for clarity */
+    padding: 22px 28px;
+}
+
+/* Docs page: slightly tighter top spacing in the content card */
+#docBody.info-content {
+    padding-top: 16px;
+}
+
+/* --- Docs mobile dropdown nav (mobile-only) --- */
+.docs-mobile-nav {
+    display: none;
+}
+
+/* Match hamburger/menu drawer breakpoint (<=1000px) */
+@media (max-width: 1000px) {
+    /* Keep Docs layout single-column when sidebar is hidden */
+    .info-layout {
+        grid-template-columns: 1fr;
+    }
+
+    /* Hide the large sidebar list on mobile; use sticky dropdown instead */
+    .info-sidebar {
+        display: none;
+    }
+
+    .docs-mobile-nav {
+        display: block;
+        position: sticky;
+        top: var(--header-offset, 56px);
+        z-index: 120;
+        margin-top: 6px;
+    }
+
+    .docs-mobile-toggle {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 14px;
+        border-radius: 14px;
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 12px 28px rgba(2, 6, 23, .08);
+        color: var(--brand-ink);
+        font-weight: 650;
+        font-size: 18px;
+        text-align: left;
+        cursor: pointer;
+        transition: transform 0.15s ease-out, box-shadow 0.2s ease-out, border-color 0.2s ease-out, background 0.2s ease-out;
+    }
+
+    .docs-mobile-toggle:active {
+        transform: translateY(1px);
+        box-shadow: 0 10px 22px rgba(2, 6, 23, .06);
+    }
+
+    .docs-mobile-toggle-chevron {
+        /* Keep the chevron hit/hover area visually compact */
+        width: 18px;
+        height: 18px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        opacity: 0.75;
+        line-height: 1;
+        transition: transform 0.2s ease-out;
+    }
+
+    .docs-mobile-nav.is-open .docs-mobile-toggle-chevron {
+        transform: rotate(180deg);
+    }
+
+    .docs-mobile-menu {
+        display: none;
+        margin-top: 10px;
+        padding: 10px;
+        border-radius: 16px;
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        box-shadow: 0 16px 36px rgba(2, 6, 23, .10);
+        max-height: min(60vh, 420px);
+        overflow: auto;
+    }
+
+    .docs-mobile-nav.is-open .docs-mobile-menu {
+        display: block;
+    }
+
+    .docs-mobile-menu a {
+        display: block;
+        padding: 8px 12px;
+        border-radius: 12px;
+        color: var(--muted);
+        font-weight: 550;
+        font-size: 18px;
+        text-decoration: none;
+        transition: background 0.15s ease-out, color 0.15s ease-out;
+    }
+
+    .docs-mobile-menu a:hover {
+        background: rgba(99, 102, 241, 0.06);
+        color: var(--brand);
+    }
+
+    .docs-mobile-menu a.is-active {
+        background: linear-gradient(180deg, #eaf2ff, #e6f6ff);
+        color: var(--brand-ink);
+        box-shadow: 0 3px 8px rgba(2, 6, 23, .08);
+    }
+
+    @media (prefers-color-scheme: dark) {
+        .docs-mobile-toggle {
+            border-color: rgba(31, 42, 68, 0.9);
+            background: rgba(15, 23, 42, 0.72);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, .35);
+        }
+
+        .docs-mobile-menu {
+            border-color: rgba(31, 42, 68, 0.9);
+            background: rgba(15, 23, 42, 0.92);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, .45);
+        }
+
+        .docs-mobile-menu a:hover {
+            background: rgba(96, 165, 250, 0.12);
+        }
+
+        .docs-mobile-menu a.is-active {
+            background: rgba(96, 165, 250, 0.14);
+        }
+    }
+}
+
+/* Desktop layout: 2 columns */
+@media (min-width: 800px) {
+    .info-layout {
+        grid-template-columns: 240px 1fr;
+        /* 240px sidebar, rest for content */
+    }
+
+    .info-sidebar {
+        position: sticky;
+        /* Keep it pinned below the sticky header, and above the fixed footer */
+        top: calc(var(--header-offset, 64px) + 12px);
+        max-height: calc(100vh - var(--header-offset, 64px) - var(--footer-offset, 48px) - 24px);
+        overflow: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* Docs dropdown should be top/full-width when hamburger menu is used (<=1000px) */
+@media (max-width: 1000px) {
+    .info-sidebar {
+        display: none;
+    }
+
+    /* Force the dropdown + doc body to span the full grid width (prevents "sidebar column" layout) */
+    .docs-mobile-nav,
+    #docBody {
+        grid-column: 1 / -1;
+    }
+}
+
+.faq-item {
+    /* This is the new wrapper for <details> */
+    display: flex;
+    align-items: flex-start;
+    /* Align icon with first line of text */
+    gap: 12px;
+    margin-bottom: 8px;
+    /* Space between items */
+}
+
+.faq-icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    color: var(--brand);
+    margin-top: 6px;
+    /* Align with text */
+}
+
+.faq-content {
+    flex-grow: 1;
+}
+
+.faq-content summary {
+    font-size: 19px;
+    /* Make question slightly larger */
+    font-weight: 550;
+    cursor: pointer;
+    padding: 4px 0;
+    /* Add a little vertical space for clicking */
+    list-style-type: none;
+    /* Hide default triangle */
+    position: relative;
+    padding-right: 25px;
+    /* Space for a new chevron */
+}
+
+.faq-content summary::after {
+    /* Custom chevron */
+    content: '▼';
+    position: absolute;
+    right: 5px;
+    top: 7px;
+    font-size: 12px;
+    color: var(--muted);
+    transform: scaleY(0.8);
+    transition: transform 0.2s ease-out;
+}
+
+.faq-content[open] summary::after {
+    transform: scaleY(-0.8);
+    /* Flip it when open */
+}
+
+/* Hide default summary marker in Webkit */
+.faq-content summary::-webkit-details-marker {
+    display: none;
+}
+
+.faq-content>div {
+    /* This is the content inside the <details> */
+    padding-top: 8px;
+    line-height: 1.6;
+}
+
+.menu .dropdown {
+    position: relative;
+    display: inline-block;
+    min-width: 130px;
+}
+
+/* Match the link style for the dropdown toggle */
+.menu .dropdown-toggle {
+    cursor: pointer;
+    display: block;
+}
+
+.menu .dropdown-toggle::after {
+    content: '';
+    position: absolute;
+    width: 130px;
+    transform: scaleX(0);
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: var(--brand);
+    transform-origin: bottom center;
+    transition: transform 0.25s ease-out;
+}
+
+/* Show underline on hover */
+.menu .dropdown:hover .dropdown-toggle::after {
+    transform: scaleX(1);
+}
+
+/* Keep underline if it's the current page */
+.menu a[aria-current="page"].dropdown-toggle::after {
+    transform: scaleX(1);
+    display: none;
+}
+
+.dropdown-content {
+    position: absolute;
+    /* Frosted glass background from .card */
+    background: linear-gradient(180deg, #fdfdff, #f3f9ff);
+    border: 1px solid var(--line);
+    width: 220px;
+    /* Softer shadow from .card */
+    box-shadow: 0 12px 28px rgba(2, 6, 23, .06);
+    border-radius: var(--radius);
+    z-index: 120;
+    padding: 8px;
+    /* Increased padding for breathing room */
+    left: 50%;
+    /* Animation properties */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-50%) translateY(-5px);
+    /* Start slightly up */
+    transition: all 0.25s ease-out;
+}
+
+.menu .dropdown-content a {
+    color: var(--muted);
+    padding: 10px 16px;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+    border-radius: 8px;
+    font-size: 17px;
+    font-weight: 500;
+    transition: all 0.25s ease-out;
+    min-width: 0;
+}
+
+.menu .dropdown:hover .dropdown-content {
+    transform: none;
+}
+
+.dropdown-content a::after {
+    display: none;
+    /* No underlines inside dropdown */
+}
+
+.dropdown-content a:hover {
+    background-color: rgba(99, 102, 241, 0.06);
+    color: var(--brand);
+}
+
+.dropdown:hover .dropdown-content {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+    /* Animate to final position */
+}
+
+@media (prefers-color-scheme: dark) {
+    .dropdown-content {
+        background-color: var(--card);
+        border-color: var(--line);
+    }
+
+    .dropdown-content a:hover {
+        background-color: #0f172a;
+    }
+}
+
+/* --- End Dropdown --- */
+
+/* --- NEW: GitHub Icon Link Style --- */
+.menu .github-link {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 6px;
+    color: var(--muted);
+    border-radius: 8px;
+    transition: all 0.25s ease-out;
+    min-width: 0;
+    /* Override default min-width */
+}
+
+.menu .github-link:hover {
+    color: var(--brand);
+    background: rgba(99, 102, 241, 0.06);
+    transform: scale(1.1);
+}
+
+.menu .github-link svg {
+    display: block;
+}
+
+@media (max-width: 1000px) {
+    .menu .github-link {
+        width: 100%;
+        /* Override 100% width on mobile */
+        align-self: flex-start;
+        padding: 8px 14px;
+        margin-top: 6px;
+        /* Add space above it in the drawer */
+        justify-content: flex-start;
+    }
+}
+
+/* Skip link for accessibility */
+.skip {
+    position: absolute;
+    left: -9999px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden
+}
+
+.skip:focus {
+    left: 10px;
+    top: 10px;
+    width: auto;
+    height: auto;
+    background: #111;
+    color: #fff;
+    padding: 8px 10px;
+    border-radius: 10px;
+    z-index: 999
+}
+
+/* Header / Tape (tab) nav refined to resemble NAR style */
+header {
+    position: sticky;
+    top: 0;
+    z-index: 1003;
+    height: var(--header-fixed-height, 64px);
+    overflow: visible;
+    backdrop-filter: saturate(1.2) blur(6px);
+    background: rgba(230, 246, 255, 0.9);
+    border-bottom: 1px solid var(--line)
+}
+
+@media (prefers-color-scheme: dark) {
+    header {
+        background: rgba(15, 23, 42, .85)
+    }
+}
+
+.nav {
+    display: flex;
+    gap: 4px;
+    padding: 7px 10px;
+    height: 100%;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    flex-shrink: 1;
+    min-width: 0;
+    align-self: center;
+}
+
+.logo {
+    width: 45px;
+    height: 45px;
+    border-radius: 8px;
+    background: radial-gradient(60% 60% at 50% 40%, #93c5fd 0%, #60a5fa 35%, #3b82f6 65%, #1e3a8a 100%);
+    box-shadow: 0 6px 18px rgba(59, 130, 246, .35)
+}
+
+.logo-img {
+    width: 45px;
+    height: 45px;
+    border-radius: 8px;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.brand h1 {
+    font-size: 18px;
+    margin: 0;
+    line-height: 18px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Tape-style tabs */
+.menu {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    margin-left: auto;
+    align-self: center;
+}
+
+.menu>a,
+.menu>.dropdown>a {
+    position: relative;
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 8px;
+    color: var(--ink);
+    text-decoration: none !important;
+    outline-offset: 1px;
+    min-width: 130px;
+    text-align: center;
+    transition: all 0.3s ease-out;
+}
+
+.menu a::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    /* Start scaled to 0 width */
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: var(--brand);
+    transform-origin: bottom center;
+    transition: transform 0.25s ease-out;
+}
+
+/* On hover, scale the underline to 100% width */
+.menu a:hover::after {
+    transform: scaleX(1);
+    /* Animate to full width */
+    transform-origin: bottom center;
+}
+
+.menu a[aria-current="page"]::after,
+.menu a.cta::after {
+    display: none;
+}
+
+.menu a:hover:not([aria-current="page"]) {
+    background: rgba(99, 102, 241, 0.06);
+}
+
+.menu a[aria-current="page"] {
+    background: linear-gradient(180deg, #eaf2ff, #e6f6ff);
+    color: var(--brand-ink);
+    font-weight: 550;
+    box-shadow: 0 3px 8px rgba(2, 6, 23, .08);
+}
+
+/* --- FIX: Add lift/press animation to regular menu links --- */
+.menu a:not(.cta):not(.github-link):not([aria-current="page"]):hover {
+    transform: translateY(-2px);
+}
+
+.menu a:not(.cta):not(.github-link):active {
+    transform: translateY(0px);
+
+    filter: brightness(0.95);
+    /* Dims slightly */
+    transition: all 0.25s ease-out;
+}
+
+@media (prefers-color-scheme: dark) {
+    .menu {
+        background: #0f172a;
+        border-color: #1e293b
+    }
+
+    .menu a[aria-current="page"] {
+        background: linear-gradient(180deg, #13243a, #0f1e34)
+    }
+}
+
+.menu .cta {
+    background: var(--brand);
+    /* <-- Solid blue background */
+    color: #fff;
+    /* <-- White text */
+    border: none;
+    /* <-- No border */
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, .25);
+    /* The blue shadow now matches */
+    transition: all 0.25s ease-out;
+}
+
+.menu .cta:hover {
+    text-decoration: none;
+    /* <-- Remove underline */
+    transform: translateY(-2px);
+    /* Lifts up */
+    box-shadow: 0 10px 22px rgba(37, 99, 235, 0.30);
+    /* Shadow expands */
+    filter: brightness(1.1);
+}
+
+.menu .cta:active {
+    transform: translateY(0px);
+    /* Pushes down */
+    box-shadow: 0 5px 15px rgba(37, 99, 235, 0.20);
+    /* Shadow shrinks */
+    filter: brightness(0.95);
+    /* Dims slightly */
+}
+
+.mobile {
+    display: none
+}
+
+/* Sections */
+section {
+    padding: 22px 18px
+}
+
+.card {
+    /* --- New Frosted Glass Style --- */
+    background: linear-gradient(180deg, #fdfdff, #f3f9ff);
+    /* Very light blue gradient */
+    border: 1px solid var(--line);
+    /* Use the standard line color */
+    border-radius: var(--radius);
+    box-shadow: 0 12px 28px rgba(2, 6, 23, .06);
+    padding: 22px 28px;
+    transition: all 0.3s ease-out;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 32px rgba(2, 6, 23, .08);
+    border-color: var(--brand);
+    /* <-- Blue border on hover */
+}
+
+/* Fancy underline for card titles */
+.card-title-hover {
+    display: inline-block;
+    /* Allows the ::after to position correctly */
+    position: relative;
+    cursor: default;
+}
+
+.card-title-hover::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    /* Start scaled to 0 width */
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: var(--brand);
+    /* Blue underline */
+    transform-origin: bottom left;
+    transition: transform 0.25s ease-out;
+}
+
+.card:hover .card-title-hover::after {
+    /* Animate when the *card* is hovered, not just the text */
+    transform: scaleX(1);
+    transform-origin: bottom left;
+}
+
+.card ul.small {
+    margin: 8px 0 0;
+    padding-left: 24px;
+    /* Gives space for the bullets */
+    line-height: 1.7;
+    /* Adds vertical spacing */
+}
+
+.hero {
+    display: grid;
+    gap: 20px;
+    padding: 22px
+}
+
+.btn {
+    appearance: none;
+    border: 0;
+    background: var(--brand);
+    color: #fff;
+    padding: 4px 14px;
+    border-radius: 12px;
+    font-weight: 600;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, .25);
+    cursor: pointer;
+    transition: all 0.3s ease-out;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(37, 99, 235, 0.30);
+    filter: brightness(1.05);
+    /* Adds a 'glow' */
+    text-decoration: underline;
+}
+
+.btn.ghost {
+    background: rgba(255, 255, 255, 0.5);
+    /* Semi-transparent white */
+    color: var(--brand-ink);
+    /* Dark blue text for contrast */
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    /* Subtle white border */
+    backdrop-filter: blur(10px);
+    /* Frosted glass effect */
+    -webkit-backdrop-filter: blur(4px);
+    /* Safari support */
+    transition: all 0.3s ease-out;
+    /* Animation */
+}
+
+.btn.ghost:hover {
+    background: rgba(255, 255, 255, 0.8);
+    /* Becomes more opaque white */
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(2, 6, 23, 0.08);
+    text-decoration: underline;
+}
+
+@media (prefers-color-scheme: dark) {
+    .btn.ghost {
+        background: #1e293b;
+        color: #e5eefc
+    }
+}
+
+.grid {
+    display: grid;
+    gap: 18px
+}
+
+.cols-2 {
+    grid-template-columns: 1fr 1fr
+}
+
+.cols-3 {
+    grid-template-columns: repeat(3, 1fr)
+}
+
+@media(max-width:1000px) {
+
+    .cols-2,
+    .cols-3 {
+        grid-template-columns: 1fr
+    }
+}
+
+h2 {
+    margin: .2em 0 .4em
+}
+
+h3 {
+    margin: 0.2em 0 .4em
+}
+
+.info-content h2,
+.info-content h3 {
+    margin-top: 0.2em;
+    /* Match the h2 top margin */
+}
+
+.muted {
+    color: var(--muted)
+}
+
+.small {
+    font-size: 17px;
+}
+
+.hero ol.small {
+    line-height: 1.8;
+}
+
+.code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    background: #0b1220;
+    color: #d1e8ff;
+    border-radius: 12px;
+    padding: 14px;
+    overflow: auto
+}
+
+.footer {
+    /* These new lines fix it to the bottom */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg);
+    /* Gives it a solid background */
+    z-index: 1000;
+    /* Keeps it on top of content and welcome screen */
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    text-align: center;
+    padding: 12px;
+    /* Reduced from 16px to 12px (3/4 of original) */
+}
+
+/* Footer: enable ellipsis + click-to-expand ONLY when JS marks it collapsible */
+.footer.footer-collapsible {
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: all 0.3s ease;
+}
+
+.footer.footer-collapsible.footer-expanded {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+}
+
+/* Docs layout - NEW */
+/*.docs {This class is now just a wrapper, no styles needed here.}*/
+/* This replaces the old .side rule */
+.doc-nav-bar {
+    display: flex;
+    flex-wrap: wrap;
+    /* Let tabs wrap on small screens */
+    gap: 10px;
+    margin-bottom: 24px;
+    /* Space above the article card */
+    border-bottom: 1px solid var(--line);
+    /* Clean separator */
+    justify-content: center;
+}
+
+/* This replaces the old .side a rule */
+.doc-nav-bar a {
+    display: inline-block;
+    padding: 6px 12px;
+    /* More vertical padding */
+    border-radius: 10px 10px 0 0;
+    /* Rounded top corners */
+    color: var(--muted);
+    /* color for non-active */
+    text-decoration: none !important;
+    font-weight: 550;
+    transition: all 0.25s ease-out;
+    border-bottom: 3px solid transparent;
+    /* Placeholder for active border */
+    margin-bottom: -1px;
+    /* Pulls border onto the main line */
+}
+
+/* This replaces the old .side a:hover rule */
+.doc-nav-bar a:hover {
+    color: var(--brand);
+    background: rgba(0, 0, 0, 0.02);
+}
+
+/* This replaces the old .side a.is-active rule */
+.doc-nav-bar a.is-active {
+    color: var(--brand);
+    font-weight: 550;
+    border-bottom-color: var(--brand);
+    /* Active blue line */
+    background: none;
+    /* Remove card background */
+    box-shadow: none;
+    /* Remove card shadow */
+}
+
+/* Make the article full width */
+.docs article.card {
+    width: 100%;
+}
+
+@media (prefers-color-scheme: dark) {
+    .doc-nav-bar a:hover {
+        background: #0f172a;
+    }
+
+    .doc-nav-bar a.is-active {
+        background: none;
+        color: var(--brand);
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    .side a:hover {
+        background: #0f172a
+    }
+}
+
+/* Focus visible for keyboard users */
+:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px
+}
+
+/* Welcome Screen Styles */
+#welcome-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Keep centered by default */
+    z-index: 999;
+    opacity: 1;
+    padding: calc(var(--header-offset, 56px) + 14px) 1rem calc(var(--footer-offset, 48px) + 12px);
+    /* Bottom padding for footer visibility */
+    transform: translateY(0);
+    transition: opacity 0.5s ease-out, transform 0.5s ease-in;
+    will-change: opacity, transform;
+    overflow-y: auto;
+    /* Allow scrolling if content is too tall */
+}
+
+@media (prefers-color-scheme: dark) {
+    #welcome-screen {
+        background: rgba(15, 23, 42, 0.7);
+        /* Dark overlay */
+    }
+}
+
+#welcome-screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-100%);
+}
+
+/* Hide main app elements initially */
+#view,
+#app-footer {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease-in 0.2s, transform 0.5s ease-out 0.2s;
+    will-change: opacity, transform;
+}
+
+#app-header.visible,
+#view.visible,
+#app-footer.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Header should stay opaque on ALL pages (including the welcome screen) */
+header {
+    z-index: 1003;
+    background: rgba(230, 246, 255, 0.95);
+    backdrop-filter: saturate(1.2) blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--line);
+    transition: background 0.3s ease, border-color 0.3s ease, backdrop-filter 0.3s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+    header {
+        background: rgba(15, 23, 42, .92);
+    }
+}
+
+.app-container {
+    position: relative;
+    z-index: 1;
+    /* Below header */
+    width: 100%;
+    max-width: 800px;
+    /* <-- This gives it a max width */
+    background: transparent;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: none;
+    border: none;
+    border-radius: none;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.tab-navigation {
+    display: none;
+    background-color: transparent;
+    /* <-- Blend with the card */
+    border-bottom: 1px solid var(--line);
+    /* --- Match the card's rounded top corners --- */
+    border-top-left-radius: var(--radius);
+    border-top-right-radius: var(--radius);
+    padding: 8px 8px 0;
+    /* Add padding so the pill doesn't touch the edge */
+}
+
+.tab-link {
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 8px 14px;
+    /* Make it more 'pilly' */
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--muted);
+    border-bottom: none;
+    /* Remove bottom border */
+    border-radius: 8px;
+    /* Make it a pill */
+    transition: all 0.2s ease-out;
+}
+
+.tab-link:hover {
+    background: rgba(0, 0, 0, 0.05);
+    /* Subtle hover */
+}
+
+.tab-link.active {
+    color: var(--brand-ink);
+    background: linear-gradient(180deg, #eaf2ff, #e6f6ff);
+    /* Light blue */
+    font-weight: 550;
+    box-shadow: 0 3px 8px rgba(2, 6, 23, .08) inset;
+}
+
+.tab-content {
+    padding: 15px;
+    text-align: center;
+}
+
+#start-content h1 {
+    font-size: 32px;
+    font-weight: 600;
+    margin-top: -20px;
+    margin-bottom: clamp(1.5rem, 3vh, 2rem);
+    /* Height-based spacing: 24px to 32px */
+    color: var(--brand-ink);
+    animation: dynamicPopIn 0.6s ease-out 0.1s both;
+    position: relative;
+    z-index: 1;
+}
+
+.acknowledgement-text p {
+    line-height: 1.6;
+    color: var(--muted);
+    margin-top: 0;
+    margin-bottom: 8px;
+    max-width: 450px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.acknowledgement-text {
+    animation: dynamicPopIn 0.6s ease-out 0.4s both;
+}
+
+.proceed-button {
+    background-color: var(--brand);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 7px 20px;
+    font-size: 18px;
+    cursor: pointer;
+    margin-top: 0px;
+    margin-bottom: 24px;
+    transition: all 0.25s ease-out;
+    animation: dynamicPopIn 0.6s ease-out 0.3s both;
+}
+
+.proceed-button:hover {
+    filter: brightness(1.1);
+    text-decoration: underline;
+    transform: translateY(-2px);
+    /* Add the lift */
+    box-shadow: 0 10px 22px rgba(37, 99, 235, 0.30);
+    /* Add shadow on hover */
+}
+
+/* --- NEW: Animated Hamburger Button --- */
+.hamburger-button {
+    /* Reset default button styles */
+    appearance: none;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 10px;
+    /* Clickable area */
+    margin-left: auto;
+    /* Pushes it to the right */
+    z-index: 100;
+    /* Make sure it's above the backdrop */
+}
+
+.hamburger-box {
+    position: relative;
+    width: 28px;
+    /* Width of the icon */
+    height: 20px;
+    /* Height of the icon */
+    display: block;
+}
+
+.hamburger-line {
+    display: block;
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    /* Thickness of the lines */
+    background: var(--muted);
+    border-radius: 4px;
+    transition: all 0.3s ease-in-out;
+}
+
+.hamburger-line:nth-child(1) {
+    top: 0;
+}
+
+.hamburger-line:nth-child(2) {
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.hamburger-line:nth-child(3) {
+    bottom: 0;
+}
+
+/* --- Animation to 'X' when open --- */
+.hamburger-button[aria-expanded="true"] .hamburger-line:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+    top: 1px;
+    /* Pixel adjustment for centering */
+}
+
+.hamburger-button[aria-expanded="true"] .hamburger-line:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger-button[aria-expanded="true"] .hamburger-line:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+    bottom: 1px;
+    /* Pixel adjustment for centering */
+}
+
+/* Hide the old button just in case */
+.btn.ghost.mobile {
+    display: none;
+}
+
+/* --- Mobile Drawer Styles --- */
+.backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: transparent;
+    z-index: 90;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.backdrop.is-open {
+    display: block;
+    opacity: 1;
+}
+
+@media (max-width: 1000px) {
+    header {
+        position: sticky;
+        top: 0;
+        z-index: 1003;
+    }
+
+    .nav {
+        position: relative;
+    }
+
+    /* RE-STYLE .menu to be an off-screen drawer */
+    .menu {
+        display: flex;
+        /* Override the default 'display:none' */
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        /* Align to the right */
+        width: 220px;
+        max-width: 100%;
+        /* Good for small screens */
+        bottom: auto;
+        /* <--- FIX: Was 600%, which made it get cut off */
+        background: rgba(255, 255, 255, 0.94);
+        border: 1px solid var(--line);
+        border-left: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px;
+        margin-left: 0;
+        z-index: 120;
+        gap: 2px;
+        align-items: flex-start;
+        box-shadow: 0 12px 28px rgba(2, 6, 23, .06);
+        /* Make drawer scrollable when it doesn't fit between header and footer */
+        max-height: calc(100vh - var(--header-offset, 64px) - var(--footer-offset, 48px) - 16px);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+        /* Animation properties */
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        /* Start slightly up */
+        transition: all 0.3s ease-out;
+    }
+
+    .menu.is-open {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+        box-shadow: 0 12px 28px rgba(2, 6, 23, .06);
+        /* Match shadow */
+    }
+
+    /* Style links for vertical drawer */
+    header .menu a {
+        display: block;
+        min-width: 0px;
+        width: 100%;
+        text-align: left;
+        padding: 8px 14px;
+        font-size: 18px;
+        background: rgba(255, 255, 255, 0);
+        border-radius: 10px;
+        font-weight: 500;
+    }
+
+    header .menu .dropdown-toggle {
+        text-align: left;
+        /* This specifically overrides the desktop "center" rule */
+    }
+
+    header .menu .dropdown-toggle::after {
+        width: 100%;
+    }
+
+    .menu .dropdown {
+        width: 100%;
+        min-width: 0;
+        /* Reset desktop min-width */
+    }
+
+    .menu .dropdown-content {
+        position: static;
+        display: none;
+        width: 100%;
+        left: auto;
+        right: auto;
+        top: auto;
+        transform: none;
+        margin-right: 0;
+        opacity: 1;
+        visibility: visible;
+        transition: none;
+        box-shadow: none;
+        border: none;
+        padding: 0px;
+        /* <--- Indent the sub-links */
+        background: transparent;
+    }
+
+    .menu .dropdown.is-open .dropdown-content {
+        display: block;
+    }
+
+    .menu .dropdown-content a {
+        padding: 8px 14px 8px 29px;
+        /* Slightly smaller padding */
+        font-size: 16px;
+        /* Slightly smaller font */
+        font-weight: 400;
+        /* Lighter weight */
+        color: var(--muted);
+    }
+
+    .menu .dropdown-content a:hover {
+        background: rgba(0, 0, 0, 0.05);
+        /* Same as other mobile hovers */
+        color: var(--brand);
+        padding: 8px 14px 8px 29px;
+    }
+
+    .menu .dropdown-toggle::before {
+        content: '›';
+        position: absolute;
+        right: 14px;
+        top: 45%;
+        /* Adjusted for new padding */
+        font-size: 24px;
+        color: var(--muted);
+        transition: transform 0.2s ease-out;
+        transform: translateY(-50%);
+    }
+
+    .menu .dropdown.is-open .dropdown-toggle::before {
+        transform: translateY(-50%) rotate(90deg);
+    }
+
+    /* --- End Mobile Dropdown Fixes --- */
+
+    .menu .cta {
+        background: var(--brand);
+        /* <-- Solid blue background */
+        color: #fff;
+        /* <-- White text */
+        border: none;
+        /* <-- No border */
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        border-radius: 10px;
+        box-shadow: 0 8px 20px rgba(37, 99, 235, .25);
+        /* The blue shadow now matches */
+        transition: all 0.25s ease-out;
+    }
+
+    .menu>a:hover:not(.cta),
+    .menu>.dropdown>a:hover:not(.cta) {
+        background: rgba(0, 0, 0, 0.05);
+        /* Adds a subtle blue hover */
+        transform: none;
+        /* Disables the desktop 'lift' effect */
+    }
+
+    .menu a[aria-current="page"] {
+        background: linear-gradient(180deg, #eaf2ff, #e6f6ff);
+        color: var(--brand-ink);
+        font-weight: 550;
+        box-shadow: none;
+    }
+
+    .mobile {
+        display: block;
+        margin-left: auto;
+    }
+}
+
+@keyframes dynamicPopIn {
+    0% {
+        opacity: 0;
+        transform: translateY(25px) scale(0.9);
+    }
+
+    60% {
+        opacity: 1;
+        transform: translateY(-5px) scale(1.05);
+        /* Overshoots */
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        /* Settles */
+    }
+}
+
+/* --- Workflow Tree Styles (Revised) --- */
+.workflow-tree {
+    padding: 20px 28px 28px 28px;
+    /* Increased padding */
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    margin-bottom: 24px;
+}
+
+.workflow-q-main {
+    /* Top-level question */
+    font-weight: 600;
+    font-size: 19px;
+    color: var(--brand-ink);
+    margin-bottom: 15px;
+}
+
+.workflow-tree ul {
+    list-style: none;
+    /* Remove default bullets */
+    padding-left: 20px;
+    /* Standard indentation */
+    margin: 12px 0 0 0;
+}
+
+.workflow-tree ul li {
+    margin-top: 10px;
+    /* Spacing between items */
+}
+
+.workflow-tree ul ul {
+    padding-left: 24px;
+    /* Deeper indentation */
+    margin-top: 10px;
+}
+
+.workflow-tree .workflow-q-sub {
+    /* Nested question */
+    font-size: 18px;
+    color: var(--ink);
+    font-weight: 400;
+    margin-bottom: 8px;
+}
+
+.workflow-tree strong {
+    color: var(--brand);
+    font-weight: 600;
+}
+
+.workflow-tree .workflow-arrow {
+    color: var(--accent);
+    font-weight: 600;
+    margin: 0 4px;
+    /* Space around the arrow */
+}
+
+.welcome-corner-text {
+    position: absolute;
+    bottom: calc(var(--footer-offset, 48px) + 12px);
+    right: 20px;
+    z-index: 1001;
+    /* Above footer (1000) and welcome screen (999) */
+    font-size: 14px;
+    color: var(--muted);
+    opacity: 0.6;
+}
+
+/* Ensure welcome screen content stays below header on small screens */
+#welcome-screen .app-container {
+    position: relative;
+    z-index: 1;
+    /* Below header (header is z-index: 1001) */
+    max-width: 100%;
+    padding: 20px;
+}
+
+#welcome-screen .tab-content,
+#welcome-screen .content-panel {
+    position: relative;
+    z-index: 1;
+    /* Explicitly set to be below header */
+}
+
+/* Responsive scaling based on viewport HEIGHT */
+@media (max-height: 800px) {
+    #welcome-screen {
+        padding: calc(var(--header-offset, 56px) + 9px) 1rem calc(var(--footer-offset, 48px) + 12px) !important;
+    }
+    
+    #start-content h1 {
+        margin-bottom: clamp(1rem, 2.5vh, 1.5rem) !important;
+    }
+    
+    .welcome-image {
+        max-height: clamp(250px, 42vh, 560px) !important;
+        /* Increased by 40%, height-based */
+        margin-bottom: clamp(1.25rem, 3vh, 2rem) !important;
+    }
+}
+
+@media (max-height: 650px) {
+    #welcome-screen {
+        padding: calc(var(--header-offset, 56px) + 4px) 1rem calc(var(--footer-offset, 48px) + 12px) !important;
+        align-items: flex-start !important;
+        /* Top-align on very short screens */
+    }
+    
+    #start-content h1 {
+        font-size: clamp(1.4rem, 5vh, 1.8rem) !important;
+        margin-top: 0 !important;
+        margin-bottom: clamp(0.75rem, 2vh, 1.2rem) !important;
+    }
+    
+    .welcome-image {
+        max-height: clamp(196px, 35vh, 420px) !important;
+        /* Proportionally scaled, height-based */
+        margin-bottom: clamp(1rem, 2.5vh, 1.5rem) !important;
+    }
+}
+
+@media (max-height: 500px) {
+    #welcome-screen {
+        padding: calc(var(--header-offset, 56px) + 0px) 0.75rem calc(var(--footer-offset, 48px) + 12px) !important;
+    }
+    
+    #start-content h1 {
+        font-size: clamp(1.2rem, 6vh, 1.6rem) !important;
+        margin-top: 0 !important;
+        margin-bottom: clamp(0.6rem, 2vh, 1rem) !important;
+    }
+    
+    .welcome-image {
+        max-height: clamp(140px, 30vh, 308px) !important;
+        /* Increased by 40% from previous */
+        margin-bottom: clamp(0.75rem, 2vh, 1.25rem) !important;
+    }
+    
+    .proceed-button {
+        font-size: 0.95rem !important;
+        padding: 0.5rem 1.5rem !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    .acknowledgement-text p {
+        font-size: 0.85rem !important;
+    }
+}
+
+/* Ensure content stays below header on all screens */
+@media (max-width: 768px) {
+    #welcome-screen,
+    #welcome-screen * {
+        z-index: auto !important;
+    }
+    
+    #welcome-screen {
+        z-index: 999 !important;
+    }
+}
+
+.faq-item {
+    /* This is the new wrapper for <details> */
+    display: flex;
+    align-items: flex-start;
+    /* Align icon with first line of text */
+    gap: 12px;
+    margin-bottom: 8px;
+    /* Space between items */
+}
+
+.faq-icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    color: var(--brand);
+    margin-top: 6px;
+    /* Align with text */
+}
+
+.faq-content {
+    flex-grow: 1;
+}
+
+.faq-content summary {
+    font-size: 19px;
+    /* Make question slightly larger */
+    font-weight: 550;
+    cursor: pointer;
+    padding: 4px 0;
+    /* Add a little vertical space for clicking */
+    list-style-type: none;
+    /* Hide default triangle */
+    position: relative;
+    padding-right: 25px;
+    /* Space for a new chevron */
+}
+
+.faq-content summary::after {
+    /* Custom chevron */
+    content: '▼';
+    position: absolute;
+    right: 5px;
+    top: 7px;
+    font-size: 12px;
+    color: var(--muted);
+    transform: scaleY(0.8);
+    transition: transform 0.2s ease-out;
+}
+
+.faq-content[open] summary::after {
+    transform: scaleY(-0.8);
+    /* Flip it when open */
+}
+
+/* Hide default summary marker in Webkit */
+.faq-content summary::-webkit-details-marker {
+    display: none;
+}
+
+.faq-content>div {
+    /* This is the content inside the <details> */
+    padding-top: 8px;
+    line-height: 1.6;
+}
+
+.about-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 20px;
+    /* More space between sections */
+}
+
+.about-icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    color: var(--brand);
+    margin-top: 6px;
+    /* Align with h3 */
+}
+
+.about-content {
+    flex-grow: 1;
+}
+
+.about-content h3 {
+    margin-top: 0;
+    /* Remove default h3 margin */
+    margin-bottom: 8px;
+    font-size: 20px;
+}
+
+.about-content p,
+.about-content ul {
+    margin-top: 0;
+    line-height: 1.6;
+}
+
+/* --- Form Styles --- */
+#contactForm {
+    margin-top: 16px;
+}
+
+#contactForm label {
+    display: block;
+    font-weight: 500;
+    font-size: 16px;
+    margin-bottom: 6px;
+    margin-top: 12px;
+}
+
+#contactForm input[type="email"],
+#contactForm textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    /* Softer radius */
+    background: var(--bg);
+    /* Light background */
+    font: 16px/1.4 system-ui, -apple-system, sans-serif;
+    color: var(--ink);
+    transition: all 0.2s ease-out;
+}
+
+#contactForm input[type="email"]:focus,
+#contactForm textarea:focus {
+    outline: none;
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    background: var(--card);
+}
+
+#contactForm textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+#contactForm .btn-group {
+    margin-top: 16px;
+    display: flex;
+    gap: 8px;
+}
+
+.tool-card {
+    /* Uses .card styles from the base sheet */
+    display: flex;
+    flex-direction: column;
+    /* Stack icon/content vertically */
+    align-items: center;
+    /* Center horizontally */
+    text-align: center;
+    padding: 22px 28px;
+    min-height: 200px;
+    /* Give them a uniform height */
+}
+
+.tool-card-icon {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    color: var(--brand);
+    margin-bottom: 12px;
+}
+
+.tool-card h3 {
+    font-size: 20px;
+    font-weight: 550;
+    margin: 0 0 8px 0;
+    color: var(--brand-ink);
+}
+
+.guide-step {
+    /* This is for the Quick Guide card */
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.guide-step:last-child {
+    margin-bottom: 0;
+}
+
+.guide-step-icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    color: var(--brand);
+    margin-top: 2px;
+}
+
+.app-header-bar h2 {
+    margin: 0;
+    font-size: 18px;
+    color: var(--brand-ink);
+}
+
+.app-container-shell:fullscreen .app-iframe {
+    height: 100%;
+}
+
+#app-shell-container .info-sidebar .btn.ghost {
+    /* Styles moved from inline JS to CSS */
+    padding: 6px 12px;
+    font-size: 14px;
+    width: 100%;
+    
+    /* Ensures text in <button> and <a> align the same way */
+    text-align: left; 
+
+    /* Original styles from this rule */
+    display: inline-block;
+    margin-bottom: 10px; /* Adds space between buttons */
+}
+/* --- App Module Layout (Top Bar) --- */
+
+.wrap.view-is-app {
+    padding-top: 15px;
+    padding-bottom: 20px;
+}
+
+/* This is the main container (replaces .app-container-shell) */
+.app-shell-stacked {
+    display: flex;
+    flex-direction: column;
+    height: 85vh; /* Sets a default height */
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: 0 12px 28px rgba(2, 6, 23, .06);
+    overflow: hidden; /* This is important! */
+}
+
+/* This is the new top bar (replaces .app-header-bar) */
+.app-shell-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px; /* A bit more padding */
+    border-bottom: 1px solid var(--line);
+    flex-shrink: 0; /* Prevents the header from shrinking */
+}
+
+.app-header-buttons {
+    display: flex;
+    gap: 8px; /* Space between buttons */
+}
+
+/* This is the content area holding the iframe */
+.app-shell-content {
+    flex-grow: 1; /* Makes the content fill the remaining space */
+    overflow: hidden; /* For the iframe */
+}
+
+/* This is the iframe itself */
+.app-iframe {
+    border: none;
+    width: 100%;
+    height: 100%; /* Make it fill the content area */
+    background-color: var(--card);
+}
+
+/* Specific styles for the buttons in the app header */
+.app-btn.btn.ghost {
+    display: inline-flex; /* Use flex to align icon and text */
+    align-items: center;
+    justify-content: center;
+    
+    /* Reset/unify styles */
+    margin: 0;
+    padding: 7px 12px;
+    font-size: 15px;
+    width: auto; /* Let the button size itself */
+    text-align: center;
+    
+    /* Re-affirm base ghost styles for consistency */
+    background: rgba(255, 255, 255, 0.5);
+    color: var(--brand-ink);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(4px);
+    transition: all 0.2s ease-out;
+}
+
+/* Ensure the icon in the button is aligned */
+.app-btn .btn-icon {
+  width: 14px;
+  height: 14px;
+  margin-right: 6px;
+  vertical-align: -2px; /* Aligns icon with text */
+  stroke-width: 2.5; /* Makes icon bolder */
+}
+
+/* Hover/Active states for the new buttons */
+.app-btn.btn.ghost:hover {
+    background: rgba(255, 255, 255, 0.8);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(2, 6, 23, 0.08);
+}
+
+.app-btn.btn.ghost:active {
+    transform: translateY(0);
+    filter: brightness(0.98);
+}
+
+/* --- Tool Card Button Group --- */
+.tool-card-buttons {
+    display: flex;
+    gap: 14px; /* Adds space between the buttons */
+    margin-top: auto; /* Pushes the button group to the bottom */
+    padding-top: 5px; /* Adds a little space above the buttons */
+    width: 100%;
+    justify-content: center; /* <-- ADDED: This centers the buttons */
+}
+
+.tool-card-buttons .btn {
+    /* REMOVED 'flex: 1' and 'width: 50%' */
+    padding: 6px 12px;
+    font-size: 14px;
+    margin-top: 0; /* Override any default margins */
+    text-align: center; /* Ensure text is centered */
+}
+
+/* Specific tweaks for the new ghost button */
+.tool-card-buttons .btn.ghost {
+    /* A lighter shadow looks better in a pair */
+    box-shadow: 0 4px 10px rgba(2, 6, 23, .04);
+}
+
+/* --- Fullscreen Handling (FOR ZOOM) --- */
+
+/* 1. This rule handles the main shell container */
+#app-shell-container:fullscreen,
+#app-shell-container:-webkit-full-screen,
+#app-shell-container:-moz-full-screen,
+#app-shell-container:-ms-fullscreen {
+    /* This overrides 'overflow: hidden' and allows scrolling */
+    overflow: auto !important;
+}
+
+/* 2. This rule handles the header */
+#app-shell-container:fullscreen .app-shell-header,
+#app-shell-container:-webkit-full-screen .app-shell-header,
+#app-shell-container:-moz-full-screen .app-shell-header,
+#app-shell-container:-ms-fullscreen .app-shell-header {
+    /* This makes the header stick to the top when you scroll */
+    position: sticky !important;
+    top: 0 !important;
+    background: var(--card);
+    z-index: 10;
+}
+
+/* 3. This rule handles the iframe's parent container */
+#app-shell-container:fullscreen .app-shell-content,
+#app-shell-container:-webkit-full-screen .app-shell-content,
+#app-shell-container:-moz-full-screen .app-shell-content,
+#app-shell-container:-ms-fullscreen .app-shell-content {
+    /* This tells the container not to clip the iframe */
+    overflow: visible !important;
+}
+
+/* 4. This is the zoom rule for the iframe itself */
+#app-shell-container:fullscreen .app-iframe,
+#app-shell-container:-webkit-full-screen .app-iframe,
+#app-shell-container:-moz-full-screen .app-iframe,
+#app-shell-container:-ms-fullscreen .app-iframe {
+    
+    /* You can change 1.25 to 1.3 or 1.4 to zoom more */
+    transform: scale(1.25) !important;
+    transform-origin: top center !important; /* Zoom from the top-center */
+    
+    /* This fixes a bug in some browsers */
+    height: 100% !important;
+    width: 100% !important;
+}
+/* --- App Shell Header --- */
+.app-shell-header {
+    padding: 8px 16px; /* Restore simple padding */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    min-height: 50px; 
+}
+
+.app-shell-title {
+  margin: 0;
+  font-size: 20px;
+  color: var(--brand-ink);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.app-shell-header .app-header-buttons {
+    flex-shrink: 0;
+    margin-left: auto; /* This pushes them to the right */
+}
+
+/* Global tooltip behavior for help-icon */
+.help-icon{position:relative;display:inline-block;cursor:help;z-index:1}
+.help-icon:hover .help-tooltip,
+.help-icon:focus-within .help-tooltip{opacity:1!important;visibility:visible!important}
+
+/* --- Mobile Optimizations --- */
+@media (max-width: 768px) {
+    /* Reduce margins - content fills 92% of screen width */
+    .wrap {
+        max-width: 92%;
+        padding-left: 4%;
+        padding-right: 4%;
+    }
+    
+    /* Footer mobile optimizations */
+    .footer {
+        font-size: 14px;
+        padding: 10px 5%;
+        left: 0;
+        right: 0;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+    
+    /* Expanded footer state */
+    .footer.footer-collapsible.footer-expanded {
+        padding: 12px 5%;
+    }
+    
+    /* App header buttons - show icons only on mobile */
+    .app-btn.btn.ghost span {
+        display: none;
+    }
+    
+    .app-btn.btn.ghost {
+        padding: 7px 10px;
+        min-width: auto;
+    }
+    
+    .app-btn .btn-icon {
+        margin-right: 0;
+        width: 18px;
+        height: 18px;
+    }
+    
+    /* Adjust app shell header for mobile */
+    .app-shell-header {
+        padding: 8px 12px;
+        gap: 8px;
+    }
+    
+    .app-shell-title {
+        font-size: 16px;
+        min-width: 0;
+        flex: 1;
+    }
+    
+    .app-header-buttons {
+        gap: 6px;
+    }
+}
