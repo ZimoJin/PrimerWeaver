@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PrimerWeaver · Integrated Primer Design</title>
+    <meta name="description"
+        content="an integrated web server for primer design in molecular biology workflows." />
+    
+    <link rel="stylesheet" href="contents/style.css">
+
+</head>
+
+<body>
+    <div id="welcome-screen" style="background: linear-gradient(180deg, #e6f6ff, #fdfdff);">
+        <div class="welcome-corner-text">PrimerWeaver v1.0.1</div>
+        <div class="app-container">
+            <nav class="tab-navigation">
+                <button class="tab-link active" id="start-tab">Start</button>
+            </nav>
+            <main class="tab-content">
+                <div id="start-content" class="content-panel active">
+                    <h1>Welcome to PrimerWeaver!</h1>
+
+                    <img class="welcome-image"
+                        src="contents/logo/welcome-image.png"
+                        alt="PrimerWeaver workflow diagram">
+
+                    <button class="proceed-button">Get Started</button>
+                    <div class="acknowledgement-text">
+                        <p>
+                            This website is free and open to all users.
+                        </p>
+                        <p>
+                            No login is required, and it does not use cookies.
+                        </p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <header role="banner" aria-label="Primary" id="app-header">
+        <div class="nav">
+            <a href="#" class="brand" aria-label="PrimerWeaver Tools" id="brand-logo">
+                
+                <img src="contents/logo/logo.png"
+                    alt="PrimerWeaver Logo" class="logo-img">
+
+                <h1>
+                    <span class="h1-primer">Primer</span><span class="h1-weaver">Weaver</span>
+                </h1>
+            </a>
+            <nav class="menu" aria-label="Main navigation">
+                <a href="#/" data-route="/" aria-current="page">Home</a>
+                <div class="dropdown">
+                    <a href="#/docs" data-route="/docs" class="dropdown-toggle">Documents</a>
+                    <div class="dropdown-content" id="header-doc-nav">
+                        <a href="#/docs#d-intro" data-doc="#d-intro">Introduction</a>
+                        <a href="#/docs#d-qc" data-doc="#d-qc">Primer QC</a>
+                        <a href="#/docs#d-opcr" data-doc="#d-opcr">Overlap PCR</a>
+                        <a href="#/docs#d-muta" data-doc="#d-muta">Mutagenesis</a>
+                        <a href="#/docs#d-mp" data-doc="#d-mp">Multiplex PCR</a>
+                        <a href="#/docs#d-re" data-doc="#d-re">Restriction Cloning</a>
+                        <a href="#/docs#d-user" data-doc="#d-user">USER Cloning</a>
+                        <a href="#/docs#d-gg" data-doc="#d-gg">Golden Gate</a>
+                        <a href="#/docs#d-gb" data-doc="#d-gb">Gibson Assembly</a>
+                    </div>
+                </div>
+                <a href="#/help" data-route="/help">FAQs</a>
+                <a href="#/about" data-route="/about">About</a>
+
+                <a href="#/tools" data-route="/tools" class="cta">Launch App</a>
+
+                <a href="https://github.com/ZimoJin/PrimerWeaver" class="github-link" target="_blank"
+                    rel="noopener noreferrer" aria-label="GitHub Page">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="24" height="24"
+                        fill="currentColor" style="display: block;">
+                        <path
+                            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z">
+                        </path>
+                    </svg>
+                </a>
+            </nav>
+            <button class="hamburger-button mobile" id="menuBtn" aria-controls="drawer" aria-expanded="false"
+                aria-label="Toggle menu">
+                <span class="hamburger-box">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </span>
+            </button>
+        </div>
+    </header>
+    <div class="backdrop" id="backdrop"></div>
+
+    <main class="wrap" id="view" tabindex="-1">
+        </main>
+
+    <footer class="footer small" id="app-footer">
+        All rights Reserved © Ignea Lab · McGill University · Free for any use · No data will be uploaded, everything is processed in your local browser with JavaScript.
+    </footer>
+
+    <script>
+      // Pre-cache App assets early (after first render) so "Launch App" feels instant.
+      // SW scope is limited to /app/ and will not affect the main site routing.
+      (function () {
+        if (!('serviceWorker' in navigator)) return;
+        var isSecure = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+        if (!isSecure) return;
+        // Avoid doing work while the welcome/home UI is painting.
+        requestAnimationFrame(function () {
+          setTimeout(async function () {
+            try {
+              var reg = await navigator.serviceWorker.register('app/sw.js', { scope: 'app/' });
+
+              function requestAppPrecache(opts) {
+                opts = opts || {};
+                var timeoutMs = typeof opts.timeoutMs === 'number' ? opts.timeoutMs : 1200;
+                var requestId = String(Date.now()) + '_' + Math.random().toString(16).slice(2);
+
+                return new Promise(function (resolve) {
+                  var done = false;
+                  var finish = function () {
+                    if (done) return;
+                    done = true;
+                    resolve(true);
+                  };
+                  var timer = setTimeout(finish, timeoutMs);
+
+                  navigator.serviceWorker.ready.then(function () {
+                    var sw = reg.active || reg.waiting || reg.installing;
+                    if (!sw) {
+                      clearTimeout(timer);
+                      finish();
+                      return;
+                    }
+
+                    var onMsg = function (e) {
+                      try {
+                        if (e && e.data && e.data.type === 'PRECACHE_DONE' && e.data.requestId === requestId) {
+                          navigator.serviceWorker.removeEventListener('message', onMsg);
+                          clearTimeout(timer);
+                          finish();
+                        }
+                      } catch (err) {}
+                    };
+                    navigator.serviceWorker.addEventListener('message', onMsg);
+                    try {
+                      sw.postMessage({ type: 'PRECACHE_ALL', requestId: requestId });
+                    } catch (err) {
+                      navigator.serviceWorker.removeEventListener('message', onMsg);
+                      clearTimeout(timer);
+                      finish();
+                    }
+                  })["catch"](function () {
+                    clearTimeout(timer);
+                    finish();
+                  });
+                });
+              }
+
+              // Background warmup (do not block UI)
+              requestAppPrecache({ timeoutMs: 0 });
+
+              // Click warmup: trigger precache without blocking navigation.
+              document.addEventListener('click', function (e) {
+                try {
+                  var el = e.target;
+                  if (!el) return;
+                  var launchLink = el.closest && el.closest('a.cta[data-route=\"/tools\"]');
+                  var getStartedBtn = el.closest && el.closest('.proceed-button');
+
+                  // Get Started: warm in background (no need to block)
+                  if (getStartedBtn) {
+                    requestAppPrecache({ timeoutMs: 0 });
+                    return;
+                  }
+
+                  // Launch App: kick off precache in background (do not delay UX).
+                  if (launchLink) {
+                    requestAppPrecache({ timeoutMs: 0 });
+                  }
+                } catch (err) {}
+              }, true);
+
+            } catch (e) {}
+          }, 0);
+        });
+      })();
+    </script>
+
+    <script src="contents/script.js"></script>
+
+</body>
+
+</html>
+

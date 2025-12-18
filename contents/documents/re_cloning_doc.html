@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restriction Enzyme Cloning - PrimerWeaver</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #333;
+            background: #f9fafb;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e40af;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2563eb;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            font-size: 1.5em;
+        }
+        h3 {
+            color: #3b82f6;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            font-size: 1.2em;
+        }
+        h4 {
+            color: #60a5fa;
+            margin-top: 1.2em;
+            margin-bottom: 0.6em;
+        }
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 1em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        strong {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c2410c;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .abstract {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+        .abstract p {
+            margin: 0;
+            font-style: italic;
+        }
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .section {
+            margin-bottom: 2.5em;
+        }
+        .version-info {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+            margin-top: 3em;
+            padding-top: 2em;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Restriction Enzyme Cloning Primer Designer</h1>
+        
+        <div class="abstract">
+            <p>The Restriction Enzyme Cloning module enables the design of primers for directional cloning using restriction enzymes. This tool automates the creation of primers that add restriction sites at both ends of a DNA fragment, enabling controlled directional insertion into restriction-digested vectors. This classical cloning approach remains widely used for simple constructs and provides a reliable, cost-effective method for plasmid construction.</p>
+        </div>
+
+        <div class="section">
+            <h2>Quick Start Guide</h2>
+            <ol>
+                <li>Upload or paste your destination vector and insert sequences into the corresponding input fields. Select the desired restriction enzyme set, verify the automatically detected vector backbone, and adjust design parameters if necessary.</li>
+	   <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/re_demo.png"
+                    style="max-width: 90%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+                <li>Click “Design Primers” to generate primers with added restriction sites. Review the primer sequences (with restriction sites highlighted), Tm values, and QC metrics. Download the assembled FASTA file to verify that the insert orientation matches the intended design. If the orientation is incorrect, reverse-complement the insert sequence and regenerate the primers.</li>
+
+
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>Restriction Enzyme Cloning Principle</h2>
+            
+            <p>Restriction enzyme cloning uses <strong>Type II restriction endonucleases</strong> to generate compatible <strong>sticky or blunt ends</strong> on both the insert and vector, followed by covalent joining of DNA ends using <strong>T4 DNA ligase</strong>. In general, <strong>sticky-end ligation is significantly more efficient than blunt-end ligation</strong>, as cohesive overhangs promote correct annealing prior to ligation, whereas blunt-end ligation relies solely on random end collisions and is therefore less efficient.</p>
+            <p>Single enzyme digestion uses one restriction enzyme to cut both the insert and vector. This strategy is simple but allows the insert to ligate in either orientation and increases the risk of vector self-ligation, particularly in blunt-end cloning. In single-enzyme digestion, <strong>vector dephosphorylation</strong> can be applied to reduce self-ligation and improve cloning efficiency.</p>
+	    <p><strong>Double enzyme digestion</strong> employs two different restriction enzymes to generate <strong>non-compatible ends</strong> at each end of the insert and vector. This approach enforces <strong>directional cloning</strong>, reduces background from vector self-ligation, and generally yields higher cloning efficiency. As a result, double digestion with sticky ends is the preferred strategy for most restriction cloning applications.</p>
+            
+           <div style="text-align: center; margin: 2em 0;">
+  		<img
+    			src="contents/pictures/re_principle.png"
+   			alt="Restriction enzyme cloning with double sticky ends"
+    			style="max-width: 60%; height: auto; border-radius: 8px;"
+  		 >
+	   </div>
+
+
+            
+        <div class="section">
+            <h2>Input Format</h2>
+            <p>Both vector and insert inputs accept <strong>FASTA or plain text format</strong>. Only <strong>one sequence</strong> is allowed per input field; if multiple FASTA headers are detected, <strong>only the first sequence</strong> will be used. Fragment names extracted from FASTA headers are displayed for reference and will be used in primer naming conventions.</p>
+            <p>PrimerWeaver currently supports approximately <strong>100 built-in Type II restriction enzymes</strong>. Once a vector sequence is provided, the system <strong>automatically identifies vector features</strong> and displays the positions of all <strong>single-cut restriction enzyme sites</strong>. The vector map can be rotated to facilitate visualization of the targeted cloning region.</p>
+
+	<div style="text-align: center; margin: 2em 0;">
+  		<img
+    			src="contents/pictures/re_input.png"
+   			alt="Restriction enzyme cloning module Input"
+    			style="max-width: 60%; height: auto; border-radius: 8px;"
+  		 >
+	   </div>
+
+
+
+        <div class="section">
+            <h2>Design Parameters</h2>
+		<p>Please select the preferred restriction enzymes from the dropdown list or search by enzyme name. Once <strong>two restriction enzymes</strong> are selected, the system automatically identifies the <strong>longest digestion fragment</strong> as the destination vector backbone. If the longest fragment does not correspond to the intended vector backbone, you may manually select the appropriate fragment.Please review the primer design parameters before proceeding, and modify them if necessary.<p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Default</th>
+                        <th>Range</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Restriction enzyme 1</strong></td>
+                        <td>None</td>
+                        <td>Any supported enzyme</td>
+                        <td>Restriction enzyme site added at 5' end of insert.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Restriction enzyme 2</strong></td>
+                        <td>None</td>
+                        <td>Any supported enzyme</td>
+                        <td>Restriction enzyme site added at 3' end of insert.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Target Tm (°C)</strong></td>
+                        <td>55</td>
+                        <td>40–75</td>
+                        <td>Target melting temperature for template-binding region (excluding restriction site).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Primer Conc. (nM)</strong></td>
+                        <td>500</td>
+                        <td>50–2000</td>
+                        <td>Effective primer concentration assumed for in silico Tm calculation. Typical range: 25-1000 nM.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Na⁺ Conc. (mM)</strong></td>
+                        <td>50</td>
+                        <td>0–200</td>
+                        <td>Monovalent cation concentration used for salt-corrected Tm calculation. Typical range: 10-200 mM.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mg²⁺ Conc. (mM)</strong></td>
+                        <td>2.0</td>
+                        <td>0–10</td>
+                        <td>Divalent cation concentration used for Tm calculation. Set to 0 if Mg²⁺ is absent from reaction. Typical range: 0.5-5 mM.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Results and Output</h2>
+            <p>After primer design, the Restriction Cloning module generates a comprehensive set of results to facilitate experimental validation and downstream cloning.<p>
+
+            <h3>Primer Table</h3>
+            <p>Designed primer pairs are reported in a structured table, including primer sequences (5′→3′), length, GC content, and melting temperatures (Tm). Tm values are displayed for both the <strong>annealing core region</strong> and the <strong>full-length primer</strong>, allowing users to assess amplification compatibility. Primer quality metrics, including homopolymer runs, hairpin structures, self-dimer, and cross-dimer formation, are evaluated and flagged to highlight potential risks that may affect PCR performance. <strong>Restriction enzyme recognition sites</strong> added to the primers are <strong>highlighted in bold</strong> within the primer sequences, while protective bases are shown in italics.</p>
+	
+	   <div style="text-align: center; margin: 2em 0;">
+  		<img
+    			src="contents/pictures/RE_primer_table.png"
+			alt="Restriction enzyme cloning primer table"
+    			style="max-width: 60%; height: auto; border-radius: 8px;"
+  		 >
+	   </div>
+
+            <h3>Assembled diagram and Sticky end table</h3>
+	    <p>An <strong>assembled plasmid schematic</strong> is generated to illustrate the cloning workflow, including vector linearization, insert incorporation, and final plasmid assembly. This diagram provides a conceptual overview of fragment orientation and junction structure. For restriction cloning strategies using sticky ends, a <strong>junction-level sticky-end table</strong> is provided. This table summarizes the left and right cohesive ends (5′→3′) at each ligation junction, allowing users to confirm end compatibility and directional cloning design at a glance.<p>
+
+	   <div style="text-align: center; margin: 2em 0;">
+  		<img
+    			src="contents/pictures/RE_assembly_tabel.png"
+			alt="Restriction enzyme cloning assembly output"
+    			style="max-width: 60%; height: auto; border-radius: 8px;"
+  		 >
+	   </div>
+
+            <h3>Simulated Agarose Gel Electrophoresis</h3>
+	    <p>PrimerWeaver generates a <strong>simulated agarose gel image</strong> to predict experimental outcomes for key cloning steps. The gel includes:<p>
+            <ul>
+                <li>A selectable DNA ladder (default: NEB 1 kb Plus DNA Ladder)</li>
+                <li>Undigested vector</li>
+                <li>Restriction-digested vector</li>
+                <li>PCR-amplified insert</li>
+                <li>Assembled plasmid</li>
+                <li>Diagnostic restriction digest of the assembled plasmid</li>
+            </ul>
+	    <p>Predicted band sizes are annotated alongside the gel, enabling users to compare expected fragment sizes with experimental results and quickly identify potential cloning issues.<P>
+
+	   <div style="text-align: center; margin: 2em 0;">
+  		<img
+    			src="contents/pictures/RE_gel.png"
+			alt="Restriction enzyme cloning simulated gel output"
+    			style="max-width: 60%; height: auto; border-radius: 8px;"
+  		 >
+	   </div>
+
+        </div>
+
+        <div class="section">
+            <h2>Primer Design Algorithm</h2>
+            
+            <h3>Primer Structure</h3>
+            <p>Each primer consists of three functional regions:</p>
+            <ul>
+                <li><strong>Annealing core (3′):</strong> template-complementary region that drives PCR annealing (typically 18–30 bp)</li>
+                <li><strong>Restriction Site:</strong> enzyme recognition sequence appended to enable digestion/ligation (typically 6–8 bp)</li>
+                <li><strong>Protective base (5′ flanks):</strong> short bases upstream of the restriction site to improve digestion efficiency (commonly 2–6 nt; enzyme-dependent)</li>
+            </ul>
+
+            <h3>Design Process</h3>
+            <p>During restriction cloning primer design, PrimerWeaver first identifies the <strong>annealing core</strong> at the insert termini, which defines primer annealing behavior and is optimized to meet the target Tm and basic QC constraints. Once the annealing core is determined, the selected <strong>restriction enzyme recognition sites</strong> are appended to the 5′ ends of the primers as non-annealing tags. Finally, short <strong>protective bases</strong> are added upstream of the restriction sites to improve the efficiency of direct digestion of PCR products.<P>
+
+   
+
+               
+    </div>
+</body>
+</html>

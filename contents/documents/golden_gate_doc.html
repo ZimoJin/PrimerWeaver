@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golden Gate Assembly - PrimerWeaver V2</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #333;
+            background: #f9fafb;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e40af;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2563eb;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            font-size: 1.5em;
+        }
+        h3 {
+            color: #3b82f6;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            font-size: 1.2em;
+        }
+        h4 {
+            color: #60a5fa;
+            margin-top: 1.2em;
+            margin-bottom: 0.6em;
+        }
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 1em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        strong {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c2410c;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .abstract {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+        .abstract p {
+            margin: 0;
+            font-style: italic;
+        }
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .section {
+            margin-bottom: 2.5em;
+        }
+        .version-info {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+            margin-top: 3em;
+            padding-top: 2em;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Golden Gate Assembly Primer Designer</h1>
+        
+        <div class="abstract">
+            <p>The Golden Gate Assembly module enables the design of primers for seamless modular DNA assembly using Type IIS restriction enzymes (typically BsaI) and T4 DNA ligase. This tool automates the creation of unique 4 bp overhangs that allow multiple DNA fragments to be assembled in a defined order and orientation in a single one-pot reaction without intermediate purification steps. Golden Gate is particularly well-suited for standardized biological parts libraries, synthetic biology applications, high-throughput genetic circuit construction, and iterative design workflows.</p>
+        </div>
+
+        <div class="section">
+            <h2>Quick Start Guide</h2>
+            <ol>
+                <li>Upload or paste your destination vector and insert sequences (maximum of 6 fragment) in FASTA or plain text format into the corresponding input fields, in the desired assembly order. Select the Type IIS enzyme, verify the automatically detected vector backbone, and adjust design parameters if necessary.</li>
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/GGA_demo.png"
+                    style="max-width: 90%; height: auto; border-radius: 8px;"
+                >
+            </div>
+                <li>Click "Design Primers" to generate primers with integrated overhang sequences. Review the primer table, overhang compatibility matrix, and predicted assembly schematic. Download the assembled FASTA file to verify that the insert orientation matches the intended design. If the orientation is incorrect, reverse-complement the insert sequence and regenerate the primers</li>
+
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>Golden Gate Assembly Principle</h2>
+            
+            <p>Golden Gate assembly employs <strong>Type IIS restriction enzymes</strong> that recognize a specific DNA sequence but cleave outside the recognition site. This unique property allows the generation of <strong>predictable, customizable overhangs</strong> that enable <strong>directional, seamless ligation</strong> of multiple DNA fragments in a single reaction. Crucially, the restriction enzyme recognition sites are removed during assembly, leaving no scars in the final construct.</p>
+
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/GGA_Principle.png"
+                    style="max-width: 60%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+            <h3>Overhang Design Principle</h3>
+            <p>The core strength of Golden Gate lies in the design of unique, non-interfering overhangs. Each fragment pair junction requires a unique 4 bp overhang that is not present elsewhere in the assembly:</p>
+            <ul>
+                <li><strong>4 bp Overhangs:</strong> Type IIS enzymes with 1 bp offset (e.g., BsaI) naturally generate 4 bp sticky ends, which provide sufficient specificity while maintaining assembly simplicity</li>
+                <li><strong>Directional Assembly:</strong> The forward overhang on one fragment must be complementary to the reverse overhang on the adjacent fragment; non-complementary overhangs cannot ligate, preventing misassembly</li>
+                <li><strong>Seamless Junctions:</strong> After assembly, the Type IIS recognition sites flanking the overhangs are removed, resulting in scar-free junctions between fragments</li>
+               
+            </ul>
+           
+        </div>
+
+        <div class="section">
+            <h2>Input Format</h2>
+	    <p>Both vector and insert inputs accept <strong>FASTA or plain text format</strong>. Only <strong>one sequence</strong> is allowed per input field; if multiple FASTA headers are detected, <strong>only the first sequence</strong> will be used. Fragment names extracted from FASTA headers are displayed for reference and will be used in primer naming conventions.</p>
+             <p>PrimerWeaver currently supports <strong>four built-in Type IIs restriction enzymes</strong>. Once a vector sequence is provided, the system <strong>automatically identifies vector features</strong> and displays the positions of all <strong>Type IIs restriction enzyme sites</strong>. The vector map can be rotated to facilitate visualization of the targeted cloning region.</p>
+
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/GGA_input.png"
+                    style="max-width: 60%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+            <h3>Fragment Management</h3>
+            <ul>
+                <li><strong>Add/Remove Fragments:</strong> Add multiple DNA sequences for multi-fragment assembly (2–10 fragments recommended; larger assemblies become more complex)</li>
+                <li><strong>Reorder Fragments:</strong> Adjust assembly order using interface controls; order determines final construct architecture</li>
+                <li><strong>Fragment Names:</strong> Auto-extracted from FASTA headers for clear primer identification; used in output reports</li>
+                <li><strong>Reverse Complement:</strong> Toggle individual fragments if needed to match desired orientation and assembly direction</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Design Parameters</h2>
+		
+	    <p>Please select the preferred Type IIs restriction enzymes from the dropdown list or search by enzyme name. Once <strong>restriction enzymes</strong> are selected, the system automatically identifies the <strong>longest digestion fragment</strong> as the destination vector backbone. If the longest fragment does not correspond to the intended vector backbone, you may manually select the appropriate fragment.Please review the primer design parameters before proceeding, and modify them if necessary.<p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Default</th>
+                        <th>Range</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Type IIS Enzyme</strong></td>
+                        <td>None</td>
+                        <td>BsaI, BsmBI, BbsI, and PaqCI.</td>
+                        <td>Type IIS restriction enzyme used for assembly. Different enzymes have different recognition sequences, cut offsets, and overhang lengths.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Target Tm (°C)</strong></td>
+                        <td>55</td>
+                        <td>40–75</td>
+                        <td>Target melting temperature for the template-binding region of primers (excluding overhang region). Affects primer length and PCR annealing temperature.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Primer Conc. (nM)</strong></td>
+                        <td>500</td>
+                        <td>50–2000</td>
+                        <td>Effective primer concentration assumed for in silico Tm calculation. Typical range: 25-1000 nM.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Na⁺ Conc. (mM)</strong></td>
+                        <td>50</td>
+                        <td>0–200</td>
+                        <td>Monovalent cation concentration used for salt-corrected Tm calculation. Typical range: 10-200 mM.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mg²⁺ Conc. (mM)</strong></td>
+                        <td>2.0</td>
+                        <td>0–10</td>
+                        <td>Divalent cation concentration used for Tm calculation. Set to 0 if Mg²⁺ is absent from reaction. Typical range: 0.5-5 mM.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="section">
+            <h2>Results and Output</h2>
+            
+            <p>After primer design, the Golden Gate Assembly module generates a comprehensive set of results to facilitate experimental validation and downstream cloning.</p>
+
+            <h3>Primer Table</h3>
+	    <p>Designed primer pairs are reported in a structured table, including primer sequences (5′→3′), length, GC content, and melting temperatures (Tm). Tm values are displayed for both the <strong>annealing core region</strong> and the <strong>full-length primer</strong>, allowing users to assess amplification compatibility. Primer quality metrics, including homopolymer runs, hairpin structures, self-dimer, and cross-dimer formation, are evaluated and flagged to highlight potential risks that may affect PCR performance. <strong>Type IIS recognition sites and overhang sequences</strong> are highlighted within the primer sequences for clarity.</p>
+
+
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/GGA_primer_table.png"
+                    alt="Golden Gate primer table"
+                    style="max-width: 60%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+	    <h3>Assembled diagram and Overhang table</h3>
+	    <p>An <strong>assembled plasmid schematic</strong> is generated to illustrate the cloning workflow, including vector linearization, insert incorporation, and final plasmid assembly. This diagram provides a conceptual overview of fragment orientation and junction structure. A <strong>overlap table</strong> displays the overhang pairs at each junction, confirming that adjacent fragments have complementary sticky ends. This table provides a quick visual verification that the assembly architecture is correct and that no overhang conflicts or mismatches are present.</p>
+
+
+	   <div style="text-align: center; margin: 2em 0;">
+  		<img
+    			src="contents/pictures/GGA_assembly_table.png"
+    			style="max-width: 60%; height: auto; border-radius: 8px;"
+  		 >
+	   </div>
+      
+
+            <h3>Simulated Agarose Gel Electrophoresis</h3>
+            <p>PrimerWeaver generates a <strong>simulated agarose gel image</strong> to predict experimental outcomes for key cloning steps. The gel includes:<p>
+
+            <ul>
+                <li>A selectable DNA ladder (default: NEB 1 kb Plus DNA Ladder)</li>
+		<li>Undigested vector</li>
+                <li>Type IIs restriction-digested vector</li>
+                <li>PCR-amplified fragments (one lane per fragment, showing expected size)</li>
+                <li>Assembled plasmid</li>
+            </ul>
+	    <p>Predicted band sizes are annotated alongside the gel, enabling users to compare expected fragment sizes with experimental results and quickly identify potential cloning issues.<P>
+
+	   <div style="text-align: center; margin: 2em 0;">
+  		<img
+    			src="contents/pictures/GGA_gel.png"
+    			style="max-width: 60%; height: auto; border-radius: 8px;"
+  		 >
+	   </div>
+
+        </div>
+
+	<div class="section">
+            <h2>Primer Design Algorithm</h2>
+            
+            <h3>Primer Structure</h3>
+            <p>Each Golden Gate primer consists of three functional regions:</p>
+            <ul>
+                <li><strong>Annealing core (3′):</strong> template-complementary region that drives PCR annealing (typically 18–30 bp)</li>
+                <li><strong>Overhang Region (5′):</strong> Contains the Type IIS restriction recognition site and a customizable 4 bp overhang sequence (typically 11~12 bp)</li>
+                <li><strong>Protective base (5′ flanks):</strong> short bases upstream of the restriction site to improve digestion efficiency (commonly 2–6 nt; enzyme-dependent)</li>
+            </ul>
+
+            <h3>Design Process</h3>
+            <p>During Golden Gate Assembly primer design, PrimerWeaver first identifies and optimizes the <strong>annealing core (template-binding region)</strong> at the termini of each fragment to meet the target Tm and basic QC constraints. Once the annealing cores are fixed, the <strong>user-defined fragment order</strong> is used to determine junction-specific 4-bp sticky ends. For each junction between fragment N and fragment N+1, PrimerWeaver selects a <strong>single 4-bp overhang sequence</strong> for that junction, preferentially using the <strong>last 4 bp of the upstream fragment</strong>; if this sequence has already been assigned elsewhere, the algorithm falls back to the <strong>first 4 bp of the downstream fragment</strong>, when available, to minimize overhang reuse. PrimerWeaver then validates all junctions to ensure overhang uniqueness and compatibility across the assembly. Finally, full-length primers are constructed by appending the selected Type IIS restriction enzyme recognition site, required spacer bases, and the validated overhangs to the 5′ ends of primers.<p>
+        </div>
+       
+    </div>
+</body>
+</html>

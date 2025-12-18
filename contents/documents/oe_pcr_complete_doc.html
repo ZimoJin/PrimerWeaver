@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overlap Extension PCR - PrimerWeaver</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #333;
+            background: #f9fafb;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e40af;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2563eb;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            font-size: 1.5em;
+        }
+        h3 {
+            color: #3b82f6;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            font-size: 1.2em;
+        }
+        h4 {
+            color: #60a5fa;
+            margin-top: 1.2em;
+            margin-bottom: 0.6em;
+        }
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 1em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        strong {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c2410c;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .abstract {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+        .abstract p {
+            margin: 0;
+            font-style: italic;
+        }
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .section {
+            margin-bottom: 2.5em;
+        }
+        .version-info {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+            margin-top: 3em;
+            padding-top: 2em;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Overlap Extension PCR Module Documentation</h1>
+        
+        <div class="abstract">
+            <p>The Overlap PCR (or Overlap Extension PCR, OE-PCR) module enables seamless assembly of multiple DNA fragments through rational design of primers containing complementary overlap sequences. The tool automatically designs primer pairs for each fragment, incorporating user-specified linker sequences (DNA or amino acid) between fragments, while optimizing overlap length and melting temperature for efficient assembly. This method is particularly suited for constructing fusion proteins, joining modular genetic elements, and creating chimeric sequences without requiring restriction enzyme sites.</p>
+        </div>
+
+        <div class="section">
+            <h2>Quick Start Guide</h2>
+            
+            <ol>
+                <li>Add 2 or more DNA fragments in FASTA or plain text format in the desired assembly order. Fragment names will be auto-extracted from FASTA headers for easy identification.Optionally specify linker sequences between fragments (DNA or amino acid), adjust design parameters (core Tm, overlap Tm, salt concentrations), and add optional 5′ sequences for terminal primers (e.g., restriction sites or affinity tags).</li>
+                
+                <div style="text-align: center; margin: 2em 0;">
+                    <img
+                        src="contents/pictures/oe_PCR_demo.png"
+                        alt="OE-PCR fragment input interface"
+                        style="max-width: 90%; height: auto; border-radius: 8px;"
+                    >
+                </div>
+                
+                
+                
+                <li>Click "Design Primers" to automatically design primer pairs with optimized overlap regions. Review primer sequences, melting temperatures, quality metrics, and the predicted assembled sequence. Download results in FASTA format.</li>
+                
+
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>Overlap PCR Principle</h2>
+            
+            <p>Overlap PCR is a powerful molecular biology technique for seamless assembly of multiple DNA fragments through design of primers containing complementary overlap regions. In overlap PCR, the procedure involves multiple PCR rounds: initial round amplifies individual fragments with overlapping primer sequences, followed by assembly PCR where overlapping fragments anneal and are extended by DNA polymerase, creating a continuous product without gaps or additional sequences at junctions.</p>
+                <div style="text-align: center; margin: 2em 0;">
+                    <img
+                        src="contents/pictures/oe_PCR_Principle.png"
+                        alt="OE-PCR design results with primer sequences"
+                        style="max-width: 60%; height: auto; border-radius: 8px;"
+                    >
+                </div>
+                        
+            <h3>Key Design Principles</h3>
+            
+            
+            <p>Overlap PCR primer design follows a <strong>two-stage thermodynamic strategy</strong>, reflecting the distinct requirements of fragment amplification and overlap extension:</p>
+            <ul>
+                <li><strong>Core Region (template-binding):</strong> The template-complementary region is optimized to achieve a user-defined <strong>core Tm</strong> (typically 55–65 °C), ensuring robust and specific amplification of individual fragments in the first PCR step.</li>
+                <li><strong>Overlap Region (extension-driven):</strong> The overlap region is designed to support stable annealing between adjacent PCR products during the extension PCR, where the overlapping fragments act as primers for each other. The thermodynamic stability of this region directly determines the efficiency of overlap extension and full-length product formation.</li>
+            </ul>
+            <p>By optimizing these two regions independently, the module enables reliable amplification of individual fragments while maximizing efficiency and specificity during the overlap extension step.</p>
+
+        </div>
+
+        <div class="section">
+            <h2>Input Format</h2>
+            
+            <p>The module accepts <strong>DNA sequences in FASTA or plain text format</strong>. Multiple fragments can be added sequentially and will be assembled in the order specified by the user. Only <strong>one sequence</strong> is allowed per input field; if multiple FASTA headers are detected, <strong>only the first sequence</strong> will be used. </p>
+            
+            <p>Optional <strong>custom overlap sequences</strong> can be appended to the 5′ ends of the first forward primer and last reverse primer. Optional <strong>linker sequences</strong> can be inserted between fragments, such as amino acids (protein linkers, affinity tags) or nucleotide sequences (e.g., restriction sites, flexible spacers). </p>
+
+                <div style="text-align: center; margin: 2em 0;">
+                    <img
+                        src="contents/pictures/oe_PCR_input.png"
+                        alt="OE-PCR Input Sequence"
+                        style="max-width: 60%; height: auto; border-radius: 8px;"
+                    >
+                </div>
+ <h3>Fragment Management</h3>
+            <ul>
+                <li><strong>Add/Remove Fragments:</strong> Add multiple DNA sequences for multi-fragment assembly (2–10 fragments recommended; larger assemblies become more complex)</li>
+                <li><strong>Reorder Fragments:</strong> Adjust assembly order using interface controls; order determines final construct architecture</li>
+                <li><strong>Fragment Names:</strong> Auto-extracted from FASTA headers for clear primer identification; used in output reports</li>
+                <li><strong>Reverse Complement:</strong> Toggle individual fragments if needed to match desired orientation and assembly direction</li>
+            </ul>
+        </div>
+
+
+        <div class="section">
+            <h2>Design Parameters</h2>
+            
+            <p>Before initiating primer design, please review and adjust the following parameters to match your PCR conditions and assembly requirements.</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Default</th>
+                        <th>Range</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Core Primers Tm (°C)</strong></td>
+                        <td>55</td>
+                        <td>40–75</td>
+                        <td>Target melting temperature for the core (template-binding) region of primers. </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Overlap Region Tm (°C)</strong></td>
+                        <td>55</td>
+                        <td>40–75</td>
+                        <td>Target melting temperature for the overlap region designed for fragment-to-fragment annealing.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Primer Concentration (nM)</strong></td>
+                        <td>500</td>
+                        <td>50–2000</td>
+                        <td>Effective primer concentration assumed for in silico Tm calculation. Typical range: 25-1000 nM.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Na⁺ Concentration (mM)</strong></td>
+                        <td>50</td>
+                        <td>0–200</td>
+                        <td>Monovalent cation concentration used for salt-corrected Tm calculation. Typical range: 10-200 mM.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mg²⁺ Concentration (mM)</strong></td>
+                        <td>2.0</td>
+                        <td>0–10</td>
+                        <td>Divalent cation concentration used for Tm calculation. Set to 0 if Mg²⁺ is absent from reaction. Typical range: 0.5-5 mM.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Forward Terminal Sequence</strong></td>
+                        <td>—</td>
+                        <td>Optional</td>
+                        <td>Custom DNA sequence appended to 5′ end of F1 primer (first fragment forward). Excluded from Tm calculation.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Reverse Terminal Sequence</strong></td>
+                        <td>—</td>
+                        <td>Optional</td>
+                        <td>Custom DNA sequence appended to 5′ end of RN primer (last fragment reverse, reverse complemented). Excluded from Tm calculation.</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            
+        </div>
+
+        <div class="section">
+            <h2>Results and Output</h2>
+            
+            <p>After primer design, the Overlap PCR module generates a comprehensive set of results to facilitate experimental validation and downstream cloning. </p>
+            
+            <h3>Primer Table</h3>
+            <p>Designed primer pairs are presented in a structured table with complete primer sequences information (5′→3′), length, GC content, and melting temperatures (Tm). Tm values are displayed for both the annealing core region and the overlap region, allowing users to assess amplification compatibility. Primer quality metrics, including homopolymer runs, hairpin structures, self-dimer, and cross-dimer formation, are evaluated and flagged to highlight potential risks that may affect PCR performance. Overlap regions are highlighted in bold within primer sequences for easy visualization. <p>
+          
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/oe_PCR_output_results.png"
+                    alt="OE-PCR primer design table results"
+                    style="max-width: 70%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+            <h3>Assembled Sequence</h3>
+            <p>The module generates the predicted final assembled construct showing complete concatenated sequence with all fragments joined. Primer binding regions highlighted for visualization. Please download in FASTA format for sequence validation and downstream analysis</p>
+            
+        </div>
+
+        <div class="section">
+            <h2>Primer Design Algorithm</h2>
+            
+            <h3>Primer Structure</h3>
+		<p>Each overlap PCR primer consists of two functional regions:</p>
+		<ul>
+  			<li><strong>Annealing core (3′):</strong> Template-complementary region that drives annealing and amplification (typically 18–30 bp).</li>
+  			<li><strong>Overlap region (5′):</strong> Sequence complementary to an adjacent fragment, introduced via the primer and used for fragment–fragment annealing and extension during overlap PCR (typically 18–30 bp). </li>
+		</ul>
+         
+            <h3>Design Process</h3>
+            <p>During overlap PCR primer design, the system first constructs the <strong>assembled target sequence</strong> by concatenating all input fragments according to the user-defined order, including any specified <strong>linker sequences</strong>. Junctions between adjacent fragments are then identified on this assembled sequence, and <strong>overlap regions are defined by their positional coordinates</strong> relative to the final construct, rather than by independent fragment sequences. These overlap regions may partially or fully span linker sequences, depending on linker length and junction context, and are therefore <strong>never truncated or discarded</strong>.</p>
+	     <p>Once junction positions and overlap boundaries are fixed, the system designs the <strong>annealing core (template-binding region)</strong> for each primer by scanning the corresponding original fragment sequence upstream or downstream of the junction. Core lengths are iteratively adjusted to achieve the target melting temperature while satisfying QC constraints. Finally, full-length OE-PCR primers are constructed by <strong>positionally concatenating</strong> the optimized annealing cores with their assigned overlap regions, ensuring that each primer introduces the correct junction context while faithfully reconstructing the assembled target sequence during overlap extension.<p>
+            
+    </div>
+</body>
+</html>

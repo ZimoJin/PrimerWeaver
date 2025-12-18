@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USER Enzyme Cloning - PrimerWeaver V2</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #333;
+            background: #f9fafb;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e40af;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2563eb;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            font-size: 1.5em;
+        }
+        h3 {
+            color: #3b82f6;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            font-size: 1.2em;
+        }
+        h4 {
+            color: #60a5fa;
+            margin-top: 1.2em;
+            margin-bottom: 0.6em;
+        }
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 1em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        strong {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c2410c;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .abstract {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+        .abstract p {
+            margin: 0;
+            font-style: italic;
+        }
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .section {
+            margin-bottom: 2.5em;
+        }
+        .version-info {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+            margin-top: 3em;
+            padding-top: 2em;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>USER Enzyme Cloning Primer Designer</h1>
+        
+        <div class="abstract">
+            <p>The USER Cloning module enables the design of primers for directional DNA assembly using the USER enzyme system (Uracil-Specific Excision Reagent). This tool automates the incorporation of uracil bases at defined positions in primers, which are recognized and cleaved by USER enzyme at room temperature to generate compatible sticky ends. USER Cloning combines the simplicity and directional control of restriction enzyme cloning with the flexibility and efficiency of seamless assembly methods, providing a rapid, single-tube alternative for multi-fragment or vector-insert cloning.</p>
+        </div>
+
+        <div class="section">
+            <h2>Quick Start Guide</h2>
+            <ol>
+		<li>Upload or paste your destination vector and insert sequences (maximum of 3 fragment) in FASTA or plain text format into the corresponding input fields, in the desired assembly order. Provide the PCR primers for vector linearization; uracil-containing primers are detected automatically for USER-compatible designs. Verify the automatically detected vector backbone, and adjust design parameters if necessary.</li>
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/USER_demo.png"
+                    style="max-width: 90%; height: auto; border-radius: 8px;"
+                >
+            </div>
+                <li>Click "Design Primers" to generate primers with integrated overhang sequences. Review the primer table, overlap table, and predicted assembly schematic. Download the assembled FASTA file to verify that the insert orientation matches the intended design. If the orientation is incorrect, reverse-complement the insert sequence and regenerate the primers</li>
+
+
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>USER Enzyme Cloning Principle</h2>
+            
+            <p>USER (Uracil-Specific Excision Reagent) cloning is a directional DNA assembly method that exploits the <strong>site-specific removal of uracil (U) residues</strong> incorporated into primers. Uracil bases introduced at defined positions are excised by <strong>uracil DNA glycosylase (UDG)</strong>, generating abasic sites that are subsequently cleaved by <strong>endonuclease VIII</strong>, resulting in complementary <strong>single-stranded overhangs</strong> at fragment ends. These overhangs enable precise and directional annealing between DNA fragments, while final gap repair and strand sealing are typically completed by <strong>host-cell DNA repair machinery</strong> after transformation, without the need for in vitro ligation.</p>
+
+            
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/USER_principle.png"
+                    alt="USER enzyme mechanism"
+                    style="max-width: 60%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+            <h3>Overlap Design Principle</h3>
+            <p>The success of USER cloning depends on the design of short, junction-specific overlaps that become exposed after USER processing of uracil-containing primer extensions. At each fragment junction, a matched pair of complementary overhangs is required to ensure directional assembly and seamless repair after transformation.</p>
+            <ul>
+                <li><strong>Complementary Overhangs:</strong> For each junction, primers are designed so that USER processing exposes complementary single-stranded overhangs at the ends of adjacent fragments. Only correctly matched overhangs can anneal, enforcing the intended fragment order and orientation.</li>
+                <li><strong>Optimal Overhang Length:</strong> USER overhangs are typically <strong>7–15</strong> nucleotides, providing sufficient specificity and annealing stability for directional assembly. In multi-fragment designs, overhangs should be unique at each junction to avoid cross-annealing and misassembly.</li>
+                <li><strong>Seamless Junctions:</strong> Because the overhangs are removed during USER processing and no restriction sites are retained, assembled fragments are joined without introducing extra sequence. Final gap repair and strand sealing are completed in vivo, resulting in scar-free junctions.</li>
+                
+            </ul>
+
+           
+        </div>
+
+        <div class="section">
+            <h2>Input Format</h2>
+            <p>Both vector and insert inputs accept <strong>FASTA or plain text format</strong>. Only <strong>one sequence</strong> is allowed per input field; if multiple FASTA headers are detected, <strong>only the first sequence</strong> will be used. Fragment names extracted from FASTA headers are displayed for reference and will be used in primer naming conventions.<p> 
+	     <p>Once a vector sequence is provided, the system <strong>automatically identifies vector features</strong>. The vector map can be rotated to facilitate visualization of the targeted cloning region.</p>
+
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/USER_input.png"
+                    alt="USER module input"
+                    style="max-width: 60%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+            <h3>Fragment Management</h3>
+            <ul>
+                <li><strong>Add/Remove Fragments:</strong> Add multiple DNA sequences for multi-fragment assembly (2–10 fragments recommended; larger assemblies become more complex)</li>
+                <li><strong>Reorder Fragments:</strong> Adjust assembly order using interface controls; order determines final construct architecture</li>
+                <li><strong>Fragment Names:</strong> Auto-extracted from FASTA headers for clear primer identification; used in output reports</li>
+                <li><strong>Reverse Complement:</strong> Toggle individual fragments if needed to match desired orientation and assembly direction</li>
+            </ul>
+
+
+
+        <div class="section">
+            <h2>Design Parameters</h2>
+            
+            <p>Please provide the primer pairs used for vector linearization. The system will automatically determine whether uracil is present in the input vector primers. If no uracil is detected, the system can redesign the vector primers with uracil incorporated at the specified junctions upon user confirmation. If uracil is already present, the system will directly use the user-provided overhangs for primer design.</p>
+	     <p>Once the vector primer pairs are provided, the system automatically identifies the longest resulting fragment as the default destination vector backbone. If this fragment does not correspond to the intended backbone, you may manually select the appropriate fragment. Before proceeding, please review the primer design parameters and adjust them if necessary.<p>
+            
+            <!-- USER cloning parameter table (same layout as your Gibson table: Category | Parameter | Default | Range | Description) -->
+<table class="param-table">
+  <thead>
+    <tr>
+      <th>Category</th>
+      <th>Parameter</th>
+      <th>Default</th>
+      <th>Range</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <!-- =========================
+         Vector Linearization
+         ========================= -->
+    <tr>
+      <td class="cat" rowspan="4">Vector Linearization</td>
+      <td><strong>Linearization Mode</strong></td>
+      <td>PCR</td>
+      <td>PCR</td>
+      <td>Method used to linearize the destination vector for USER cloning. USER cloning uses PCR-based vector linearization with primer-defined junctions.</td>
+    </tr>
+
+    <tr>
+      <td><strong>Vector PCR Primers (5′→3′)</strong></td>
+      <td>—</td>
+      <td>DNA sequence</td>
+      <td>Forward and reverse primers used to PCR-linearize the vector backbone. Primers may contain uracil (U) or standard bases.</td>
+    </tr>
+
+    <tr>
+      <td><strong>Uracil Detection</strong></td>
+      <td>Auto</td>
+      <td>Auto</td>
+      <td>The system automatically detects whether uracil (U) is present in the input vector primers and uses it to infer USER-compatible junctions.</td>
+    </tr>
+
+    <tr>
+      <td><strong>Vector Backbone Fragment</strong></td>
+      <td>Longest fragment</td>
+      <td>Any PCR fragment</td>
+      <td>Destination vector backbone selected from PCR products. The longest amplified fragment is selected by default and can be manually adjusted.</td>
+    </tr>
+
+    <!-- =========================
+         Primer & Overlap Design
+         ========================= -->
+    <tr>
+      <td class="cat" rowspan="6">Primer &amp; Overlap Design</td>
+      <td><strong>Overlap Length (bp)</strong></td>
+      <td>9</td>
+      <td>6–15</td>
+      <td>Length of complementary overlap exposed after USER processing. </td>
+    </tr>
+
+    <tr>
+      <td><strong>Target Core Tm (°C)</strong></td>
+      <td>55</td>
+      <td>45–70</td>
+      <td>Target melting temperature of the template-binding (annealing) core. Uracil and overlap regions are excluded from Tm calculation.</td>
+    </tr>
+
+    <tr>
+      <td><strong>ΔTm (°C)</strong></td>
+      <td>2.5</td>
+      <td>0–5</td>
+      <td>Maximum allowed melting temperature difference between forward and reverse primer annealing cores.</td>
+    </tr>
+
+    <tr>
+      <td><strong>Primer Concentration (nM)</strong></td>
+      <td>500</td>
+      <td>50–2000</td>
+      <td>Effective primer concentration assumed for in silico Tm calculation. Typical range: 25-1000 nM.</td>
+    </tr>
+
+    <tr>
+      <td><strong>Na<sup>+</sup> Concentration (mM)</strong></td>
+      <td>50</td>
+      <td>0–200</td>
+      <td>Monovalent cation concentration used for salt-corrected Tm calculation. Typical range: 10-200 mM.
+</td>
+    </tr>
+
+    <tr>
+      <td><strong>Mg<sup>2+</sup> Concentration (mM)</strong></td>
+      <td>2.0</td>
+      <td>0–10</td>
+      <td>Divalent cation concentration used for Tm calculation. Set to 0 if Mg²⁺ is absent from reaction. Typical range: 0.5-5 mM.</td>
+    </tr>
+  </tbody>
+</table>
+
+        </div>
+
+        <div class="section">
+            <h2>Results and Output</h2>
+            
+	    <p>After primer design, the USER Cloning module generates a comprehensive set of results to facilitate experimental validation and downstream cloning.</p>
+
+
+            <h3>Primer Table</h3>
+	    <p>Designed primer pairs are presented in a structured table with complete primer sequences information (5′→3′), length, GC content, and melting temperatures (Tm). Tm values are displayed for both the <strong>annealing core region</strong> and the <strong>full-length primer</strong>, allowing users to assess amplification compatibility. Primer quality metrics, including homopolymer runs, hairpin structures, self-dimer, and cross-dimer formation, are evaluated and flagged to highlight potential risks that may affect PCR performance. <strong>Overlap regions are highlighted in bold</strong> within primer sequences for easy visualization.<p>
+
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/USER_primer_tabel.png"
+                    alt="USER Cloning primer table"
+                    style="max-width: 60%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+            <h3>Assembled diagram and Overhang table</h3>
+	    <p>An <strong>assembled plasmid schematic</strong> is generated to illustrate the cloning workflow, including vector linearization, insert incorporation, and final plasmid assembly. This diagram provides a conceptual overview of fragment orientation and junction structure. A <strong>overlap table</strong> displays the overlap sequence at each junction, confirming that adjacent fragments have complementary homologous region. This table provides a quick visual verification that the assembly architecture is correct and that no overhang conflicts or mismatches are present.</p>
+
+
+	   <div style="text-align: center; margin: 2em 0;">
+  		<img
+    			src="contents/pictures/USER_assembly_tabel.png"
+                    	alt="USER Cloning assembly tabel"
+    			style="max-width: 60%; height: auto; border-radius: 8px;"
+  		 >
+	   </div>
+
+
+            <h3>Simulated Agarose Gel Electrophoresis</h3>
+            <p>PrimerWeaver generates a <strong>simulated agarose gel image</strong> to predict experimental outcomes for key cloning steps. The gel includes:<p>
+
+            <ul>
+                <li>A selectable DNA ladder (default: NEB 1 kb Plus DNA Ladder)</li>
+                <li>Undigested vector</li>
+                <li>Linearized vector by PCR</li>
+		<li>PCR-amplified fragments (one lane per fragment, showing expected size including overlap)</li>
+                <li>USER cloning product (showing assembled construct)</li>
+            </ul>
+            <p>Predicted band sizes are annotated, enabling rapid comparison with experimental results and quick identification of digestion efficiency or assembly issues.</p>
+
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/USER_gel.png"
+                    alt="Simulated agarose gel showing USER workflow"
+                    style="max-width: 60%; height: auto; border-radius: 8px;"
+                >
+            </div>
+        </div>
+
+
+        <div class="section">
+            <h2>Primer Design Algorithm</h2>
+	    
+	    <h3>Primer Structure</h3>
+            <p>Each USER cloning primers consists of three functional regions:</p>
+            <ul>
+                <li><strong>Annealing core (3′):</strong> template-complementary region that drives PCR annealing (typically 18–30 bp)</li>
+		<li><strong>Uracil Region:</strong> 1 nucleotides containing uracil modifications, position recognized and cleaved by USER enzyme.</li>
+		<li><strong>Overlap Region (5′):</strong> Sequence complementary to an adjacent fragment that will be exposed after exonuclease digestion (typically 6–15 bp). </li>
+            </ul>
+
+            <h3>Design Process</h3>
+            <p>In USER cloning primer design, the algorithm first operates at the <strong>junction level</strong>, rather than starting from primer cores. For each vector–insert or insert–insert junction, the system identifies a short, junction-centered DNA segment suitable for generating a USER-compatible sticky end. Within this region, a thymine (T) at a defined position is selected and substituted with uracil (U), such that USER enzyme treatment will expose a precise, strand-specific overhang after cleavage. Once the junction-specific overhang sequence and U position are fixed, the algorithm then designs the <strong>template-binding core regions</strong> on each side of the junction by extending away from the overlap boundary and selecting the minimal core length that achieves the target melting temperature. Finally, full-length primers are constructed by concatenating the USER overhang (including the U residue) at the 5′ end with the optimized core sequence at the 3′ end, ensuring that USER cleavage produces the intended complementary sticky ends while PCR amplification remains efficient and specific.<p>
+
+            
+        </div>
+
+
+
+    </div>
+</body>
+</html>

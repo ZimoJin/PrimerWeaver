@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gibson Assembly - PrimerWeaver V2</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #333;
+            background: #f9fafb;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e40af;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2563eb;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            font-size: 1.5em;
+        }
+        h3 {
+            color: #3b82f6;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            font-size: 1.2em;
+        }
+        h4 {
+            color: #60a5fa;
+            margin-top: 1.2em;
+            margin-bottom: 0.6em;
+        }
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 1em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        strong {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c2410c;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .abstract {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+        .abstract p {
+            margin: 0;
+            font-style: italic;
+        }
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .section {
+            margin-bottom: 2.5em;
+        }
+        .version-info {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+            margin-top: 3em;
+            padding-top: 2em;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gibson Assembly Primer Designer</h1>
+        
+        <div class="abstract">
+            <p>The Gibson Assembly module enables the seamless assembly of multiple DNA fragments in a single isothermal one-pot reaction through rational primer design with complementary overlap regions. This tool automates the creation of primers with optimized overlap sequences (typically 20–30 bp) that allow exonuclease, polymerase, and ligase enzymes to assemble DNA fragments without relying on restriction sites. Gibson Assembly is particularly well-suited for rapid prototyping, constructing large multi-fragment constructs, and flexible cloning where restriction sites may not be available.</p>
+        </div>
+
+        <div class="section">
+            <h2>Quick Start Guide</h2>
+            <ol>
+		<li>Upload or paste your destination vector and insert sequences (maximum of 6 fragment) in FASTA or plain text format into the corresponding input fields, in the desired assembly order. Select the vector linearization methods by either restriction enzymes or PCR. Verify the automatically detected vector backbone, and adjust design parameters if necessary.</li>
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/Gibson_demo.png"
+                    style="max-width: 90%; height: auto; border-radius: 8px;"
+                >
+            </div>
+                <li>Click "Design Primers" to generate primers with integrated overhang sequences. Review the primer table, overlap table, and predicted assembly schematic. Download the assembled FASTA file to verify that the insert orientation matches the intended design. If the orientation is incorrect, reverse-complement the insert sequence and regenerate the primers</li>
+
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>Gibson Assembly Principle</h2>
+            
+            <p>Gibson Assembly is an isothermal, one-pot DNA assembly method that enables seamless joining of DNA fragments through <strong>homologous overlap</strong> regions without the need for restriction enzymes. In a single reaction, a <strong>5′ exonuclease</strong> resects the ends of double-stranded DNA fragments to generate complementary 3′ single-stranded overhangs, which anneal specifically between adjacent fragments. A <strong>high-fidelity DNA polymerase</strong> then fills in the remaining gaps using the annealed 3′ ends as primers, and a <strong>thermostable DNA ligase</strong> subsequently seals the nicks in the DNA backbone. Together, these coordinated enzymatic activities result in <strong>scarless assembly</strong> of multiple DNA fragments into a continuous double-stranded DNA molecule, making Gibson Assembly particularly suitable for constructing large or complex DNA constructs./p>
+
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/Gibson_principle.png"
+                    alt="Gibson Assembly mechanism"
+                    style="max-width: 60%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+            <h3>Overlap Design Principle</h3>
+            <p>The success of Gibson Assembly relies on the design of complementary overlap regions between adjacent DNA fragments. Each junction requires a pair of overlaps that are complementary in sequence and sufficient in length to support stable annealing during assembly.</p>
+            <ul>
+                <li><strong>Complementary Overlaps:</strong> The 3′ end of fragment i must be complementary to the 5′ end of fragment i + 1, ensuring specific annealing between adjacent fragments.</li>
+                <li><strong>Optimal Overlap Length:</strong>Overlaps of <strong>20–30 bp</strong> are generally sufficient for most assemblies, balancing thermal stability and primer length; longer overlaps may improve robustness for complex or large constructs.</li>
+                <li><strong>Seamless Junctions:</strong> Because overlaps are derived directly from native sequence, Gibson Assembly produces <strong>scar-free junctions</strong> without introducing additional residues.</li>
+            </ul>
+
+        </div>
+
+        <div class="section">
+            <h2>Input Format</h2>
+	    <p>Both vector and insert inputs accept <strong>FASTA or plain text format</strong>. Only <strong>one sequence</strong> is allowed per input field; if multiple FASTA headers are detected, <strong>only the first sequence</strong> will be used. Fragment names extracted from FASTA headers are displayed for reference and will be used in primer naming conventions.</p>
+	     <p>PrimerWeaver currently supports approximately <strong>100 built-in Type II restriction enzymes</strong>. Once a vector sequence is provided, the system <strong>automatically identifies vector features</strong> and displays the positions of all <strong>single-cut restriction enzyme sites</strong>. The vector map can be rotated to facilitate visualization of the targeted cloning region.</p>
+
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/Gibson_input.png"
+                    alt="Gibson Assembly input"
+                    style="max-width: 60%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+            <h3>Fragment Management</h3>
+            <ul>
+                <li><strong>Add/Remove Fragments:</strong> Add multiple DNA sequences for multi-fragment assembly (2–10 fragments recommended; larger assemblies become more complex)</li>
+                <li><strong>Reorder Fragments:</strong> Adjust assembly order using interface controls; order determines final construct architecture</li>
+                <li><strong>Fragment Names:</strong> Auto-extracted from FASTA headers for clear primer identification; used in output reports</li>
+                <li><strong>Reverse Complement:</strong> Toggle individual fragments if needed to match desired orientation and assembly direction</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Design Parameters</h2>
+            
+            <p>Please select the preferred vector linearization method, either <strong>Type II restriction enzyme digestion</strong> or <strong>PCR amplification</strong>. If restriction enzymes are used for vector linearization, specify whether the <strong>recognition sites should be retained or removed</strong> in the final construct. Once the restriction enzymes are selected, the system automatically identifies the <strong>longest fragment</strong> as the default destination vector backbone. If this fragment does not correspond to the intended backbone, you may manually select the appropriate fragment. Before proceeding, please review the <strong>primer design parameters</strong> and adjust them if necessary.</p>
+            
+            <table>
+  <thead>
+    <tr>
+      <th>Category</th>
+      <th>Parameter</th>
+      <th>Default</th>
+      <th>Range</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <!-- Vector linearization -->
+    <tr>
+      <td rowspan="7"><strong>Vector Linearization</strong></td>
+      <td><strong>Linearization Mode</strong></td>
+      <td>Restriction enzyme</td>
+      <td>Restriction enzyme / PCR</td>
+      <td>
+        Method used to linearize the destination vector prior to Gibson Assembly.
+        Choose restriction enzyme digestion or PCR amplification.
+      </td>
+    </tr>
+
+    <tr>
+      <td><strong>Restriction Enzyme 1 / 2</strong></td>
+      <td>—</td>
+      <td>Built-in Type II enzymes</td>
+      <td>
+        Type II restriction enzyme used for vector digestion when restriction-based
+        linearization is selected.
+      </td>
+    </tr>
+
+    <tr></tr>
+
+    <tr>
+      <td><strong>Keep Recognition Sites</strong></td>
+      <td>Yes</td>
+      <td>Yes / No</td>
+      <td>
+        Specifies whether restriction enzyme recognition sites are retained or removed in the final construct.
+        (If removed, junctions are designed such that recognition sites are not regenerated.)
+      </td>
+    </tr>
+
+    <tr>
+      <td><strong>Vector PCR Primer (5′→3′)</strong></td>
+      <td>—</td>
+      <td>DNA sequence</td>
+      <td>
+        Forward and reverse primer used to PCR-linearize the vector when PCR linearization is selected.
+        Primers should amplify the intended backbone region.
+      </td>
+    </tr>
+
+    <tr></tr>
+
+    <tr>
+      <td><strong>Vector Backbone Fragment</strong></td>
+      <td>Longest fragment</td>
+      <td>Any digestion fragment</td>
+      <td>
+        Destination vector backbone selected from digestion fragments (restriction mode) or amplified segment (PCR mode).
+        The longest digestion fragment is selected by default and can be manually adjusted.
+      </td>
+    </tr>
+
+    <!-- Gibson overlap / primer design -->
+    <tr>
+      <td rowspan="6"><strong>Primer & Overlap Design</strong></td>
+      <td><strong>Overlap Length (bp)</strong></td>
+      <td>25</td>
+      <td>15–40</td>
+      <td>
+        Length of homologous overlap between adjacent fragments for Gibson Assembly.
+        Longer overlaps increase stability but extend primer length.
+      </td>
+    </tr>
+
+    <tr>
+      <td><strong>Target Tm (°C)</strong></td>
+      <td>55</td>
+      <td>40–75</td>
+      <td>
+        Target melting temperature for the template-binding (annealing) core of PCR primers.
+        Overlap regions are excluded from Tm calculation.
+      </td>
+    </tr>
+
+    <tr>
+      <td><strong>ΔTm (°C)</strong></td>
+      <td>2.5</td>
+      <td>0–10</td>
+      <td>
+        Maximum allowed melting temperature difference between forward and reverse primers within the same primer pair.
+      </td>
+    </tr>
+
+    <tr>
+      <td><strong>Primer Concentration (nM)</strong></td>
+      <td>500</td>
+      <td>50–2000</td>
+      <td>
+        Effective primer concentration assumed for in silico Tm calculation. Typical range: 25-1000 nM.
+      </td>
+    </tr>
+
+    <tr>
+      <td><strong>Na⁺ Concentration (mM)</strong></td>
+      <td>50</td>
+      <td>0–200</td>
+      <td>
+       Monovalent cation concentration used for salt-corrected Tm calculation. Typical range: 10-200 mM.
+      </td>
+    </tr>
+
+    <tr>
+      <td><strong>Mg²⁺ Concentration (mM)</strong></td>
+      <td>2.0</td>
+      <td>0–10</td>
+      <td>
+        Divalent cation concentration used for Tm calculation. Set to 0 if Mg²⁺ is absent from reaction. Typical range: 0.5-5 mM.
+
+      </td>
+    </tr>
+
+  </tbody>
+</table>
+
+        </div>
+
+        
+        <div class="section">
+            <h2>Results and Output</h2>
+            
+            <p>After primer design, the Gibson Assembly module generates a comprehensive set of results to facilitate experimental validation and downstream cloning.</p>
+
+            <h3>Primer Table</h3>
+	    <p>Designed primer pairs are presented in a structured table with complete primer sequences information (5′→3′), length, GC content, and melting temperatures (Tm). Tm values are displayed for both the <strong>annealing core region</strong> and the <strong>full-length primer</strong>, allowing users to assess amplification compatibility. Primer quality metrics, including homopolymer runs, hairpin structures, self-dimer, and cross-dimer formation, are evaluated and flagged to highlight potential risks that may affect PCR performance. <strong>Overlap regions are highlighted in bold</strong> within primer sequences for easy visualization.<p>
+
+
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/Gibson_primer_table.png"
+                    alt="Gibson Assembly primer table"
+                    style="max-width: 60%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+	    <h3>Assembled diagram and Overhang table</h3>
+	    <p>An <strong>assembled plasmid schematic</strong> is generated to illustrate the cloning workflow, including vector linearization, insert incorporation, and final plasmid assembly. This diagram provides a conceptual overview of fragment orientation and junction structure. A <strong>overlap table</strong> displays the overlap sequence at each junction, confirming that adjacent fragments have complementary homologous region. This table provides a quick visual verification that the assembly architecture is correct and that no overhang conflicts or mismatches are present.</p>
+
+
+	   <div style="text-align: center; margin: 2em 0;">
+  		<img
+    			src="contents/pictures/Gibson_assembly_table.png"
+    			style="max-width: 60%; height: auto; border-radius: 8px;"
+  		 >
+	   </div>
+            
+            <h3>Simulated Agarose Gel Electrophoresis</h3>
+            <p>PrimerWeaver generates a <strong>simulated agarose gel image</strong> to predict experimental outcomes for key cloning steps. The gel includes:<p>
+
+            <ul>
+                <li>A selectable DNA ladder (default: NEB 1 kb Plus DNA Ladder)</li>
+		<li>Undigested vector</li>
+                <li>Linearized vector by digestion or PCR</li>
+                <li>PCR-amplified fragments (one lane per fragment, showing expected size including overlap)</li>
+                <li>Gibson Assembly reaction product (showing assembled construct)</li>
+                
+            </ul>
+            <p>Predicted band sizes are annotated alongside the gel, enabling users to compare expected fragment sizes with experimental results and quickly identify potential cloning issues.<P>
+
+
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/Gibson_gel.png"
+                    alt="Simulated agarose gel for Gibson Assembly workflow"
+                    style="max-width: 60%; height: auto; border-radius: 8px;"
+                >
+            </div>
+        </div>
+
+
+
+        <div class="section">
+            <h2>Primer Design Algorithm</h2>
+            
+            <h3>Primer Structure</h3>
+            <p>Each Gibson Assembly primers consists of two functional regions:</p>
+            <ul>
+                <li><strong>Annealing core (3′):</strong> template-complementary region that drives PCR annealing (typically 18–30 bp)</li>
+
+		<li><strong>Overlap Region (5′):</strong> Sequence complementary to an adjacent fragment that will be exposed after exonuclease digestion (typically 20–30 bp). </li>
+            </ul>
+
+            <h3>Design Process</h3>
+            <p>During Gibson Assembly primer design, PrimerWeaver first identifies and optimizes the <strong>annealing core (template-binding region)</strong> at the termini of each fragment. This region defines PCR annealing behavior and is iteratively adjusted to achieve the target melting temperature while satisfying basic QC constraints, including GC content and secondary structure avoidance. Once the annealing cores are fixed, <strong>junction-specific overlap regions</strong> are defined according to the user-specified fragment order. For each junction between adjacent fragments, PrimerWeaver assigns complementary overlap sequences derived from the fragment termini to ensure precise and directional annealing after exonuclease resection. Finally, full-length primers are constructed by concatenating the optimized annealing cores with the validated overlap regions, yielding primers that simultaneously amplify the desired fragments and introduce the required homologous overlaps for seamless Gibson Assembly.<p>
+
+           
+        </div>
+
+    </div>
+</body>
+</html>
