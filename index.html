@@ -13,7 +13,7 @@
 </head>
 
 <body>
-    <div id="welcome-screen" style="background: linear-gradient(180deg, #e6f6ff, #fdfdff);">
+    <div id="welcome-screen">
         <div class="welcome-corner-text">PrimerWeaver v1.0.1</div>
         <div class="app-container">
             <nav class="tab-navigation">
@@ -21,10 +21,10 @@
             </nav>
             <main class="tab-content">
                 <div id="start-content" class="content-panel active">
-                    <h1>Welcome to PrimerWeaver!</h1>
+                    <h1>Welcome to <span class="h1-primer">Primer</span><span class="h1-weaver">Weaver</span>!</h1>
 
-                    <img class="welcome-image"
-                        src="contents/logo/welcome-image.png"
+                    <img id="welcome-img" class="welcome-image"
+                        src="contents/logo/welcome-image_light.png"
                         alt="PrimerWeaver workflow diagram">
 
                     <button class="proceed-button">Get Started</button>

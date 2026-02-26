@@ -794,3 +794,112 @@ button:focus-visible {
 #golden-gate-pane .frag-actions .down::before{content:'▼';font-size:14px;line-height:1}
 #user-cloning-pane .insert-controls .remove-insert-btn::before,
 #golden-gate-pane .frag-actions .del::before{content:'×';font-size:16px;line-height:1}
+
+/* ─── Dark Mode ─────────────────────────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --line:  #1e2d45;
+    --muted: #9fb0c9;
+    --ink:   #e2e8f0;
+    --bg:    #070d1a;
+    --card:  #0f172a;
+  }
+
+  body { color: var(--ink); }
+
+  /* Form controls */
+  textarea, select, input {
+    background: #1e293b;
+    color: #e2e8f0;
+    border-color: var(--line);
+  }
+
+  /* Card and box containers */
+  .card {
+    background: var(--card);
+    border-color: var(--line);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  }
+  .box {
+    background: var(--card);
+    border-color: var(--line);
+  }
+
+  /* Simulated Gel and Assembled diagram: keep white so canvas/image renders correctly */
+  #gg-gel-section.box,
+  #cell-gel.box,
+  .asm-card.box,
+  .box:has(> .asm-title),
+  .box:has(> div > .asm-title) {
+    background: #ffffff;
+    border-color: #d1d5db;
+    color: #0b1220;
+  }
+  #gg-gel-section.box h3,
+  #gg-gel-section.box .ggx-header,
+  #cell-gel.box h3,
+  #cell-gel.box .aside,
+  .asm-card.box .asm-title,
+  .asm-card.box h3,
+  .box:has(> .asm-title) .asm-title,
+  .box:has(> div > .asm-title) .asm-title,
+  .box:has(> .asm-title) .aside,
+  .box:has(> div > .asm-title) .aside {
+    color: #0b1220;
+  }
+
+  /* Ghost / secondary buttons */
+  .ghost {
+    background: #1e293b;
+    color: #e2e8f0;
+  }
+
+  /* Tables */
+  th, td { border-color: var(--line); }
+  th {
+    background: #1e293b;
+    color: #93c5fd;
+  }
+  tr:nth-child(even) { background: rgba(255,255,255,0.03); }
+
+  /* Info / warning / highlight pills */
+  .info-box {
+    background: #0f2447;
+    border-color: #3b82f6;
+    color: #bfdbfe;
+  }
+  .warnings-box {
+    background: #1c1200;
+    border-color: #f59e0b;
+    color: #fde68a;
+  }
+  .linker-display {
+    background: #3d2000;
+    color: #fde68a;
+  }
+  .overlap-display {
+    background: #0c2a3f;
+    color: #7dd3fc;
+  }
+  .uracil-highlight {
+    background: #3d2000;
+    color: #fde68a;
+  }
+
+  /* Download button (overrides the !important rules above) */
+  #gg-download-btn {
+    background: #334155 !important;
+    color: #e2e8f0 !important;
+  }
+  #gg-download-btn:hover { background: #3f5068 !important; }
+
+  /* OE-PCR Show Linker hover */
+  #toggle-linker:hover { background: #2a1800; }
+
+  /* Warning modal */
+  .warning-modal-content { background: #0f172a; }
+  .warning-modal-header  { background: #1c1500; border-color: #78350f; }
+  .warning-modal-header h3 { color: #fde68a; }
+  .warning-modal-body p  { color: #d1d5db; }
+  .warning-modal-footer  { background: #1e293b; border-color: var(--line); }
+}

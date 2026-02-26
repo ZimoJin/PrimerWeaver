@@ -72,9 +72,6 @@ const routes = {
 
 // --- Welcome Screen Logic ---
 function initWelcomeScreen() {
-    // Remove the local 'const welcomeScreen = ...'
-    // This function will now use the global 'welcomeScreen' variable,
-    // which will be correctly assigned on page load.
     if (!welcomeScreen) return;
 
     const proceedButton = welcomeScreen.querySelector('.proceed-button');
@@ -82,6 +79,19 @@ function initWelcomeScreen() {
         proceedButton.addEventListener('click', () => {
             location.hash = '#/tools';
         });
+    }
+
+    // Switch the welcome image based on the OS colour scheme.
+    const welcomeImg = document.getElementById('welcome-img');
+    if (welcomeImg) {
+        const darkMQ = window.matchMedia('(prefers-color-scheme: dark)');
+        function applyWelcomeImg() {
+            welcomeImg.src = darkMQ.matches
+                ? 'contents/logo/welcome-image_dark.png'
+                : 'contents/logo/welcome-image_light.png';
+        }
+        applyWelcomeImg();
+        darkMQ.addEventListener('change', applyWelcomeImg);
     }
 }
 
@@ -306,11 +316,8 @@ function initFooterToggle() {
     if (!footer) return;
 
     function updateFooterCollapsible() {
-        // Enable ellipsis + toggle ONLY when the footer would naturally wrap to 2+ lines.
-        // This is independent of viewport size (works anywhere it becomes multi-line).
         const wasExpanded = footer.classList.contains('footer-expanded');
 
-        // Measure natural wrapping height (without truncation)
         footer.classList.remove('footer-collapsible');
         footer.classList.remove('footer-expanded');
 
@@ -332,7 +339,6 @@ function initFooterToggle() {
         }
     }
 
-    // Toggle only if the footer is currently collapsible
     footer.addEventListener('click', function () {
         if (!footer.classList.contains('footer-collapsible')) return;
         footer.classList.toggle('footer-expanded');
@@ -340,8 +346,44 @@ function initFooterToggle() {
 
     updateFooterCollapsible();
     window.addEventListener('resize', updateFooterCollapsible);
-    // In case fonts load late / layout settles after first paint
     setTimeout(updateFooterCollapsible, 250);
+
+    // Auto-collapse to a thin accent bar after 4 seconds; expands on hover via CSS.
+    // On the home route ('/') the footer stays fully visible — collapse begins only
+    // after the user navigates away for the first time.
+    function isHomePage() {
+        const h = location.hash;
+        return h === '' || h === '#' || h === '#/';
+    }
+
+    let collapseTimer = null;
+
+    function scheduleCollapse() {
+        clearTimeout(collapseTimer);
+        if (isHomePage()) return;
+        collapseTimer = setTimeout(function () {
+            footer.classList.add('footer-collapsed');
+            updateHeaderOffsetVar();
+        }, 2000);
+    }
+
+    function onRouteChange() {
+        if (isHomePage()) {
+            // Restore footer when returning home
+            clearTimeout(collapseTimer);
+            footer.classList.remove('footer-collapsed');
+            updateHeaderOffsetVar();
+        } else {
+            scheduleCollapse();
+        }
+    }
+
+    window.addEventListener('hashchange', onRouteChange);
+    scheduleCollapse();
+
+    // Re-measure footer offset after hover expand/collapse so page padding stays accurate.
+    footer.addEventListener('mouseenter', updateHeaderOffsetVar);
+    footer.addEventListener('mouseleave', updateHeaderOffsetVar);
 }
 
 function setActive(path) {
@@ -1458,7 +1500,58 @@ async function loadDocumentHTML(filePath) {
  #docBody .doc-scope h1 {
      padding-bottom: 30px;
      line-height: 1.15;
-}
+ }
+
+ /* ── Dark-mode text overrides ───────────────────────────────────────────── */
+ @media (prefers-color-scheme: dark) {
+     /* All body text → white */
+     #docBody .doc-scope { color: #e2e8f0; }
+
+     /* Headings → light blue tones */
+     #docBody .doc-scope h1 { color: #93c5fd; border-color: #3b82f6; }
+     #docBody .doc-scope h2 { color: #93c5fd; }
+     #docBody .doc-scope h3 { color: #60a5fa; }
+     #docBody .doc-scope h4 { color: #7dd3fc; }
+
+     /* Bold text → soft bright blue instead of dark navy */
+     #docBody .doc-scope strong { color: #bfdbfe; }
+
+     /* Inline code → dark surface, light text */
+     #docBody .doc-scope code {
+         background: #1e293b;
+         color: #7dd3fc;
+     }
+
+     /* Tables */
+     #docBody .doc-scope th {
+         background: #1e293b;
+         color: #93c5fd;
+         border-color: #2d3f5a;
+     }
+     #docBody .doc-scope td { border-color: #2d3f5a; }
+     #docBody .doc-scope tr:nth-child(even) { background: rgba(255,255,255,0.04); }
+
+     /* Footer / version info */
+     #docBody .doc-scope .version-info {
+         color: #9fb0c9;
+         border-color: #2d3f5a;
+     }
+
+     /* ── White boxes: keep light background, restore dark readable text ── */
+     #docBody .doc-scope .abstract,
+     #docBody .doc-scope .info-box,
+     #docBody .doc-scope .warning-box,
+     #docBody .doc-scope .feature-card,
+     #docBody .doc-scope .highlight-box,
+     #docBody .doc-scope .highlight {
+         color: #1e293b;
+     }
+     /* Inline formula / display boxes that use background: #f8fafc */
+     #docBody .doc-scope [style*="background: #f8fafc"],
+     #docBody .doc-scope [style*="background:#f8fafc"] {
+         color: #1e293b !important;
+     }
+ }
 `.trim();
         
         // Extract the "card" itself when present, otherwise fall back to body

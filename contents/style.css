@@ -13,7 +13,7 @@
 
 @media (prefers-color-scheme: dark) {
     :root {
-        --bg: #0b1220;
+        --bg: #070d1a;
         --ink: #e5eefc;
         --muted: #9fb0c9;
         --card: #0f172a;
@@ -21,10 +21,6 @@
         --brand: #60a5fa;
         --brand-ink: #93c5fd;
         --accent: #22d3ee;
-    }
-
-    body {
-        background: linear-gradient(180deg, #0c1222, #0b1220)
     }
 }
 
@@ -43,11 +39,14 @@ body {
     overflow-x: hidden;
     font: 18px/1.55 system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
     color: var(--ink);
-    background-image: linear-gradient(180deg, #e6f6ff, #fdfdff);
-    background-color: #fdfdff;
-    /* Sets the solid white color for the rest of the page */
-    background-repeat: no-repeat;
-    /* Stops the gradient from repeating */
+    background: linear-gradient(180deg, #e6f6ff, #fdfdff) no-repeat, #fdfdff;
+    transition: background 0.3s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background: var(--bg);
+    }
 }
 
 /* While the welcome overlay is shown, scroll ONLY inside the overlay. */
@@ -98,10 +97,9 @@ a:not(.btn):not(.cta):hover {
 
 .welcome-image:hover {
     transform: scale(1.02);
-    /* Subtle scale on hover */
     opacity: 0.95;
-    /* Slight fade for elegance */
 }
+
 
 .h1-primer {
     color: #3a0c5f;
@@ -111,6 +109,27 @@ a:not(.btn):not(.cta):hover {
 .h1-weaver {
     color: #1ca4b6;
     font-size: 24px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .h1-primer { color: #c084fc; }
+    .h1-weaver { color: #22d3ee; }
+}
+
+/* Welcome h1 spans: override #start-content h1 specificity and keep the h1 font size */
+#start-content .h1-primer {
+    font-size: inherit;
+    color: #3a0c5f;
+}
+
+#start-content .h1-weaver {
+    font-size: inherit;
+    color: #1ca4b6;
+}
+
+@media (prefers-color-scheme: dark) {
+    #start-content .h1-primer { color: #c084fc; }
+    #start-content .h1-weaver { color: #22d3ee; }
 }
 
 .brand:hover .logo-img {
@@ -447,27 +466,23 @@ a:not(.btn):not(.cta):hover {
 
 .dropdown-content {
     position: absolute;
-    /* Frosted glass background from .card */
-    background: linear-gradient(180deg, #fdfdff, #f3f9ff);
+    background: var(--card);
     border: 1px solid var(--line);
     width: 220px;
-    /* Softer shadow from .card */
     box-shadow: 0 12px 28px rgba(2, 6, 23, .06);
     border-radius: var(--radius);
     z-index: 120;
     padding: 8px;
-    /* Increased padding for breathing room */
     left: 50%;
     /* Animation properties */
     opacity: 0;
     visibility: hidden;
     transform: translateX(-50%) translateY(-5px);
-    /* Start slightly up */
     transition: all 0.25s ease-out;
 }
 
 .menu .dropdown-content a {
-    color: var(--muted);
+    color: var(--ink);
     padding: 10px 16px;
     text-decoration: none;
     display: block;
@@ -501,13 +516,8 @@ a:not(.btn):not(.cta):hover {
 }
 
 @media (prefers-color-scheme: dark) {
-    .dropdown-content {
-        background-color: var(--card);
-        border-color: var(--line);
-    }
-
     .dropdown-content a:hover {
-        background-color: #0f172a;
+        background-color: rgba(96, 165, 250, 0.12);
     }
 }
 
@@ -760,15 +770,18 @@ section {
 }
 
 .card {
-    /* --- New Frosted Glass Style --- */
     background: linear-gradient(180deg, #fdfdff, #f3f9ff);
-    /* Very light blue gradient */
     border: 1px solid var(--line);
-    /* Use the standard line color */
     border-radius: var(--radius);
     box-shadow: 0 12px 28px rgba(2, 6, 23, .06);
     padding: 22px 28px;
     transition: all 0.3s ease-out;
+}
+
+@media (prefers-color-scheme: dark) {
+    .card {
+        background: var(--card);
+    }
 }
 
 .card:hover {
@@ -929,20 +942,45 @@ h3 {
 }
 
 .footer {
-    /* These new lines fix it to the bottom */
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
     background: var(--bg);
-    /* Gives it a solid background */
     z-index: 1000;
-    /* Keeps it on top of content and welcome screen */
     border-top: 1px solid var(--line);
     color: var(--muted);
     text-align: center;
     padding: 12px;
-    /* Reduced from 16px to 12px (3/4 of original) */
+    transition: max-height 0.4s ease, padding 0.4s ease, opacity 0.4s ease;
+    max-height: 60px;
+    overflow: hidden;
+}
+
+/* Collapsed state: shrinks to a thin accent bar.
+   Transition has a 0.9s delay so re-collapse isn't jarring after mouse-leave. */
+.footer.footer-collapsed {
+    max-height: 4px;
+    padding: 0;
+    opacity: 0.5;
+    border-top: 4px solid var(--brand);
+    background: var(--brand);
+    cursor: pointer;
+    transition: max-height 0.4s ease 1.5s, padding 0.4s ease 1.5s,
+                opacity 0.4s ease 1.5s, border-top 0.4s ease 1.5s,
+                background 0.4s ease 1.5s;
+}
+
+/* Expand on hover — quick, no delay */
+.footer.footer-collapsed:hover {
+    max-height: 60px;
+    padding: 12px;
+    opacity: 1;
+    border-top: 1px solid var(--line);
+    background: var(--bg);
+    transition: max-height 0.3s ease, padding 0.3s ease,
+                opacity 0.3s ease, border-top 0.3s ease,
+                background 0.3s ease;
 }
 
 /* Footer: enable ellipsis + click-to-expand ONLY when JS marks it collapsible */
@@ -1049,22 +1087,19 @@ h3 {
     display: flex;
     justify-content: center;
     align-items: center;
-    /* Keep centered by default */
     z-index: 999;
     opacity: 1;
     padding: calc(var(--header-offset, 56px) + 14px) 1rem calc(var(--footer-offset, 48px) + 12px);
-    /* Bottom padding for footer visibility */
     transform: translateY(0);
-    transition: opacity 0.5s ease-out, transform 0.5s ease-in;
+    transition: opacity 0.5s ease-out, transform 0.5s ease-in, background 0.3s ease;
     will-change: opacity, transform;
     overflow-y: auto;
-    /* Allow scrolling if content is too tall */
+    background: linear-gradient(180deg, #e6f6ff, #fdfdff);
 }
 
 @media (prefers-color-scheme: dark) {
     #welcome-screen {
-        background: rgba(15, 23, 42, 0.7);
-        /* Dark overlay */
+        background: var(--bg);
     }
 }
 
@@ -1112,10 +1147,7 @@ header {
     /* Below header */
     width: 100%;
     max-width: 800px;
-    /* <-- This gives it a max width */
     background: transparent;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: none;
     border: none;
     border-radius: none;
     box-shadow: none;
@@ -1487,6 +1519,25 @@ header {
     }
 }
 
+@media (max-width: 1000px) and (prefers-color-scheme: dark) {
+    .menu {
+        background: rgba(15, 23, 42, 0.97);
+        border-color: var(--line);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+    }
+    .menu a[aria-current="page"] {
+        background: linear-gradient(180deg, #13243a, #0f1e34);
+        color: var(--brand-ink);
+    }
+    .menu>a:hover:not(.cta),
+    .menu>.dropdown>a:hover:not(.cta) {
+        background: rgba(255, 255, 255, 0.06);
+    }
+    .menu .dropdown-content a:hover {
+        background: rgba(255, 255, 255, 0.06);
+    }
+}
+
 @keyframes dynamicPopIn {
     0% {
         opacity: 0;
@@ -1509,8 +1560,7 @@ header {
 /* --- Workflow Tree Styles (Revised) --- */
 .workflow-tree {
     padding: 20px 28px 28px 28px;
-    /* Increased padding */
-    background: #ffffff;
+    background: var(--card);
     border-radius: 12px;
     border: 1px solid var(--line);
     margin-bottom: 24px;
