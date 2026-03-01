@@ -1714,18 +1714,20 @@ function showCDSDetectionModal(candidates) {
   if (!modal) {
     modal = document.createElement('div');
     modal.id = 'cds-detection-modal';
+    const _dk = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     modal.style.cssText = `
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: white;
-      border: 2px solid #333;
+      background: ${_dk ? '#0f172a' : 'white'};
+      border: 2px solid ${_dk ? '#334155' : '#333'};
       border-radius: 8px;
       padding: 20px;
       max-width: 500px;
       z-index: 10000;
       box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      color: ${_dk ? '#e2e8f0' : 'inherit'};
     `;
     document.body.appendChild(modal);
   }
@@ -3496,9 +3498,25 @@ async function onDesignClickDNAMode() {
         editedTemplateLength: eInfo.editedTemplate.length
       });
 
+      // Build CDS-style description with lowercase nt
+      const origNt = (eInfo.originalSegment || '').toLowerCase();
+      const newNt  = (edit.newSeq || '').toLowerCase();
+      let dnaDescription;
+      if (edit.operation === 'substitution') {
+        dnaDescription = edit.startPos === edit.endPos
+          ? `${origNt}${edit.startPos}${newNt}`
+          : `${origNt}[${edit.startPos}-${edit.endPos}]${newNt}`;
+      } else if (edit.operation === 'insertion') {
+        dnaDescription = `ins${edit.startPos}${newNt}`;
+      } else if (edit.operation === 'deletion') {
+        dnaDescription = `Δ${origNt}[${edit.startPos}-${edit.endPos}]`;
+      } else {
+        dnaDescription = edit.description;
+      }
+
       results.push({
         id: edit.index,
-        description: edit.description,
+        description: dnaDescription,
         operation: edit.operation,
         startPos: edit.startPos,
         endPos: edit.endPos,
@@ -3723,7 +3741,6 @@ function renderDNAEditResults(results, origSeq, finalSeq, edits, rawTemplate = n
       
       const tbody = document.createElement('tbody');
       
-      // Generate operation string for Fmut/Rmut naming (e.g., del100-107, rep100-107, ins100)
       let operationStr = editResult.description || `edit${editIdx + 1}`;
       
       // Generate primer names based on naming convention

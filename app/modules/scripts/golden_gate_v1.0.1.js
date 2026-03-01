@@ -59,6 +59,184 @@ function initGoldenGate(container) {
     return out;
   };
 
+  // ==================== Fidelity Calculation ====================
+  // Based on Pryor et al. (2020) PLOS ONE — NEB Ligase Fidelity Viewer logic
+  const FIDELITY_MATRIX_CACHE = {};
+
+  async function loadFidelityMatrix(enzymeName) {
+    const key = (enzymeName === 'BbsI') ? 'BbsI' : 'BsaI';
+    if (FIDELITY_MATRIX_CACHE[key]) return FIDELITY_MATRIX_CACHE[key];
+    try {
+      const resp = await fetch(`./modules/scripts/${key}_global_matrix.json`);
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const json = await resp.json();
+      const m = {
+        rows: json.rows_top_strand_5to3,
+        cols: json.cols_bottom_strand_5to3,
+        matrix: json.matrix,
+        rowIndex: {},
+        colIndex: {}
+      };
+      m.rows.forEach((r, i) => { m.rowIndex[r] = i; });
+      m.cols.forEach((c, i) => { m.colIndex[c] = i; });
+      FIDELITY_MATRIX_CACHE[key] = m;
+      return m;
+    } catch (e) {
+      console.error('Failed to load fidelity matrix for', key, e);
+      return null;
+    }
+  }
+
+  async function calculateFidelity(junctions, enzymeName) {
+    const mat = await loadFidelityMatrix(enzymeName);
+    if (!mat) return null;
+
+    const inputOHs = [];
+    const allOHs = new Set();
+    for (const j of junctions) {
+      const oh = (j.leftOH || '').toUpperCase();
+      const ohR = (j.rightOH || '').toUpperCase();
+      if (oh.length === 4) { inputOHs.push(oh); allOHs.add(oh); }
+      if (ohR.length === 4) allOHs.add(ohR);
+    }
+    const rcOH = s => rc(s);
+    for (const oh of [...allOHs]) allOHs.add(rcOH(oh));
+    const fullSet = [...allOHs];
+
+    const perOH = [];
+    for (const oh of inputOHs) {
+      const r = mat.rowIndex[oh];
+      const partner = rcOH(oh);
+      const c = mat.colIndex[partner];
+      if (r === undefined || c === undefined) continue;
+      let totalSubset = 0;
+      for (const target of fullSet) {
+        const tc = mat.colIndex[target];
+        if (tc !== undefined) totalSubset += mat.matrix[r][tc] || 0;
+      }
+      const correct = mat.matrix[r][c] || 0;
+      const p = totalSubset > 0 ? correct / totalSubset : 0;
+      perOH.push({ oh, partner, correct, totalSubset, p });
+    }
+
+    let overall = 1.0;
+    for (const item of perOH) overall *= item.p;
+
+    // Build ligation frequency matrix for detail view
+    const sortedOHs = sortOHsPaired(fullSet);
+    const matrixGrid = buildFreqMatrix(sortedOHs, mat);
+
+    return { perOH, overall, enzymeName, matrixGrid, sortedOHs };
+  }
+
+  function sortOHsPaired(ohArray) {
+    const used = new Set();
+    const sorted = [];
+    const alpha = [...ohArray].sort();
+    for (const oh of alpha) {
+      if (used.has(oh)) continue;
+      const partner = rc(oh);
+      used.add(oh);
+      sorted.push(oh);
+      if (ohArray.includes(partner) && !used.has(partner)) {
+        used.add(partner);
+        sorted.push(partner);
+      }
+    }
+    return sorted;
+  }
+
+  function buildFreqMatrix(sortedOHs, mat) {
+    const allCounts = [];
+    for (const oh1 of sortedOHs) {
+      for (const oh2 of sortedOHs) {
+        const r = mat.rowIndex[oh1], c = mat.colIndex[oh2];
+        if (r !== undefined && c !== undefined) allCounts.push(mat.matrix[r][c] || 0);
+      }
+    }
+    const maxCount = Math.max(0, ...allCounts);
+    const highTh = maxCount * 0.5, modestTh = maxCount * 0.1;
+
+    const grid = {};
+    for (const oh1 of sortedOHs) {
+      grid[oh1] = {};
+      for (const oh2 of sortedOHs) {
+        const r = mat.rowIndex[oh1], c = mat.colIndex[oh2];
+        const count = (r !== undefined && c !== undefined) ? (mat.matrix[r][c] || 0) : 0;
+        const isWC = rc(oh1) === oh2;
+        let type = 'trace';
+        if (isWC) type = 'wc';
+        else if (count > highTh) type = 'high';
+        else if (count > modestTh) type = 'modest';
+        grid[oh1][oh2] = { count, type };
+      }
+    }
+    return grid;
+  }
+
+  function renderFidelitySection(result) {
+    if (!result) return '<div class="aside">Fidelity data unavailable.</div>';
+    const { overall, enzymeName, matrixGrid, sortedOHs } = result;
+    const pct = (overall * 100).toFixed(1);
+
+    const dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    let color;
+    if (overall >= 0.9) color = dark ? '#34d399' : '#065f46';
+    else if (overall >= 0.7) color = dark ? '#fcd34d' : '#92400e';
+    else color = dark ? '#f87171' : '#991b1b';
+
+    const uid = 'fid-' + Date.now();
+    const headBg = dark ? '#1e293b' : '#f3f4f6';
+    const headBorder = dark ? '#334155' : '#d1d5db';
+    const summaryColor = dark ? '#94a3b8' : '#4b5563';
+
+    let html = `<p style="margin:6px 0; color:${color}; font-weight:600;">Estimated Ligation Fidelity: ${pct}%</p>`;
+
+    // Collapsible matrix
+    html += `<details id="${uid}" style="margin-top:4px;">`;
+    html += `<summary style="cursor:pointer; color:${summaryColor}; font-size:0.92rem; user-select:none;">▶ Ligation frequency matrix</summary>`;
+    html += `<div style="overflow-x:auto; margin-top:8px;">`;
+    html += `<table style="border-collapse:collapse; font-size:0.82rem;">`;
+
+    // Header
+    html += `<thead><tr><th style="padding:4px 6px; background:${headBg}; border:1px solid ${headBorder}; color:${dark ? '#e2e8f0' : 'inherit'};"></th>`;
+    for (const oh of sortedOHs) {
+      html += `<th style="padding:4px 6px; background:${headBg}; border:1px solid ${headBorder}; font-family:monospace; font-size:0.78rem; color:${dark ? '#e2e8f0' : 'inherit'};">${oh}</th>`;
+    }
+    html += `</tr></thead><tbody>`;
+
+    // Rows
+    for (const oh1 of sortedOHs) {
+      html += `<tr><td style="padding:4px 6px; background:${headBg}; border:1px solid ${headBorder}; font-family:monospace; font-weight:700; font-size:0.78rem; color:${dark ? '#e2e8f0' : 'inherit'};">${oh1}</td>`;
+      for (const oh2 of sortedOHs) {
+        const cell = matrixGrid[oh1][oh2];
+        let bg, fg;
+        if (cell.type === 'wc') { bg = '#1e40af'; fg = '#ffffff'; }
+        else if (cell.type === 'high') { bg = '#ea580c'; fg = '#ffffff'; }
+        else if (cell.type === 'modest') { bg = dark ? '#b45309' : '#fdba74'; fg = dark ? '#fde68a' : '#000000'; }
+        else if (cell.count > 0) { bg = dark ? '#422006' : '#fef3c7'; fg = dark ? '#fcd34d' : '#78350f'; }
+        else { bg = dark ? '#0f172a' : '#ffffff'; fg = dark ? '#64748b' : '#9ca3af'; }
+        const txt = cell.count > 0 ? cell.count : '';
+        html += `<td style="padding:3px 5px; border:1px solid ${headBorder}; text-align:center; background:${bg}; color:${fg}; font-family:monospace; min-width:40px; font-size:0.78rem;">${txt}</td>`;
+      }
+      html += `</tr>`;
+    }
+    html += `</tbody></table></div>`;
+
+    // Legend
+    const legendColor = dark ? '#94a3b8' : '#4b5563';
+    const legendBorder = dark ? '#475569' : '#d1d5db';
+    html += `<div style="margin-top:8px; display:flex; gap:12px; flex-wrap:wrap; font-size:0.82rem; color:${legendColor};">`;
+    html += `<span><span style="display:inline-block;width:12px;height:12px;background:#1e40af;border:1px solid ${legendBorder};vertical-align:middle;margin-right:3px;"></span>Watson-Crick</span>`;
+    html += `<span><span style="display:inline-block;width:12px;height:12px;background:#ea580c;border:1px solid ${legendBorder};vertical-align:middle;margin-right:3px;"></span>high mismatch</span>`;
+    html += `<span><span style="display:inline-block;width:12px;height:12px;background:${dark ? '#b45309' : '#fdba74'};border:1px solid ${legendBorder};vertical-align:middle;margin-right:3px;"></span>modest</span>`;
+    html += `<span><span style="display:inline-block;width:12px;height:12px;background:${dark ? '#422006' : '#fef3c7'};border:1px solid ${legendBorder};vertical-align:middle;margin-right:3px;"></span>trace</span>`;
+    html += `</div>`;
+
+    html += `</details>`;
+    return html;
+  }
+
   // Standard MW warning modal (instead of legacy OK-only popup)
   function showMWMessage(message) {
     const warningsBox = byId('warnings-box');
@@ -350,7 +528,7 @@ function initGoldenGate(container) {
         return 'ACGTACGTAC'.slice(0, len);
       };
 
-  function designGGPrimers(vectorRaw, frags, enzymeName, clampN, tmTarget, Na, conc, preferVectorEnds){
+  async function designGGPrimers(vectorRaw, frags, enzymeName, clampN, tmTarget, Na, conc, preferVectorEnds){
     const enz = TYPEIIS[enzymeName];
     const vec = cleanFasta(vectorRaw);
     const report = {warnings:[], vector:{len:vec.length}};
@@ -405,35 +583,98 @@ function initGoldenGate(container) {
       usedOH.add(I_R[k-1]);
     }
 
-    // internal junctions: Insert i → Insert i+1
-    for(let i=0; i<k-1; i++){
-      const prev = inserts[i];
-      const next = inserts[i+1];
-      const preferred = tail4(prev);
-      const alternative = head4(next);
-      let chosen = preferred;
+    // Fidelity-aware internal junction overhang selection (seamless cloning).
+    // For each junction i→i+1, candidates are tail4(insert_i) or head4(insert_i+1).
+    // We enumerate valid combinations and pick the one with the highest ligation fidelity.
+    if(k > 1){
+      const junctionCandidates = [];
+      for(let i=0; i<k-1; i++){
+        const a = tail4(inserts[i]).toUpperCase();
+        const b = head4(inserts[i+1]).toUpperCase();
+        junctionCandidates.push(a === b ? [a] : [a, b]);
+      }
 
-      // avoid reused overhangs if possible
-      if(chosen && usedOH.has(chosen)){
-        if(alternative && !usedOH.has(alternative)){
-          chosen = alternative;
-        }else if(preferred){
-          const msgAlt = (alternative && alternative !== preferred) ? ` / ${alternative}` : '';
-          report.warnings.push(`Junction Insert #${i+1} → Insert #${i+2}: overhang ${preferred}${msgAlt} already used; keeping ${preferred}.`);
+      const isHomopolymer = s => s.length >= 4 && s.split('').every(c => c === s[0]);
+      const isPalindrome4 = s => s.length === 4 && rc(s) === s;
+      const isValid = oh => oh.length === 4 && /^[ATGC]{4}$/.test(oh) && !isHomopolymer(oh) && !isPalindrome4(oh);
+
+      // Fixed vector junction overhangs (one per junction, not both strands)
+      const fixedJunctionOHs = [];
+      if(vOH && vOH.leftOH) fixedJunctionOHs.push(vOH.leftOH.toUpperCase());
+      if(vOH && vOH.rightOH) fixedJunctionOHs.push(vOH.rightOH.toUpperCase());
+      const numJunctions = junctionCandidates.length;
+
+      let bestCombo = null;
+      let bestFidelity = -1;
+
+      const validCombos = [];
+      const collect = (idx, current) => {
+        if(idx === numJunctions){
+          const combo = [...current];
+          const allJunctionOHs = fixedJunctionOHs.concat(combo);
+          const withRC = allJunctionOHs.concat(allJunctionOHs.map(o => rc(o)));
+          const seen = new Set();
+          for(const oh of withRC){
+            if(seen.has(oh)){ return; }
+            seen.add(oh);
+          }
+          validCombos.push(combo);
+          return;
+        }
+        for(const cand of junctionCandidates[idx]){
+          if(!isValid(cand)) continue;
+          collect(idx+1, [...current, cand]);
+        }
+      };
+      collect(0, []);
+
+      if(validCombos.length > 0){
+        try {
+          const mat = await loadFidelityMatrix(enzymeName);
+          if(mat){
+            for(const combo of validCombos){
+              const inputOHs = fixedJunctionOHs.concat(combo);
+              const fullSet = new Set(inputOHs);
+              for(const oh of [...fullSet]) fullSet.add(rc(oh));
+              const fullArr = [...fullSet];
+              let fid = 1.0;
+              for(const oh of inputOHs){
+                const r = mat.rowIndex[oh];
+                const partner = rc(oh);
+                const c = mat.colIndex[partner];
+                if(r === undefined || c === undefined){ fid = 0; break; }
+                let total = 0;
+                for(const t of fullArr){
+                  const tc = mat.colIndex[t];
+                  if(tc !== undefined) total += mat.matrix[r][tc] || 0;
+                }
+                const correct = mat.matrix[r][c] || 0;
+                fid *= total > 0 ? correct / total : 0;
+              }
+              if(fid > bestFidelity){
+                bestFidelity = fid;
+                bestCombo = combo;
+              }
+            }
+          }
+        } catch(e) {
+          console.warn('Fidelity matrix unavailable, falling back to default selection:', e);
         }
       }
-      if(!chosen){
-        chosen = preferred || alternative || 'NNNN';
+
+      if(!bestCombo){
+        bestCombo = junctionCandidates.map(c => c[0]);
       }
 
-      // We want front4 = upstream fragment's visible sticky end.
-      // So we assign the COMPLEMENT of chosen to the upstream right end,
-      // and chosen itself to the downstream left end.
-      if(!I_R[i]) I_R[i] = rc(chosen);   // Insert i right end
-      if(!I_L[i+1]) I_L[i+1] = chosen;       // Insert i+1 left end
+      report.overhangFidelity = bestFidelity >= 0 ? bestFidelity : null;
 
-      usedOH.add(chosen);
-      usedOH.add(rc(chosen));
+      for(let i=0; i<k-1; i++){
+        const chosen = bestCombo[i];
+        if(!I_R[i]) I_R[i] = rc(chosen);
+        if(!I_L[i+1]) I_L[i+1] = chosen;
+        usedOH.add(chosen);
+        usedOH.add(rc(chosen));
+      }
     }
 
     // if vector didn't fix first/last overhangs, fallback to seamless
@@ -471,8 +712,8 @@ function initGoldenGate(container) {
       const seq = inserts[idx];
       const headerName = headers[idx];
       const baseTag = headerName ? headerName : ('insert' + insertIdx);
-      const primerLabelF = baseTag + '-F';
-      const primerLabelR = baseTag + '-R';
+      const primerLabelF = baseTag + '(' + enzymeName + ')-F';
+      const primerLabelR = baseTag + '(' + enzymeName + ')-R';
       const name = 'Insert #' + insertIdx;
       if(!seq){
         primers.push({name, error:'Empty sequence', labelF: primerLabelF, labelR: primerLabelR, insertName: headerName, baseTag});
@@ -1662,10 +1903,10 @@ function initGoldenGate(container) {
     fillInsert(rows[0], insertSamples[0]);
     fillInsert(rows[1], insertSamples[1]);
 
-    // Set enzyme to BsaI
+    // Set enzyme to Esp3I
     const enzSel = container.querySelector('#gg-enzyme');
     if (enzSel) {
-      enzSel.value = 'BsaI';
+      enzSel.value = 'Esp3I';
       enzSel.dispatchEvent(new Event('change', { bubbles: true }));
     }
   });
@@ -1754,7 +1995,7 @@ function initGoldenGate(container) {
   });
 
   // Run
-  container.querySelector('#gg-run').addEventListener('click', ()=>{
+  container.querySelector('#gg-run').addEventListener('click', async ()=>{
     const seqEls = [
       container.querySelector('#gg-vector'),
       ...Array.from(container.querySelectorAll('#frag-list .frag-seq'))
@@ -1841,7 +2082,7 @@ function initGoldenGate(container) {
         });
       }
 
-      const proceed = () => {
+      const proceed = async () => {
         try {
           const enzObj   = TYPEIIS[enz];
           const vecClean = cleanFasta(vector || '');
@@ -1921,7 +2162,7 @@ function initGoldenGate(container) {
           }
 
           // Normal case: vector has sites, design primers
-          const {report, primers} = designGGPrimers(vector, frags, enz, clampN, tmTarget, Na, conc, preferVectorEnds);
+          const {report, primers} = await designGGPrimers(vector, frags, enz, clampN, tmTarget, Na, conc, preferVectorEnds);
           window._ggPrimers = primers;
 
           const vecClean2 = cleanFasta(vector);
@@ -1948,20 +2189,13 @@ function initGoldenGate(container) {
                   return vecClean2.slice(start) + vecClean2.slice(0,(start+len)%N);
                 }
                 const backboneSeq = subseq(vOH2.cutL, backboneLen);
-                // Include the overhang at the "cutR" end (vOH2.leftOH) once in the assembled sequence.
-                // This overhang is not necessarily contained within backboneSeq (which ends at cutR),
-                // and omission can lead to an assembled sequence shorter by the overhang length (typically 4 bp).
-                const tailOH = vOH2.leftOH || '';
-                const tailOHToAdd = (tailOH && !backboneSeq.endsWith(tailOH)) ? tailOH : '';
-                if (tailOHToAdd) {
-                  console.log('[Golden Gate Debug] Adding vector-end overhang to assembledSeq:', {
-                    enz,
-                    overhangLen: (enzObj2 && enzObj2.overhang) || null,
-                    leftOH: vOH2.leftOH,
-                    rightOH: vOH2.rightOH,
-                    added: tailOHToAdd
-                  });
-                }
+                // Seamless assembly: backbone + inserts joined directly.
+                // The V→I1 junction overhang (top strand) = subseq(cutR, overhang) = rc(leftOH).
+                // Only add it if the first insert doesn't already start with it (seamless = no extra bp).
+                const junctionOH = vOH2.leftOH ? rc(vOH2.leftOH) : '';
+                const firstInsert = insertsCleanList[0] || '';
+                const ohAlreadyInInsert = junctionOH && firstInsert.toUpperCase().startsWith(junctionOH.toUpperCase());
+                const tailOHToAdd = (junctionOH && !ohAlreadyInInsert) ? junctionOH : '';
                 assembledSeq = backboneSeq + tailOHToAdd + insertsCleanList.join('');
                 assembledLen = assembledSeq.length;
               }else{
@@ -2193,6 +2427,19 @@ function initGoldenGate(container) {
       ${renderOHTable(report.junctions, insertCount, report.insertHeaders, report.vectorName) + overhangWarningHtml}
     `;
     leftCol.appendChild(overhangTableCell);
+
+    // Append fidelity info into the overhang table cell
+    if (report.junctions && report.junctions.length > 0) {
+      const fidelityDiv = document.createElement('div');
+      fidelityDiv.innerHTML = '<p class="aside" style="margin:6px 0 0;">Calculating fidelity...</p>';
+      overhangTableCell.appendChild(fidelityDiv);
+      calculateFidelity(report.junctions, report.enzymeName).then(result => {
+        fidelityDiv.innerHTML = renderFidelitySection(result);
+      }).catch(err => {
+        console.error('Fidelity calculation error:', err);
+        fidelityDiv.innerHTML = '';
+      });
+    }
 
     // Unified warnings/notes box (always present)
     const warningsBoxElement = document.createElement('div');

@@ -7,6 +7,10 @@
  * - Legend now correctly pulls lane data from GGX_STATE.
  */
 
+function _isDark() {
+  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
 // --- 1. Vector Map Renderer (Kept same) ---
 export function drawVectorMap(canvasId, seqLen, name, annotations = [], rotationDeg = 0) {
   const canvas = document.getElementById(canvasId);
@@ -14,7 +18,12 @@ export function drawVectorMap(canvasId, seqLen, name, annotations = [], rotation
   const ctx = canvas.getContext('2d');
   const W = canvas.width;
   const H = canvas.height;
+  const dark = _isDark();
   ctx.clearRect(0, 0, W, H);
+  if (dark) {
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(0, 0, W, H);
+  }
   const cx = W / 2;
   const cy = H / 2;
   const R_plasmid = Math.min(W, H) / 2 - 55;
@@ -22,7 +31,7 @@ export function drawVectorMap(canvasId, seqLen, name, annotations = [], rotation
   ctx.beginPath();
   ctx.arc(cx, cy, R_plasmid, 0, 2 * Math.PI);
   ctx.lineWidth = 6;
-  ctx.strokeStyle = '#cbd5e1';
+  ctx.strokeStyle = dark ? '#64748b' : '#cbd5e1';
   ctx.stroke();
   const regions = annotations.filter(a => a.start !== undefined);
   regions.forEach(f => {
@@ -83,10 +92,10 @@ export function drawVectorMap(canvasId, seqLen, name, annotations = [], rotation
       const midX = s.cutX + (s.labelX - s.cutX) * 0.25;
       ctx.lineTo(midX, s.labelY);
       ctx.lineTo(s.labelX, s.labelY);
-      ctx.strokeStyle = '#94a3b8';
+      ctx.strokeStyle = dark ? '#94a3b8' : '#94a3b8';
       ctx.lineWidth = 1;
       ctx.stroke();
-      ctx.fillStyle = '#334155';
+      ctx.fillStyle = dark ? '#e2e8f0' : '#334155';
       ctx.textAlign = isRight ? 'left' : 'right';
       const txtX = s.labelX + (isRight ? 5 : -5);
       ctx.fillText(`${s.name} (${s.pos})`, txtX, s.labelY);
@@ -94,11 +103,11 @@ export function drawVectorMap(canvasId, seqLen, name, annotations = [], rotation
   };
   layoutSide(rightSide, true);
   layoutSide(leftSide, false);
-  ctx.fillStyle = '#0f172a';
+  ctx.fillStyle = dark ? '#f1f5f9' : '#0f172a';
   ctx.textAlign = 'center';
   ctx.font = 'bold 16px system-ui';
   ctx.fillText(name || 'Vector', cx, cy - 10);
-  ctx.fillStyle = '#64748b';
+  ctx.fillStyle = dark ? '#94a3b8' : '#64748b';
   ctx.font = '14px system-ui';
   ctx.fillText(`${seqLen} bp`, cx, cy + 12);
 }
@@ -195,12 +204,17 @@ function ggxDrawGel() {
   const canvas = document.getElementById('gg-gel-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
+  const dark = _isDark();
 
   if (canvas.height !== 640) canvas.height = 640;
   const W = canvas.width;
   const H = canvas.height;
 
   ctx.clearRect(0, 0, W, H);
+  if (dark) {
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(0, 0, W, H);
+  }
 
   const bandTop = 90;
   const gelTop = bandTop - 32;
@@ -231,7 +245,9 @@ function ggxDrawGel() {
   for (let i = 0; i < laneCount; i++) {
     ctx.fillRect(x, wellY, wellWidth, wellHeight);
     const lx = gelLeft + spacing * (i + 1) + wellWidth * (i + 0.5);
+    ctx.fillStyle = dark ? '#e2e8f0' : '#050505';
     ctx.fillText('L' + (i + 1), lx, gelTop - 10);
+    ctx.fillStyle = '#050505';
     x += wellWidth + spacing;
   }
 
@@ -310,10 +326,10 @@ function ggxDrawGel() {
   labels.forEach(l => {
     if (l.labelY > H - 10) return;
     ctx.font = l.isBold ? "bold 18px 'Segoe UI', sans-serif" : "18px 'Segoe UI', sans-serif";
-    ctx.fillStyle = '#000000';
+    ctx.fillStyle = dark ? '#e2e8f0' : '#000000';
     ctx.fillText(l.text, labelX, l.labelY);
 
-    ctx.strokeStyle = '#e0e0e0';
+    ctx.strokeStyle = dark ? '#475569' : '#e0e0e0';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(connectorStart, l.labelY);
@@ -324,7 +340,7 @@ function ggxDrawGel() {
 
   ctx.font = "bold 24px 'Segoe UI', sans-serif";
   ctx.textAlign = 'center';
-  ctx.fillStyle = '#000000';
+  ctx.fillStyle = dark ? '#e2e8f0' : '#000000';
   ctx.fillText('kb', gelLeft - 50, gelTop - 10);
 }
 

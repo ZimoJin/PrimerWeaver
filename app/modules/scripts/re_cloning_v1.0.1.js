@@ -316,8 +316,8 @@ function subseqCircular(seq, start, len){
         name:'Insert #1',
         error:'Empty insert sequence',
         insertName:headerName||null,
-        labelF:(headerName?headerName+'-F':'Insert1-F'),
-        labelR:(headerName?headerName+'-R':'Insert1-R'),
+        labelF:(headerName?headerName+'('+enz1Name+')-F':'Insert1-F'),
+        labelR:(headerName?headerName+'('+enz2Name+')-R':'Insert1-R'),
         baseTag:headerName||'insert1'
       });
       return {primers, pcrSize:0, insertLen:0};
@@ -347,8 +347,8 @@ function subseqCircular(seq, start, len){
       F,R,Fcore,Rcore,
       tmF:tmNEB(Fcore,Na,conc),
       tmR:tmNEB(Rcore,Na,conc),
-      labelF:(headerName?headerName+'-F':'Insert1-F'),
-      labelR:(headerName?headerName+'-R':'Insert1-R'),
+      labelF:(headerName?headerName+'('+enz1Name+')-F':'Insert1-F'),
+      labelR:(headerName?headerName+'('+enz2Name+')-R':'Insert1-R'),
       insertName:headerName||null,
       baseTag:headerName||'insert1',
       clampLen:clampN,
@@ -759,13 +759,16 @@ function subseqCircular(seq, start, len){
     return Math.max(100, bp * 0.7);
   }
 
+  function _isDark(){ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }
   function ggxDrawGel(){
     const canvas = document.getElementById('gg-gel-canvas');
     if(!canvas) return;
     const ctx = canvas.getContext('2d');
     const W = canvas.width;
     const H = canvas.height;
+    const dark = _isDark();
     ctx.clearRect(0,0,W,H);
+    if(dark){ ctx.fillStyle = '#0f172a'; ctx.fillRect(0,0,W,H); }
 
     const bandTop   = 90;
     const bandRegionHeight = 520;
@@ -794,7 +797,7 @@ function subseqCircular(seq, start, len){
       x += wellWidth + laneSpacing;
     }
 
-    ctx.fillStyle = '#000000';
+    ctx.fillStyle = dark ? '#e2e8f0' : '#000000';
     ctx.font = "18px 'Segoe UI', sans-serif";
     ctx.textAlign = 'center';
     for(let i=0; i<laneCount; i++){
@@ -905,10 +908,10 @@ function subseqCircular(seq, start, len){
       }else{
         ctx.font = "20px 'Segoe UI', sans-serif";
       }
-      ctx.fillStyle = '#000000';
+      ctx.fillStyle = dark ? '#e2e8f0' : '#000000';
       ctx.fillText(label, labelX, labelY);
 
-      ctx.strokeStyle = '#e0e0e0';
+      ctx.strokeStyle = dark ? '#475569' : '#e0e0e0';
       ctx.lineWidth = 1.2;
       ctx.beginPath();
       ctx.moveTo(labelX + connectorStartOffset, labelY);
@@ -921,7 +924,7 @@ function subseqCircular(seq, start, len){
 
     ctx.font = "24px 'Segoe UI', sans-serif";
     ctx.textAlign = 'center';
-    ctx.fillStyle = '#000000';
+    ctx.fillStyle = dark ? '#e2e8f0' : '#000000';
     ctx.fillText('kb', gelLeft - 45, bandTop + 30);
   }
 
@@ -1904,8 +1907,8 @@ function subseqCircular(seq, start, len){
         const insSeq = insClean;
         const N = vecSeq.length;
 
-        const hasEnz1 = enz1 && enz1.site;
-        const hasEnz2 = enz2 && enz2.site;
+        const hasEnz1 = !!(digestInfo && digestInfo.sites1 && digestInfo.sites1.length > 0);
+        const hasEnz2 = !!(digestInfo && digestInfo.sites2 && digestInfo.sites2.length > 0);
 
         // Check if user has selected a specific fragment via dropdown
         let userSelectedBackboneSeq = null;
@@ -1946,210 +1949,77 @@ function subseqCircular(seq, start, len){
           return { name, site: enzObj.site, cut5: enzObj.cut5 };
         }
 
-        // Helper: fallback to simple backbone + insert model (with recognition sites when possible)
-        const fallbackBackbonePlusInsert = () => {
-          let backboneSeq;
-          let backboneFrag = null;
-          // Use user-selected fragment if available
-          if (userSelectedBackboneSeq) {
-            backboneSeq = userSelectedBackboneSeq;
-            backboneFrag = userSelectedBackboneFrag;
-          } else if (window.currentREBackboneSeq) {
-            backboneSeq = window.currentREBackboneSeq;
-            backboneFrag = findBackboneFragmentForSeq(window.currentREBackboneSeq);
-          } else {
-            backboneSeq = subseqCircular(vecSeq, digestInfo.backboneStart, digestInfo.longestFragLen);
-          }
+        // Unified assembly: backbone + enzyme sites + insert
+        // 1. Get backbone (user-selected or auto-detected largest fragment)
+        let backboneSeq = null;
+        let backboneFrag = null;
+        if (userSelectedBackboneSeq) {
+          backboneSeq = userSelectedBackboneSeq;
+          backboneFrag = userSelectedBackboneFrag;
+        } else if (window.currentREBackboneSeq) {
+          backboneSeq = window.currentREBackboneSeq;
+          backboneFrag = findBackboneFragmentForSeq(window.currentREBackboneSeq);
+        } else if (digestInfo && digestInfo.backboneStart != null && digestInfo.longestFragLen) {
+          backboneSeq = subseqCircular(vecSeq, digestInfo.backboneStart, digestInfo.longestFragLen);
+          backboneFrag = findBackboneFragmentForSeq(backboneSeq);
+        }
 
-          // If we know which enzymes cut the selected backbone fragment, we can restore
-          // the recognition sites flanking the insert in the assembled plasmid.
-          // IMPORTANT: digest fragments include partial site remnants at their ends (cutTop breakpoints),
-          // so we must trim those remnants before adding full recognition sites, otherwise assembled
-          // length is inflated by ~site.length.
-          const leftEnzName = backboneFrag ? pickEnzymeNameForCuts(backboneFrag.leftCuts, effEnz1Name, effEnz2Name) : null;
-          const rightEnzName = backboneFrag ? pickEnzymeNameForCuts(backboneFrag.rightCuts, effEnz2Name, effEnz1Name) : null;
+        // When a single cut produces a full-circle fragment, subseqCircular
+        // returns the sequence starting from position 0 instead of the cut site.
+        // Rotate the backbone so it actually starts at the cut point.
+        if (backboneSeq && backboneFrag &&
+            backboneFrag.start === backboneFrag.end && backboneFrag.start > 0) {
+          const p = backboneFrag.start;
+          backboneSeq = backboneSeq.slice(p) + backboneSeq.slice(0, p);
+        }
+
+        if (backboneSeq) {
+          // 2. Determine which enzyme cuts at each end of the backbone fragment
+          const leftEnzName = backboneFrag
+            ? pickEnzymeNameForCuts(backboneFrag.leftCuts, effEnz1Name, effEnz2Name) : null;
+          const rightEnzName = backboneFrag
+            ? pickEnzymeNameForCuts(backboneFrag.rightCuts, effEnz2Name, effEnz1Name) : null;
           const leftEnz = getEnzymeInfoByName(leftEnzName);
           const rightEnz = getEnzymeInfoByName(rightEnzName);
 
+          // 3. Trim partial recognition-site remnants from backbone ends
+          //    (digest fragments start/end at cutTop, so they carry partial site bases)
           let trimmedBackbone = backboneSeq;
-          if (leftEnz && trimmedBackbone) {
-            const siteBasesInFragmentStart = leftEnz.site.length - leftEnz.cut5;
-            if (siteBasesInFragmentStart > 0 && trimmedBackbone.length >= siteBasesInFragmentStart) {
-              const expectedSuffix = leftEnz.site.slice(leftEnz.cut5);
-              if (expectedSuffix && trimmedBackbone.startsWith(expectedSuffix)) {
-                trimmedBackbone = trimmedBackbone.slice(siteBasesInFragmentStart);
+          if (leftEnz) {
+            const remnantLen = leftEnz.site.length - leftEnz.cut5;
+            if (remnantLen > 0 && trimmedBackbone.length >= remnantLen) {
+              const expected = leftEnz.site.slice(leftEnz.cut5);
+              if (expected && trimmedBackbone.startsWith(expected)) {
+                trimmedBackbone = trimmedBackbone.slice(remnantLen);
               }
             }
           }
-          if (rightEnz && trimmedBackbone) {
-            const siteBasesInFragmentEnd = rightEnz.cut5;
-            if (siteBasesInFragmentEnd > 0 && trimmedBackbone.length >= siteBasesInFragmentEnd) {
-              const expectedPrefix = rightEnz.site.slice(0, rightEnz.cut5);
-              if (expectedPrefix && trimmedBackbone.endsWith(expectedPrefix)) {
-                trimmedBackbone = trimmedBackbone.slice(0, trimmedBackbone.length - siteBasesInFragmentEnd);
+          if (rightEnz) {
+            const remnantLen = rightEnz.cut5;
+            if (remnantLen > 0 && trimmedBackbone.length >= remnantLen) {
+              const expected = rightEnz.site.slice(0, rightEnz.cut5);
+              if (expected && trimmedBackbone.endsWith(expected)) {
+                trimmedBackbone = trimmedBackbone.slice(0, -remnantLen);
               }
             }
           }
 
-          const seq = (leftEnz && rightEnz)
-            ? (trimmedBackbone + rightEnz.site + insSeq + leftEnz.site)
-            : (trimmedBackbone + insSeq);
-          return { seq, len: seq.length };
-        };
+          // 4. Determine insert orientation by comparing primer enzymes with backbone topology.
+          //    Primers: enz1 (F) is at insert 5', enz2 (R) is at insert 3'.
+          //    Backbone: leftEnz at backbone START, rightEnz at backbone END.
+          //    If rightEnz == enz1 → insert 5' connects to backbone END → forward on top strand.
+          //    If rightEnz == enz2 → insert 3' connects to backbone END → reverse-complement on top strand.
+          //    Single-enzyme (enz1 == enz2): no directional control, keep forward.
+          const sameEnzyme = (effEnz1Name === effEnz2Name);
+          const needFlip = !sameEnzyme && leftEnzName === effEnz1Name;
+          const insertForAssembly = needFlip ? rc(insSeq) : insSeq;
 
-        // Case A: both enzymes defined (double digest / pseudo single)
-        if (hasEnz1 && hasEnz2) {
-          const s1 = (digestInfo.sites1 || []);
-          const s2 = (digestInfo.sites2 || []);
-
-          // A1. Each enzyme has a single recognition site: simple replacement between sites
-          if (s1.length === 1 && s2.length === 1) {
-            // If user selected a specific fragment, use simple model
-            if (userSelectedBackboneSeq) {
-              const fb = fallbackBackbonePlusInsert();
-              assembledSeq = fb.seq;
-              assembledLen = fb.len;
-            } else {
-              let p1 = s1[0];
-              let p2 = s2[0];
-              let leftPos = p1;
-              let rightPos = p2;
-              let leftSite = enz1.site;
-              let rightSite = enz2.site;
-
-              if (p2 < p1) {
-                leftPos = p2;
-                rightPos = p1;
-                leftSite = enz2.site;
-                rightSite = enz1.site;
-              }
-
-              assembledSeq =
-                vecSeq.slice(0, leftPos) +
-                leftSite +
-                insSeq +
-                rightSite +
-                vecSeq.slice(rightPos + rightSite.length);
-              assembledLen = assembledSeq.length;
-            }
-          }
-          // A2. Multiple sites: use digestInfo.longestFragLen/backboneStart to
-          //     identify the backbone fragment, and treat the complementary
-          //     arc as the "removed" MCS that gets replaced.
-          else if ((s1.length + s2.length) >= 2) {
-            // If user selected a specific fragment, use simple model
-            if (userSelectedBackboneSeq) {
-              const fb = fallbackBackbonePlusInsert();
-              assembledSeq = fb.seq;
-              assembledLen = fb.len;
-            } else {
-              // Rebuild cuts the same way as in analyzeVectorDigest
-              const cuts = [];
-              s1.forEach(p => cuts.push({ pos: (p + enz1.cut5) % N, enz: 1 }));
-              s2.forEach(p => cuts.push({ pos: (p + enz2.cut5) % N, enz: 2 }));
-              cuts.sort((a, b) => a.pos - b.pos);
-
-              if (cuts.length >= 2) {
-                // Find the cut pair that matches the recorded backbone fragment
-                let idxLongest = 0;
-                for (let i = 0; i < cuts.length; i++) {
-                  const start = cuts[i].pos;
-                  const end = cuts[(i + 1) % cuts.length].pos;
-                  const len = (end - start + N) % N || N;
-                  if (start === digestInfo.backboneStart &&
-                      Math.abs(len - digestInfo.longestFragLen) <= 1) {
-                    idxLongest = i;
-                    break;
-                  }
-                }
-
-                const cutA = cuts[idxLongest];                 // start of longest fragment
-                const cutB = cuts[(idxLongest + 1) % cuts.length]; // end of longest fragment
-
-                // The complementary arc (removed fragment) starts at cutB and ends at cutA
-                const shortStartCut = cutB;
-                const shortEndCut = cutA;
-
-                const siteStartForCut = (cut) => {
-                  const enzObj = (cut.enz === 1 ? enz1 : enz2);
-                  if (!enzObj || !enzObj.site) return null;
-                  return (cut.pos - enzObj.cut5 + N) % N;
-                };
-
-                let leftSiteStart = siteStartForCut(shortStartCut);
-                let rightSiteStart = siteStartForCut(shortEndCut);
-
-                if (leftSiteStart != null && rightSiteStart != null) {
-                  let leftSiteSeq = (shortStartCut.enz === 1 ? enz1.site : enz2.site);
-                  let rightSiteSeq = (shortEndCut.enz === 1 ? enz1.site : enz2.site);
-
-                  // Ensure linear order left -> right
-                  if (rightSiteStart < leftSiteStart) {
-                    [leftSiteStart, rightSiteStart] = [rightSiteStart, leftSiteStart];
-                    [leftSiteSeq, rightSiteSeq] = [rightSiteSeq, leftSiteSeq];
-                  }
-
-                  const leftSiteEnd = leftSiteStart + leftSiteSeq.length;
-                  const rightSiteEnd = rightSiteStart + rightSiteSeq.length;
-
-                  assembledSeq =
-                    vecSeq.slice(0, leftSiteStart) +
-                    leftSiteSeq +
-                    insSeq +
-                    rightSiteSeq +
-                    vecSeq.slice(rightSiteEnd);
-                  assembledLen = assembledSeq.length;
-                } else {
-                  const fb = fallbackBackbonePlusInsert();
-                  assembledSeq = fb.seq;
-                  assembledLen = fb.len;
-                }
-              } else {
-                const fb = fallbackBackbonePlusInsert();
-                assembledSeq = fb.seq;
-                assembledLen = fb.len;
-              }
-            }
-          }
-          // A3. No usable site information; fallback
-          else {
-            const fb = fallbackBackbonePlusInsert();
-            assembledSeq = fb.seq;
-            assembledLen = fb.len;
-          }
-        }
-        // Case B: only one enzyme defined (single digest)
-        else if (hasEnz1 || hasEnz2) {
-          const enz = hasEnz1 ? enz1 : enz2;
-          if (enz && enz.site) {
-            const s = findRESites(vecSeq, enz.site);
-            if (s.length === 1 && !userSelectedBackboneSeq) {
-              const siteStart = s[0];
-              const siteEnd = siteStart + enz.site.length;
-              // Approximate model: site + insert + site at the single recognition locus
-              assembledSeq =
-                vecSeq.slice(0, siteStart) +
-                enz.site +
-                insSeq +
-                enz.site +
-                vecSeq.slice(siteEnd);
-              assembledLen = assembledSeq.length;
-            } else {
-              const fb = fallbackBackbonePlusInsert();
-              assembledSeq = fb.seq;
-              assembledLen = fb.len;
-            }
+          if (leftEnz && rightEnz) {
+            assembledSeq = trimmedBackbone + rightEnz.site + insertForAssembly + leftEnz.site;
           } else {
-            const fb = fallbackBackbonePlusInsert();
-            assembledSeq = fb.seq;
-            assembledLen = fb.len;
+            assembledSeq = trimmedBackbone + insertForAssembly;
           }
-        }
-        // Case C: no enzyme information; fallback safely
-        else {
-          const fb = fallbackBackbonePlusInsert();
-          assembledSeq = fb.seq;
-          assembledLen = fb.len;
+          assembledLen = assembledSeq.length;
         }
       }
 

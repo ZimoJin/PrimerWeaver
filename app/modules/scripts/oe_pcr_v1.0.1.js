@@ -1622,7 +1622,8 @@ function renderResults(primerResults, linkers) {
   window.currentAssembledName = fastaHeader;
   
   const assembledDiv = document.createElement('div');
-  assembledDiv.style.cssText = 'background:#f1f5f9;padding:10px 12px;border-radius:12px;margin-top:12px;';
+  const _dk = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  assembledDiv.style.cssText = `background:${_dk ? '#1e293b' : '#f1f5f9'};padding:10px 12px;border-radius:12px;margin-top:12px;`;
   
   // Format sequence as FASTA with line breaks (70 characters per line)
   function formatFASTA(seq, header) {
@@ -1902,7 +1903,7 @@ function renderResults(primerResults, linkers) {
   const downloadSelect = document.createElement('select');
   downloadSelect.id = 'download-type-select';
   downloadSelect.className = 'ghost btn';
-  downloadSelect.style.cssText = 'min-width:140px;width:auto;border:1px solid var(--line);color:#0b1220;background:#ffffff';
+  downloadSelect.style.cssText = `min-width:140px;width:auto;border:1px solid var(--line);color:${_dk ? '#e2e8f0' : '#0b1220'};background:${_dk ? '#0f172a' : '#ffffff'}`;
   downloadSelect.innerHTML = `
     <option value="primers">primers.txt</option>
     <option value="fasta">assembled.fasta</option>

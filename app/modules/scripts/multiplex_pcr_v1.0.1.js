@@ -753,42 +753,42 @@ function poolPrimers(primerPairs, opts = {}) {
   };
 }
 
+function _isDark() {
+  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
 /**
  * Generate heatmap color based on ΔG value
  * @param {number|null} dG - ΔG value (kcal/mol)
  * @returns {Object} {color, intensity, label} Color information
  */
 function getHeatmapColor(dG) {
+  const dark = _isDark();
   if (dG === null || !isFinite(dG)) {
     return {
-      color: '#f0f0f0',
+      color: dark ? '#1e293b' : '#f0f0f0',
       intensity: 0,
       label: 'None',
       dG: null
     };
   }
   
-  // Use fixed colors matching the legend (not gradient)
   let color, intensity, label;
   
   if (dG > -3) {
-    // Weak or no interaction: white/light gray
-    color = 'rgb(250, 250, 250)';
+    color = dark ? '#1e293b' : 'rgb(250, 250, 250)';
     intensity = 0;
     label = 'Weak';
   } else if (dG > -5) {
-    // Medium: light yellow
-    color = 'rgb(255, 255, 200)';
+    color = dark ? '#3d3500' : 'rgb(255, 255, 200)';
     intensity = 1;
     label = 'Medium';
   } else if (dG > -7) {
-    // Strong: orange
-    color = 'rgb(255, 200, 100)';
+    color = dark ? '#6b3a00' : 'rgb(255, 200, 100)';
     intensity = 2;
     label = 'Strong';
   } else {
-    // Very strong: dark red
-    color = 'rgb(200, 50, 0)';
+    color = dark ? '#7f1d1d' : 'rgb(200, 50, 0)';
     intensity = 3;
     label = 'Very Strong';
   }
@@ -1326,8 +1326,9 @@ function renderResults(primerResults) {
   if (failed.length > 0) {
     const errorDiv = document.createElement('div');
     errorDiv.className = 'info-box';
-    errorDiv.style.background = '#fef2f2';
+    errorDiv.style.background = _isDark() ? '#2a0a0a' : '#fef2f2';
     errorDiv.style.borderLeftColor = '#dc2626';
+    if (_isDark()) errorDiv.style.color = '#fca5a5';
     errorDiv.innerHTML = `<strong>Warning:</strong> Unable to design primers for the following target sequences:<ul>${failed.map(f => `<li>${f.target.name}: ${f.error}</li>`).join('')}</ul>`;
     contentDiv.appendChild(errorDiv);
   }
@@ -1349,8 +1350,9 @@ function renderResults(primerResults) {
     if (offTargetWarnings.length > 0) {
       const warningDiv = document.createElement('div');
       warningDiv.className = 'info-box';
-      warningDiv.style.background = '#fff7ed';
+      warningDiv.style.background = _isDark() ? '#1c1500' : '#fff7ed';
       warningDiv.style.borderLeftColor = '#f59e0b';
+      if (_isDark()) warningDiv.style.color = '#fde68a';
       warningDiv.innerHTML = `<strong>⚠️ Off-Target Amplification Warning:</strong> The following primer pairs may produce amplicons on non-target sequences, which may cause multiplex PCR failure or confusing gel bands:<ul>${offTargetWarnings.map(w => `<li>${w}</li>`).join('')}</ul>`;
       contentDiv.appendChild(warningDiv);
     }
@@ -1358,8 +1360,9 @@ function renderResults(primerResults) {
     // Designed primer mode: show info message
     const infoDiv = document.createElement('div');
     infoDiv.className = 'info-box';
-    infoDiv.style.background = '#eff6ff';
+    infoDiv.style.background = _isDark() ? '#0f2447' : '#eff6ff';
     infoDiv.style.borderLeftColor = '#3b82f6';
+    if (_isDark()) infoDiv.style.color = '#bfdbfe';
     infoDiv.innerHTML = `<strong>ℹ️ Designed Primer Mode:</strong> Currently analyzing uploaded primer pairs. Off-target amplification check is not available due to lack of template sequence information. Only primer quality check (QC) and pooling analysis are performed.`;
     contentDiv.appendChild(infoDiv);
   }
@@ -1468,7 +1471,7 @@ function renderResults(primerResults) {
     let offTargetBadge = '';
     if (isQCMode || !hasTemplateSequences) {
       // QC mode: cannot check off-target amplification
-      offTargetBadge = '<span class="qc-badge" style="background: #e5e7eb; color: #6b7280;">Unknown</span>';
+      offTargetBadge = `<span class="qc-badge" style="background: ${_isDark() ? '#334155' : '#e5e7eb'}; color: ${_isDark() ? '#94a3b8' : '#6b7280'};">Unknown</span>`;
     } else if (offTargetInfo.length > 0) {
       const offTargetNames = offTargetInfo.map(off => off.targetName).join(', ');
       offTargetBadge = `<span class="qc-badge qc-bad" title="May produce off-target amplification on: ${offTargetNames}">⚠️ ${offTargetInfo.length}</span>`;
@@ -1650,8 +1653,9 @@ function renderResults(primerResults) {
       // Display warning box with QC mode help icon if applicable
       const warningBox = document.createElement('div');
       warningBox.className = 'info-box';
-      warningBox.style.background = '#fff7ed';
+      warningBox.style.background = _isDark() ? '#1c1500' : '#fff7ed';
       warningBox.style.borderLeftColor = '#f59e0b';
+      if (_isDark()) warningBox.style.color = '#fde68a';
       warningBox.innerHTML = `
         <div style="display: flex; align-items: center; gap: 8px;">
           <div style="flex: 1;">
@@ -1698,7 +1702,7 @@ function renderResults(primerResults) {
           const tr = document.createElement('tr');
           const rowspan = j === 0 ? pool.length : 0;
           tr.innerHTML = `
-            ${j === 0 ? `<td rowspan="${rowspan}" style="text-align:center; vertical-align:middle; font-weight:600; background:#f8f9fa;">Pool ${i + 1}</td>` : ''}
+            ${j === 0 ? `<td rowspan="${rowspan}" style="text-align:center; vertical-align:middle; font-weight:600; background:${_isDark() ? '#1e293b' : '#f8f9fa'};">Pool ${i + 1}</td>` : ''}
             <td>${item.target}</td>
             <td style="text-align:center;">${item.primers.productLength}</td>
             <td class="mono" style="font-size:0.75rem;">
@@ -1726,7 +1730,7 @@ function renderResults(primerResults) {
         const noteDiv = document.createElement('div');
         noteDiv.style.marginTop = '8px';
         noteDiv.style.fontSize = '0.85rem';
-        noteDiv.style.color = '#6b7280';
+        noteDiv.style.color = _isDark() ? '#94a3b8' : '#6b7280';
         noteDiv.style.fontStyle = 'italic';
         if (!hasProductLength) {
           noteDiv.innerHTML = `<strong>Note:</strong> No product length information is available, size-based pooling is disabled. Primers cannot be distinguished based on size on gel electrophoresis. Pooling is based only on thermodynamic parameters (cross-dimer conflicts).`;
@@ -1793,7 +1797,7 @@ function renderResults(primerResults) {
           return `<td style="font-size: 0.7rem;"><strong>${cell}</strong></td>`;
         } else {
           const isDiagonal = cell.isDiagonal;
-          const bgColor = isDiagonal ? '#e5e7eb' : cell.color;
+          const bgColor = isDiagonal ? (_isDark() ? '#334155' : '#e5e7eb') : cell.color;
           const title = isDiagonal ? 'Self-interaction (ignored)' : 
                        cell.dG !== null ? `ΔG = ${cell.dG} kcal/mol (${cell.label})` : 'No interaction';
           
@@ -1833,27 +1837,34 @@ function renderResults(primerResults) {
     // Add legend once at the end
     const legend = document.createElement('div');
     legend.className = 'heatmap-legend';
+    const _dk = _isDark();
+    const _lc = [
+      _dk ? '#1e293b' : 'rgb(250, 250, 250)',
+      _dk ? '#3d3500' : 'rgb(255, 255, 200)',
+      _dk ? '#6b3a00' : 'rgb(255, 200, 100)',
+      _dk ? '#7f1d1d' : 'rgb(200, 50, 0)'
+    ];
     legend.innerHTML = `
       <div style="font-weight: 600;">Legend:</div>
       <div class="heatmap-legend-items">
         <div class="heatmap-legend-item">
-          <div class="heatmap-legend-color" style="background: rgb(250, 250, 250);"></div>
+          <div class="heatmap-legend-color" style="background: ${_lc[0]};"></div>
           <span>None/Weak (ΔG > -3)</span>
         </div>
         <div class="heatmap-legend-item">
-          <div class="heatmap-legend-color" style="background: rgb(255, 255, 200);"></div>
+          <div class="heatmap-legend-color" style="background: ${_lc[1]};"></div>
           <span>Medium (-5 < ΔG ≤ -3)</span>
         </div>
         <div class="heatmap-legend-item">
-          <div class="heatmap-legend-color" style="background: rgb(255, 200, 100);"></div>
+          <div class="heatmap-legend-color" style="background: ${_lc[2]};"></div>
           <span>Strong (-7 < ΔG ≤ -5)</span>
         </div>
         <div class="heatmap-legend-item">
-          <div class="heatmap-legend-color" style="background: rgb(200, 50, 0);"></div>
+          <div class="heatmap-legend-color" style="background: ${_lc[3]};"></div>
           <span>Very Strong (ΔG ≤ -7)</span>
         </div>
         <div class="heatmap-legend-item" style="margin-left: auto;">
-          <span style="font-size: 0.75rem; color: #6b7280;">Hover to view detailed ΔG value</span>
+          <span style="font-size: 0.75rem; color: ${_dk ? '#94a3b8' : '#6b7280'};">Hover to view detailed ΔG value</span>
         </div>
       </div>
     `;
@@ -1868,27 +1879,34 @@ function renderResults(primerResults) {
         // Add legend
         const legend = document.createElement('div');
         legend.className = 'heatmap-legend';
+        const _dk2 = _isDark();
+        const _lc2 = [
+          _dk2 ? '#1e293b' : 'rgb(250, 250, 250)',
+          _dk2 ? '#3d3500' : 'rgb(255, 255, 200)',
+          _dk2 ? '#6b3a00' : 'rgb(255, 200, 100)',
+          _dk2 ? '#7f1d1d' : 'rgb(200, 50, 0)'
+        ];
         legend.innerHTML = `
           <div style="font-weight: 600;">Legend:</div>
           <div class="heatmap-legend-items">
             <div class="heatmap-legend-item">
-              <div class="heatmap-legend-color" style="background: rgb(250, 250, 250);"></div>
+              <div class="heatmap-legend-color" style="background: ${_lc2[0]};"></div>
               <span>None/Weak (ΔG > -3)</span>
             </div>
             <div class="heatmap-legend-item">
-              <div class="heatmap-legend-color" style="background: rgb(255, 255, 200);"></div>
+              <div class="heatmap-legend-color" style="background: ${_lc2[1]};"></div>
               <span>Medium (-5 < ΔG ≤ -3)</span>
             </div>
             <div class="heatmap-legend-item">
-              <div class="heatmap-legend-color" style="background: rgb(255, 200, 100);"></div>
+              <div class="heatmap-legend-color" style="background: ${_lc2[2]};"></div>
               <span>Strong (-7 < ΔG ≤ -5)</span>
             </div>
             <div class="heatmap-legend-item">
-              <div class="heatmap-legend-color" style="background: rgb(200, 50, 0);"></div>
+              <div class="heatmap-legend-color" style="background: ${_lc2[3]};"></div>
               <span>Very Strong (ΔG ≤ -7)</span>
             </div>
             <div class="heatmap-legend-item" style="margin-left: auto;">
-              <span style="font-size: 0.75rem; color: #6b7280;">Hover to view detailed ΔG value</span>
+              <span style="font-size: 0.75rem; color: ${_dk2 ? '#94a3b8' : '#6b7280'};">Hover to view detailed ΔG value</span>
             </div>
           </div>
         `;
