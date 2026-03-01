@@ -1,4 +1,5 @@
 :root {
+    color-scheme: light dark;
     --bg: #f8fafc;
     --ink: #0b1220;
     --muted: #475569;
@@ -102,12 +103,12 @@ a:not(.btn):not(.cta):hover {
 
 
 .h1-primer {
-    color: #3a0c5f;
+    color: #1e3a5f;
     font-size: 24px;
 }
 
 .h1-weaver {
-    color: #1ca4b6;
+    color: #0d7a8a;
     font-size: 24px;
 }
 
@@ -119,12 +120,12 @@ a:not(.btn):not(.cta):hover {
 /* Welcome h1 spans: override #start-content h1 specificity and keep the h1 font size */
 #start-content .h1-primer {
     font-size: inherit;
-    color: #3a0c5f;
+    color: #1e3a5f;
 }
 
 #start-content .h1-weaver {
     font-size: inherit;
-    color: #1ca4b6;
+    color: #0d7a8a;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -173,14 +174,14 @@ a:not(.btn):not(.cta):hover {
     display: block;
     padding: 10px 12px;
     border-radius: 10px;
-    color: var(--muted);
+    color: #334155;
     font-weight: 500;
     text-decoration: none;
     transition: all 0.2s ease-out;
 }
 
 .info-sidebar a:hover {
-    background: rgba(99, 102, 241, 0.06);
+    background: rgba(99, 102, 241, 0.12);
     color: var(--brand);
 }
 
@@ -504,7 +505,7 @@ a:not(.btn):not(.cta):hover {
 }
 
 .dropdown-content a:hover {
-    background-color: rgba(99, 102, 241, 0.06);
+    background-color: rgba(99, 102, 241, 0.14);
     color: var(--brand);
 }
 
@@ -776,6 +777,7 @@ section {
     box-shadow: 0 12px 28px rgba(2, 6, 23, .06);
     padding: 22px 28px;
     transition: all 0.3s ease-out;
+    color: var(--ink);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -1123,6 +1125,11 @@ h3 {
 #app-footer.visible {
     opacity: 1;
     transform: translateY(0);
+}
+
+/* Footer only on home — completely hidden on other pages */
+#app-footer.footer-hidden {
+    display: none !important;
 }
 
 /* Header should stay opaque on ALL pages (including the welcome screen) */
@@ -1717,6 +1724,15 @@ header {
     }
 }
 
+.faq-section-heading {
+    margin-top: 24px;
+    margin-bottom: 16px;
+    color: #334155;
+}
+@media (prefers-color-scheme: dark) {
+    .faq-section-heading { color: #93c5fd; }
+}
+
 .faq-item {
     /* This is the new wrapper for <details> */
     display: flex;
@@ -1808,12 +1824,18 @@ header {
     /* Remove default h3 margin */
     margin-bottom: 8px;
     font-size: 20px;
+    color: var(--ink);
 }
 
 .about-content p,
 .about-content ul {
     margin-top: 0;
     line-height: 1.6;
+    color: #334155;
+}
+
+.about-content .muted {
+    color: #475569;
 }
 
 /* --- Form Styles --- */
@@ -2179,5 +2201,127 @@ header {
     
     .app-header-buttons {
         gap: 6px;
+    }
+}
+
+/* ─── Additional Dark Mode Fixes ─────────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+    .tab-link.active {
+        background: linear-gradient(180deg, #13243a, #0f1e34);
+        color: var(--brand);
+        box-shadow: 0 3px 8px rgba(0,0,0,.2) inset;
+    }
+    .tab-link:hover {
+        background: rgba(255,255,255,0.06);
+    }
+    .doc-nav-bar a:hover {
+        background: rgba(255,255,255,0.06);
+    }
+    .tool-card h3 { color: #e2e8f0; }
+    .tool-card .small,
+    .tool-card .muted { color: #94a3b8; }
+    .tool-card-buttons .btn:not(.ghost) {
+        background: #1e3a5f;
+        color: #93c5fd;
+        box-shadow: none;
+    }
+    .tool-card-buttons .btn:not(.ghost):hover {
+        background: #264a6e;
+        box-shadow: none;
+        filter: none;
+    }
+    .tool-card-buttons .btn.ghost {
+        background: #1e293b;
+        color: #94a3b8;
+        border-color: var(--line);
+    }
+    .tool-card-buttons .btn.ghost:hover {
+        background: #334155;
+    }
+    .app-header-bar h2 { color: var(--brand); }
+    .app-shell-header { border-color: var(--line); }
+    .app-shell-title { color: #e2e8f0; }
+    .app-btn.btn.ghost {
+        background: #1e293b;
+        color: #94a3b8;
+        border: 1px solid var(--line);
+        box-shadow: none;
+    }
+    .app-btn.btn.ghost:hover {
+        background: #334155;
+        box-shadow: none;
+    }
+    .app-shell-stacked {
+        box-shadow: 0 12px 28px rgba(0,0,0,0.3);
+    }
+    .info-sidebar {
+        box-shadow: 0 12px 28px rgba(0,0,0,0.3);
+    }
+    .info-sidebar h3 { color: var(--brand); }
+    .info-sidebar a:hover {
+        background: rgba(96,165,250,0.1);
+    }
+    .info-sidebar a.is-active {
+        background: linear-gradient(180deg, #13243a, #0f1e34);
+        color: var(--brand);
+        box-shadow: 0 3px 8px rgba(0,0,0,.2);
+    }
+    .info-sidebar .btn.ghost {
+        background: #1e293b;
+        color: var(--ink);
+    }
+    .info-sidebar .btn.ghost:hover {
+        background: #334155;
+    }
+
+    /* Doc page card */
+    #docBody.info-content {
+        background: var(--card);
+    }
+
+    /* FAQ page — match doc contrast (bright headings, readable body) */
+    .faq-section-heading { color: #93c5fd; }
+    .faq-content summary { color: #f1f5f9; }
+    .faq-content > div,
+    .faq-content p,
+    .faq-content li { color: #cbd5e1; }
+    .faq-content strong { color: #bfdbfe; }
+    .faq-content summary::after { color: #94a3b8; }
+    .faq-icon { color: #60a5fa; }
+    .faq-content a { color: #60a5fa; }
+
+    /* About page */
+    .about-content h3 { color: #f1f5f9; }
+    .about-content p,
+    .about-content ul,
+    .about-content li { color: #cbd5e1; }
+    .about-content .muted { color: #cbd5e1; }
+    .about-content strong { color: #e2e8f0; }
+    .about-content a { color: #60a5fa; }
+
+    /* Contact form */
+    #contactForm input[type="email"],
+    #contactForm textarea {
+        background: #1e293b;
+        color: #e2e8f0;
+        border-color: var(--line);
+    }
+    #contactForm label { color: #e2e8f0; }
+    #contactForm .btn[type="submit"] {
+        background: #1e3a5f;
+        color: #93c5fd;
+        box-shadow: none;
+    }
+    #contactForm .btn[type="submit"]:hover {
+        background: #264a6e;
+    }
+    #contactForm .btn.ghost[type="reset"] {
+        background: #1e293b;
+        color: #94a3b8;
+        border: 1px solid var(--line);
+        box-shadow: none;
+    }
+    #contactForm .btn.ghost[type="reset"]:hover {
+        background: #334155;
     }
 }

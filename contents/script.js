@@ -6,13 +6,13 @@ let view, welcomeScreen, appHeader, appFooter;
 const docsList = [
     { id: '#d-intro', label: 'Introduction' },
     { id: '#d-qc', label: 'Primer QC' },
+    { id: '#d-mp', label: 'Multiplex PCR' },
     { id: '#d-opcr', label: 'Overlap PCR' },
     { id: '#d-muta', label: 'Mutagenesis' },
-    { id: '#d-mp', label: 'Multiplex PCR' },
     { id: '#d-re', label: 'Restriction Cloning' },
-    { id: '#d-user', label: 'USER Cloning' },
     { id: '#d-gg', label: 'Golden Gate' },
     { id: '#d-gb', label: 'Gibson Assembly' },
+    { id: '#d-user', label: 'USER Cloning' },
 ];
 
 function getDocLabel(id) {
@@ -125,7 +125,10 @@ function navigate() {
         if (welcomeScreen) welcomeScreen.classList.add('hidden');
         if (appHeader) appHeader.classList.add('visible');
         if (view) view.classList.add('visible');
-        if (appFooter) appFooter.classList.add('visible');
+        if (appFooter) {
+            appFooter.classList.remove('visible');
+            appFooter.classList.add('footer-hidden');
+        }
 
         const moduleName = path.split('/')[2];
         if (view) {
@@ -173,17 +176,23 @@ function navigate() {
     } else {
         // --- This part is for all other pages (/, /tools, /docs, etc.) ---
         if (path === '/') {
-            // Welcome Screen
+            // Welcome Screen — show footer only on home
             if (welcomeScreen) welcomeScreen.classList.remove('hidden');
             if (appHeader) appHeader.classList.remove('visible');
             if (view) view.classList.remove('visible');
-            if (appFooter) appFooter.classList.add('visible');
+            if (appFooter) {
+                appFooter.classList.add('visible');
+                appFooter.classList.remove('footer-hidden');
+            }
         } else {
-            // All other main pages
+            // All other main pages — hide footer completely
             if (welcomeScreen) welcomeScreen.classList.add('hidden');
             if (appHeader) appHeader.classList.add('visible');
             if (view) view.classList.add('visible');
-            if (appFooter) appFooter.classList.add('visible');
+            if (appFooter) {
+                appFooter.classList.remove('visible');
+                appFooter.classList.add('footer-hidden');
+            }
         }
 
         // Render the correct page's HTML
@@ -347,39 +356,6 @@ function initFooterToggle() {
     updateFooterCollapsible();
     window.addEventListener('resize', updateFooterCollapsible);
     setTimeout(updateFooterCollapsible, 250);
-
-    // Auto-collapse to a thin accent bar after 4 seconds; expands on hover via CSS.
-    // On the home route ('/') the footer stays fully visible — collapse begins only
-    // after the user navigates away for the first time.
-    function isHomePage() {
-        const h = location.hash;
-        return h === '' || h === '#' || h === '#/';
-    }
-
-    let collapseTimer = null;
-
-    function scheduleCollapse() {
-        clearTimeout(collapseTimer);
-        if (isHomePage()) return;
-        collapseTimer = setTimeout(function () {
-            footer.classList.add('footer-collapsed');
-            updateHeaderOffsetVar();
-        }, 2000);
-    }
-
-    function onRouteChange() {
-        if (isHomePage()) {
-            // Restore footer when returning home
-            clearTimeout(collapseTimer);
-            footer.classList.remove('footer-collapsed');
-            updateHeaderOffsetVar();
-        } else {
-            scheduleCollapse();
-        }
-    }
-
-    window.addEventListener('hashchange', onRouteChange);
-    scheduleCollapse();
 
     // Re-measure footer offset after hover expand/collapse so page padding stays accurate.
     footer.addEventListener('mouseenter', updateHeaderOffsetVar);
@@ -627,7 +603,7 @@ function help() {
 
 <h2 style="margin-bottom: 24px;">Help & FAQs</h2>
 
-<h3 style="margin-top: 24px; margin-bottom: 16px; color: #555;">Getting Started</h3>
+<h3 class="faq-section-heading">Getting Started</h3>
 
 <div class="faq-item">
     <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-user"></use></svg>
@@ -670,7 +646,7 @@ function help() {
     </details>
 </div>
 
-<h3 style="margin-top: 24px; margin-bottom: 16px; color: #555;">Design Parameters & Accuracy</h3>
+<h3 class="faq-section-heading">Design Parameters & Accuracy</h3>
 
 <div class="faq-item">
     <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-settings"></use></svg>
@@ -701,7 +677,7 @@ function help() {
     </details>
 </div>
 
-<h3 style="margin-top: 24px; margin-bottom: 16px; color: #555;">Workflow Methods</h3>
+<h3 class="faq-section-heading">Workflow Methods</h3>
 
 <div class="faq-item">
     <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-layers"></use></svg>
@@ -836,7 +812,7 @@ function help() {
     </details>
 </div>
 
-<h3 style="margin-top: 24px; margin-bottom: 16px; color: #555;">Quality Control & Validation</h3>
+<h3 class="faq-section-heading">Quality Control & Validation</h3>
 
 <div class="faq-item">
     <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-list"></use></svg>
@@ -910,7 +886,7 @@ function help() {
     </details>
 </div>
 
-<h3 style="margin-top: 24px; margin-bottom: 16px; color: #555;">Technical Details & Support</h3>
+<h3 class="faq-section-heading">Technical Details & Support</h3>
 
 <div class="faq-item">
     <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-format"></use></svg>
@@ -1038,8 +1014,7 @@ function about() {
     <div class="about-content">
         <h3>About PrimerWeaver</h3>
         <p class="muted">
-            <strong>PrimerWeaver</strong> is a browser-based primer design and <i>in&nbsp;silico</i> QC platform that supports common cloning and PCR workflows from a single, consistent interface:
-            Restriction cloning, Golden Gate (Type IIS), Gibson Assembly, USER cloning, overlap PCR (SOE-PCR), mutagenesis, multiplex PCR, and standalone Primer QC.
+            <strong>PrimerWeaver</strong> is a browser-based platform for integrated DNA primer design across diverse molecular biology workflows. It provides a streamlined interface for primer quality control, multiplex PCR, overlap extension, site-directed mutagenesis, restriction-based cloning, golden gate assembly, and homology-directed assembly.
         </p>
         <p class="muted">
             PrimerWeaver is designed for privacy and convenience: calculations run locally in your web browser using JavaScript, so sequences are processed on-device.
@@ -1100,7 +1075,7 @@ function about() {
             <li>SantaLucia, J. (2004). Thermodynamics of DNA structural motifs. <em>Annu. Rev. Biophys. Biomol. Struct.</em>.</li>
         </ul>
         <p class="small muted" style="margin-bottom: 0;">
-            Workflow modules are informed by established molecular biology methods, including Golden Gate (Engler <em>et&nbsp;al.</em>), Gibson Assembly (Gibson <em>et&nbsp;al.</em>), and overlap-extension PCR / SOE-PCR (Horton <em>et&nbsp;al.</em>), as summarized in the PrimerWeaver documentation.
+            Workflow modules are informed by established molecular biology methods, including Golden Gate (Engler <em>et&nbsp;al.</em>), Gibson Assembly (Gibson <em>et&nbsp;al.</em>), and overlap-extension PCR (Horton <em>et&nbsp;al.</em>), as summarized in the PrimerWeaver documentation.
             If you use PrimerWeaver in academic work, please cite the PrimerWeaver web server and the relevant primary method/model references.
         </p>
     </div>
@@ -1201,6 +1176,15 @@ function appDashboard() {
                     </div>
                 </div>
                 <div class="card tool-card">
+                    <svg class="tool-card-icon" aria-hidden="true"><use xlink:href="#icon-beaker"></use></svg>
+                    <h3>Multiplex PCR</h3>
+                    <p class="small muted">Design and sort primers into compatible, non-conflicting pools.</p>
+                    <div class="tool-card-buttons">
+                        <a href="#/docs#d-mp" class="btn ghost">Read Docs</a>
+                        <a href="#/app/multiplex-pcr" class="btn">Open App</a>
+                    </div>
+                </div>
+                <div class="card tool-card">
                     <svg class="tool-card-icon" aria-hidden="true"><use xlink:href="#icon-merge"></use></svg>
                     <h3>Overlap PCR</h3>
                     <p class="small muted">Design primers to stitch two or more DNA fragments together (SOE-PCR).</p>
@@ -1219,30 +1203,12 @@ function appDashboard() {
                     </div>
                 </div>
                 <div class="card tool-card">
-                    <svg class="tool-card-icon" aria-hidden="true"><use xlink:href="#icon-beaker"></use></svg>
-                    <h3>Multiplex PCR</h3>
-                    <p class="small muted">Design and sort primers into compatible, non-conflicting pools.</p>
-                    <div class="tool-card-buttons">
-                        <a href="#/docs#d-mp" class="btn ghost">Read Docs</a>
-                        <a href="#/app/multiplex-pcr" class="btn">Open App</a>
-                    </div>
-                </div>
-                <div class="card tool-card">
                     <svg class="tool-card-icon" aria-hidden="true"><use xlink:href="#icon-scissors"></use></svg>
                     <h3>Restriction Cloning</h3>
                     <p class="small muted">Design primers for traditional enzyme-based cloning.</p>
                     <div class="tool-card-buttons">
                         <a href="#/docs#d-re" class="btn ghost">Read Docs</a>
                         <a href="#/app/restriction" class="btn">Open App</a>
-                    </div>
-                </div>
-                <div class="card tool-card">
-                    <svg class="tool-card-icon" aria-hidden="true"><use xlink:href="#icon-layers"></use></svg>
-                    <h3>USER Cloning</h3>
-                    <p class="small muted">Designs primers incorporating uracil for seamless cloning.</p>
-                    <div class="tool-card-buttons">
-                        <a href="#/docs#d-user" class="btn ghost">Read Docs</a>
-                        <a href="#/app/user" class="btn">Open App</a>
                     </div>
                 </div>
                 <div class="card tool-card">
@@ -1261,6 +1227,15 @@ function appDashboard() {
                     <div class="tool-card-buttons">
                         <a href="#/docs#d-gb" class="btn ghost">Read Docs</a>
                         <a href="#/app/gibson" class="btn">Open App</a>
+                    </div>
+                </div>
+                <div class="card tool-card">
+                    <svg class="tool-card-icon" aria-hidden="true"><use xlink:href="#icon-layers"></use></svg>
+                    <h3>USER Cloning</h3>
+                    <p class="small muted">Designs primers incorporating uracil for seamless cloning.</p>
+                    <div class="tool-card-buttons">
+                        <a href="#/docs#d-user" class="btn ghost">Read Docs</a>
+                        <a href="#/app/user" class="btn">Open App</a>
                     </div>
                 </div>
                 <div class="card tool-card" style="opacity: 0.6; border-style: dashed;">
@@ -1507,6 +1482,11 @@ async function loadDocumentHTML(filePath) {
      /* All body text → white */
      #docBody .doc-scope { color: #e2e8f0; }
 
+     /* Invert light-mode screenshots so they match dark theme */
+     #docBody .doc-scope img {
+         filter: invert(1) hue-rotate(180deg);
+     }
+
      /* Headings → light blue tones */
      #docBody .doc-scope h1 { color: #93c5fd; border-color: #3b82f6; }
      #docBody .doc-scope h2 { color: #93c5fd; }
@@ -1537,19 +1517,98 @@ async function loadDocumentHTML(filePath) {
          border-color: #2d3f5a;
      }
 
-     /* ── White boxes: keep light background, restore dark readable text ── */
-     #docBody .doc-scope .abstract,
-     #docBody .doc-scope .info-box,
-     #docBody .doc-scope .warning-box,
-     #docBody .doc-scope .feature-card,
-     #docBody .doc-scope .highlight-box,
-     #docBody .doc-scope .highlight {
-         color: #1e293b;
+     /* Pre / code blocks */
+     #docBody .doc-scope pre {
+         background: #1e293b;
+         border-color: #2d3f5a;
      }
+     #docBody .doc-scope pre code {
+         background: transparent;
+         color: #e2e8f0;
+     }
+
+     /* Feature cards */
+     #docBody .doc-scope .feature-card {
+         background: #0f1d32;
+         border-left-color: #3b82f6;
+         color: #e2e8f0;
+     }
+     #docBody .doc-scope .feature-card h4 { color: #93c5fd; }
+     #docBody .doc-scope .feature-card p { color: #cbd5e1; }
+
+     /* Highlight boxes */
+     #docBody .doc-scope .highlight-box {
+         background: #0f1d32;
+         border-left-color: #3b82f6;
+         color: #cbd5e1;
+     }
+     #docBody .doc-scope .highlight-box strong { color: #93c5fd; }
+
+     /* Highlight span */
+     #docBody .doc-scope .highlight {
+         background: #1e3a5f;
+         color: #bfdbfe;
+     }
+
+     /* Abstract */
+     #docBody .doc-scope .abstract {
+         background: #0f1d32;
+         border-color: #2d3f5a;
+         color: #cbd5e1;
+     }
+     #docBody .doc-scope .abstract p { color: #cbd5e1; }
+
+     /* Info box */
+     #docBody .doc-scope .info-box {
+         background: #0f2447;
+         border-color: #3b82f6;
+         color: #bfdbfe;
+     }
+
+     /* Warning box */
+     #docBody .doc-scope .warning-box {
+         background: #1c1200;
+         border-color: #f59e0b;
+         color: #fde68a;
+     }
+
+     /* Section borders */
+     #docBody .doc-scope .section {
+         border-color: #2d3f5a;
+     }
+
+     /* Reference */
+     #docBody .doc-scope .reference {
+         background: #0f172a;
+         border-color: #2d3f5a;
+         color: #94a3b8;
+     }
+
+     /* Lists */
+     #docBody .doc-scope li { color: #cbd5e1; }
+     #docBody .doc-scope p { color: #cbd5e1; }
+
      /* Inline formula / display boxes that use background: #f8fafc */
      #docBody .doc-scope [style*="background: #f8fafc"],
      #docBody .doc-scope [style*="background:#f8fafc"] {
-         color: #1e293b !important;
+         background: #0f1d32 !important;
+         color: #e2e8f0 !important;
+     }
+     #docBody .doc-scope [style*="background: #f1f5f9"],
+     #docBody .doc-scope [style*="background:#f1f5f9"] {
+         background: #1e293b !important;
+         color: #e2e8f0 !important;
+     }
+     #docBody .doc-scope [style*="background: #eff6ff"],
+     #docBody .doc-scope [style*="background:#eff6ff"] {
+         background: #0f2447 !important;
+         color: #bfdbfe !important;
+     }
+     #docBody .doc-scope [style*="background: white"],
+     #docBody .doc-scope [style*="background: #fff"],
+     #docBody .doc-scope [style*="background:#fff"] {
+         background: #0f172a !important;
+         color: #e2e8f0 !important;
      }
  }
 `.trim();
