@@ -4,7 +4,7 @@ PrimerWeaver is a client-side web app for primer design across common molecular 
 
 Live server: https://ignea.lab.mcgill.ca/primerweaver/
 
-![PrimerWeaver](contents/logo/welcome-image.png)
+![PrimerWeaver](contents/logo/welcome-image_light.svg)
 
 ## Quick start (local)
 
