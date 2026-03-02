@@ -2,6 +2,8 @@
 
 PrimerWeaver is a client-side web app for primer design across common molecular biology workflows (Golden Gate, Gibson, Restriction cloning, USER cloning, Overlap PCR, Mutagenesis, Multiplex PCR, and Primer QC).
 
+Live server: https://ignea.lab.mcgill.ca/primerweaver/
+
 ![PrimerWeaver](contents/logo/welcome-image.png)
 
 ## Quick start (local)
