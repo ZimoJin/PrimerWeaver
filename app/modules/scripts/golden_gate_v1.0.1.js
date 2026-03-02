@@ -704,8 +704,10 @@ function initGoldenGate(container) {
     // primers
     const primers = [];
     const site = enz.site;
-    const bases = ['A','C','G','T'];
-    const randN = n => Array(n).fill(0).map(()=>bases[Math.floor(Math.random()*4)]).join('');
+    // Protective N bases after the recognition site:
+    // use only A/T in Golden Gate to avoid introducing GC at the cut junction.
+    const bases = ['A','T'];
+    const randN = n => Array(n).fill(0).map(()=>bases[Math.floor(Math.random()*bases.length)]).join('');
 
     for(let idx=0; idx<k; idx++){
       const insertIdx = idx + 1;
