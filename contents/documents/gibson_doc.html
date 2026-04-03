@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gibson Assembly - PrimerWeaver V2</title>
+    <title>Gibson Assembly - PrimerWeaver v1.0.1</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -162,7 +162,7 @@
         <div class="section">
             <h2>Gibson Assembly Principle</h2>
             
-            <p>Gibson Assembly is an isothermal, one-pot DNA assembly method that enables seamless joining of DNA fragments through <strong>homologous overlap</strong> regions without the need for restriction enzymes. In a single reaction, a <strong>5′ exonuclease</strong> resects the ends of double-stranded DNA fragments to generate complementary 3′ single-stranded overhangs, which anneal specifically between adjacent fragments. A <strong>high-fidelity DNA polymerase</strong> then fills in the remaining gaps using the annealed 3′ ends as primers, and a <strong>thermostable DNA ligase</strong> subsequently seals the nicks in the DNA backbone. Together, these coordinated enzymatic activities result in <strong>scarless assembly</strong> of multiple DNA fragments into a continuous double-stranded DNA molecule, making Gibson Assembly particularly suitable for constructing large or complex DNA constructs./p>
+            <p>Gibson Assembly is an isothermal, one-pot DNA assembly method that enables seamless joining of DNA fragments through <strong>homologous overlap</strong> regions without the need for restriction enzymes. In a single reaction, a <strong>5′ exonuclease</strong> resects the ends of double-stranded DNA fragments to generate complementary 3′ single-stranded overhangs, which anneal specifically between adjacent fragments. A <strong>high-fidelity DNA polymerase</strong> then fills in the remaining gaps using the annealed 3′ ends as primers, and a <strong>thermostable DNA ligase</strong> subsequently seals the nicks in the DNA backbone. Together, these coordinated enzymatic activities result in <strong>scarless assembly</strong> of multiple DNA fragments into a continuous double-stranded DNA molecule, making Gibson Assembly particularly suitable for constructing large or complex DNA constructs.</p>
 
 
 
@@ -178,7 +178,7 @@
 
         <div class="section">
             <h2>Input Format</h2>
-	    <p>Both vector and insert inputs accept <strong>FASTA or plain text format</strong>. Only <strong>one sequence</strong> is allowed per input field; if multiple FASTA headers are detected, <strong>only the first sequence</strong> will be used. Fragment names extracted from FASTA headers are displayed for reference and will be used in primer naming conventions.</p>
+	    <p>Both vector and insert inputs accept <strong>FASTA</strong>, <strong>plain DNA text</strong>, or standard <strong>GenBank</strong> files (<code>.gb</code>, <code>.gbk</code>, <code>.gbff</code>, <code>.genbank</code>) with <code>LOCUS</code> and <code>ORIGIN</code> blocks. The short name in <strong>LOCUS</strong> is used as the sequence title. Only <strong>one sequence</strong> is allowed per input field; if multiple FASTA headers are detected, <strong>only the first sequence</strong> will be used. If you upload plain sequence without a <code>&gt;</code> header, the <strong>file name</strong> (without extension) is used as the name. Proprietary binary formats (e.g. SnapGene <code>.dna</code>) must be exported as GenBank or FASTA first. Fragment names from FASTA or GenBank are used in primer naming where applicable.</p>
 	     <p>PrimerWeaver currently supports approximately <strong>100 built-in Type II restriction enzymes</strong>. Once a vector sequence is provided, the system <strong>automatically identifies vector features</strong> and displays the positions of all <strong>single-cut restriction enzyme sites</strong>. The vector map can be rotated to facilitate visualization of the targeted cloning region.</p>
 
             <div style="text-align: center; margin: 2em 0;">
@@ -342,7 +342,7 @@
             <p>After primer design, the Gibson Assembly module generates a comprehensive set of results to facilitate experimental validation and downstream cloning.</p>
 
             <h3>Primer Table</h3>
-	    <p>Designed primer pairs are presented in a structured table with complete primer sequences information (5′→3′), length, GC content, and melting temperatures (Tm). Tm values are displayed for both the <strong>annealing core region</strong> and the <strong>full-length primer</strong>, allowing users to assess amplification compatibility. Primer quality metrics, including homopolymer runs, hairpin structures, self-dimer, and cross-dimer formation, are evaluated and flagged to highlight potential risks that may affect PCR performance. <strong>Overlap regions are highlighted in bold</strong> within primer sequences for easy visualization.<p>
+	    <p>Designed primer pairs are presented in a structured table with complete primer sequences information (5′→3′), length, GC content, and melting temperatures (Tm). Tm values are displayed for both the <strong>annealing core region</strong> and the <strong>full-length primer</strong>, allowing users to assess amplification compatibility. Primer quality metrics, including homopolymer runs, hairpin structures, self-dimer, and cross-dimer formation, are evaluated and flagged to highlight potential risks that may affect PCR performance. <strong>Overlap regions are highlighted in bold</strong> within primer sequences for easy visualization.</p>
 
 
             <div style="text-align: center; margin: 2em 0;">
@@ -355,6 +355,9 @@
 
 	    <h3>Assembled diagram and Overhang table</h3>
 	    <p>An <strong>assembled plasmid schematic</strong> is generated to illustrate the cloning workflow, including vector linearization, insert incorporation, and final plasmid assembly. This diagram provides a conceptual overview of fragment orientation and junction structure. A <strong>overlap table</strong> displays the overlap sequence at each junction, confirming that adjacent fragments have complementary homologous region. This table provides a quick visual verification that the assembly architecture is correct and that no overhang conflicts or mismatches are present.</p>
+            <div class="warning-box">
+                <p><strong>Note:</strong> The assembly diagram is schematic only and is not drawn to scale. Exact interpretation should be based on the assembled sequence and junction overlap information.</p>
+            </div>
 
 
 	   <div style="text-align: center; margin: 2em 0;">
@@ -365,7 +368,7 @@
 	   </div>
             
             <h3>Simulated Agarose Gel Electrophoresis</h3>
-            <p>PrimerWeaver generates a <strong>simulated agarose gel image</strong> to predict experimental outcomes for key cloning steps. The gel includes:<p>
+            <p>PrimerWeaver generates a <strong>simulated agarose gel image</strong> to predict experimental outcomes for key cloning steps. The gel includes:</p>
 
             <ul>
                 <li>A selectable DNA ladder (default: NEB 1 kb Plus DNA Ladder)</li>
@@ -375,7 +378,7 @@
                 <li>Gibson Assembly reaction product (showing assembled construct)</li>
                 
             </ul>
-            <p>Predicted band sizes are annotated alongside the gel, enabling users to compare expected fragment sizes with experimental results and quickly identify potential cloning issues.<P>
+            <p>Predicted band sizes are annotated alongside the gel, enabling users to compare expected fragment sizes with experimental results and quickly identify potential cloning issues.</p>
 
 
             <div style="text-align: center; margin: 2em 0;">
@@ -395,15 +398,215 @@
             <h3>Primer Structure</h3>
             <p>Each Gibson Assembly primers consists of two functional regions:</p>
             <ul>
-                <li><strong>Annealing core (3′):</strong> template-complementary region that drives PCR annealing (typically 18–30 bp)</li>
-
-		<li><strong>Overlap Region (5′):</strong> Sequence complementary to an adjacent fragment that will be exposed after exonuclease digestion (typically 20–30 bp). </li>
+                <li><strong>Annealing core (3′):</strong> template-complementary region that drives PCR annealing (designed within an 18-40 bp search window)</li>
+		<li><strong>Overlap Region (5′):</strong> Sequence copied from the adjacent junction context in the final assembly and appended as the Gibson homology tail (typically 20-30 bp). </li>
             </ul>
 
             <h3>Design Process</h3>
-            <p>During Gibson Assembly primer design, PrimerWeaver first identifies and optimizes the <strong>annealing core (template-binding region)</strong> at the termini of each fragment. This region defines PCR annealing behavior and is iteratively adjusted to achieve the target melting temperature while satisfying basic QC constraints, including GC content and secondary structure avoidance. Once the annealing cores are fixed, <strong>junction-specific overlap regions</strong> are defined according to the user-specified fragment order. For each junction between adjacent fragments, PrimerWeaver assigns complementary overlap sequences derived from the fragment termini to ensure precise and directional annealing after exonuclease resection. Finally, full-length primers are constructed by concatenating the optimized annealing cores with the validated overlap regions, yielding primers that simultaneously amplify the desired fragments and introduce the required homologous overlaps for seamless Gibson Assembly.<p>
+            <p>PrimerWeaver does not design Gibson overlaps in isolation. Instead, it first builds the <strong>actual assembly context</strong>, then extracts overlap segments directly from that context, and only then constructs full primers. In practice, the algorithm is easiest to understand as four linked stages.</p>
 
-           
+            <h3>Stage 1. Define the retained vector backbone and the assembled sequence</h3>
+            <p>If <strong>restriction-enzyme linearization</strong> is selected, the module digests the circular vector in silico, lists all candidate fragments, and uses the user-selected backbone fragment as the retained vector piece. It then inserts the ordered insert block into that backbone context and optionally keeps or removes restriction-site sequence depending on the <strong>keep sites</strong> setting. In this mode the code also tracks a <strong>raw unrotated assembly</strong> and may rotate the displayed circular sequence so that the reported assembly is easier to interpret while still preserving the original junction coordinates for overlap extraction.</p>
+            <p>If <strong>PCR linearization</strong> is selected, the module maps the user-supplied vector primers onto the vector by anchored 3′ matching, allows reverse-complement / primer-swap fallback when needed, and chooses the best valid amplicon pair. The retained backbone sequence is then the reconstructed PCR product, and the ordered insert block is appended into that linearized backbone context to form the assembled sequence used for downstream overlap design.</p>
+
+            <h3>Stage 2. Determine insert coordinates in the final assembly</h3>
+            <p>After the vector backbone is fixed, the module calculates the start and end position of every insert in the assembled construct. In enzyme-linearization mode, these coordinates are mapped through any circular rotation applied for display; in PCR-linearization mode, they are accumulated directly along the reconstructed linear backbone. This coordinate map is critical because Gibson overlaps are taken from the <strong>assembled junction neighborhood</strong>, not guessed independently for each primer.</p>
+
+            <h3>Stage 3. Design the annealing cores on each insert</h3>
+            <p>For each insert, PrimerWeaver designs a forward core from the insert 5′ end and a reverse core from the insert 3′ end. Core lengths are scanned across an <strong>18-40 bp</strong> window and evaluated with the nearest-neighbor Tm model. The selected core is the one that best satisfies the target Tm behavior under the current salt / primer-concentration settings; if no ideal choice is available, the algorithm falls back to the closest workable core rather than abandoning the design.</p>
+
+            <h3>Stage 4. Extract Gibson overlaps from assembly junctions and build full primers</h3>
+            <p>Once insert positions are known, the module extracts the overlap for each insert end from the assembled sequence itself. The <strong>left overlap</strong> is taken from the junction sequence immediately upstream of the insert, and the <strong>right overlap</strong> is taken from the junction sequence immediately downstream. For vector-facing ends, circular subsequence logic is used when necessary so that overlaps can cross the origin of the rotated plasmid view. For insert-insert junctions, the overlap geometry depends on whether an optional linker is long enough to supply the full overlap by itself or whether the overlap must straddle linker and neighboring insert sequence together.</p>
+            <p>Full primers are then assembled as <strong>5′ overlap + 3′ annealing core</strong>. Forward primers receive the left overlap directly, whereas reverse primers receive the reverse complement of the right overlap before the reverse annealing core is appended. In this way, the final primer pair simultaneously amplifies each insert and installs the exact homology required by the chosen backbone, fragment order, and linker configuration.</p>
+            <h3>Edge-Case Logic in the Algorithm</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Algorithm edge case</th>
+                        <th>Current behavior in Gibson module</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Linearization mode changes the whole geometry</strong></td>
+                        <td>Restriction-enzyme mode and PCR mode do not just change the input form; they produce different backbone sequences, different coordinate systems, and different overlap-extraction paths. The Gibson overlap layout is therefore mode-dependent from the start.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Vector linearization cannot be defined cleanly</strong></td>
+                        <td>If enzyme-linearization or PCR-linearization fails to produce a valid retained backbone sequence, the algorithm stops rather than guessing a junction architecture.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>PCR-linearization orientation is ambiguous</strong></td>
+                        <td>If the initial PCR-primer interpretation fails but a reverse-complement / swapped-primer interpretation succeeds, the module automatically adopts that recovered orientation instead of discarding the design immediately.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Backbone selection is required after digestion</strong></td>
+                        <td>When restriction digestion yields multiple fragments, the algorithm cannot proceed until one fragment is designated as the retained backbone. Changing that selection changes the overlap coordinates and the final primer set.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Recognition-site retention changes the assembled sequence</strong></td>
+                        <td>If the workflow keeps restriction-site sequence during enzyme-based linearization, the assembled backbone context changes before overlaps are extracted, so the junction homology may differ from the seamless site-free version.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Overlap design is junction-specific and backbone-aware</strong></td>
+                        <td>Overlaps are not assigned as generic tails. They are cut from the assembled junction neighborhood after backbone choice, insert order, and any linker placement are fixed, so changing any of those factors changes the overlap solution.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Linker length changes overlap extraction geometry</strong></td>
+                        <td>If a linker is long enough, the algorithm can take the full overlap from the linker interior. If the linker is short or absent, the overlap is split across neighboring sequence so that the final homology still spans the junction.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Rotated plasmid display does not equal raw overlap coordinates</strong></td>
+                        <td>In enzyme-linearization mode, the displayed assembled plasmid may be rotated for readability, but overlap extraction still has to respect the raw pre-rotation junction coordinates so that the reported primers match the true assembly geometry.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Core search may not hit an ideal target exactly</strong></td>
+                        <td>The algorithm scans a bounded core-length window and picks the closest workable Tm solution. If no perfect target-Tm hit exists, it falls back to the best available core instead of failing outright.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Warnings and Edge Cases</h2>
+            <p>The Gibson Assembly module uses the shared <strong>MW (Message Warning)</strong> layer for preflight validation where applicable, and also raises module-specific design errors or design notes when vector linearization, fragment selection, or overlap generation becomes ambiguous.</p>
+
+            <h3>General warning</h3>
+            <p>These warnings are primarily generated before design starts and usually indicate input-quality or parameter-quality issues. Depending on the situation, users can either revise the setup or continue with the current settings.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Trigger</th>
+                        <th>Current behavior in Gibson module</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Blocking input prompts</strong></td>
+                        <td>Missing vector sequence, missing inserts, missing PCR primers in PCR-linearization mode, invalid enzyme names, or invalid backbone selection.</td>
+                        <td>Design stops immediately and the module reports what must be corrected before a valid design can proceed.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-04</strong><br>No valid sequence after normalization</td>
+                        <td>A vector or insert becomes empty after normalization because no valid IUPAC DNA symbols remain.</td>
+                        <td>The user may still continue, but the affected sequence will no longer support meaningful design output.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-05</strong><br>Non-IUPAC characters removed</td>
+                        <td>Input contains unsupported characters that are stripped during normalization.</td>
+                        <td>The module proceeds with normalized sequences only and warns that the effective design template may have changed.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-06</strong><br>Degenerate bases detected</td>
+                        <td>Vector or insert contains ambiguous IUPAC bases.</td>
+                        <td>Thermodynamic values are estimated conservatively from the most stable variant, so Tm and ΔG values may represent a worst-case approximation.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-FRAG-01</strong><br>Insufficient fragments</td>
+                        <td>Too few insert fragments are provided for Gibson Assembly.</td>
+                        <td>The shared warning layer flags insufficient fragment count before design proceeds.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-OVERLAP-01</strong><br>Overlap length outside recommended range</td>
+                        <td>The requested overlap length falls outside the recommended <strong>15–40 bp</strong> range.</td>
+                        <td>The module allows design to proceed, but warns that very short overlaps may reduce efficiency and very long overlaps may increase off-target assembly.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-10 to MW-15</strong><br>Parameter range warnings</td>
+                        <td>Na<sup>+</sup>, Mg<sup>2+</sup>, primer concentration, or target Tm falls outside the recommended or validated model range.</td>
+                        <td>The module can still run, but thermodynamic prediction and primer optimization may become less reliable.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-19</strong><br>Large total input size</td>
+                        <td>Total vector plus insert input becomes large enough to stress browser-side computation.</td>
+                        <td>The shared warning layer reports that browser-side design and rendering may slow down for very large total input sizes.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-20</strong><br>Multiple FASTA headers in one field</td>
+                        <td>A vector or insert textarea contains more than one FASTA record.</td>
+                        <td>A shared MW dialog warns that only one sequence is allowed per field. If the user proceeds, the field is trimmed to the <strong>first FASTA record</strong> before design continues.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-22</strong><br>File upload exceeds import limit</td>
+                        <td>An uploaded vector or insert file is larger than <strong>1 MB</strong>.</td>
+                        <td>The import is blocked before sequence loading, and the user must choose a smaller file.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Design warning</h3>
+            <p>These warnings and edge cases arise from Gibson-specific design logic, especially vector linearization mode, fragment handling, and overlap interpretation.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Case</th>
+                        <th>Trigger</th>
+                        <th>Current behavior in Gibson module</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Insert count cap</strong></td>
+                        <td>More than six insert rows are added.</td>
+                        <td>The interface hard-caps Gibson Assembly at <strong>six inserts</strong> and warns the user when that limit is reached.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Vector preview uses first sequence only</strong></td>
+                        <td>Multiple vector records are present before preflight trimming occurs.</td>
+                        <td>The map preview reports that multiple sequences were found and uses the <strong>first record</strong> for visualization.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Enzyme-linearization requires valid cut topology</strong></td>
+                        <td>No enzyme is selected, both enzyme names are invalid, both enzymes are identical, or the selected enzyme set has no valid sites in the vector.</td>
+                        <td>The design aborts with a descriptive error because a valid enzyme-based linearization backbone cannot be defined.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Double-digest site requirement</strong></td>
+                        <td>Double-digest mode is chosen but one of the two enzymes has no site in the vector.</td>
+                        <td>The design stops and reports which enzyme site is missing in the vector.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Backbone fragment must be selectable</strong></td>
+                        <td>No fragment list is available after enzyme analysis, or the selected fragment index is invalid.</td>
+                        <td>The module stops because Gibson enzyme-linearization requires a concrete backbone fragment to replace.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>PCR-linearization requires valid primer placement</strong></td>
+                        <td>Forward and reverse PCR primers cannot be matched to the vector, or no valid PCR product can be reconstructed.</td>
+                        <td>The design aborts and asks the user to verify or revise PCR primers.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Automatic RC / primer-swap fallback</strong></td>
+                        <td>Initial primer matching fails but the reverse-complement / swapped orientation succeeds.</td>
+                        <td>The module automatically swaps the primer interpretation and records a design note indicating that RC orientation was detected.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Selected backbone fragment replaces all other enzyme fragments</strong></td>
+                        <td>Enzyme-linearization mode is used with a chosen backbone fragment.</td>
+                        <td>The selected fragment is treated as the retained backbone, and all other digest fragments are conceptually replaced by the provided insert block.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Recognition-site retention option changes assembly sequence</strong></td>
+                        <td>The <code>keep sites</code> option is enabled during enzyme-based linearization.</td>
+                        <td>Recognition-site sequence can be reintroduced around the insert junctions in the assembled construct, which changes the final assembly sequence compared with the seamless option.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Linker conversion may fail</strong></td>
+                        <td>An amino-acid linker cannot be converted using the selected host-organism codon table.</td>
+                        <td>The design stops and reports the linker-conversion error for the affected insert.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Assembly diagram is schematic</strong></td>
+                        <td>Any successful Gibson Assembly design.</td>
+                        <td>The assembly image is conceptual rather than length-accurate; exact interpretation should rely on the assembled sequence, overlap table, and primer results.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <p><strong>Practical interpretation:</strong> warnings in Gibson Assembly do not always indicate a failed design. Some warnings reflect sequence normalization, fragment-count limits, or ambiguity in vector linearization and primer orientation. Results should therefore be interpreted together with the selected backbone fragment, the overlap table, and the final assembled sequence.</p>
+            </div>
         </div>
 
     </div>

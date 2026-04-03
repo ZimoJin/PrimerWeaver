@@ -167,14 +167,11 @@
             <p>Restriction enzyme cloning uses <strong>Type II restriction endonucleases</strong> to generate compatible <strong>sticky or blunt ends</strong> on both the insert and vector, followed by covalent joining of DNA ends using <strong>T4 DNA ligase</strong>. In general, <strong>sticky-end ligation is significantly more efficient than blunt-end ligation</strong>, as cohesive overhangs promote correct annealing prior to ligation, whereas blunt-end ligation relies solely on random end collisions and is therefore less efficient.</p>
             <p>Single enzyme digestion uses one restriction enzyme to cut both the insert and vector. This strategy is simple but allows the insert to ligate in either orientation and increases the risk of vector self-ligation, particularly in blunt-end cloning. In single-enzyme digestion, <strong>vector dephosphorylation</strong> can be applied to reduce self-ligation and improve cloning efficiency.</p>
 	    <p><strong>Double enzyme digestion</strong> employs two different restriction enzymes to generate <strong>non-compatible ends</strong> at each end of the insert and vector. This approach enforces <strong>directional cloning</strong>, reduces background from vector self-ligation, and generally yields higher cloning efficiency. As a result, double digestion with sticky ends is the preferred strategy for most restriction cloning applications.</p>
-            
+        </div>
 
-
-
-            
         <div class="section">
             <h2>Input Format</h2>
-            <p>Both vector and insert inputs accept <strong>FASTA or plain text format</strong>. Only <strong>one sequence</strong> is allowed per input field; if multiple FASTA headers are detected, <strong>only the first sequence</strong> will be used. Fragment names extracted from FASTA headers are displayed for reference and will be used in primer naming conventions.</p>
+            <p>Both vector and insert inputs accept <strong>FASTA</strong>, <strong>plain DNA text</strong>, or standard <strong>GenBank</strong> files (<code>.gb</code>, <code>.gbk</code>, <code>.gbff</code>, <code>.genbank</code>) with <code>LOCUS</code> and <code>ORIGIN</code> blocks. The short name in <strong>LOCUS</strong> is used as the sequence title. Only <strong>one sequence</strong> is allowed per input field; if multiple FASTA headers are detected, <strong>only the first sequence</strong> will be used. If you upload plain sequence without a <code>&gt;</code> header, the <strong>file name</strong> (without extension) is used as the name. Proprietary binary formats (e.g. SnapGene <code>.dna</code>) must be exported as GenBank or FASTA first. Fragment names from FASTA or GenBank are used in primer naming where applicable.</p>
             <p>PrimerWeaver currently supports approximately <strong>100 built-in Type II restriction enzymes</strong>. Once a vector sequence is provided, the system <strong>automatically identifies vector features</strong> and displays the positions of all <strong>single-cut restriction enzyme sites</strong>. The vector map can be rotated to facilitate visualization of the targeted cloning region.</p>
 
 	<div style="text-align: center; margin: 2em 0;">
@@ -189,7 +186,7 @@
 
         <div class="section">
             <h2>Design Parameters</h2>
-		<p>Please select the preferred restriction enzymes from the dropdown list or search by enzyme name. Once <strong>two restriction enzymes</strong> are selected, the system automatically identifies the <strong>longest digestion fragment</strong> as the destination vector backbone. If the longest fragment does not correspond to the intended vector backbone, you may manually select the appropriate fragment.Please review the primer design parameters before proceeding, and modify them if necessary.<p>
+		<p>Please select the preferred restriction enzymes from the dropdown list or search by enzyme name. Once <strong>two restriction enzymes</strong> are selected, the system automatically identifies the <strong>longest digestion fragment</strong> as the destination vector backbone. If the longest fragment does not correspond to the intended vector backbone, you may manually select the appropriate fragment. Please review the primer design parameters before proceeding, and modify them if necessary.</p>
             
             <table>
                 <thead>
@@ -243,7 +240,7 @@
 
         <div class="section">
             <h2>Results and Output</h2>
-            <p>After primer design, the Restriction Cloning module generates a comprehensive set of results to facilitate experimental validation and downstream cloning.<p>
+            <p>After primer design, the Restriction Cloning module generates a comprehensive set of results to facilitate experimental validation and downstream cloning.</p>
 
             <h3>Primer Table</h3>
             <p>Designed primer pairs are reported in a structured table, including primer sequences (5′→3′), length, GC content, and melting temperatures (Tm). Tm values are displayed for both the <strong>annealing core region</strong> and the <strong>full-length primer</strong>, allowing users to assess amplification compatibility. Primer quality metrics, including homopolymer runs, hairpin structures, self-dimer, and cross-dimer formation, are evaluated and flagged to highlight potential risks that may affect PCR performance. <strong>Restriction enzyme recognition sites</strong> added to the primers are <strong>highlighted in bold</strong> within the primer sequences, while protective bases are shown in italics.</p>
@@ -257,7 +254,7 @@
 	   </div>
 
             <h3>Assembled diagram and Sticky end table</h3>
-	    <p>An <strong>assembled plasmid schematic</strong> is generated to illustrate the cloning workflow, including vector linearization, insert incorporation, and final plasmid assembly. This diagram provides a conceptual overview of fragment orientation and junction structure. For restriction cloning strategies using sticky ends, a <strong>junction-level sticky-end table</strong> is provided. This table summarizes the left and right cohesive ends (5′→3′) at each ligation junction, allowing users to confirm end compatibility and directional cloning design at a glance.<p>
+	    <p>An <strong>assembled plasmid schematic</strong> is generated to illustrate the cloning workflow, including vector linearization, insert incorporation, and final plasmid assembly. This diagram provides a conceptual overview of fragment orientation and junction structure. For restriction cloning strategies using sticky ends, a <strong>junction-level sticky-end table</strong> is provided. This table summarizes the left and right cohesive ends (5′→3′) at each ligation junction, allowing users to confirm end compatibility and directional cloning design at a glance.</p>
 
 	   <div style="text-align: center; margin: 2em 0;">
   		<img
@@ -268,7 +265,7 @@
 	   </div>
 
             <h3>Simulated Agarose Gel Electrophoresis</h3>
-	    <p>PrimerWeaver generates a <strong>simulated agarose gel image</strong> to predict experimental outcomes for key cloning steps. The gel includes:<p>
+	    <p>PrimerWeaver generates a <strong>simulated agarose gel image</strong> to predict experimental outcomes for key cloning steps. The gel includes:</p>
             <ul>
                 <li>A selectable DNA ladder (default: NEB 1 kb Plus DNA Ladder)</li>
                 <li>Undigested vector</li>
@@ -277,7 +274,7 @@
                 <li>Assembled plasmid</li>
                 <li>Diagnostic restriction digest of the assembled plasmid</li>
             </ul>
-	    <p>Predicted band sizes are annotated alongside the gel, enabling users to compare expected fragment sizes with experimental results and quickly identify potential cloning issues.<P>
+	    <p>Predicted band sizes are annotated alongside the gel, enabling users to compare expected fragment sizes with experimental results and quickly identify potential cloning issues.</p>
 
 	   <div style="text-align: center; margin: 2em 0;">
   		<img
@@ -301,11 +298,212 @@
             </ul>
 
             <h3>Design Process</h3>
-            <p>During restriction cloning primer design, PrimerWeaver first identifies the <strong>annealing core</strong> at the insert termini, which defines primer annealing behavior and is optimized to meet the target Tm and basic QC constraints. Once the annealing core is determined, the selected <strong>restriction enzyme recognition sites</strong> are appended to the 5′ ends of the primers as non-annealing tags. Finally, short <strong>protective bases</strong> are added upstream of the restriction sites to improve the efficiency of direct digestion of PCR products.<P>
+            <p>Restriction cloning design in PrimerWeaver is divided into three linked steps: <strong>insert-primer construction</strong>, <strong>vector digest interpretation</strong>, and <strong>ligation-aware assembly reconstruction</strong>. These steps are summarized below.</p>
 
-   
+            <h3>Insert Primer Construction</h3>
+            <p>The module first normalizes the insert sequence and designs the <strong>template-binding core</strong> directly on the insert termini. The forward core is selected from the 5′ end of the insert, and the reverse core is selected from the 3′ end as the reverse complement of the insert terminus. Core length is scanned iteratively until the target Tm is reached or the best available terminal primer is found. A 3′ GC-ending primer is preferred when available.</p>
+            <p>Once the insert-binding cores are fixed, the full primers are assembled as:</p>
+            <p><strong>5′ protective clamp + restriction site + annealing core 3′</strong></p>
+            <p>The protective clamp is generated as a short non-self-complementary 5′ sequence intended to improve digestion efficiency, and the selected enzyme recognition site is appended between the clamp and the annealing core. Thermodynamic calculations are therefore performed on the <strong>insert-binding core</strong>, not on the full 5′ cloning tail.</p>
 
-               
+            <h3>Vector Digest and Backbone Selection</h3>
+            <p>The vector is treated as a <strong>circular molecule</strong>. For each selected restriction enzyme, the module identifies all recognition sites, converts them into actual cut positions, and enumerates all digest fragments generated on the circular backbone. The longest fragment is used as the default backbone candidate, but the user may manually choose another fragment from the backbone selector if multiple fragments are produced.</p>
+            <p>The digest topology is then interpreted from the enzyme identities present at the two ends of the retained backbone fragment. This determines whether the cloning behaves as a directional double digest, a pseudo-single digest, or a truly non-directional ligation scenario.</p>
+
+            <h3>Ligation and Assembled Sequence Reconstruction</h3>
+            <p>After the backbone fragment is chosen, the module reconstructs the assembled plasmid rather than reporting primer sequences alone. Partial recognition-site remnants left at the fragment edges are trimmed from the retained backbone where appropriate, and the insert is oriented relative to the backbone according to the enzyme identity at the left and right backbone ends. In directional two-enzyme cloning, the insert may be kept as-is or reverse-complemented so that the primer-borne enzyme sites align with the actual backbone topology.</p>
+            <p>The final assembled sequence is then reconstructed as:</p>
+            <p><strong>trimmed backbone + right-end restriction site + oriented insert + left-end restriction site</strong></p>
+            <p>This same interpretation is used to populate the junction sticky-end table, the assembled plasmid summary, and the simulated diagnostic digest output.</p>
+
+            <h3>Edge-Case Logic in the Algorithm</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Algorithm edge case</th>
+                        <th>Current behavior in Restriction Cloning module</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Neither enzyme cuts the vector</strong></td>
+                        <td>The module cannot define a digest backbone at all. Instead of inventing a cloning topology, it returns an explicit N/A-style result and reports that the selected enzymes have no usable sites in the vector.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Only one enzyme cuts the vector</strong></td>
+                        <td>The design automatically falls back to <strong>single-enzyme mode</strong>, using the cutting enzyme on both insert ends. This preserves a clonable design, but the resulting ligation is non-directional and has higher vector self-ligation risk.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Multiple sites exist in the vector</strong></td>
+                        <td>The module computes all digest fragments and uses the longest fragment as the default retained backbone. If the two ends of that fragment are produced by the same enzyme, the backbone is treated as a <strong>pseudo-single-enzyme</strong> backbone even in a nominal double-digest setup.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Insert contains the selected restriction site(s)</strong></td>
+                        <td>The primer design itself can still be generated, but the module explicitly flags that the amplified insert may also be cut by the chosen enzyme combination, which changes the practical cloning interpretation.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Sticky-end compatibility changes ligation interpretation</strong></td>
+                        <td>If both ends are blunt, or if both enzymes generate identical sticky ends, the assembly is interpreted as non-directional ligation. If one end is blunt and the other sticky, the module still reports the design but treats it as an unfavorable cloning topology.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Insert orientation depends on backbone-end enzyme identity</strong></td>
+                        <td>The assembled sequence is not created by simply pasting the insert after the vector. The module compares the left and right backbone-end enzymes with the forward and reverse primer enzyme tags, and reverse-complements the insert when necessary to keep ligation topology internally consistent.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Warnings and Edge Cases</h2>
+            <p>The Restriction Cloning module uses the shared <strong>MW (Message Warning)</strong> system for preflight validation and confirmation dialogs whenever the shared visualization layer is available. If the MW layer is unavailable, the module falls back to standard browser alert/confirm dialogs. In practice, warnings in this module fall into two groups: <strong>General warning</strong> messages inherited from the shared validation layer, and <strong>Design warning</strong> messages specific to restriction cloning logic.</p>
+
+            <h3>General warning</h3>
+            <p>These warnings are generated before design starts and mainly indicate potential input-quality or parameter-quality problems. Most of them allow the user to click <strong>Cancel</strong> to revise inputs or <strong>OK</strong> to proceed with the current settings.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Trigger</th>
+                        <th>Current behavior in RE module</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Blocking input prompts</strong></td>
+                        <td>No insert sequence, no vector sequence, empty normalized insert/vector sequence, or missing enzyme selection.</td>
+                        <td>Design stops immediately and shows a prompt telling the user what must be provided before continuing.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-04</strong><br>No valid sequence after normalization</td>
+                        <td>All characters are removed after normalization because no valid IUPAC DNA symbols remain.</td>
+                        <td>The user may cancel to revise input or proceed, but the resulting design will be empty or non-informative.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-05</strong><br>Non-IUPAC characters removed</td>
+                        <td>Sequence contains unsupported characters, especially if they appear near a primer-relevant 3′ region.</td>
+                        <td>The module continues using the normalized sequence only; users are warned that this may alter design behavior.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-06</strong><br>Degenerate bases detected</td>
+                        <td>Vector or insert contains IUPAC degenerate symbols.</td>
+                        <td>Thermodynamic values are estimated conservatively from the most stable variant, so reported Tm and ΔG values may be worst-case approximations.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-10 to MW-13</strong><br>Parameter range warnings</td>
+                        <td>Na<sup>+</sup>, Mg<sup>2+</sup>, primer concentration, or target Tm falls outside the recommended design range.</td>
+                        <td>The user can continue, but Tm prediction and primer optimization may become less reliable.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-14</strong><br>High salt combination</td>
+                        <td>High Na<sup>+</sup> and high Mg<sup>2+</sup> are provided simultaneously.</td>
+                        <td>The module warns that duplex stability may be overestimated by the model.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-15</strong><br>Outside validated thermodynamic range</td>
+                        <td>Parameter values move beyond the validated range of the thermodynamic model.</td>
+                        <td>The user can still proceed, but the resulting Tm values may no longer be physically meaningful.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-19</strong><br>Large total input size</td>
+                        <td>Total vector plus insert input is very large (&gt; 1 MB).</td>
+                        <td>The module warns about slow browser-side execution. This is the practical performance warning most relevant to RE; the generic “too many items” warning is normally not triggered because RE processes one vector and one insert design at a time.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-20</strong><br>Multiple FASTA headers in one field</td>
+                        <td>A vector or insert textarea contains more than one FASTA record.</td>
+                        <td>A shared MW dialog warns that only one sequence is allowed per field. If the user proceeds, the field is trimmed to the <strong>first FASTA record</strong> before design continues.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-22</strong><br>File upload exceeds import limit</td>
+                        <td>An uploaded vector or insert file is larger than <strong>1 MB</strong>.</td>
+                        <td>The import is blocked before sequence loading, and the user must choose a smaller file.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Design warning</h3>
+            <p>These warnings come from the restriction cloning algorithm itself. Some are shown as confirmation-style MW dialogs because they change the interpretation of the selected enzyme pair; others are appended directly to the result panels so the design can still be reviewed in context.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Case</th>
+                        <th>Trigger</th>
+                        <th>Current behavior in RE module</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Only the first insert is used</strong></td>
+                        <td>More than one insert row is present in the interface.</td>
+                        <td>The current RE design flow collects all non-empty insert rows but only uses <strong>the first non-empty insert</strong> for primer design, assembly prediction, and gel simulation.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Both selected enzymes absent from the vector</strong></td>
+                        <td>No recognition site for either selected enzyme is found in the vector.</td>
+                        <td>The module opens a confirmation MW dialog. If the user proceeds, the output panels show <strong>N/A</strong>, no assembled plasmid is generated, and the assembly graphic reflects the no-cut case.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Only one enzyme site found in the vector</strong></td>
+                        <td>Exactly one of the two selected enzymes cuts the vector.</td>
+                        <td>The module offers a <strong>single-enzyme fallback</strong>, reusing the cutting enzyme on both ends. This permits design to continue, but cloning becomes non-directional and self-ligation risk increases.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Multiple vector cut sites</strong></td>
+                        <td>One or both selected enzymes cut the vector at more than one position.</td>
+                        <td>The module auto-selects the <strong>longest digestion fragment</strong> as the candidate backbone and warns the user to verify that the chosen fragment matches the intended experimental backbone. The backbone dropdown can be used to override the automatic choice.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Pseudo-single digest backbone</strong></td>
+                        <td>The longest fragment is flanked by the <strong>same enzyme</strong> on both ends even though two enzymes were entered.</td>
+                        <td>The module warns that the selected backbone effectively behaves like a single-enzyme digest, so cloning is non-directional and vector background may increase.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Selected enzyme site present inside the insert</strong></td>
+                        <td>The insert already contains one or both selected restriction sites.</td>
+                        <td>A warning is appended to the sticky-end or junction output because the insert may be unintentionally cut during the cloning workflow.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Identical sticky ends</strong></td>
+                        <td>The two selected enzymes generate the same cohesive end sequence.</td>
+                        <td>The module flags the design as <strong>non-directional</strong>; insert orientation is not enforced and vector self-ligation risk is increased.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Both ends are blunt</strong></td>
+                        <td>Neither selected enzyme generates a sticky end.</td>
+                        <td>The module warns that blunt-end cloning is non-directional, usually lower in ligation efficiency, and more prone to background colonies.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>One blunt end and one sticky end</strong></td>
+                        <td>One selected enzyme generates a blunt end and the other generates a sticky end.</td>
+                        <td>The module still reports a design, but labels this enzyme combination as generally <strong>not recommended</strong> for standard restriction cloning.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Very short insert</strong></td>
+                        <td>The insert length is shorter than <strong>50 bp</strong>.</td>
+                        <td>A warning is added to remind the user that ligation, colony screening, and sequence verification may be more difficult for very short inserts.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>High vector self-ligation risk</strong></td>
+                        <td>Triggered by identical sticky ends, blunt-blunt cloning, or a pseudo-single backbone topology.</td>
+                        <td>The module explicitly recommends <strong>vector dephosphorylation</strong> and/or choosing a different enzyme combination to reduce background colonies.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Orientation mismatch after design review</strong></td>
+                        <td>The assembled output does not match the intended top-strand insert orientation.</td>
+                        <td>The recommended corrective action is to <strong>reverse-complement the insert sequence</strong> and re-run the design, rather than manually editing the predicted assembly.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Assembly diagram is schematic</strong></td>
+                        <td>Any successful restriction cloning design with an assembly preview.</td>
+                        <td>The assembly image is a conceptual schematic rather than a length-accurate plasmid map; users should rely on the assembled sequence, sticky-end table, and fragment information for exact interpretation.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <p><strong>Practical interpretation:</strong> a warning in this module does not always mean the design is impossible. Some warnings simply indicate that the current enzyme pair changes the cloning topology from the ideal directional sticky-end workflow to a fallback or lower-efficiency scenario. Users should therefore interpret RE results together with the <strong>backbone fragment selector</strong>, the <strong>sticky-end table</strong>, and the <strong>assembled plasmid preview</strong>.</p>
+            </div>
+        </div>
     </div>
 </body>
 </html>

@@ -143,7 +143,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Multiplex PCR Module Documentation</h1>
+        <h1>Multiplex PCR</h1>
         
         <div class="abstract">
             <p>The Multiplex PCR module provides comprehensive tools for designing and validating primer sets that can simultaneously amplify multiple DNA target sequences in a single reaction. The module automates primer design with integrated thermodynamic analysis, cross-dimer conflict detection, off-target amplification screening, and intelligent graph-based pooling strategies. A unified conflict graph considers three factors—primer-primer thermodynamic interactions, PCR product size resolution on gels, and shared off-target amplification—to automatically partition primers into non-conflicting pools, each suitable for a separate reaction tube. Interactive heatmap visualizations enable users to assess primer compatibility at a glance.</p>
@@ -183,7 +183,7 @@
         <div class="section">
             <h2>Input Format</h2>
 
-	    <p>Both <strong>De Novo Design Mode</strong> and <strong>QC mode</strong> accept <strong>multi-FASTA or plain text format</strong>. The current upload size limit is <strong>1 MB</strong>; however, the user interface may become unstable when processing very large inputs. We therefore recommend limiting each run to <strong>no more than 500 sequences</strong>.<p>
+	    <p>Both <strong>De Novo Design Mode</strong> and <strong>QC mode</strong> accept <strong>multi-FASTA or plain text format</strong>. Uploaded files larger than <strong>1 MB</strong> are now blocked by the shared <strong>MW-22</strong> import guard. Even below that hard limit, the user interface may become unstable when processing very large inputs, so we still recommend limiting each run to <strong>no more than 500 sequences</strong>.<p>
 
              <div style="text-align: center; margin: 2em 0;">
                 <img
@@ -360,6 +360,122 @@
             
         </div>
 
+        <div class="section">
+            <h2>Warnings and Edge Cases</h2>
+            <p>The Multiplex PCR module combines the shared <strong>MW (Message Warning)</strong> layer with multiplex-specific design constraints around target count, overlap tails, off-target screening, and graph-based pooling. Some warnings are pure preflight checks, while others explain why a design or pool assignment behaves differently from a simple single-target PCR workflow.</p>
+
+            <h3>General warning</h3>
+            <p>These warnings are mainly generated before design or QC analysis starts and reflect sequence-quality, parameter-quality, input-size, or upload-limit issues.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Trigger</th>
+                        <th>Current behavior in Multiplex PCR module</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Blocking input prompts</strong></td>
+                        <td>Missing target sequences, missing primer sequences in QC mode, parse failures, or other invalid required inputs.</td>
+                        <td>The module stops immediately and asks the user to correct the missing or invalid input before analysis can proceed.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-04</strong><br>No valid sequence after normalization</td>
+                        <td>All submitted target sequences become empty after normalization.</td>
+                        <td>The user may still continue, but the resulting design or QC output will be empty or non-informative.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-05</strong><br>Non-IUPAC characters removed</td>
+                        <td>Target sequences contain unsupported characters.</td>
+                        <td>The module proceeds with normalized sequences only and warns that the effective template may differ from the original input.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-06</strong><br>Degenerate bases detected</td>
+                        <td>Targets contain ambiguous IUPAC bases.</td>
+                        <td>Thermodynamic values are estimated conservatively from the most stable interpretation, so Tm and ΔG values should be treated as approximations.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-09</strong><br>Large dataset</td>
+                        <td>The number of submitted target items or primer pairs exceeds <strong>500</strong>.</td>
+                        <td>The module warns that browser-side processing may become slow or unresponsive.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-10 to MW-15</strong><br>Parameter range warnings</td>
+                        <td>In Design mode, Na<sup>+</sup>, Mg<sup>2+</sup>, primer concentration, or target Tm falls outside recommended or validated thermodynamic ranges.</td>
+                        <td>The module can still proceed, but primer optimization and thermodynamic interpretation become less reliable.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-19</strong><br>Large total input size</td>
+                        <td>Total input sequence size becomes very large.</td>
+                        <td>The module warns that browser-side computation may become slow during design, QC, or pooling analysis.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-22</strong><br>File upload exceeds import limit</td>
+                        <td>An uploaded target or primer file is larger than <strong>1 MB</strong>.</td>
+                        <td>The import is blocked before sequence loading, and the user must choose a smaller file.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Design warning</h3>
+            <p>These warnings and edge cases arise from multiplex-specific primer design logic, off-target screening, and the final pooling model.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Case</th>
+                        <th>Trigger</th>
+                        <th>Current behavior in Multiplex PCR module</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>MPX-MW-01</strong><br>Many targets in one design run</td>
+                        <td>Design mode is used with more than <strong>10 targets</strong>.</td>
+                        <td>The module warns that multiplex efficiency and cross-reactivity risks increase as the panel grows, but still allows the design to continue.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Forward / Reverse overlap length warning</strong></td>
+                        <td>User-supplied 5′ overlap tails fall outside the recommended <strong>15–40 bp</strong> range.</td>
+                        <td>The module raises overlap warnings but still allows design to proceed, warning that extreme overlap lengths may reduce downstream assembly robustness.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Nearest-Tm fallback for primer placement</strong></td>
+                        <td>No candidate primer exactly satisfies the requested Tm window at a target terminus.</td>
+                        <td>The algorithm falls back to the locally best available primer rather than failing immediately, so some reported primers may sit outside the ideal Tm tolerance.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Design mode performs off-target screening, QC mode does not</strong></td>
+                        <td>The selected workflow changes between De Novo Design and QC mode.</td>
+                        <td>Only Design mode evaluates off-target amplification against the submitted target panel; in QC mode off-target status is unknown because template context is not provided.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>QC mode disables size-based pooling logic</strong></td>
+                        <td>QC mode is used with uploaded primer pairs only.</td>
+                        <td>Pooling recommendations rely on thermodynamic conflicts only, because expected amplicon size and size-resolution filtering are unavailable.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Pooling is graph-based and heuristic</strong></td>
+                        <td>Many primer pairs compete for the same multiplex pool.</td>
+                        <td>The module assigns primers to pools using conflict-graph coloring, which is practical but not guaranteed to produce a globally minimal number of pools in every case.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Result-level failed targets</strong></td>
+                        <td>A target cannot yield a valid primer pair, or a designed pair conflicts with product-length expectations.</td>
+                        <td>The affected target is listed as failed in the result area rather than silently dropped, so users can review why it could not be included in the panel.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Shared off-targets can split pools</strong></td>
+                        <td>Different primer pairs amplify the same unintended region or produce indistinguishable products.</td>
+                        <td>The conflict graph treats those primer pairs as incompatible, forcing them into separate pools even if their direct thermodynamic interaction is weak.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <p><strong>Practical interpretation:</strong> warnings in Multiplex PCR do not always indicate a failed panel. The most important distinction is whether the module is working in <strong>Design mode</strong> or <strong>QC mode</strong>, because only Design mode can evaluate off-target amplification and product-size-aware pooling. Final interpretation should therefore combine the warning list with the failed-target report, the pooling explanation, and the selected workflow mode.</p>
+            </div>
+        </div>
 
     </div>
 </body>

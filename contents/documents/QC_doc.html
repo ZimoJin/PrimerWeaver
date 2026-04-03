@@ -131,6 +131,13 @@
         .section {
             margin-bottom: 2.5em;
         }
+        .warning-box {
+            background: #fff7ed;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
         .reference {
             font-size: 0.9em;
             margin-left: 20px;
@@ -148,7 +155,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Primer QC Module Documentation</h1>
+        <h1>Primer QC</h1>
         
         <div class="abstract">
             <p>Primer QC supports multiple practical scenarios encountered in routine molecular biology workflows. It can be used to validate primer sequences obtained from publications, databases, or previous experiments before ordering new oligonucleotides, and to assess the compatibility of existing primer pairs. The module also facilitates troubleshooting by identifying primer features that may lead to PCR failure, enabling users to understand why certain primers perform poorly. In addition, Primer QC allows comparison of multiple primer candidates to aid optimization and serves as an educational resource for understanding fundamental primer design principles and thermodynamic parameters affecting PCR performance.</p>
@@ -195,7 +202,7 @@
             <h2>Input Format</h2>
             
             <h3>Sequence Format Support</h3>
-            <p>This module accept <strong>both multi-FASTA and plain text format</strong>. The current upload size limit is 1 MB; however, the user interface may become unstable when processing very large inputs. We therefore recommend limiting each run to <strong>no more than 500 sequences</strong>. The system supports <strong>both canonical DNA bases (A, T, G, C) and IUPAC degenerate bases (R, Y, S, W, K, M, B, D, H, V, N)</strong>. These bases are integrated into complementary pairing and thermodynamic calculations. Non-IUPAC characters are removed during normalization with user confirmation. Primers containing degenerate bases are marked with an asterisk (*) in results.</p>
+            <p>This module accept <strong>both multi-FASTA and plain text format</strong>. Uploaded files larger than <strong>1 MB</strong> are blocked by the shared <strong>MW-22</strong> import guard. Even below that hard limit, the user interface may become unstable when processing very large inputs, so we still recommend limiting each run to <strong>no more than 500 sequences</strong>. The system supports <strong>both canonical DNA bases (A, T, G, C) and IUPAC degenerate bases (R, Y, S, W, K, M, B, D, H, V, N)</strong>. These bases are integrated into complementary pairing and thermodynamic calculations. Non-IUPAC characters are removed during normalization with user confirmation. Primers containing degenerate bases are marked with an asterisk (*) in results.</p>
 
 		<div style="text-align: center; margin: 2em 0;">
                     <img
@@ -579,6 +586,147 @@
         <p>If ΔTm &gt; 5 °C, then <code>pp -= 10</code>. Final score is clamped to [0, 100].</p>
         </div>
 
+        <div class="section">
+            <h2>Warnings and Edge Cases</h2>
+            <p>The Primer QC module uses its own preflight warning system to validate primer lists, pairing logic, sequence normalization, and thermodynamic input ranges before analysis begins. It also exposes several interpretation-level edge cases that affect how pairwise QC metrics should be read.</p>
+
+            <h3>General warning</h3>
+            <p>These warnings are primarily generated before QC starts and usually indicate input-quality, pairing-quality, or model-boundary issues. In most cases the user may still continue, but the meaning of the final score or pairwise metrics can change.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Trigger</th>
+                        <th>Current behavior in Primer QC module</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Blocking input prompt</strong></td>
+                        <td>Neither forward nor reverse primer list contains any usable sequence.</td>
+                        <td>The module stops immediately and asks the user to provide primer input before QC can run.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-01 / MW-02</strong><br>Only one side usable</td>
+                        <td>Only forward primers or only reverse primers remain analyzable after parsing and cleanup.</td>
+                        <td>The module continues with single-primer QC only; pair-level metrics such as cross-dimer and pair reliability are unavailable.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-03</strong><br>Primer-count mismatch</td>
+                        <td>The number of forward and reverse entries differs.</td>
+                        <td>The module tries name-based pairing first and then falls back to index-based pairing, so some rows may be evaluated only as partial or unmatched primer entries.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-04</strong><br>No valid sequence after normalization</td>
+                        <td>Primer text is present, but no valid IUPAC primer remains after normalization.</td>
+                        <td>The user may still continue, but the resulting QC output will be empty or non-informative.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-05</strong><br>Non-IUPAC characters removed</td>
+                        <td>One or more primer sequences contain unsupported characters.</td>
+                        <td>The module proceeds with normalized sequences only and warns that the effective sequence used for thermodynamic calculation may differ from the original pasted text.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-06</strong><br>Degenerate bases detected</td>
+                        <td>One or more primers contain ambiguous IUPAC bases.</td>
+                        <td>Thermodynamic values are estimated conservatively from the most stable interpretation, so reported Tm and ΔG should be treated as approximations.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-07</strong><br>Duplicate primer names</td>
+                        <td>Primer labels are repeated across the submitted primer lists.</td>
+                        <td>The module still runs, but pairing and output labels may become ambiguous.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-08</strong><br>Direction or naming scheme looks suspicious</td>
+                        <td>Primer labels suggest a reverse primer in the forward box, a forward primer in the reverse box, or incompatible naming styles are mixed.</td>
+                        <td>The module warns that automatic pairing may not match the user's biological intent.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-09</strong><br>Large primer set</td>
+                        <td>Total primer count exceeds <strong>500</strong>.</td>
+                        <td>The module warns that browser-side computation may slow down or become unresponsive.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-10 to MW-15</strong><br>Parameter range warnings</td>
+                        <td>Na<sup>+</sup>, Mg<sup>2+</sup>, primer concentration, or target Tm falls outside recommended or validated thermodynamic ranges.</td>
+                        <td>The module can still proceed, but Tm, ΔG, and score interpretation become less reliable under those conditions.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-16</strong><br>Extremely stable structures or extreme target Tm</td>
+                        <td>The requested target Tm is very high or one or more primers form very stable self-complementary structures.</td>
+                        <td>The module warns that the calculated result may become highly parameter-sensitive and experimentally difficult to interpret.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-17</strong><br>Large primer-length spread</td>
+                        <td>Primer lengths vary widely across the submitted set.</td>
+                        <td>The module warns that cross-primer comparability and scoring consistency may weaken for very heterogeneous primer collections.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-19</strong><br>Large total sequence size</td>
+                        <td>Total normalized primer sequence length is very large.</td>
+                        <td>The module warns that browser-side QC and rendering may become slow.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-21</strong><br>Pair-level results largely degrade to single-primer QC</td>
+                        <td>Too few usable forward/reverse pairs can be constructed relative to the submitted primer lists.</td>
+                        <td>The module warns that most results will be interpreted as individual-primer QC rather than true pairwise QC.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-22</strong><br>File upload exceeds import limit</td>
+                        <td>An uploaded primer file is larger than <strong>1 MB</strong>.</td>
+                        <td>The import is blocked before sequence loading, and the user must choose a smaller file.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Design warning</h3>
+            <p>These edge cases are specific to QC interpretation, pair construction, and the internal thermodynamic heuristics used by the module.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Case</th>
+                        <th>Trigger</th>
+                        <th>Current behavior in Primer QC module</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Multi-FASTA is expected input, not an error</strong></td>
+                        <td>Users provide many primers in FASTA format.</td>
+                        <td>Unlike single-sequence modules, Primer QC is designed to accept multi-FASTA primer lists, so <strong>MW-20 is not used here</strong>.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Name-based pairing with index fallback</strong></td>
+                        <td>Primer labels cannot be paired cleanly by naming convention.</td>
+                        <td>The module first tries to match primers by inferred target name and direction, then falls back to index-based pairing for unresolved entries.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Single-primer rows show reduced pairwise information</strong></td>
+                        <td>One member of a primer pair is absent or unusable.</td>
+                        <td>Cross-dimer and pair-level metrics are shown as unavailable rather than inferred from incomplete data.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Degenerate primers are marked but still scored</strong></td>
+                        <td>Primers contain legal IUPAC ambiguity codes.</td>
+                        <td>The results table marks these primers and evaluates them with conservative thermodynamic assumptions instead of rejecting them outright.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Hairpin and dimer models are heuristic</strong></td>
+                        <td>Secondary structures are detected in borderline energetic ranges.</td>
+                        <td>The module reports the most relevant predicted structures, but wet-lab behavior can differ because loop penalties, bulges, and salt effects are approximated computationally.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Preset recovery falls back to system defaults</strong></td>
+                        <td>Saved QC presets are malformed, incomplete, or unavailable from local storage.</td>
+                        <td>The module restores internal default parameters rather than preserving invalid preset values.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <p><strong>Practical interpretation:</strong> warnings in Primer QC do not always mean the submitted primers are unusable. Many warnings reflect sequence normalization, ambiguous pairing, or the distinction between pair-level QC and single-primer-only QC. Results should therefore be interpreted together with the pairing status, cross-dimer output, and final score summary.</p>
+            </div>
+        </div>
 
     </div>
 </body>

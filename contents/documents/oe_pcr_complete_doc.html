@@ -138,7 +138,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Overlap Extension PCR Module Documentation</h1>
+        <h1>Overlap Extension PCR</h1>
         
         <div class="abstract">
             <p>The Overlap PCR (or Overlap Extension PCR, OE-PCR) module enables seamless assembly of multiple DNA fragments through rational design of primers containing complementary overlap sequences. The tool automatically designs primer pairs for each fragment, incorporating user-specified linker sequences (DNA or amino acid) between fragments, while optimizing overlap length and melting temperature for efficient assembly. This method is particularly suited for constructing fusion proteins, joining modular genetic elements, and creating chimeric sequences without requiring restriction enzyme sites.</p>
@@ -305,7 +305,158 @@
             <h3>Design Process</h3>
             <p>During overlap PCR primer design, the system first constructs the <strong>assembled target sequence</strong> by concatenating all input fragments according to the user-defined order, including any specified <strong>linker sequences</strong>. Junctions between adjacent fragments are then identified on this assembled sequence, and <strong>overlap regions are defined by their positional coordinates</strong> relative to the final construct, rather than by independent fragment sequences. These overlap regions may partially or fully span linker sequences, depending on linker length and junction context, and are therefore <strong>never truncated or discarded</strong>.</p>
 	     <p>Once junction positions and overlap boundaries are fixed, the system designs the <strong>annealing core (template-binding region)</strong> for each primer by scanning the corresponding original fragment sequence upstream or downstream of the junction. Core lengths are iteratively adjusted to achieve the target melting temperature while satisfying QC constraints. Finally, full-length OE-PCR primers are constructed by <strong>positionally concatenating</strong> the optimized annealing cores with their assigned overlap regions, ensuring that each primer introduces the correct junction context while faithfully reconstructing the assembled target sequence during overlap extension.<p>
+
+            <h3>Edge-Case Logic in the Algorithm</h3>
+            <p>Several edge cases are handled directly inside the primer-design algorithm rather than being treated only as user-facing warnings. The most important branches are summarized below.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Algorithm edge case</th>
+                        <th>Current behavior in Overlap PCR module</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Fewer than two valid fragments</strong></td>
+                        <td>The workflow stops before primer construction. Empty rows are ignored first, and design proceeds only if at least <strong>two non-empty fragments</strong> remain.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Long linker between adjacent fragments</strong></td>
+                        <td>If the linker is sufficiently long, the algorithm preferentially searches for the overlap <strong>inside the linker itself</strong>. The reported overlap Tm is then driven mainly by the linker-overlap segment rather than by the full primer tail.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Short linker or no linker</strong></td>
+                        <td>If the linker is short or absent, the overlap region is built by combining linker sequence with flanking sequence from both neighboring fragments, so the junction overlap can span fragment-linker-fragment context rather than belonging to a single source region.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>No ideal overlap found at the preferred junction setting</strong></td>
+                        <td>The algorithm does not fail immediately. It continues scanning alternative overlap lengths and local junction placements, then falls back to the <strong>best-scoring available overlap</strong> based on Tm proximity and length penalty before giving up.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Very short fragment ends for core design</strong></td>
+                        <td>The core-design step normally scans primer-binding lengths iteratively toward the target Tm. If sequence context near a fragment end is limited, the module falls back to using the best available terminal sequence even if the ideal Tm target cannot be matched perfectly.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Connection-primer assembly depends on linker class</strong></td>
+                        <td>The internal composition of <strong>R1</strong> and <strong>F2</strong> changes according to linker length: for long linkers the overlap tail is linker-dominated, whereas for short or empty linkers the tail is split across linker and neighboring fragment sequence.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Optional terminal sequences at the construct ends</strong></td>
+                        <td>User-provided forward and reverse terminal sequences are appended after core/overlap design and are excluded from thermodynamic optimization. The reverse terminal sequence is incorporated on the final reverse primer in reverse-complement-compatible orientation.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Amino-acid linker input</strong></td>
+                        <td>If the linker is supplied as amino acids, the module sanitizes the amino-acid string first and then converts it into DNA according to the selected codon table before overlap design begins. The downstream overlap algorithm always works on DNA sequence, not amino-acid symbols.</td>
+                    </tr>
+                </tbody>
+            </table>
             
     </div>
+        <div class="section">
+            <h2>Warnings and Edge Cases</h2>
+            <p>The Overlap PCR module uses the shared <strong>MW (Message Warning)</strong> layer for sequence normalization and parameter preflight, and also exposes OE-PCR-specific edge cases when fragment count, linker conversion, or terminal overlap choices require user attention.</p>
+
+            <h3>General warning</h3>
+            <p>These warnings mostly occur before the final primer set is generated and indicate issues in sequence input or parameter selection. In most cases the user may revise the input or continue with the normalized values.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Trigger</th>
+                        <th>Current behavior in Overlap PCR module</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Blocking input prompts</strong></td>
+                        <td>No valid fragment is provided, or fewer than <strong>two non-empty fragments</strong> remain after empty rows are ignored.</td>
+                        <td>Design stops immediately and the user is asked to provide enough fragment sequences for assembly.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-04</strong><br>No valid sequence after normalization</td>
+                        <td>A fragment becomes empty after FASTA header removal and non-IUPAC cleanup.</td>
+                        <td>The user may still continue, but the affected fragment can no longer support meaningful primer design.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-05</strong><br>Non-IUPAC characters removed</td>
+                        <td>Unsupported characters are present in fragment input.</td>
+                        <td>The module continues with normalized DNA only and warns that the effective template may differ from the original pasted text.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-06</strong><br>Degenerate bases detected</td>
+                        <td>One or more fragments contain ambiguous IUPAC bases.</td>
+                        <td>Thermodynamic values are estimated conservatively from the most stable variant, so displayed Tm and ΔG values should be treated as approximations.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-10 to MW-15</strong><br>Parameter range warnings</td>
+                        <td>Na<sup>+</sup>, Mg<sup>2+</sup>, primer concentration, or <strong>Core primers Tm</strong> falls outside recommended or validated ranges.</td>
+                        <td>The module can still proceed, but thermodynamic prediction becomes less reliable under those conditions.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-19</strong><br>Large total input size</td>
+                        <td>Total sequence input across fragments exceeds the shared browser-side warning threshold.</td>
+                        <td>The shared warning layer reports that computation may become slow for very large total input sizes, but the user may still proceed.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-20</strong><br>Multiple FASTA headers in one field</td>
+                        <td>Any fragment textarea contains more than one FASTA record.</td>
+                        <td>A shared MW dialog warns that only one sequence is allowed per field. If the user proceeds, the field is trimmed to the <strong>first FASTA record</strong> before design continues.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-22</strong><br>File upload exceeds import limit</td>
+                        <td>An uploaded fragment file is larger than <strong>1 MB</strong>.</td>
+                        <td>The import is blocked before sequence loading, and the user must choose a smaller file.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Design warning</h3>
+            <p>These edge cases arise from OE-PCR-specific design logic, especially fragment concatenation, linker conversion, and terminal overlap handling.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Case</th>
+                        <th>Trigger</th>
+                        <th>Current behavior in Overlap PCR module</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Terminal overlap length warning</strong></td>
+                        <td>User-supplied <strong>Forward Terminal Sequence</strong> or <strong>Reverse Terminal Sequence</strong> falls outside the recommended <strong>15–30 bp</strong> range.</td>
+                        <td>The module raises an OE-specific MW prompt and still allows the design to proceed, warning that very short overlaps may reduce assembly efficiency while longer overlaps may increase unwanted recombination.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>AA linker contains unsupported symbols</strong></td>
+                        <td>An amino-acid linker includes characters that are not valid amino-acid symbols.</td>
+                        <td>The module reports the ignored characters, offers to sanitize the linker, and then retries design using the cleaned amino-acid sequence.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>AA linker conversion failure</strong></td>
+                        <td>An amino-acid linker cannot be translated into DNA with the selected host codon table.</td>
+                        <td>The design stops and reports the linker-conversion error for correction.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Linker-length-dependent overlap strategy</strong></td>
+                        <td>Junction linker length differs substantially between neighboring fragments.</td>
+                        <td>When the linker is long, the overlap is preferentially designed within linker sequence; when the linker is short or absent, the overlap spans linker plus flanking fragment sequence. This may change which bases contribute to the reported overlap Tm.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Very short fragment ends</strong></td>
+                        <td>Template sequence near a junction is too short to support the usual iterative core scan.</td>
+                        <td>The module falls back to using the available terminal sequence as the core region, which can reduce optimization freedom and may yield shorter-than-usual annealing cores.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>QC flags are result-level annotations</strong></td>
+                        <td>Hairpin, dimer, homopolymer, or related primer-QC concerns are detected after primer generation.</td>
+                        <td>These issues appear inline in the results table rather than as standalone MW dialogs, so final interpretation should include the QC badges together with the assembled sequence and overlap layout.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <p><strong>Practical interpretation:</strong> in Overlap PCR, warnings do not necessarily mean that primer design failed. Many warnings reflect input normalization or design heuristics. Note that <strong>Overlap Region Tm</strong> influences junction design but the shared MW range check targets the <strong>Core primers Tm</strong> field. Results should therefore be interpreted together with the primer QC table, the assembled sequence, and the actual fragment/linker context at each junction.</p>
+            </div>
+        </div>
 </body>
 </html>

@@ -1912,6 +1912,7 @@ header {
     color: var(--brand-ink);
 }
 
+
 .guide-step {
     /* This is for the Quick Guide card */
     display: flex;
@@ -2202,6 +2203,7 @@ header {
     .app-header-buttons {
         gap: 6px;
     }
+
 }
 
 /* ─── Additional Dark Mode Fixes ─────────────────────────────────────────── */

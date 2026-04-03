@@ -138,7 +138,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Site-Directed Mutagenesis Module Documentation</h1>
+        <h1>Site-Directed Mutagenesis</h1>
         
         <div class="abstract">
             <p>The Site-Directed Mutagenesis module enables precise introduction of point mutations, insertions, and deletions into a DNA template using overlap PCR primer design. The tool supports two complementary mutagenesis approaches: protein-level mutagenesis in coding sequences (with automatic ORF detection and codon optimization based on host organism preferences) and DNA-level sequence editing for any genomic region. The module automatically designs primer pairs that enable efficient assembly of the mutated construct through two sequential PCR reactions.</p>
@@ -359,8 +359,124 @@ thermodynamic calculations</strong>.
                 <li><strong>R2 (Reverse Flanking):</strong> A wild-type primer binding downstream (3′) of the mutagenic region. R2 defines the 3′ boundary of the final PCR product and may carry optional 5′ terminal sequences (reverse-complemented), which do not participate in Tm calculations.</li>
             </ul>
 
+            <h3>Fallback for End-Proximal Edits</h3>
+            <p>The default four-primer OE-PCR strategy assumes that the mutation site is flanked by enough wild-type sequence on both sides to support two outer primers and two mutagenic primers. When the requested edit is <strong>too close to either template terminus</strong>, this assumption breaks down because one side can no longer provide a sufficiently long PCR fragment for stable amplification.</p>
+            <p>To handle this situation, the module evaluates the available sequence length on the 5′ and 3′ sides of the edit. If one side falls below the internal minimum fragment-length requirement (about <strong>39 nt</strong>), the design automatically switches to a <strong>single-fragment PCR fallback</strong> instead of forcing the standard four-primer layout. In this fallback mode, the algorithm keeps the mutagenic primer centered on the edited region and reuses only the terminus-compatible flanking primer on the side that still has sufficient template context.</p>
+            <p>As a result, edits near the start of the template may produce a design dominated by <strong>Fmut + R2</strong>, whereas edits near the end may instead rely on <strong>F1 + Rmut</strong>. In extreme cases where the edit itself must be amplified directly from a terminally constrained fragment, the final output can effectively collapse to a single mutagenic primer pair. This fallback behavior is intentional and reflects the physical limitation of primer placement near sequence ends, not a failed design attempt.</p>
+
            
 
+        </div>
+        <div class="section">
+            <h2>Warnings and Edge Cases</h2>
+            <p>The Site-Directed Mutagenesis module combines the shared <strong>MW (Message Warning)</strong> layer with mutagenesis-specific design fallbacks. Some warnings are purely preflight checks, while others describe how the algorithm changes strategy when mutations are close to template ends or when sequence interpretation becomes ambiguous.</p>
+
+            <h3>General warning</h3>
+            <p>These warnings primarily reflect input-quality or parameter-quality issues detected before or during design. In many cases the user may continue, but the resulting thermodynamic interpretation becomes less reliable.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Trigger</th>
+                        <th>Current behavior in Mutagenesis module</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Blocking input prompts</strong></td>
+                        <td>Missing template sequence, no mutation/edit definition, or invalid preconditions for the selected mode.</td>
+                        <td>Design stops immediately and the user is asked to complete the required inputs before a valid mutagenesis design can proceed.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-04</strong><br>No valid sequence after normalization</td>
+                        <td>The template becomes empty after normalization because no valid IUPAC DNA symbols remain.</td>
+                        <td>The user may still continue, but the resulting mutagenesis output will not be meaningful.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-05</strong><br>Non-IUPAC characters removed</td>
+                        <td>Unsupported characters are present in the template input.</td>
+                        <td>The module proceeds with normalized sequence only and warns that the effective design template may differ from the original pasted text.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-06</strong><br>Degenerate bases detected</td>
+                        <td>The template contains ambiguous IUPAC bases.</td>
+                        <td>Thermodynamic values are estimated conservatively, so displayed Tm and ΔG should be treated as approximations.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-09</strong><br>Large edit batch</td>
+                        <td>In <strong>DNA editing mode</strong>, the number of edit rows becomes very large.</td>
+                        <td>The shared warning layer reports that browser-side processing may become slow or unresponsive for large edit batches.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-10 to MW-15</strong><br>Parameter range warnings</td>
+                        <td>Na<sup>+</sup>, Mg<sup>2+</sup>, primer concentration, or target <strong>Core Primer Tm</strong> falls outside recommended or validated thermodynamic ranges.</td>
+                        <td>The module can still proceed, but thermodynamic prediction and primer optimization become less reliable.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-19</strong><br>Large template input</td>
+                        <td>Total template input size exceeds the shared large-input threshold. This preflight is applied in both <strong>CDS mode</strong> and <strong>DNA editing mode</strong>.</td>
+                        <td>The module warns that design and rendering may become slow in the browser, but the user may still continue.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-20</strong><br>Multiple FASTA headers in one field</td>
+                        <td>In either <strong>CDS mode</strong> or <strong>DNA editing mode</strong>, the template textarea contains more than one FASTA record.</td>
+                        <td>A shared MW dialog warns that only one sequence is allowed per field. If the user proceeds, the template is trimmed to the <strong>first FASTA record</strong> before design continues.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-22</strong><br>File upload exceeds import limit</td>
+                        <td>The uploaded template file is larger than <strong>1 MB</strong>.</td>
+                        <td>This is an import-stage hard blocking MW: the file is rejected before sequence loading and must be replaced with a smaller upload.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Design warning</h3>
+            <p>These edge cases are specific to the mutagenesis algorithm, particularly the distinction between CDS and DNA editing modes, end-proximal mutations, and optional terminal overlap usage.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Case</th>
+                        <th>Trigger</th>
+                        <th>Current behavior in Mutagenesis module</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Mutation near one template end</strong></td>
+                        <td>The edit site is too close to the 5′ or 3′ end to leave the usual flanking fragment length (internally about <strong>39 nt</strong> minimum on one side).</td>
+                        <td>The module automatically falls back from the default four-primer overlap-PCR design to a <strong>single-fragment PCR</strong> strategy, so the output may contain only one principal mutagenic primer pair rather than a full four-primer set.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Optional terminal overlap length warning</strong></td>
+                        <td>User-supplied forward or reverse terminal overlap sequence falls outside the recommended <strong>15–40 bp</strong> range.</td>
+                        <td>The module raises a mutagenesis-specific MW prompt but still allows design to proceed, warning that very short overlaps may reduce downstream assembly efficiency and very long overlaps may increase off-target pairing.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>No confidently detected CDS</strong></td>
+                        <td>In CDS mode, no ORF is found automatically.</td>
+                        <td>If the cleaned template is long enough, the module falls back to using the full normalized sequence as the CDS input; if it is too short, design stops and asks for a valid CDS template.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Sequential multi-edit application</strong></td>
+                        <td>Multiple mutation/edit rows are provided.</td>
+                        <td>Edits are applied <strong>in order</strong>, and each subsequent design step uses the template already modified by the previous step. This means row order can change the final intermediate context and primer design outcome.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CDS mode codon selection behavior</strong></td>
+                        <td>Protein-level substitutions or insertions require reverse translation into DNA.</td>
+                        <td>The module uses the selected host organism codon preferences; a single amino acid with an explicitly chosen codon uses that codon directly, whereas multi-amino-acid edits are expanded according to preferred codon choices for the selected host.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Insufficient overlap/core construction</strong></td>
+                        <td>Local sequence context does not permit a valid overlap region or sufficient core primer length around the requested edit.</td>
+                        <td>The module stops with a design error instead of silently producing a weak primer set, and the mutation definition or sequence context must be revised.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <p><strong>Practical interpretation:</strong> warnings in Mutagenesis do not necessarily mean that design has failed. If an edit is too close to one end of the template, the module may intentionally fall back from the default four-primer OE-PCR layout to a single-fragment PCR strategy, so seeing fewer than four primers can be an expected outcome rather than an error. Final interpretation should therefore consider the selected mode, mutation order, optional terminal overlaps, and whether the reported result reflects the default four-primer design or an end-proximal fallback strategy.</p>
+            </div>
         </div>
 
     </div>

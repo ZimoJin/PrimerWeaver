@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integrated Cloning Workspace - PrimerWeaver</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #333;
+            background: #f9fafb;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e40af;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2563eb;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            font-size: 1.5em;
+        }
+        h3 {
+            color: #3b82f6;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            font-size: 1.2em;
+        }
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 1em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        strong {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c2410c;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .abstract {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+        .abstract p {
+            margin: 0;
+            font-style: italic;
+        }
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background: #fff7ed;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .section {
+            margin-bottom: 2.5em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Integrated Cloning Workspace</h1>
+
+        <div class="abstract">
+            <p>The Integrated Cloning Workspace provides a unified front end for four cloning workflows in PrimerWeaver: Restriction Cloning, Golden Gate Assembly, Gibson Assembly, and USER Cloning. Instead of asking users to re-enter vector and insert sequences in each individual module, the workspace keeps a shared sequence layer at the top and renders the selected method below with its native method-specific design settings and outputs.</p>
+        </div>
+
+        <div class="section">
+            <h2>What This Workspace Is For</h2>
+            <p>This document describes only the <strong>workspace-specific integration layer</strong>: shared inputs, method switching, synchronization, persistence, and workspace-level reset or demo behavior. It does <strong>not</strong> repeat the full design logic of each cloning method.</p>
+
+            <div class="info-box">
+                <strong>Method-specific documentation:</strong>
+                <ul style="margin: 8px 0 0 20px;">
+                    <li><a href="#/docs#d-re">Restriction Cloning</a></li>
+                    <li><a href="#/docs#d-gg">Golden Gate Assembly</a></li>
+                    <li><a href="#/docs#d-gb">Gibson Assembly</a></li>
+                    <li><a href="#/docs#d-user">USER Cloning</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Quick Start Guide</h2>
+            <ol>
+                <li>Paste or upload the shared <strong>Vector sequence</strong> and <strong>Insert sequence</strong> in the top input area. These fields accept FASTA, plain text, and standard GenBank text files (<code>.gb</code>, <code>.gbk</code>, <code>.gbff</code>, <code>.genbank</code>), just like the underlying cloning modules.</li>
+                <li>Select a cloning method from the <strong>Cloning method</strong> dropdown. The workspace will then render the corresponding method-specific interface below the shared inputs.</li>
+                <li>Adjust the method-specific design parameters, presets, and optional advanced settings in the rendered module area, then run the design normally.</li>
+                <li>Use <strong>Demo Set</strong> only after selecting a method; the workspace will load the method’s own demo content into the shared area and synchronized method pane.</li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>Workspace Architecture</h2>
+            <p>The workspace is a <strong>shared-shell adapter</strong> rather than a fifth cloning algorithm. It preserves one common sequence input region and dynamically mounts the selected cloning module below it. Only one method pane is active at a time, which prevents DOM conflicts between modules that use overlapping element IDs or method-local UI assumptions.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Layer</th>
+                        <th>Role in the workspace</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Shared top inputs</strong></td>
+                        <td>Hold the common vector and insert sequence state used across cloning methods.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Method selector</strong></td>
+                        <td>Chooses which cloning module is rendered and synchronized below the shared inputs.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Method pane</strong></td>
+                        <td>Renders the native interface of Restriction, Golden Gate, Gibson, or USER cloning, while hiding duplicated top-level fields already provided by the workspace shell.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Synchronization layer</strong></td>
+                        <td>Keeps shared vector/insert state aligned between the workspace shell and the currently active method pane.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Shared Inputs and Synchronization</h2>
+            <p>The top <strong>Vector sequence</strong> and <strong>Insert sequence</strong> areas are the canonical input fields for the workspace. When a method is selected, the workspace copies those values into the method-specific DOM and keeps the active pane synchronized as the user edits content.</p>
+            <p>This means users can compare different cloning strategies without manually re-pasting the same vector and insert sequences for every module. If the active method modifies the synchronized input fields, the shared workspace fields are also updated so that method switching remains consistent.</p>
+
+            <div class="warning-box">
+                <p><strong>Practical interpretation:</strong> the workspace is designed to reduce re-entry of shared sequence input, but it does not flatten all method-specific assumptions into one universal algorithm. Final interpretation should still rely on the selected cloning method and its own downstream settings, warnings, and results.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Method Switching Behavior</h2>
+            <p>Switching the cloning method does <strong>not</strong> clear the shared vector and insert draft by default. The workspace keeps those sequences available across method changes so users can compare methods on the same construct idea.</p>
+            <p>If the newly selected method supports fewer inserts than the previous interpretation of the shared insert panel, the workspace raises a confirmation prompt before truncating the effective insert set. This prevents silent loss of insert rows when moving from a more permissive assembly method to a more restrictive one.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Workspace switch behavior</th>
+                        <th>Current implementation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Shared draft retention</strong></td>
+                        <td>Vector and insert drafts are preserved across method switches within the same session.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Insert-capacity mismatch check</strong></td>
+                        <td>The workspace warns before dropping inserts when switching to a method with lower insert capacity.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Method-specific refresh hooks</strong></td>
+                        <td>Active method panes can request redraws such as vector-map refresh after synchronization.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Demo Set and Reset</h2>
+            <p>The workspace-level <strong>Demo Set</strong> button is method-aware. A cloning method must be selected first; otherwise the workspace shows a warning instead of guessing which module’s demo should be loaded.</p>
+            <p>The workspace-level <strong>Reset</strong> button behaves more aggressively than a local method reset. It clears the shared workspace draft and refreshes the page so that both the shell state and the active method pane return to a clean state.</p>
+        </div>
+
+        <div class="section">
+            <h2>Workspace-Specific Notes</h2>
+            <ul>
+                <li>The shared top input area is intentionally simplified to <strong>Vector</strong> plus <strong>Insert</strong>; method-specific enzyme, overlap, primer, and parameter settings stay in the method pane below.</li>
+                <li>Parameter presets shown in the lower method pane remain <strong>method-specific</strong>. The workspace unifies navigation and shared sequence input, but does not merge cloning parameter presets into one global preset format.</li>
+                <li>Vector-map behavior, warnings, and result interpretation remain the responsibility of the selected cloning module.</li>
+                <li>The workspace is best understood as a comparison and orchestration layer built on top of the four cloning tools, not a replacement for their method-level documentation.</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

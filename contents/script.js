@@ -9,6 +9,7 @@ const docsList = [
     { id: '#d-mp', label: 'Multiplex PCR' },
     { id: '#d-opcr', label: 'Overlap PCR' },
     { id: '#d-muta', label: 'Mutagenesis' },
+    { id: '#d-workspace', label: 'Integrated Cloning Workspace' },
     { id: '#d-re', label: 'Restriction Cloning' },
     { id: '#d-gg', label: 'Golden Gate' },
     { id: '#d-gb', label: 'Gibson Assembly' },
@@ -383,6 +384,7 @@ function loadAppModule(moduleName) {
     // --- Pretty Name Lookup (Still needed for iframe title) ---
     const prettyNameMap = {
         'qc': 'Primer QC',
+        'workspace': 'Integrated Cloning Workspace',
         'restriction': 'Restriction Cloning',
         'golden-gate': 'Golden Gate Assembly',
         'gibson': 'Gibson Assembly',
@@ -935,7 +937,7 @@ function help() {
         <ol>
         <li><strong>Use the Contact Form:</strong> Navigate to <strong>About</strong> and fill out the Contact Us form with details of the issue or feature request.</li>
         <li><strong>GitHub Issues:</strong> Visit the <a href="https://github.com/ZimoJin/PrimerWeaver" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline;">PrimerWeaver GitHub repository</a> and open an issue (requires a free GitHub account).</li>
-        <li><strong>Direct Email:</strong> Contact the corresponding authors listed in the Impressum (About page).</li>
+        <li><strong>Direct Email:</strong> Contact the corresponding authors listed in the About page contact details.</li>
         </ol>
         <p><strong>Helpful information to include:</strong></p>
         <ul>
@@ -1046,21 +1048,6 @@ function about() {
 
 </div>
 <div class="card" style="padding:22px 28px">
-
-    <div class="about-item">
-    <svg class="about-icon" aria-hidden="true"><use xlink:href="#icon-status"></use></svg>
-    <div class="about-content">
-        <h3>System Status</h3>
-        <ul class="small muted" style="padding-left: 20px; margin-top: 0;">
-        <li><strong>Compute model:</strong> Client-side (runs in your browser)</li>
-        <li><strong>Queue policy:</strong> None (no server-side jobs)</li>
-        <li><strong>Data handling:</strong> No sequence upload required for analysis</li>
-        <li><strong>Availability:</strong> Works offline after assets are cached by the browser (when supported)</li>
-        <li><strong>Version:</strong> v1.0.1</li>
-        </ul>
-    </div>
-    </div>
-
     <div class="about-item">
     <svg class="about-icon" aria-hidden="true"><use xlink:href="#icon-award"></use></svg>
     <div class="about-content">
@@ -1076,7 +1063,7 @@ function about() {
         </ul>
         <p class="small muted" style="margin-bottom: 0;">
             Workflow modules are informed by established molecular biology methods, including Golden Gate (Engler <em>et&nbsp;al.</em>), Gibson Assembly (Gibson <em>et&nbsp;al.</em>), and overlap-extension PCR (Horton <em>et&nbsp;al.</em>), as summarized in the PrimerWeaver documentation.
-            If you use PrimerWeaver in academic work, please cite the PrimerWeaver web server and the relevant primary method/model references.
+            If you use PrimerWeaver in academic work, please cite the PrimerWeaver web server and the relevant primary method references.
         </p>
     </div>
     </div>
@@ -1084,7 +1071,7 @@ function about() {
     <div class="about-item">
     <svg class="about-icon" aria-hidden="true"><use xlink:href="#icon-file"></use></svg>
     <div class="about-content">
-        <h3 id="impressum">Impressum (Legal Notice)</h3>
+        <h3 id="impressum">Service Information</h3>
         <p class="small muted">
         <strong>Responsible for this service:</strong><br>
         Codruta Ignea<br>
@@ -1163,9 +1150,22 @@ function appDashboard() {
         <div>
             <h2>PrimerWeaver App Dashboard</h2>
             <p class="muted">Select a cloning or analysis module to begin.</p>
-            
+
             <div class="grid cols-3" style="margin-top:30px;">
-                
+                <div></div>
+                <div class="card tool-card">
+                    <svg class="tool-card-icon" aria-hidden="true"><use xlink:href="#icon-layers"></use></svg>
+                    <h3>Integrated Cloning Workspace</h3>
+                    <p class="small muted">A unified workspace for Golden Gate, Gibson, Restriction, and USER cloning, with shared sequence input and method-specific design settings in one place.</p>
+                    <div class="tool-card-buttons">
+                        <a href="#/docs#d-workspace" class="btn ghost">Read Docs</a>
+                        <a href="#/app/workspace" class="btn">Open App</a>
+                    </div>
+                </div>
+                <div></div>
+            </div>
+
+            <div class="grid cols-3" style="margin-top:30px;">
                 <div class="card tool-card">
                     <svg class="tool-card-icon" aria-hidden="true"><use xlink:href="#icon-check"></use></svg>
                     <h3>Primer QC</h3>
@@ -1203,9 +1203,9 @@ function appDashboard() {
                     </div>
                 </div>
                 <div class="card tool-card">
-                    <svg class="tool-card-icon" aria-hidden="true"><use xlink:href="#icon-scissors"></use></svg>
+                    <svg class="tool-card-icon" aria-hidden="true"><use xlink:href="#icon-link"></use></svg>
                     <h3>Restriction Cloning</h3>
-                    <p class="small muted">Design primers for traditional enzyme-based cloning.</p>
+                    <p class="small muted">Design cloning primers with restriction sites for vector insertion and enzyme-based assembly workflows.</p>
                     <div class="tool-card-buttons">
                         <a href="#/docs#d-re" class="btn ghost">Read Docs</a>
                         <a href="#/app/restriction" class="btn">Open App</a>
@@ -1214,16 +1214,16 @@ function appDashboard() {
                 <div class="card tool-card">
                     <svg class="tool-card-icon" aria-hidden="true"><use xlink:href="#icon-puzzle"></use></svg>
                     <h3>Golden Gate Assembly</h3>
-                    <p class="small muted">Designs primers for Type IIS multi-fragment assembly.</p>
+                    <p class="small muted">Design seamless Type IIS assembly workflows for one or multiple inserts with custom overhangs.</p>
                     <div class="tool-card-buttons">
                         <a href="#/docs#d-gg" class="btn ghost">Read Docs</a>
                         <a href="#/app/golden-gate" class="btn">Open App</a>
                     </div>
                 </div>
                 <div class="card tool-card">
-                    <svg class="tool-card-icon" aria-hidden="true"><use xlink:href="#icon-link"></use></svg>
+                    <svg class="tool-card-icon" aria-hidden="true"><use xlink:href="#icon-beaker"></use></svg>
                     <h3>Gibson Assembly</h3>
-                    <p class="small muted">Generates optimized homology overlaps with a uniform target Tm.</p>
+                    <p class="small muted">Design overlap-based assembly primers for vector and inserts with junction-aware settings.</p>
                     <div class="tool-card-buttons">
                         <a href="#/docs#d-gb" class="btn ghost">Read Docs</a>
                         <a href="#/app/gibson" class="btn">Open App</a>
@@ -1232,7 +1232,7 @@ function appDashboard() {
                 <div class="card tool-card">
                     <svg class="tool-card-icon" aria-hidden="true"><use xlink:href="#icon-layers"></use></svg>
                     <h3>USER Cloning</h3>
-                    <p class="small muted">Designs primers incorporating uracil for seamless cloning.</p>
+                    <p class="small muted">Plan USER cloning with uracil-compatible primer design and assembly parameter controls.</p>
                     <div class="tool-card-buttons">
                         <a href="#/docs#d-user" class="btn ghost">Read Docs</a>
                         <a href="#/app/user" class="btn">Open App</a>
@@ -1647,6 +1647,7 @@ const docRoutes = {
     '#d-qc': 'contents/documents/QC_doc.html',
     '#d-opcr': 'contents/documents/oe_pcr_complete_doc.html',
     '#d-muta': 'contents/documents/mutagenesis_doc.html',
+    '#d-workspace': 'contents/documents/integrated_workspace_doc.html',
     '#d-mp': 'contents/documents/multiplex_pcr_doc.html',
     '#d-re': 'contents/documents/re_cloning_doc.html',
     '#d-user': 'contents/documents/user_cloning_doc.html',

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Golden Gate Assembly - PrimerWeaver V2</title>
+    <title>Golden Gate Assembly - PrimerWeaver v1.0.1</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -179,8 +179,8 @@
 
         <div class="section">
             <h2>Input Format</h2>
-	    <p>Both vector and insert inputs accept <strong>FASTA or plain text format</strong>. Only <strong>one sequence</strong> is allowed per input field; if multiple FASTA headers are detected, <strong>only the first sequence</strong> will be used. Fragment names extracted from FASTA headers are displayed for reference and will be used in primer naming conventions.</p>
-             <p>PrimerWeaver currently supports <strong>four built-in Type IIs restriction enzymes</strong>. Once a vector sequence is provided, the system <strong>automatically identifies vector features</strong> and displays the positions of all <strong>Type IIs restriction enzyme sites</strong>. The vector map can be rotated to facilitate visualization of the targeted cloning region.</p>
+            <p>Both vector and insert inputs accept <strong>FASTA</strong>, <strong>plain DNA text</strong>, or standard <strong>GenBank</strong> files (<code>.gb</code>, <code>.gbk</code>, <code>.gbff</code>, <code>.genbank</code>) with <code>LOCUS</code> and <code>ORIGIN</code> blocks. The short name in <strong>LOCUS</strong> is used as the sequence title. Only <strong>one sequence</strong> is allowed per input field; if multiple FASTA headers are detected, <strong>only the first sequence</strong> will be used. If you upload plain sequence without a <code>&gt;</code> header, the <strong>file name</strong> (without extension) is used as the name. Proprietary binary formats (e.g. SnapGene <code>.dna</code>) must be exported as GenBank or FASTA first.</p>
+             <p>PrimerWeaver currently supports <strong>four built-in Type IIs restriction enzymes</strong>. Once a vector sequence is provided, the system <strong>automatically identifies vector features</strong> and displays the positions of all <strong>Type IIs restriction enzyme sites</strong>. The vector map can be rotated to facilitate visualization of the targeted cloning region. The selected <strong>vector backbone fragment</strong> also determines the automatic 4-bp boundary overhangs used for the <strong>first insert left end</strong> and the <strong>last insert right end</strong>.</p>
 
             <div style="text-align: center; margin: 2em 0;">
                 <img
@@ -195,13 +195,14 @@
                 <li><strong>Reorder Fragments:</strong> Adjust assembly order using interface controls; order determines final construct architecture</li>
                 <li><strong>Fragment Names:</strong> Auto-extracted from FASTA headers for clear primer identification; used in output reports</li>
                 <li><strong>Reverse Complement:</strong> Toggle individual fragments if needed to match desired orientation and assembly direction</li>
+                <li><strong>Internal overlap entry:</strong> For every internal junction, paired <strong>Left/Right overhang (custom, 4 bp)</strong> fields are provided. These two fields mirror the same junction value. Leave them blank to let the algorithm choose sequence-derived overhangs automatically, or enter a custom <strong>exactly 4-bp</strong> value to override the automatic choice for that junction.</li>
             </ul>
         </div>
 
         <div class="section">
             <h2>Design Parameters</h2>
 		
-	    <p>Please select the preferred Type IIs restriction enzymes from the dropdown list or search by enzyme name. Once <strong>restriction enzymes</strong> are selected, the system automatically identifies the <strong>longest digestion fragment</strong> as the destination vector backbone. If the longest fragment does not correspond to the intended vector backbone, you may manually select the appropriate fragment.Please review the primer design parameters before proceeding, and modify them if necessary.<p>
+	    <p>Please select the preferred Type IIs restriction enzymes from the dropdown list or search by enzyme name. Once <strong>restriction enzymes</strong> are selected, the system automatically identifies the <strong>longest digestion fragment</strong> as the default destination vector backbone. If the longest fragment does not correspond to the intended vector backbone, you may manually select another fragment. That backbone choice directly controls the automatic boundary overhangs assigned to the <strong>first</strong> and <strong>last</strong> insert ends; these boundary values are always taken from the selected backbone interpretation rather than from manual typing. Please review the primer design parameters before proceeding, and modify them if necessary.</p>
             
             <table>
                 <thead>
@@ -277,7 +278,7 @@
       
 
             <h3>Simulated Agarose Gel Electrophoresis</h3>
-            <p>PrimerWeaver generates a <strong>simulated agarose gel image</strong> to predict experimental outcomes for key cloning steps. The gel includes:<p>
+	    <p>PrimerWeaver generates a <strong>simulated agarose gel image</strong> to predict experimental outcomes for key cloning steps. The gel includes:</p>
 
             <ul>
                 <li>A selectable DNA ladder (default: NEB 1 kb Plus DNA Ladder)</li>
@@ -286,7 +287,7 @@
                 <li>PCR-amplified fragments (one lane per fragment, showing expected size)</li>
                 <li>Assembled plasmid</li>
             </ul>
-	    <p>Predicted band sizes are annotated alongside the gel, enabling users to compare expected fragment sizes with experimental results and quickly identify potential cloning issues.<P>
+	    <p>Predicted band sizes are annotated alongside the gel, enabling users to compare expected fragment sizes with experimental results and quickly identify potential cloning issues.</p>
 
 	   <div style="text-align: center; margin: 2em 0;">
   		<img
@@ -309,7 +310,214 @@
             </ul>
 
             <h3>Design Process</h3>
-            <p>During Golden Gate Assembly primer design, PrimerWeaver first identifies and optimizes the <strong>annealing core (template-binding region)</strong> at the termini of each fragment to meet the target Tm and basic QC constraints. Once the annealing cores are fixed, the <strong>user-defined fragment order</strong> is used to determine junction-specific 4-bp sticky ends. For each junction between fragment N and fragment N+1, PrimerWeaver selects a <strong>single 4-bp overhang sequence</strong> for that junction, preferentially using the <strong>last 4 bp of the upstream fragment</strong>; if this sequence has already been assigned elsewhere, the algorithm falls back to the <strong>first 4 bp of the downstream fragment</strong>, when available, to minimize overhang reuse. PrimerWeaver then validates all junctions to ensure overhang uniqueness and compatibility across the assembly. Finally, full-length primers are constructed by appending the selected Type IIS restriction enzyme recognition site, required spacer bases, and the validated overhangs to the 5′ ends of primers.<p>
+            <p>Golden Gate primer design in PrimerWeaver is divided into three linked steps: <strong>vector-end interpretation</strong>, <strong>junction overhang assignment</strong>, and <strong>primer-tail construction for each insert</strong>. These steps are summarized below.</p>
+
+            <h3>Vector-End Interpretation</h3>
+            <p>The vector is first normalized and scanned for the selected <strong>Type IIS restriction enzyme</strong>. Unlike standard restriction cloning, Golden Gate requires a vector context that can expose defined 4-bp assembly overhangs after Type IIS digestion. The module computes candidate digest fragments, auto-selects the longest one by default, and allows the user to override that backbone choice. The selected backbone fragment is then used to derive the left and right vector overhangs from the cut geometry of the chosen Type IIS enzyme. Those vector-derived values become the fixed boundary conditions for the <strong>first insert left overhang</strong> and the <strong>last insert right overhang</strong>, and the interface overwrites those two boundary fields automatically whenever vector/enzyme/backbone interpretation changes.</p>
+            <p>If the vector does not provide usable end overhangs under this interpretation, the design does not immediately fail. Instead, the module records that vector-derived ends are unavailable and falls back to a <strong>seamless junction rule</strong> at the assembly boundaries.</p>
+
+            <h3>Junction Overhang Assignment</h3>
+            <p>After vector constraints are defined, the algorithm assigns a 4-bp overhang to each insert-insert or vector-insert junction. For each <strong>internal junction</strong>, the module first checks whether the user has entered a custom junction value in the paired <strong>Right overhang / Left overhang</strong> fields. If a non-empty custom value is present, it must be <strong>exactly 4 bp</strong> and is used directly for that junction. If both paired fields are blank, the algorithm falls back to sequence-derived candidates, typically using the <strong>last 4 bp of the upstream insert</strong> and the <strong>first 4 bp of the downstream insert</strong>. These native candidates are filtered to reject invalid Golden Gate overhangs such as homopolymer 4-mers or palindromic 4-mers.</p>
+            <p>The module then evaluates complete combinations of junction overhangs at the <strong>assembly level</strong>, not one junction at a time. Overhang sets are accepted only if the complete panel remains unique even after considering reverse-complement partners. When a fidelity matrix is available for the selected enzyme, PrimerWeaver ranks valid combinations by predicted ligation fidelity and uses the highest-scoring compatible set. If fidelity scoring is unavailable, the module falls back to the first valid non-conflicting combination. A user-supplied internal 4-bp junction therefore acts as a <strong>fixed constraint</strong> on the global overhang-combination problem rather than as a cosmetic annotation.</p>
+
+            <h3>Primer-Tail Construction and Assembly Reconstruction</h3>
+            <p>Once the left and right overhangs for each insert are fixed, the module designs the <strong>annealing core</strong> at the insert termini and then constructs the full primers by appending the Type IIS recognition site, spacer bases, and the selected 4-bp overhangs as 5′ non-annealing tails. During this step, PrimerWeaver removes redundant overlap sequence at <strong>both insert ends</strong>. At the left end, it trims any largest <strong>suffix-prefix duplication</strong> between the chosen 4-bp overhang and the start of the forward annealing core. At the right end, it trims any largest duplication between the end of the insert sequence covered by the reverse-primer core and the beginning of the selected right-side overhang. For example, if a custom left overhang ends with <code>ATG</code> and the insert core already begins with <code>ATG</code>, or if the insert already ends with <code>AATG</code> and the chosen right overhang starts with <code>AATG</code>, the shared sequence is not duplicated in the final primer tail. The full Golden Gate primer therefore follows this structure:</p>
+            <p><strong>5′ protective clamp + Type IIS site + offset bases + selected 4-bp overhang + annealing core 3′</strong></p>
+            <p>After primer construction, the module reconstructs the assembled plasmid by combining the digested vector backbone with the insert block according to the derived vector cut positions and the chosen junction overhang logic. When vector-derived ends are available, the backbone is re-extracted from the Type IIS cut positions and used as the physical backbone for assembled-sequence reconstruction. If not, the module falls back to a simpler seamless concatenation model for reporting assembled sequence length and downstream visualization.</p>
+            <h3>Edge-Case Logic in the Algorithm</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Algorithm edge case</th>
+                        <th>Current behavior in Golden Gate module</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Vector has zero or one Type IIS site</strong></td>
+                        <td>The module does not attempt a normal Golden Gate backbone interpretation. Instead, it reports N/A-style assembly output because the vector cannot provide the two-sided Type IIS digest context needed for standard Golden Gate assembly.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Vector-derived end overhangs cannot be recovered cleanly</strong></td>
+                        <td>If explicit vector end overhangs cannot be derived, the algorithm falls back to a seamless boundary rule at the first and last junctions instead of abandoning the whole design immediately.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>User supplies an internal 4-bp junction manually</strong></td>
+                        <td>A non-empty internal custom overhang is treated as a fixed junction choice. The paired left/right UI fields mirror the same junction value, and the global overhang search must accommodate that preselected 4-bp constraint.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Internal custom junction is partially filled</strong></td>
+                        <td>If an internal overlap field is non-empty but not exactly 4 bp, the module blocks the design with a warning dialog rather than silently guessing or padding the junction.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>No single junction overhang can be chosen independently</strong></td>
+                        <td>The algorithm evaluates overhang combinations across the full assembly panel, because a locally acceptable overhang may still conflict with another junction or its reverse complement elsewhere in the construct.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Fidelity matrix is unavailable</strong></td>
+                        <td>The module still completes design by falling back to the first valid non-conflicting overhang combination, but it can no longer rank combinations by predicted ligation fidelity.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Selected overhang is already present at the insert terminus</strong></td>
+                        <td>During primer construction, the module checks for the <strong>largest shared overlap</strong> between the selected 4-bp overhang and the insert sequence already covered by the primer core. This is evaluated at both the <strong>left boundary</strong> and the <strong>right boundary</strong>, so shared sequence is not duplicated even when only part of the 4-bp overhang is already present at the insert start or insert end.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Internal Type IIS sites exist in inserts</strong></td>
+                        <td>The algorithm can still construct primers, but the design is flagged because internal enzyme sites may fragment inserts during digestion and therefore undermine the intended Golden Gate assembly topology.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Fragment order changes the full overhang solution</strong></td>
+                        <td>Because junction overhangs are assigned from neighboring fragment sequence context, reordering inserts changes not only one junction but the global overhang-combination problem and can produce a different final primer set.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Warnings and Edge Cases</h2>
+            <p>The Golden Gate Assembly module uses the shared <strong>MW (Message Warning)</strong> framework for preflight validation and confirmation dialogs whenever the common visualization layer is available. Some warnings appear before design begins, whereas others are interpreted only after the module inspects vector topology, Type IIS sites, and candidate overhang combinations.</p>
+
+            <h3>General warning</h3>
+            <p>These warnings mostly come from shared input validation and from high-level Golden Gate preflight checks. In most cases, the user can click <strong>Cancel</strong> to revise the setup or <strong>OK</strong> to continue.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Trigger</th>
+                        <th>Current behavior in GGA module</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Blocking input prompts</strong></td>
+                        <td>No insert fragments are provided, or no Type IIS enzyme is selected.</td>
+                        <td>Design stops immediately and the module asks the user to add at least one insert and choose an enzyme before continuing.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-04</strong><br>No valid sequence after normalization</td>
+                        <td>A vector or insert becomes empty after normalization because no valid IUPAC DNA symbols remain.</td>
+                        <td>The user may still proceed, but the design will become empty or non-informative for the affected input.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-05</strong><br>Non-IUPAC characters removed</td>
+                        <td>Input contains unsupported characters, including potentially near a primer-relevant 3′ region.</td>
+                        <td>The module continues using only the normalized sequence and warns that this may affect primer behavior.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-06</strong><br>Degenerate bases detected</td>
+                        <td>Vector or insert contains degenerate IUPAC bases.</td>
+                        <td>Thermodynamic values are estimated conservatively from the most stable variant, so reported Tm and ΔG values may be worst-case approximations.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-10 to MW-15</strong><br>Parameter range warnings</td>
+                        <td>Na<sup>+</sup>, Mg<sup>2+</sup>, primer concentration, or target Tm falls outside the recommended range or thermodynamic validation window.</td>
+                        <td>The user can still continue, but Tm prediction and primer optimization may become less reliable.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-19</strong><br>Large total input size</td>
+                        <td>Total vector plus insert input becomes large enough to stress browser-side computation.</td>
+                        <td>The module warns that browser performance may degrade during design and rendering.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-20</strong><br>Multiple FASTA headers in one field</td>
+                        <td>A vector or insert textarea contains more than one FASTA record.</td>
+                        <td>A shared MW dialog warns that only one sequence is allowed per field. If the user proceeds, the field is trimmed to the <strong>first FASTA record</strong> before design continues.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-22</strong><br>File upload exceeds import limit</td>
+                        <td>An uploaded vector or insert file is larger than <strong>1 MB</strong>.</td>
+                        <td>The import is blocked before sequence loading, and the user must choose a smaller file.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GG-MW-01</strong><br>Internal Type IIS sites in inserts</td>
+                        <td>One or more inserts already contain recognition sites for the selected Golden Gate enzyme.</td>
+                        <td>The module warns that these inserts may be cut during assembly and encourages redesign, domestication, or enzyme replacement.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GG-MW-02</strong><br>Internal custom overlap length is invalid</td>
+                        <td>An internal custom overlap field is non-empty but its length is not exactly <strong>4 bp</strong>.</td>
+                        <td>The module raises an MW dialog. Leaving the field blank is allowed, but any non-empty internal overlap must be exactly 4 bp before design can continue.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Design warning</h3>
+            <p>These warnings and edge cases are specific to the Golden Gate design algorithm and output interpretation.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Case</th>
+                        <th>Trigger</th>
+                        <th>Current behavior in GGA module</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Insert count cap</strong></td>
+                        <td>More than six insert rows are attempted.</td>
+                        <td>The current implementation caps Golden Gate design to <strong>six inserts</strong>. The interface disables further addition once six inserts are present, and the internal collection logic also truncates to the first six non-empty inserts.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Vector has fewer than two selected Type IIS sites</strong></td>
+                        <td>The chosen vector contains zero or one site for the selected enzyme.</td>
+                        <td>The module does not produce a full Golden Gate assembly design. The output is rendered as <strong>N/A</strong>, and the gel model shows only the uncut vector or a linearized single-cut vector.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Automatic backbone selection</strong></td>
+                        <td>The vector contains multiple digest fragments.</td>
+                        <td>The module automatically uses the <strong>longest digestion fragment</strong> as the candidate backbone and exposes a fragment selector so the user can verify or override that choice. Changing the selected backbone also recalculates the automatic first/last insert overhangs.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Boundary overhang fields are not user-editable</strong></td>
+                        <td>The first insert left overhang and the last insert right overhang are boundary conditions derived from the chosen vector backbone.</td>
+                        <td>Those two fields are displayed as auto-filled read-only values. If vector sequence, enzyme, or backbone choice changes, the module overwrites them with the newly derived boundary overhangs.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Vector-end overhangs not recoverable</strong></td>
+                        <td>The module cannot reliably derive Type IIS overhangs at the chosen vector ends.</td>
+                        <td>The design falls back to a more generic <strong>seamless-rule</strong> strategy at the vector boundaries, using fragment-derived end sequences instead of vector-derived overhang constraints.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Internal junction overhangs are candidate-limited unless manually fixed</strong></td>
+                        <td>If an internal junction is left blank, the algorithm only considers two native candidates: the <strong>last 4 bp of the upstream insert</strong> or the <strong>first 4 bp of the downstream insert</strong>. If the user supplies a custom 4-bp internal overlap, that manual choice replaces the native-candidate search for that junction.</td>
+                        <td>This keeps the default design scar-minimized and sequence-derived, while still allowing users to pin a specific internal 4-bp junction when required by a cloning standard or part library.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Homopolymer / palindromic 4-mer rejection</strong></td>
+                        <td>A candidate overhang is a 4-bp homopolymer or a 4-bp palindrome.</td>
+                        <td>That candidate is excluded from valid overhang combinations because it is more prone to misligation or ambiguity.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>No valid unique junction set found</strong></td>
+                        <td>No overhang combination passes the uniqueness filter together with reverse complements, or fidelity optimization cannot identify a valid preferred set.</td>
+                        <td>The algorithm falls back to a default candidate choice for each junction, so a design may still be produced even when the overhang set is suboptimal.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Fidelity score unavailable</strong></td>
+                        <td>The ligation-fidelity matrix cannot be loaded or computed for the selected enzyme / junction set.</td>
+                        <td>The design still proceeds, but the fidelity panel may be absent and the overhang set is chosen without a final matrix-based ranking.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>First / last overhang fallback</strong></td>
+                        <td>Vector-derived end constraints are unavailable.</td>
+                        <td>The first insert left overhang falls back to the <strong>5′ end of insert #1</strong>, and the last insert right overhang falls back to the <strong>3′ end of the terminal insert</strong>.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Internal enzyme sites inside inserts</strong></td>
+                        <td>The selected Type IIS enzyme cuts within one or more insert sequences.</td>
+                        <td>A warning is shown because those inserts may be fragmented during the Golden Gate reaction, even if primers can still be generated.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Assembly diagram is schematic</strong></td>
+                        <td>Any successful multi-fragment design.</td>
+                        <td>The assembly image is a conceptual schematic rather than a length-accurate plasmid drawing; users should rely on the sequence output and overhang table for exact interpretation.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <p><strong>Practical interpretation:</strong> in Golden Gate Assembly, a warning often reflects <strong>topology or overhang quality</strong> rather than a complete design failure. Users should interpret warnings together with the <strong>backbone selector</strong>, the <strong>overhang table</strong>, the optional <strong>fidelity section</strong>, and the final assembled sequence.</p>
+            </div>
         </div>
        
     </div>

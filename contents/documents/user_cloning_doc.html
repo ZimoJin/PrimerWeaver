@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>USER Enzyme Cloning - PrimerWeaver V2</title>
+    <title>USER Enzyme Cloning - PrimerWeaver v1.0.1</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -182,7 +182,7 @@
 
         <div class="section">
             <h2>Input Format</h2>
-            <p>Both vector and insert inputs accept <strong>FASTA or plain text format</strong>. Only <strong>one sequence</strong> is allowed per input field; if multiple FASTA headers are detected, <strong>only the first sequence</strong> will be used. Fragment names extracted from FASTA headers are displayed for reference and will be used in primer naming conventions.<p> 
+            <p>Both vector and insert inputs accept <strong>FASTA</strong>, <strong>plain DNA text</strong>, or standard <strong>GenBank</strong> files (<code>.gb</code>, <code>.gbk</code>, <code>.gbff</code>, <code>.genbank</code>) with <code>LOCUS</code> and <code>ORIGIN</code> blocks. The short name in <strong>LOCUS</strong> is used as the sequence title. Only <strong>one sequence</strong> is allowed per input field; if multiple FASTA headers are detected, <strong>only the first sequence</strong> will be used. If you upload plain sequence without a <code>&gt;</code> header, the <strong>file name</strong> (without extension) is used as the name. Proprietary binary formats (e.g. SnapGene <code>.dna</code>) must be exported as GenBank or FASTA first. Fragment names from FASTA or GenBank are used in primer naming where applicable.</p> 
 	     <p>Once a vector sequence is provided, the system <strong>automatically identifies vector features</strong>. The vector map can be rotated to facilitate visualization of the targeted cloning region.</p>
 
             <div style="text-align: center; margin: 2em 0;">
@@ -207,7 +207,7 @@
             <h2>Design Parameters</h2>
             
             <p>Please provide the primer pairs used for vector linearization. The system will automatically determine whether uracil is present in the input vector primers. If no uracil is detected, the system can redesign the vector primers with uracil incorporated at the specified junctions upon user confirmation. If uracil is already present, the system will directly use the user-provided overhangs for primer design.</p>
-	     <p>Once the vector primer pairs are provided, the system automatically identifies the longest resulting fragment as the default destination vector backbone. If this fragment does not correspond to the intended backbone, you may manually select the appropriate fragment. Before proceeding, please review the primer design parameters and adjust them if necessary.<p>
+	     <p>Once the vector primer pairs are provided, the system automatically identifies the longest resulting fragment as the default destination vector backbone. If this fragment does not correspond to the intended backbone, you may manually select the appropriate fragment. Before proceeding, please review the primer design parameters and adjust them if necessary.</p>
             
             <!-- USER cloning parameter table (same layout as your Gibson table: Category | Parameter | Default | Range | Description) -->
 <table class="param-table">
@@ -312,7 +312,7 @@
 
 
             <h3>Primer Table</h3>
-	    <p>Designed primer pairs are presented in a structured table with complete primer sequences information (5′→3′), length, GC content, and melting temperatures (Tm). Tm values are displayed for both the <strong>annealing core region</strong> and the <strong>full-length primer</strong>, allowing users to assess amplification compatibility. Primer quality metrics, including homopolymer runs, hairpin structures, self-dimer, and cross-dimer formation, are evaluated and flagged to highlight potential risks that may affect PCR performance. <strong>Overlap regions are highlighted in bold</strong> within primer sequences for easy visualization.<p>
+	    <p>Designed primer pairs are presented in a structured table with complete primer sequences information (5′→3′), length, GC content, and melting temperatures (Tm). Tm values are displayed for both the <strong>annealing core region</strong> and the <strong>full-length primer</strong>, allowing users to assess amplification compatibility. Primer quality metrics, including homopolymer runs, hairpin structures, self-dimer, and cross-dimer formation, are evaluated and flagged to highlight potential risks that may affect PCR performance. <strong>Overlap regions are highlighted in bold</strong> within primer sequences for easy visualization.</p>
 
             <div style="text-align: center; margin: 2em 0;">
                 <img
@@ -324,6 +324,9 @@
 
             <h3>Assembled diagram and Overhang table</h3>
 	    <p>An <strong>assembled plasmid schematic</strong> is generated to illustrate the cloning workflow, including vector linearization, insert incorporation, and final plasmid assembly. This diagram provides a conceptual overview of fragment orientation and junction structure. A <strong>overlap table</strong> displays the overlap sequence at each junction, confirming that adjacent fragments have complementary homologous region. This table provides a quick visual verification that the assembly architecture is correct and that no overhang conflicts or mismatches are present.</p>
+            <div class="warning-box">
+                <p><strong>Note:</strong> The assembly diagram is schematic only and is not drawn to scale. Exact interpretation should be based on the assembled sequence and junction overlap information.</p>
+            </div>
 
 
 	   <div style="text-align: center; margin: 2em 0;">
@@ -336,7 +339,7 @@
 
 
             <h3>Simulated Agarose Gel Electrophoresis</h3>
-            <p>PrimerWeaver generates a <strong>simulated agarose gel image</strong> to predict experimental outcomes for key cloning steps. The gel includes:<p>
+            <p>PrimerWeaver generates a <strong>simulated agarose gel image</strong> to predict experimental outcomes for key cloning steps. The gel includes:</p>
 
             <ul>
                 <li>A selectable DNA ladder (default: NEB 1 kb Plus DNA Ladder)</li>
@@ -364,14 +367,186 @@
             <p>Each USER cloning primers consists of three functional regions:</p>
             <ul>
                 <li><strong>Annealing core (3′):</strong> template-complementary region that drives PCR annealing (typically 18–30 bp)</li>
-		<li><strong>Uracil Region:</strong> 1 nucleotides containing uracil modifications, position recognized and cleaved by USER enzyme.</li>
-		<li><strong>Overlap Region (5′):</strong> Sequence complementary to an adjacent fragment that will be exposed after exonuclease digestion (typically 6–15 bp). </li>
+		<li><strong>Uracil marker:</strong> a single <strong>U</strong> placed at the defined cleavage position used by USER chemistry.</li>
+		<li><strong>Overlap Region (5′):</strong> Junction-specific sequence that becomes the exposed sticky end after USER processing (typically within the user-defined overlap range). </li>
             </ul>
 
             <h3>Design Process</h3>
-            <p>In USER cloning primer design, the algorithm first operates at the <strong>junction level</strong>, rather than starting from primer cores. For each vector–insert or insert–insert junction, the system identifies a short, junction-centered DNA segment suitable for generating a USER-compatible sticky end. Within this region, a thymine (T) at a defined position is selected and substituted with uracil (U), such that USER enzyme treatment will expose a precise, strand-specific overhang after cleavage. Once the junction-specific overhang sequence and U position are fixed, the algorithm then designs the <strong>template-binding core regions</strong> on each side of the junction by extending away from the overlap boundary and selecting the minimal core length that achieves the target melting temperature. Finally, full-length primers are constructed by concatenating the USER overhang (including the U residue) at the 5′ end with the optimized core sequence at the 3′ end, ensuring that USER cleavage produces the intended complementary sticky ends while PCR amplification remains efficient and specific.<p>
+            <p>The formal USER workflow in PrimerWeaver assumes that the two vector-linearization primers are already supplied as <strong>U-containing USER primers</strong>. Under that assumption, the algorithm is best understood as a four-stage process: reconstruct the PCR-linearized vector, derive vector-facing USER junctions from the supplied primers, discover internal USER-compatible junctions between inserts, and then build the final insert primers around those fixed USER tails.</p>
 
-            
+            <h3>Stage 1. Reconstruct the PCR-linearized vector product from the USER primers</h3>
+            <p>The module first parses each vector primer at the <strong>terminal U</strong>. The sequence before that U is treated as the USER overlap-defining segment, and the sequence after that U is treated as the 3′ core used to map the primer back onto the vector. Using those post-U core regions, the code reconstructs the PCR-linearized vector product. If direct mapping fails, it still tries reverse-complement / swapped-primer interpretation before aborting. The retained PCR product becomes the vector backbone used for all downstream USER-junction calculations.</p>
+
+            <h3>Stage 2. Define the vector-facing USER boundaries</h3>
+            <p>Once the PCR product is fixed, the vector-side USER junctions are derived directly from the user-provided vector primers rather than invented from scratch. In practical terms, the sequence before the terminal U in each vector primer defines the intended sticky-end logic at the vector boundaries, and the insert-facing primer tails are generated to match those USER boundaries after cleavage. This means the supplied vector primers are not just validation inputs; they are active boundary constraints on the final cloning geometry.</p>
+
+            <h3>Stage 3. Search internal insert-insert junctions for USER-compatible overlap motifs</h3>
+            <p>For each internal junction between adjacent inserts, PrimerWeaver searches the insert assembly near that junction for a USER-compatible motif of the form <strong>A + N{4-13} + T</strong>. Candidate motifs are ranked by how well they sit on the intended junction, how closely their overlap length matches the requested setting, and how closely their overlap Tm matches the target overlap behavior. Once a suitable motif is selected, the terminal cleavage-position <strong>T</strong> is converted to <strong>U</strong> in the designed primer tail so that USER treatment exposes the intended sticky end.</p>
+
+            <h3>Stage 4. Design the template-binding cores and build full USER primers</h3>
+            <p>After each USER tail is fixed, the module extends away from the junction to design the 3′ core-binding region. Core length is scanned across a bounded window and scored by the difference between the calculated salt-corrected Tm and the target Tm, so the algorithm chooses the <strong>closest workable core</strong> rather than simply the shortest threshold-passing one. Final primers are then assembled as <strong>5′ USER tail (including the U cleavage marker) + 3′ template-binding core</strong>. The vector primers are largely retained from user input, while the insert primers are generated so that USER processing produces the intended compatible ends across the whole assembly.</p>
+            <h3>Edge-Case Logic in the Algorithm</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Algorithm edge case</th>
+                        <th>Current behavior in USER module</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Both vector primers must define a valid USER geometry</strong></td>
+                        <td>The formal USER algorithm assumes that the vector-linearization primers already define the USER boundaries. If that geometry is not present, the design is treated as outside the main USER workflow rather than as an equivalent normal case.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Only one primer contains uracil</strong></td>
+                        <td>A mixed U / non-U vector-primer pair is treated as algorithmically inconsistent. The module warns the user rather than pretending this is a clean strict-USER boundary definition.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>USER primer format is non-canonical</strong></td>
+                        <td>Strict USER-mode primers are expected to follow the validated <strong>5′ A N{4-13} U core 3′</strong> architecture. Primers outside that pattern are not interpreted as normal USER primers.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Vector-linearization primer mapping is ambiguous</strong></td>
+                        <td>If the 3′ core-binding region of the vector primers cannot be matched directly, the module tries reverse-complement and swapped-primer interpretations before aborting the design.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>No canonical USER-compatible junction pattern is found</strong></td>
+                        <td>When a junction search cannot find a suitable <strong>A + N{4-13} + T</strong> pattern, the module falls back to a manually introduced overlap/U strategy instead of silently inventing a canonical USER-compatible motif.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Core design is nearest-fit, not threshold-stop</strong></td>
+                        <td>The core-binding region is selected from a bounded scan by minimizing the Tm error relative to target settings. If no ideal core exists, the best available one is still returned rather than forcing a clean threshold pass.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Warnings and Edge Cases</h2>
+            <p>The USER Cloning module combines shared <strong>MW (Message Warning)</strong> checks with USER-specific validation around uracil-containing primers, overlap discovery, and behavior when canonical USER-compatible junction patterns cannot be found.</p>
+
+            <h3>General warning</h3>
+            <p>These warnings mostly arise before the final design is generated and reflect sequence-quality or parameter-quality issues.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Trigger</th>
+                        <th>Current behavior in USER module</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Blocking input prompts</strong></td>
+                        <td>Missing vector, missing inserts, or missing PCR primers for vector linearization.</td>
+                        <td>Design stops immediately and the user is asked to complete the required inputs before continuing.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-04</strong><br>No valid sequence after normalization</td>
+                        <td>Vector or insert sequence becomes empty after normalization.</td>
+                        <td>The user may still continue, but the affected design input will no longer support meaningful output.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-05</strong><br>Non-IUPAC characters removed</td>
+                        <td>Unsupported characters are present in vector or insert sequence input.</td>
+                        <td>The module continues using normalized sequences only and warns that the effective design template may differ from the original text input.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-06</strong><br>Degenerate bases detected</td>
+                        <td>Vector or insert contains ambiguous IUPAC bases.</td>
+                        <td>Thermodynamic values are estimated conservatively from the most stable variant, so Tm and ΔG values may represent worst-case approximations.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-10 to MW-15</strong><br>Parameter range warnings</td>
+                        <td>Na<sup>+</sup>, Mg<sup>2+</sup>, primer concentration, or target Tm falls outside recommended or validated thermodynamic ranges.</td>
+                        <td>The module can still proceed, but thermodynamic interpretation becomes less reliable.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-19</strong><br>Large total input size</td>
+                        <td>Total vector plus insert input becomes large enough to stress browser-side computation.</td>
+                        <td>The shared warning layer reports that browser-side design and rendering may slow down for very large total input sizes.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-20</strong><br>Multiple FASTA headers in one field</td>
+                        <td>A vector or insert textarea contains more than one FASTA record.</td>
+                        <td>A shared MW dialog warns that only one sequence is allowed per field. If the user proceeds, the field is trimmed to the <strong>first FASTA record</strong> before design continues.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-22</strong><br>File upload exceeds import limit</td>
+                        <td>An uploaded vector or insert file is larger than <strong>1 MB</strong>.</td>
+                        <td>The import is blocked before sequence loading, and the user must choose a smaller file.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Design warning</h3>
+            <p>These edge cases are specific to USER-cloning logic, particularly the treatment of uracil-containing primers and junction-level overhang discovery.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Case</th>
+                        <th>Trigger</th>
+                        <th>Current behavior in USER module</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Insert count cap</strong></td>
+                        <td>More than three insert rows are added.</td>
+                        <td>The interface warns that USER cloning currently supports a maximum of <strong>three inserts</strong>.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Vector preview uses first sequence only</strong></td>
+                        <td>Multiple vector records are present before preflight trimming occurs.</td>
+                        <td>The vector-map preview reports that multiple sequences were found and uses the <strong>first record</strong> for visualization.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Strict USER mode requires both primers to contain U</strong></td>
+                        <td>Both primers are expected to be USER-compatible, but one or both violate the required U-containing format.</td>
+                        <td>The module reports a USER primer-format error and asks the user to return to primer editing.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>One primer contains U and the other does not</strong></td>
+                        <td>Only one of the two PCR primers contains a uracil base.</td>
+                        <td>The module shows a confirmation warning explaining that both primers should either contain U or both omit U. Proceeding in this mixed state is not supported cleanly and normally leads back to correction.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>U-primer format constraint</strong></td>
+                        <td>U-containing primers do not satisfy the expected <strong>5′ A N{4-13} U core 3′</strong> rule.</td>
+                        <td>The design is halted with a dedicated USER-format warning so the user can rewrite primers before proceeding.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>PCR primer core not found in vector</strong></td>
+                        <td>The 3′ core-binding part of the USER linearization primers cannot be matched onto the vector sequence.</td>
+                        <td>The module attempts reverse-complement / swapped-primer fallback first, and throws an error only if no valid mapping can be found.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>No valid PCR product found</strong></td>
+                        <td>Primer placement is insufficient to reconstruct a valid PCR-linearized vector product.</td>
+                        <td>The design aborts and asks the user to check primer sequences.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>No canonical USER junction pattern found</strong></td>
+                        <td>No suitable <strong>5′AN(4-13)T3′</strong> pattern can be found around a desired USER junction.</td>
+                        <td>The algorithm falls back to a default overlap sequence with an extra U introduced manually, and explicitly warns that this may create a <strong>frameshift risk</strong>.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Result-level overlap warning output</strong></td>
+                        <td>Junction discovery succeeds but one or more overlap-search steps report warnings.</td>
+                        <td>These warnings are shown both in the overlap table area and in the unified warnings box so the user can review the exact affected primer or junction.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Assembly diagram is schematic</strong></td>
+                        <td>Any successful USER cloning design.</td>
+                        <td>The assembly image is conceptual rather than length-accurate; exact interpretation should rely on the assembled sequence and overlap / USER-junction information.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <p><strong>Practical interpretation:</strong> warnings in USER Cloning do not always mean the design is unusable. Many warnings reflect primer-format expectations or non-canonical USER junctions rather than complete failure. Results should therefore be interpreted together with the overlap table, warning list, and final assembled sequence.</p>
+            </div>
         </div>
 
 
