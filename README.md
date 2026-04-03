@@ -37,6 +37,7 @@ The app is hash-routed from `app/app-index.html` via `app/app-main.js`:
 - `#/mutagenesis` -> `app/modules/mutagenesis_v1.0.1.html`
 - `#/multiplex-pcr` -> `app/modules/multiplex_pcr_v1.0.1.html`
 - `#/qc` -> `app/modules/QC_V1.0.1.html`
+- `#/workspace` -> `app/modules/Integrated_Workspace_V1.0.1.html` (default landing module)
 
 ## Project structure
 
