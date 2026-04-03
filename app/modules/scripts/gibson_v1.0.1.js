@@ -4,6 +4,16 @@
 import * as Core from './core_v1.0.1.js';
 import * as VIZ from './bio_visuals_v1.0.1.js';
 import { CODON_USAGE, getCodonEntries } from './codon_v1.0.1.js';
+import { setupAssemblyParameterPresets } from './assembly_parameter_presets_v1.0.1.js';
+
+let GIBSON_ROOT = document;
+
+function scopedById(id) {
+  if (GIBSON_ROOT && GIBSON_ROOT.querySelector) {
+    return GIBSON_ROOT.querySelector('#' + id) || document.getElementById(id);
+  }
+  return document.getElementById(id);
+}
 
 function ensureHelpIcon(labelEl, tooltipHtml, ariaLabel = 'Help') {
   if (!labelEl) return;
@@ -22,7 +32,7 @@ function ensureHelpIcon(labelEl, tooltipHtml, ariaLabel = 'Help') {
 }
 
 function attachHelpToInput(inputId, tooltipHtml, ariaLabel) {
-  const input = document.getElementById(inputId);
+  const input = scopedById(inputId);
   if (!input) return;
   const wrapper = input.parentElement;
   const label = wrapper?.querySelector?.('label');
@@ -30,7 +40,7 @@ function attachHelpToInput(inputId, tooltipHtml, ariaLabel) {
 }
 
 function attachHelpToTextarea(textareaId, tooltipHtml, ariaLabel) {
-  const textarea = document.getElementById(textareaId);
+  const textarea = scopedById(textareaId);
   if (!textarea) return;
   const wrapper = textarea.parentElement;
   const label = wrapper?.querySelector?.('label');
@@ -42,7 +52,7 @@ let vectorPreviewTimer = null;
 
 // Utility functions
 function $(id) {
-  return document.getElementById(id);
+  return scopedById(id);
 }
 
 function parseFASTA(text) {
@@ -262,12 +272,14 @@ function initVectorUpload() {
   $('vector-file').addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    const container = document.getElementById('module-content') || document.body;
+    if (VIZ && typeof VIZ.guardFileUploadSize === 'function' && VIZ.guardFileUploadSize(container, file, e.target)) return;
     const reader = new FileReader();
     reader.onload = (event) => {
-      $('vector-seq').value = event.target.result;
+      $('vector-seq').value = Core.formatSequenceUploadText(event.target.result, { genbankMode: 'sequence', fileBaseName: file.name });
       updateVectorPreview();
     };
-    reader.readAsText(file);
+    reader.readAsText(file, 'UTF-8');
   });
   
   // Vector demo button: load pESC-His.txt
@@ -532,7 +544,7 @@ function initAddInsert() {
             <button type="button" class="linker-type-btn" data-type="AA" style="padding: 4px 8px; border: 1px solid #d0d0dd; border-radius: 4px; background: #e0f2fe; cursor: pointer; font-size: 0.8rem; white-space: nowrap; color: #0369a1;">AA</button>
           </div>
           <div style="display: flex; justify-content: flex-end; gap: 6px; flex-wrap: wrap;">
-            <input type="file" class="insert-file" accept=".fa,.fasta,.fas,.txt" style="display: none;">
+            <input type="file" class="insert-file" accept=".fa,.fasta,.fas,.txt,.gb,.gbk,.gbff,.genbank" style="display: none;">
             <button class="btn demo xs insert-flip-btn" type="button">Reverse complement</button>
             <button class="btn demo xs insert-demo-btn" type="button">Demo</button>
             <button class="ghost btn xs insert-upload-btn" type="button">Upload</button>
@@ -588,11 +600,12 @@ function initAddInsert() {
     const textarea = row.querySelector('.insert-seq');
     const file = fileInput.files && fileInput.files[0];
     if (file) {
+      if (VIZ && typeof VIZ.guardFileUploadSize === 'function' && VIZ.guardFileUploadSize(document.getElementById('module-content') || document.body, file, fileInput)) return;
       const reader = new FileReader();
       reader.onload = (event) => {
-        textarea.value = event.target.result;
+        textarea.value = Core.formatSequenceUploadText(event.target.result, { genbankMode: 'sequence', fileBaseName: file.name });
       };
-      reader.readAsText(file);
+      reader.readAsText(file, 'UTF-8');
     }
   });
 }
@@ -2722,7 +2735,7 @@ function renderGel(results, vector, inserts) {
  * @param {string} message - Warning message to display
  */
 function showWarning(message) {
-  const host = document.getElementById('module-content') || document.body;
+  const host = (GIBSON_ROOT && GIBSON_ROOT.querySelector && GIBSON_ROOT.querySelector('#module-content')) || document.getElementById('module-content') || GIBSON_ROOT || document.body;
   if (VIZ && typeof VIZ.showMWModal === 'function') {
     VIZ.showMWModal(host, message || '', () => {}, () => {});
     return;
@@ -2982,10 +2995,32 @@ function initDemoSetButton() {
 }
 
 // Initialize function - can be called after HTML is injected
-function initGibsonModule() {
+function initGibsonModule(container) {
+  GIBSON_ROOT = container && container.querySelector ? container : document;
+
+  setupAssemblyParameterPresets(GIBSON_ROOT, {
+    scope: 'gibson-assembly',
+    label: 'Gibson assembly settings',
+    placeholder: 'e.g. Standard Gibson',
+    fields: [
+      { key: 'linearizationMode', type: 'radio', name: 'linearization-mode', defaultValue: 'enzyme' },
+      { key: 'enzyme1', selector: '#enzyme1', defaultValue: '' },
+      { key: 'enzyme2', selector: '#enzyme2', defaultValue: '' },
+      { key: 'keepSites', selector: '#keep-sites', defaultValue: 'yes' },
+      { key: 'pcrForward', selector: '#pcr-forward', defaultValue: '' },
+      { key: 'pcrReverse', selector: '#pcr-reverse', defaultValue: '' },
+      { key: 'targetTm', selector: '#target-tm', defaultValue: '55' },
+      { key: 'deltaTm', selector: '#delta-tm', defaultValue: '2.5' },
+      { key: 'overlapLen', selector: '#overlap-len', defaultValue: '25' },
+      { key: 'primerConc', selector: '#primer-conc', defaultValue: '500' },
+      { key: 'naConc', selector: '#na-conc', defaultValue: '50' },
+      { key: 'mgConc', selector: '#mg-conc', defaultValue: '2.0' }
+    ]
+  });
+
   // Add inline help tooltips (page-level)
-  attachHelpToTextarea('vector-seq', "Paste your vector/plasmid DNA sequence in FASTA format (header optional). Line breaks and spaces are ignored.", 'Help: Vector sequence');
-  ensureHelpIcon(document.querySelector('#right-panel > label'), "Add insert fragments in order (FASTA supported). For multi-insert designs, each insert can optionally include a linker sequence.", 'Help: Assembly plan');
+  attachHelpToTextarea('vector-seq', "<strong style=\"display:block;margin-bottom:6px;\">Vector sequence</strong><strong>Formats:</strong> FASTA (optional &gt;), plain DNA, or GenBank (.gb, .gbk, .gbff, .genbank) with LOCUS and ORIGIN. <strong>LOCUS</strong> is the short name. Upload without a header uses the <strong>file name</strong> (no extension) as &gt;name. SnapGene .dna is binary—export as GenBank or FASTA first. Whitespace ignored.", 'Help: Vector sequence');
+  ensureHelpIcon((GIBSON_ROOT.querySelector && GIBSON_ROOT.querySelector('#right-panel > label')) || document.querySelector('#right-panel > label'), "Add insert fragments in order (FASTA supported). For multi-insert designs, each insert can optionally include a linker sequence.", 'Help: Assembly plan');
   attachHelpToInput('target-tm', "Target melting temperature for primer design. Primers are optimized to be close to this value.", 'Help: Target Tm');
   attachHelpToInput('delta-tm', "Maximum allowed deviation from the target Tm. Larger values allow more flexibility but may yield less uniform primer pairs.", 'Help: ΔTm');
   attachHelpToInput('primer-conc', "Effective primer concentration assumed for in silico Tm calculation. Typical range: 25-1000 nM.", 'Help: Primer concentration');
@@ -3059,6 +3094,18 @@ function initGibsonModule() {
   setTimeout(scheduleSync, 50);
   setTimeout(scheduleSync, 200);
   setTimeout(scheduleSync, 500);
+
+  if (GIBSON_ROOT && typeof GIBSON_ROOT === 'object') {
+    GIBSON_ROOT.__workspaceRefresh = () => {
+      try { updateVectorPreview(); } catch (e) {}
+      try { updateFragmentsInfo(); } catch (e) {}
+      try { scheduleSync(); } catch (e) {}
+      setTimeout(() => {
+        try { updateVectorPreview(); } catch (e) {}
+        try { scheduleSync(); } catch (e) {}
+      }, 80);
+    };
+  }
 }
 
 // Export for app-main.js

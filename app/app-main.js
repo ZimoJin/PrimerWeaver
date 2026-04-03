@@ -5,6 +5,7 @@ const moduleContent = document.getElementById('module-content');
 
 const moduleMap = {
   'qc': 'modules/QC_V1.0.1.html',
+  'workspace': 'modules/Integrated_Workspace_V1.0.1.html',
   'restriction': 'modules/RE_cloning_v1.0.1.html',
   'golden-gate': 'modules/Golden_Gate_v1.0.1.html',
   'gibson': 'modules/Gibson_V1.0.1.html',
@@ -64,6 +65,7 @@ function deferAfterFirstPaint(fn) {
 }
 
 const moduleScriptMap = {
+  'workspace': './modules/scripts/integrated_workspace_v1.0.1.js',
   'golden-gate': './modules/scripts/golden_gate_v1.0.1.js',
   'gibson': './modules/scripts/gibson_v1.0.1.js',
   'user': './modules/scripts/user_cloning_v1.0.1.js',
@@ -81,7 +83,7 @@ function warmupModuleNetwork(moduleName) {
   const scriptHref = moduleScriptMap[moduleName];
   if (scriptHref) modulePreload(scriptHref);
   // Prefetch the heavy feature DB only for modules that may use it
-  if (moduleName === 'golden-gate' || moduleName === 'gibson' || moduleName === 'user' || moduleName === 'restriction') {
+  if (moduleName === 'workspace' || moduleName === 'golden-gate' || moduleName === 'gibson' || moduleName === 'user' || moduleName === 'restriction') {
     prefetch('./modules/scripts/common_features_v1.0.1.js');
   }
 }
@@ -119,7 +121,7 @@ async function loadModule(moduleName) {
 
 function handleHashChange() {
   let hash = window.location.hash.substring(1);
-  if (!hash || !moduleMap[hash]) hash = 'golden-gate';
+  if (!hash || !moduleMap[hash]) hash = 'workspace';
   loadModule(hash);
 }
 

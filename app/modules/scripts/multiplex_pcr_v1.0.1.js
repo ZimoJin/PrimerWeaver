@@ -930,25 +930,19 @@ function parseAndPreviewSequences() {
 function handleFileUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
-  
-  // Check file size (limit to 1MB)
-  const maxSize = 1024 * 1024; // 1MB
-  if (file.size > maxSize) {
-    showWarning(`File size exceeds the limit of 1MB. Please upload a smaller file.\n\nCurrent file size: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
-    event.target.value = ''; // Clear the file input
-    return;
-  }
+  const container = document.getElementById('module-content') || document.body;
+  if (VIZ && typeof VIZ.guardFileUploadSize === 'function' && VIZ.guardFileUploadSize(container, file, event.target)) return;
   
   const reader = new FileReader();
   reader.onload = function(e) {
     const content = e.target.result;
-    $('target-sequences').value = content;
+    $('target-sequences').value = Core.formatSequenceUploadText(content, { genbankMode: 'fasta', fileBaseName: file.name });
     parseAndPreviewSequences();
   };
   reader.onerror = function() {
     showWarning('Failed to read file, please try again.');
   };
-  reader.readAsText(file);
+  reader.readAsText(file, 'UTF-8');
 }
 
 /**
@@ -1109,14 +1103,8 @@ function parseAndPreviewPrimers() {
 function handlePrimerFileUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
-  
-  // Check file size (limit to 1MB)
-  const maxSize = 1024 * 1024; // 1MB
-  if (file.size > maxSize) {
-    showWarning(`File size exceeds the limit of 1MB. Please upload a smaller file.\n\nCurrent file size: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
-    event.target.value = ''; // Clear the file input
-    return;
-  }
+  const container = document.getElementById('module-content') || document.body;
+  if (VIZ && typeof VIZ.guardFileUploadSize === 'function' && VIZ.guardFileUploadSize(container, file, event.target)) return;
   
   const reader = new FileReader();
   reader.onload = function(e) {

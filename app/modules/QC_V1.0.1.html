@@ -71,7 +71,31 @@
     </div>
   </div>
 
-  <div class="grid cols-4" style="margin-top:10px; position: relative; overflow: visible;">
+  <div class="qc-preset-toolbar" style="margin-top:10px;">
+    <div class="qc-preset-group">
+      <div class="qc-preset-main" style="position: relative; overflow: visible;">
+        <label class="aside" for="qc-preset-select" style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible; margin: 0 0 6px 0; white-space: nowrap;">
+          <span>Parameter preset</span>
+          <span class="help-icon">
+            <span>?</span>
+            <span class="help-tooltip" style="top: calc(100% + 10px); left: 0; width: 320px;">
+              <p style="margin: 0;">Save commonly used Primer QC parameter sets in this browser. Select a preset to load it, then use "Set as Startup Default" if you want it to open automatically next time.</p>
+              <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
+            </span>
+          </span>
+        </label>
+        <select id="qc-preset-select"></select>
+      </div>
+      <div class="qc-preset-actions">
+        <button class="btn demo" id="qc-preset-save" type="button">Save as New</button>
+        <button class="btn demo" id="qc-preset-update" type="button">Update</button>
+        <button class="btn ghost" id="qc-preset-delete" type="button">Delete</button>
+        <button class="btn" id="qc-preset-set-default" type="button">Set as Startup Default</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid qc-params-grid" style="margin-top:10px; position: relative; overflow: visible;">
     <div style="position: relative; overflow: visible;">
       <label class="aside" style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible;">
 
@@ -215,6 +239,76 @@
 }
 .help-icon:hover {
   z-index: 999998 !important;
+}
+.qc-preset-toolbar{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(140px,1fr));
+  gap:12px;
+  align-items:end;
+  width:100%;
+}
+.qc-preset-group{
+  grid-column:3 / 5;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+}
+.qc-params-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(140px,1fr));
+  gap:12px;
+}
+.qc-preset-main{
+  min-width:0;
+  flex:1 1 auto;
+}
+.qc-preset-main select{
+  width:100%;
+}
+.qc-preset-actions{
+  display:flex;
+  flex-wrap:nowrap;
+  align-items:center;
+  gap:8px;
+  justify-content:flex-end;
+  flex:0 0 auto;
+  margin-top:18px;
+}
+@media (max-width: 1200px){
+  .qc-preset-toolbar{
+    grid-template-columns:repeat(4,minmax(140px,1fr));
+  }
+  .qc-params-grid{
+    grid-template-columns:repeat(4,minmax(140px,1fr));
+  }
+}
+@media (max-width: 800px){
+  .qc-preset-toolbar{
+    grid-template-columns:repeat(2,minmax(180px,1fr));
+  }
+  .qc-preset-group{
+    grid-column:1 / -1;
+    flex-wrap:wrap;
+  }
+  .qc-preset-actions{
+    justify-content:flex-start;
+    flex-wrap:wrap;
+  }
+  .qc-params-grid{
+    grid-template-columns:repeat(2,minmax(180px,1fr));
+  }
+}
+@media (max-width: 560px){
+  .qc-preset-toolbar{
+    grid-template-columns:1fr;
+  }
+  .qc-preset-group{
+    grid-column:1;
+  }
+  .qc-params-grid{
+    grid-template-columns:1fr;
+  }
 }
 .score-row{display:flex;align-items:baseline;gap:10px;}
 .score{

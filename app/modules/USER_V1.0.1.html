@@ -3,10 +3,17 @@
     <div id="left-panel" style="display:flex;flex-direction:column">
       <label style="display:flex;align-items:center;gap:8px">
         <strong>Vector sequence (FASTA)</strong>
+        <span class="help-icon" tabindex="0" aria-label="Help: Vector sequence">
+          <span>?</span>
+          <span class="help-tooltip">
+            <strong style="display:block;margin-bottom:6px;">Vector sequence input</strong>
+            <strong>Formats:</strong> FASTA (optional <code>&gt;</code>), plain DNA, or GenBank (<code>.gb</code>, <code>.gbk</code>, <code>.gbff</code>, <code>.genbank</code>) with <code>LOCUS</code> and <code>ORIGIN</code>. The <strong>LOCUS</strong> name is used as the short sequence name. <strong>Upload</strong> without a header uses the <strong>file name</strong> (no extension) as <code>&gt;</code>name. SnapGene <code>.dna</code> is binary—export as GenBank or FASTA first. Whitespace ignored.
+          </span>
+        </span>
       </label>
       <textarea id="vector-seq" placeholder=">pESC-His&#10;GAGCAGACAA..." style="min-height:220px;flex:1;margin-bottom:6px"></textarea>
       <div class="row end" id="left-upload-row" style="gap:8px">
-        <input type="file" id="vector-file" accept=".fa,.fasta,.fas,.txt" style="display:none">
+        <input type="file" id="vector-file" accept=".fa,.fasta,.fas,.txt,.gb,.gbk,.gbff,.genbank" style="display:none">
         <button class="btn demo" id="vector-flip-btn" type="button" title="Reverse complement the vector sequence">Reverse complement</button>
         <button class="btn demo" id="vector-demo-btn" type="button">Demo</button>
         <button class="ghost btn" id="vector-upload-btn" type="button">Upload</button>
@@ -16,12 +23,12 @@
     <div id="right-panel" style="display:flex;flex-direction:column">
       <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom: 8px;">
         <label style="display:flex;align-items:center;gap:8px; margin:0">
-          <strong>Assembly plan (FASTA)</strong>
-          <span class="help-icon" tabindex="0" aria-label="Help: Assembly plan">
+          <strong>Insert sequence (FASTA)</strong>
+          <span class="help-icon" tabindex="0" aria-label="Help: Insert sequence">
             <span>?</span>
             <span class="help-tooltip">
               <strong style="display:block;margin-bottom:6px;">Insert sequences</strong>
-              Add inserts in order (FASTA supported). The tool designs primers for USER cloning and generates an assembly diagram and gel simulation for the final product.
+              Same formats as vector (FASTA, plain DNA, GenBank <code>.gb</code>/<code>.gbk</code>/<code>.gbff</code>/<code>.genbank</code>; file name as header when missing). Add inserts in order. The tool designs USER primers and generates an assembly diagram and gel simulation for the final product.
             </span>
           </span>
         </label>
@@ -44,7 +51,7 @@
             <textarea class="insert-seq" placeholder=">yeGFP&#10;ATGTCTAAAG..." style="min-height:100px"></textarea>
             <div style="display: flex; flex-direction: column; margin-top: 6px;">
               <div class="row end">
-                <input type="file" class="insert-file" accept=".fa,.fasta,.fas,.txt" style="display: none;">
+                <input type="file" class="insert-file" accept=".fa,.fasta,.fas,.txt,.gb,.gbk,.gbff,.genbank" style="display: none;">
                 <button class="btn demo xs insert-flip-btn" type="button">Reverse complement</button>
                 <button class="btn demo xs insert-demo-btn" type="button">Demo</button>
                 <button class="ghost btn xs insert-upload-btn" type="button">Upload</button>
@@ -83,8 +90,8 @@
 
     <div class="box" id="settings-box">
       <h3 style="display:flex;align-items:center;gap:8px">
-        Vector Linearization Mode
-        <span class="help-icon" tabindex="0" aria-label="Help: Vector Linearization Mode">
+        Assembly settings
+        <span class="help-icon" tabindex="0" aria-label="Help: Assembly settings">
           <span>?</span>
           <span class="help-tooltip">
             <strong style="display:block;margin-bottom:6px;">Inverse PCR Linearization</strong>
@@ -92,6 +99,26 @@
           </span>
         </span>
       </h3>
+      <div class="assembly-preset-toolbar">
+        <div class="assembly-preset-main">
+          <label class="aside" for="assembly-preset-select" style="display:flex;align-items:center;gap:6px;">
+            <span>Parameter preset</span>
+            <span class="help-icon">
+              <span>?</span>
+              <span class="help-tooltip">
+                Save commonly used assembly settings in this browser. Select a preset to reuse it, or set one as the startup default for next time.
+              </span>
+            </span>
+          </label>
+          <select id="assembly-preset-select" class="assembly-preset-select"></select>
+        </div>
+        <div class="assembly-preset-actions">
+          <button class="btn demo assembly-preset-save" type="button">Save as New</button>
+          <button class="btn demo assembly-preset-update" type="button">Update</button>
+          <button class="btn ghost assembly-preset-delete" type="button">Delete</button>
+          <button class="btn assembly-preset-set-default" type="button">Set as Startup Default</button>
+        </div>
+      </div>
       <div class="grid cols-2" style="margin-top:12px;gap:12px">
         <div>
           <label for="pcr-forward" class="aside">Vector PCR forward primer (5′→3′)</label>

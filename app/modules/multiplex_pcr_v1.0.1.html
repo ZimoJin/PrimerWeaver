@@ -268,7 +268,7 @@
               <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
                 <span style="display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.7rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
                 <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 420px; padding: 14px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.6; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
-                  <p style="margin: 0 0 8px 0;"><strong>Target Sequences:</strong> Paste or upload multiple DNA target sequences in multi-FASTA format. Each target will receive one forward and one reverse primer pair under a shared PCR condition.</p>
+                  <p style="margin: 0 0 8px 0;"><strong>Target Sequences:</strong> Paste or upload multiple DNA targets: multi-FASTA, plain DNA, or GenBank (<code>.gb</code>, <code>.gbk</code>, <code>.gbff</code>, <code>.genbank</code>) with <code>LOCUS</code>/<code>ORIGIN</code> (short name from <strong>LOCUS</strong>; upload without <code>&gt;</code> uses <strong>file name</strong>). Each target gets one F/R primer pair under shared PCR conditions. SnapGene <code>.dna</code> is binary—export as GenBank or FASTA first.</p>
                   <p style="margin: 0 0 8px 0;"><strong>Example:</strong></p>
                   <pre style="margin: 0; padding: 10px 12px; background: rgba(255,255,255,0.08); border-radius: 8px; font-size: 0.82rem; line-height: 1.4; overflow: auto; white-space: pre;">&gt;Target1
 ATGCGTAGCTA...
@@ -320,7 +320,7 @@ GCTAGCTAGCT...</pre>
             <strong id="sequences-count" style="font-size: 0.85rem;">Loaded Sequences: 0</strong>
           </div>
           <div class="row end" style="gap: 8px; align-items: center; margin-left: auto;">
-            <input type="file" id="fasta-upload" accept=".fasta,.fa,.fas,.txt" style="display: none;">
+            <input type="file" id="fasta-upload" accept=".fasta,.fa,.fas,.txt,.gb,.gbk,.gbff,.genbank" style="display: none;">
             <button type="button" class="btn demo" id="target-reverse-complement-btn">Reverse complement</button>
             <button class="btn demo" id="target-demo-btn" type="button">Demo</button>
             <button class="ghost btn" id="upload-btn" type="button">Upload</button>

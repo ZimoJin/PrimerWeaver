@@ -178,7 +178,7 @@
       <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
         <span style="display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.7rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
         <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 450px; padding: 14px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.6; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
-          <p style="margin: 0 0 8px 0;">Paste or upload a DNA sequence (FASTA or plain text). Coding or non-coding regions are supported; ORFs and reading frames are detected automatically. Use Reverse complement if the input is from the reverse strand. Whitespace and line breaks are ignored.</p>
+          <p style="margin: 0 0 8px 0;"><strong>Formats:</strong> FASTA (optional <code>&gt;</code>), plain DNA, or GenBank (<code>.gb</code>, <code>.gbk</code>, <code>.gbff</code>, <code>.genbank</code>) with <code>LOCUS</code> and <code>ORIGIN</code> (<strong>LOCUS</strong> = short name). Upload without a header uses the <strong>file name</strong> as <code>&gt;</code>name. SnapGene <code>.dna</code> is binary—export as GenBank or FASTA first. Coding or non-coding regions are supported; ORFs are detected automatically. Use Reverse complement if the input is from the reverse strand. Whitespace is ignored.</p>
           <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
         </span>
       </span>
@@ -191,7 +191,7 @@
 
   <textarea id="template-seq" placeholder=">yeGFP&#10;ATGTCTAAAG..." style="font-family: monospace;"></textarea>
   <div class="row end" style="margin-top:8px; gap: 8px;">
-    <input type="file" id="mut-file-upload" accept=".fa,.fasta,.fas,.txt" style="display:none">
+    <input type="file" id="mut-file-upload" accept=".fa,.fasta,.fas,.txt,.gb,.gbk,.gbff,.genbank" style="display:none">
     <button type="button" class="btn demo" id="mut-rc-btn">Reverse complement</button>
     <button type="button" class="btn demo" id="mut-demo-btn">Demo</button>
     <button class="ghost btn" id="mut-upload-btn" type="button">Upload</button>

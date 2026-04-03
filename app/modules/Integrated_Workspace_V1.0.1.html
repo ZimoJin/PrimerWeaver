@@ -1,0 +1,115 @@
+<section class="pane" id="integrated-workspace-pane">
+  <div class="workspace-header-row">
+    <div class="workspace-method-controls">
+      <div>
+        <label class="aside" for="workspace-method">Cloning method</label>
+        <select id="workspace-method">
+          <option value="">Select a cloning method...</option>
+          <option value="golden-gate">Golden Gate Assembly</option>
+          <option value="gibson">Gibson Assembly</option>
+          <option value="restriction">Restriction Cloning</option>
+          <option value="user">USER Cloning</option>
+        </select>
+      </div>
+    </div>
+    <div class="workspace-header-actions">
+      <button class="btn demo" id="workspace-demo-set" type="button">Demo Set</button>
+      <button class="ghost btn" id="workspace-reset-current" type="button">Reset</button>
+    </div>
+  </div>
+
+  <div id="workspace-placeholder" class="grid cols-2" style="margin-top: 16px;">
+    <div>
+      <label style="display:flex;align-items:center;gap:8px;">
+        <strong>Vector sequence (FASTA)</strong>
+        <span class="help-icon" tabindex="0" aria-label="Help: Vector sequence">
+          <span>?</span>
+          <span class="help-tooltip">
+            <strong style="display:block;margin-bottom:6px;">Vector sequence</strong>
+            FASTA (optional <code>&gt;</code>), plain DNA, or GenBank (<code>.gb</code>, <code>.gbk</code>, <code>.gbff</code>, <code>.genbank</code>) with <code>LOCUS</code>/<code>ORIGIN</code>. <strong>LOCUS</strong> is the short name. Upload without a header uses the <strong>file name</strong> as <code>&gt;</code>name. SnapGene <code>.dna</code> is binary—export as GenBank or FASTA first.
+          </span>
+        </span>
+      </label>
+      <textarea id="workspace-vector" placeholder=">vector&#10;ATGC..." style="min-height:220px"></textarea>
+      <div class="row end" style="margin-top:6px;">
+        <input type="file" id="workspace-vector-file" accept=".fa,.fasta,.fas,.txt,.gb,.gbk,.gbff,.genbank" style="display:none">
+        <button class="btn demo" id="workspace-vector-rc" type="button">Reverse complement</button>
+        <button class="ghost btn" id="workspace-vector-upload" type="button">Upload</button>
+      </div>
+    </div>
+    <div>
+      <label style="display:flex;align-items:center;gap:8px;">
+        <strong>Insert sequence (FASTA)</strong>
+        <span class="help-icon" tabindex="0" aria-label="Help: Insert sequence">
+          <span>?</span>
+          <span class="help-tooltip">
+            <strong style="display:block;margin-bottom:6px;">Insert sequence</strong>
+            Same formats as vector (multi-FASTA allowed; GenBank <code>.gb</code>/<code>.gbk</code>/<code>.gbff</code>/<code>.genbank</code>). Uploads without <code>&gt;</code> use the <strong>file name</strong> as the header.
+          </span>
+        </span>
+      </label>
+      <textarea id="workspace-insert" placeholder=">insert1&#10;ATGC...&#10;>insert2&#10;ATGC..." style="min-height:220px"></textarea>
+      <div class="row end" style="margin-top:6px;">
+        <input type="file" id="workspace-insert-file" accept=".fa,.fasta,.fas,.txt,.gb,.gbk,.gbff,.genbank" style="display:none">
+        <button class="btn demo" id="workspace-insert-rc" type="button">Reverse complement</button>
+        <button class="ghost btn" id="workspace-insert-upload" type="button">Upload</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="workspace-method-host" style="margin-top:16px;"></div>
+</section>
+
+<style>
+#integrated-workspace-pane .workspace-header-row{
+  display:flex;
+  justify-content:space-between;
+  gap:16px;
+  align-items:end;
+  flex-wrap:wrap;
+  margin-bottom:16px;
+}
+
+#integrated-workspace-pane .workspace-method-controls{
+  display:flex;
+  gap:10px;
+  align-items:end;
+  flex-wrap:wrap;
+}
+
+#integrated-workspace-pane .workspace-header-actions{
+  display:flex;
+  gap:8px;
+  align-items:end;
+  flex-wrap:wrap;
+}
+
+#integrated-workspace-pane #workspace-method-host .workspace-hidden-top{
+  display:none !important;
+}
+
+#integrated-workspace-pane #workspace-method-host .workspace-pane-hidden{
+  display:none !important;
+}
+
+#integrated-workspace-pane #workspace-method-host .workspace-loading-box{
+  margin-top:0;
+}
+
+#integrated-workspace-pane #workspace-placeholder[hidden]{
+  display:none !important;
+}
+
+@media (max-width: 768px){
+  #integrated-workspace-pane .workspace-header-row,
+  #integrated-workspace-pane .workspace-method-controls,
+  #integrated-workspace-pane .workspace-header-actions{
+    align-items:stretch;
+  }
+
+  #integrated-workspace-pane .workspace-method-controls > div,
+  #integrated-workspace-pane .workspace-method-controls select{
+    width:100%;
+  }
+}
+</style>

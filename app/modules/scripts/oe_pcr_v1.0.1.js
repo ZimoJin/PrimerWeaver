@@ -1289,7 +1289,7 @@ function createFragmentRow() {
     <td id="dna-seq-cell-${fragmentRowCount}" style="width: 65%;">
       <textarea id="frag-seq-${fragmentRowCount}" placeholder="Enter DNA sequence (FASTA format supported)..."></textarea>
       <div class="row end" style="margin-top:6px">
-        <input type="file" id="file-frag-${fragmentRowCount}" accept=".fa,.fasta,.fas,.txt" style="display:none">
+        <input type="file" id="file-frag-${fragmentRowCount}" accept=".fa,.fasta,.fas,.txt,.gb,.gbk,.gbff,.genbank" style="display:none">
         <button type="button" class="btn demo" id="frag-rc-${fragmentRowCount}">Reverse complement</button>
         <button class="btn demo" id="frag-demo-${fragmentRowCount}" type="button">Demo</button>
         <button class="ghost btn" id="frag-upload-${fragmentRowCount}" type="button">Upload</button>
@@ -1381,14 +1381,17 @@ function createFragmentRow() {
     fileInput.addEventListener('change', (e) => {
       const f = e.target.files && e.target.files[0];
       if (!f) return;
+      if (VIZ && typeof VIZ.guardFileUploadSize === 'function' && VIZ.guardFileUploadSize(document.getElementById('module-content') || document.body, f, e.target)) {
+        return;
+      }
       const r = new FileReader();
       r.onload = (ev) => {
         const textarea = $(`frag-seq-${rowNum}`);
         if (textarea) {
-          textarea.value = ev.target.result;
+          textarea.value = Core.formatSequenceUploadText(ev.target.result, { genbankMode: 'sequence', fileBaseName: f.name });
         }
       };
-      r.readAsText(f);
+      r.readAsText(f, 'UTF-8');
     });
   }
   
@@ -2362,8 +2365,9 @@ function onDesignClick() {
   
   const container = document.getElementById('module-content') || document.body;
   const warnings = [];
+  let seqs = [];
   if (window.VIZ && window.VIZ.validateSequenceInput) {
-    const seqs = Array.from(rows).map((row, i) => {
+    seqs = Array.from(rows).map((row, i) => {
       const rowId = row.id.replace('fragment-row-', '');
       const raw = row.querySelector(`#frag-seq-${rowId}`)?.value || '';
       const label = extractFASTAHeader(raw) || `Fragment ${i + 1}`;
@@ -2374,6 +2378,10 @@ function onDesignClick() {
   }
   if (window.VIZ && window.VIZ.validateParameterRange) {
     warnings.push(...window.VIZ.validateParameterRange({ Na: na_mM, Mg: mg_mM, conc: conc_nM, targetTm: coreTm }));
+  }
+  if (window.VIZ && window.VIZ.validatePerformance) {
+    const totalBp = (seqs.length ? seqs : fragments).reduce((sum, item) => sum + ((item && item.seq) ? item.seq.length : 0), 0);
+    warnings.push(...window.VIZ.validatePerformance(fragments.length, totalBp));
   }
   if (window.VIZ && window.VIZ.validateOverlapLength) {
     if (userFOverlap && userFOverlap.length) {

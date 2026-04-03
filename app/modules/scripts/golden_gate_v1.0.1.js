@@ -1,5 +1,6 @@
 import * as CORE from './core_v1.0.1.js';
 import * as VIZ from './bio_visuals_v1.0.1.js';
+import { setupAssemblyParameterPresets } from './assembly_parameter_presets_v1.0.1.js';
 
 function ensureHelpIcon(labelEl, tooltipHtml, ariaLabel = 'Help') {
   if (!labelEl) return;
@@ -35,6 +36,20 @@ function attachHelpToTextarea(container, textareaId, tooltipHtml, ariaLabel) {
 
 function initGoldenGate(container) {
   const byId = (id) => container?.querySelector?.(`#${id}`) || document.getElementById(id);
+
+  setupAssemblyParameterPresets(container || document, {
+    scope: 'golden-gate-assembly',
+    label: 'Golden Gate assembly settings',
+    placeholder: 'e.g. Standard Golden Gate',
+    fields: [
+      { key: 'enzyme', selector: '#gg-enzyme', defaultValue: 'Esp3I' },
+      { key: 'clamp', selector: '#gg-clamp', defaultValue: '5' },
+      { key: 'tmTarget', selector: '#gg-tmTarget', defaultValue: '55' },
+      { key: 'conc', selector: '#gg-conc', defaultValue: '500' },
+      { key: 'na', selector: '#gg-na', defaultValue: '50' },
+      { key: 'mg', selector: '#gg-mg', defaultValue: '2.0' }
+    ]
+  });
 
   // Download state (primers.txt and assembled.fasta)
   if (typeof window !== 'undefined') {
@@ -239,6 +254,10 @@ function initGoldenGate(container) {
 
   // Standard MW warning modal (instead of legacy OK-only popup)
   function showMWMessage(message) {
+    if (VIZ && typeof VIZ.showMWModal === 'function') {
+      VIZ.showMWModal(container || document.body, String(message || ''), () => {}, () => {});
+      return;
+    }
     const warningsBox = byId('warnings-box');
     if (warningsBox) {
       warningsBox.innerHTML = ''; // Clear previous messages
@@ -281,7 +300,7 @@ function initGoldenGate(container) {
   }
 
   // Add inline help tooltips (page-level)
-  attachHelpToTextarea(container, 'gg-vector', "Paste your vector/plasmid DNA sequence in FASTA format (header optional). Line breaks and spaces are ignored.", 'Help: Vector sequence');
+  attachHelpToTextarea(container, 'gg-vector', "<strong style=\"display:block;margin-bottom:6px;\">Vector sequence</strong><strong>Formats:</strong> FASTA (optional &gt;), plain DNA, or GenBank (.gb, .gbk, .gbff, .genbank) with LOCUS and ORIGIN. <strong>LOCUS</strong> is the short name. Upload without a header uses the <strong>file name</strong> (no extension) as &gt;name. SnapGene .dna is binary—export as GenBank or FASTA first.", 'Help: Vector sequence');
   attachHelpToInput(container, 'gg-clamp', "Extra bases added to the 5' end of primers to improve Type IIS digestion efficiency. Typical values: 2–6.", 'Help: Protective base');
   attachHelpToInput(container, 'gg-tmTarget', "Target melting temperature for the primer core region. Primers are optimized to be close to this value.", 'Help: Target Tm');
   attachHelpToInput(container, 'gg-conc', "Effective primer concentration assumed for in silico Tm calculation. Typical range: 25-1000 nM.", 'Help: Primer concentration');
@@ -403,13 +422,12 @@ function initGoldenGate(container) {
   // ===== Enzymes =====
   const TYPEIIS = CORE.RAW_TYPEIIS_ENZYMES;
   const findTypeIISSites = CORE.findTypeIISSites;
-  function deriveVectorOverhangs(seq, enz){
+  function getTypeIISCutPositions(seq, enz){
     const N = seq.length;
     if(!N) return null;
     const sites = findTypeIISSites(seq, enz);
     if(!sites.F.length && !sites.R.length) return null;
 
-    // collect all cut positions around the circle
     const cuts = [];
     for(const i of sites.F){
       cuts.push((i + enz.site.length + enz.cutF + N) % N);
@@ -419,25 +437,34 @@ function initGoldenGate(container) {
     }
     if(cuts.length < 2) return null;
     cuts.sort((a,b)=>a-b);
+    return cuts;
+  }
+  function deriveVectorOverhangs(seq, enz, fragmentIndex = null){
+    const N = seq.length;
+    if(!N) return null;
+    const cuts = getTypeIISCutPositions(seq, enz);
+    if(!cuts || cuts.length < 2) return null;
 
     function circDist(a,b){
       return (b > a) ? (b - a) : (N - a + b);
     }
 
-    // choose the neighbouring cut pair that yields the LONGEST fragment
-    let bestA = cuts[0], bestB = cuts[1], bestLen = -1;
-    for(let idx=0; idx<cuts.length; idx++){
-      const a = cuts[idx];
-      const b = cuts[(idx+1) % cuts.length];
-      const len = circDist(a,b);
-      if(len > bestLen){
-        bestLen = len;
-        bestA = a;
-        bestB = b;
+    let cutIdx = Number.isInteger(fragmentIndex) ? fragmentIndex : null;
+    if(cutIdx === null || cutIdx < 0 || cutIdx >= cuts.length){
+      let bestLen = -1;
+      cutIdx = 0;
+      for(let idx=0; idx<cuts.length; idx++){
+        const a = cuts[idx];
+        const b = cuts[(idx+1) % cuts.length];
+        const len = circDist(a,b);
+        if(len > bestLen){
+          bestLen = len;
+          cutIdx = idx;
+        }
       }
     }
-    const cutL = bestA;
-    const cutR = bestB;
+    const cutL = cuts[cutIdx];
+    const cutR = cuts[(cutIdx + 1) % cuts.length];
 
     function subseq(start, len){
       start = ((start % N) + N) % N;
@@ -448,7 +475,7 @@ function initGoldenGate(container) {
 
     const leftOH  = rc(subseq(cutR, enz.overhang));
     const rightOH =     subseq(cutL, enz.overhang);
-    return { leftOH, rightOH, cutL, cutR };
+    return { leftOH, rightOH, cutL, cutR, fragmentIndex: cutIdx };
   }
 
   // Rough circular digest: use recognition-site offsets as cut positions
@@ -489,6 +516,24 @@ function initGoldenGate(container) {
 
   function last4(s){ return (s||'').slice(-4); }
   function first4(s){ return (s||'').slice(0,4); }
+  function sanitizeOverhangInput(raw){
+    return String(raw || '')
+      .toUpperCase()
+      .replace(/[^ATGC]/g, '')
+      .slice(0, 4);
+  }
+  function trimOverhangDuplication(overhang, coreSeq){
+    const oh = String(overhang || '').toUpperCase();
+    const core = String(coreSeq || '').toUpperCase();
+    if(!oh || !core) return { overhangToAdd: oh, overlapLen: 0 };
+    const maxK = Math.min(oh.length, core.length);
+    for(let k = maxK; k > 0; k--){
+      if(oh.slice(oh.length - k) === core.slice(0, k)){
+        return { overhangToAdd: oh.slice(0, oh.length - k), overlapLen: k };
+      }
+    }
+    return { overhangToAdd: oh, overlapLen: 0 };
+  }
 
   const makeSmartClamp = (typeof CORE.makeSmartClamp === 'function')
     ? CORE.makeSmartClamp
@@ -528,11 +573,14 @@ function initGoldenGate(container) {
         return 'ACGTACGTAC'.slice(0, len);
       };
 
-  async function designGGPrimers(vectorRaw, frags, enzymeName, clampN, tmTarget, Na, conc, preferVectorEnds){
+  async function designGGPrimers(vectorRaw, frags, enzymeName, clampN, tmTarget, Na, conc, options = {}){
     const enz = TYPEIIS[enzymeName];
     const vec = cleanFasta(vectorRaw);
     const report = {warnings:[], vector:{len:vec.length}};
     report.enzymeName = enzymeName;
+    const preferVectorEnds = options.preferVectorEnds !== false;
+    const backboneFragmentIndex = Number.isInteger(options.backboneFragmentIndex) ? options.backboneFragmentIndex : null;
+    const customLeftOverhangs = Array.isArray(options.customLeftOverhangs) ? options.customLeftOverhangs : [];
 
     // parse vector header name (first token after '>')
     let vectorName = null;
@@ -546,7 +594,7 @@ function initGoldenGate(container) {
 
     let vOH = null;
     if(preferVectorEnds && vec.length){
-      vOH = deriveVectorOverhangs(vec, enz);
+      vOH = deriveVectorOverhangs(vec, enz, backboneFragmentIndex);
       if(!vOH){
         report.warnings.push('Vector ends not found; fallback to seamless rule at ends.');
       }
@@ -589,6 +637,11 @@ function initGoldenGate(container) {
     if(k > 1){
       const junctionCandidates = [];
       for(let i=0; i<k-1; i++){
+        const custom = sanitizeOverhangInput(customLeftOverhangs[i+1]);
+        if(custom){
+          junctionCandidates.push([custom]);
+          continue;
+        }
         const a = tail4(inserts[i]).toUpperCase();
         const b = head4(inserts[i+1]).toUpperCase();
         junctionCandidates.push(a === b ? [a] : [a, b]);
@@ -731,25 +784,20 @@ function initGoldenGate(container) {
       const leftOH = I_L[idx] || '';
       const rightOH = I_R[idx] || '';
 
-      // Forward: clamp + site + offset + overhang + core (with duplication check)
+      // Forward: clamp + site + offset + overhang + core
+      // Avoid duplicating any suffix of the 4-bp overhang that is already the prefix of the annealing core.
       let F = clamp + site + offsetF;
       const fOH = leftOH;
-      const fHead = Fcore.slice(0, fOH.length);
-      if(fOH && fHead === fOH){
-        F += Fcore;
-      }else{
-        F += fOH + Fcore;
-      }
+      const fTail = trimOverhangDuplication(fOH, Fcore);
+      F += fTail.overhangToAdd + Fcore;
 
-      // Reverse: clamp + site + offset + overhang + core (with duplication check)
+      // Reverse: clamp + site + offset + overhang + core
+      // At the insert right end, remove any prefix of the chosen overhang that is already
+      // present at the end of the insert sequence covered by the reverse-primer core.
       let R = clamp + site + offsetR;
       const rOH = rightOH || '';
-      const rHead = Rcore.slice(0, rOH.length);
-      if(rOH && rHead === rOH){
-        R += Rcore;
-      }else{
-        R += rOH + Rcore;
-      }
+      const rTail = trimOverhangDuplication(rOH, Rcore);
+      R += rTail.overhangToAdd + Rcore;
 
       primers.push({
         name,
@@ -889,8 +937,7 @@ function initGoldenGate(container) {
       <thead>
         <tr>
           <th>Junction</th>
-          <th>Left overhang (5'→3')</th>
-          <th>Right overhang (5'→3')</th>
+          <th colspan="2" style="text-align:center;">Overhang (5'→3')</th>
         </tr>
       </thead>
       <tbody>${rows}</tbody>
@@ -1620,6 +1667,7 @@ function initGoldenGate(container) {
       backboneSelect.innerHTML = '<option value="">Please select enzyme...</option>';
       backboneSelect.disabled = true;
       vectorFragments = [];
+      updateFragOverhangInputs();
       return;
     }
 
@@ -1627,6 +1675,7 @@ function initGoldenGate(container) {
       backboneSelect.innerHTML = '<option value="">Analyze vector first...</option>';
       backboneSelect.disabled = true;
       vectorFragments = [];
+      updateFragOverhangInputs();
       return;
     }
 
@@ -1638,6 +1687,7 @@ function initGoldenGate(container) {
       backboneSelect.innerHTML = '<option value="">Vector needs ≥ ' + enzName + ' sites</option>';
       backboneSelect.disabled = true;
       vectorFragments = [];
+      updateFragOverhangInputs();
       return;
     }
 
@@ -1682,10 +1732,12 @@ function initGoldenGate(container) {
     backboneSelect.value = longestIdx;
     backboneSelect.disabled = false;
     selectedFragmentIdx = longestIdx;
+    updateFragOverhangInputs();
 
     // Listen for backbone selection change
     backboneSelect.onchange = ()=>{
       selectedFragmentIdx = parseInt(backboneSelect.value) || 0;
+      updateFragOverhangInputs();
     };
   }
 
@@ -1712,7 +1764,144 @@ function initGoldenGate(container) {
   function scheduleSync(){ window.requestAnimationFrame(syncVectorHeight); }
 
   const fragList = container.querySelector('#frag-list');
-  function renumberFrags(){ Array.from(fragList.querySelectorAll('.frag-label')).forEach((el,i)=>{ el.textContent = 'Insert #'+(i+1); }); enforceFragCap(); }
+  function getSelectedBackboneInsertOverhangs(){
+    const raw = container.querySelector('#gg-vector');
+    const seq = cleanFasta(raw ? raw.value : '');
+    const enzName = container.querySelector('#gg-enzyme').value;
+    const enz = TYPEIIS[enzName];
+    if(!seq || !enz) return null;
+    const vOH = deriveVectorOverhangs(seq, enz, selectedFragmentIdx);
+    if(!vOH) return null;
+    // Show backbone (vector) sticky ends in FASTA order; primers still use rc(...) in designGGPrimers (I_L / I_R).
+    return {
+      leftInsertOH: vOH.leftOH || '',
+      rightInsertOH: vOH.rightOH || ''
+    };
+  }
+  function isLeftAutoOverhang(idx){
+    return idx === 0;
+  }
+  function isRightAutoOverhang(idx, total){
+    return idx === total - 1;
+  }
+  function getAutoOverhangThemeStyles(){
+    const dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return dark
+      ? { background: '#1e293b', color: '#e2e8f0', borderColor: '#475569' }
+      : { background: '#f8fafc', color: '#0f172a', borderColor: '#cbd5e1' };
+  }
+  function setOverhangInputMode(input, { readOnly, placeholder, background, color, borderColor }){
+    if(!input) return;
+    input.readOnly = !!readOnly;
+    input.placeholder = placeholder || '';
+    input.style.background = background || '';
+    input.style.color = color || '';
+    input.style.borderColor = borderColor || '';
+  }
+  function syncCustomJunctionValue(sourceInput, targetInput){
+    if(!sourceInput || !targetInput || targetInput.readOnly) return;
+    const value = sanitizeOverhangInput(sourceInput.value);
+    if(targetInput.value !== value){
+      targetInput.value = value;
+    }
+    targetInput.dataset.overhangSource = value ? 'custom' : '';
+  }
+  function validateCustomOverhangOnBlur(input){
+    if(!input || input.readOnly) return;
+    const value = sanitizeOverhangInput(input.value);
+    if(input.value !== value) input.value = value;
+    if(value && value.length < 4){
+      if((container || document.body).querySelector('#mw-modal')) return;
+      if(input.dataset.lastWarnedInvalidValue === value) return;
+      input.dataset.lastWarnedInvalidValue = value;
+      showModal('Custom overhang must be exactly 4 bp.');
+      return;
+    }
+    input.dataset.lastWarnedInvalidValue = '';
+  }
+  function activateAutoOverhang(input, value, placeholder){
+    if(!input) return;
+    const autoTheme = getAutoOverhangThemeStyles();
+    setOverhangInputMode(input, {
+      readOnly: true,
+      placeholder,
+      background: autoTheme.background,
+      color: autoTheme.color,
+      borderColor: autoTheme.borderColor
+    });
+    input.value = value || '';
+    input.dataset.overhangRole = 'auto';
+    input.dataset.overhangSource = 'auto';
+    input.dataset.lastWarnedInvalidValue = '';
+  }
+  function activateCustomOverhang(input){
+    if(!input) return;
+    const wasAuto = input.dataset.overhangRole === 'auto' || input.dataset.overhangSource === 'auto';
+    setOverhangInputMode(input, {
+      readOnly: false,
+      placeholder: '',
+      background: '',
+      color: '',
+      borderColor: ''
+    });
+    input.dataset.overhangRole = 'custom';
+    if(wasAuto){
+      input.value = '';
+      input.dataset.overhangSource = '';
+    }else{
+      input.value = sanitizeOverhangInput(input.value);
+    }
+    input.dataset.lastWarnedInvalidValue = '';
+  }
+  function markCustomOverhang(input, value){
+    if(!input || input.readOnly) return;
+    input.value = sanitizeOverhangInput(value || '');
+    input.dataset.overhangSource = input.value ? 'custom' : '';
+    input.dataset.lastWarnedInvalidValue = '';
+  }
+  function updateFragOverhangInputs(){
+    const rows = Array.from(fragList.querySelectorAll('.frag-row'));
+    const autoOH = getSelectedBackboneInsertOverhangs();
+    rows.forEach((row, idx)=>{
+      const leftInput = row.querySelector('.frag-left-overhang');
+      const rightInput = row.querySelector('.frag-right-overhang');
+      const leftLabel = row.querySelector('.frag-left-overhang-label');
+      const rightLabel = row.querySelector('.frag-right-overhang-label');
+      if(leftInput){
+        if(isLeftAutoOverhang(idx)){
+          activateAutoOverhang(leftInput, autoOH && autoOH.leftInsertOH ? autoOH.leftInsertOH : '', 'Auto');
+          if(leftLabel) leftLabel.textContent = 'Left overhang (vector sticky, 4 bp)';
+        }else{
+          activateCustomOverhang(leftInput);
+          if(leftLabel) leftLabel.textContent = 'Left overhang (custom, 4 bp)';
+        }
+      }
+      if(rightInput){
+        if(isRightAutoOverhang(idx, rows.length)){
+          activateAutoOverhang(rightInput, autoOH && autoOH.rightInsertOH ? autoOH.rightInsertOH : '', 'Auto');
+          if(rightLabel) rightLabel.textContent = 'Right overhang (vector sticky, 4 bp)';
+        }else{
+          activateCustomOverhang(rightInput);
+          if(rightLabel) rightLabel.textContent = 'Right overhang (custom, 4 bp)';
+        }
+      }
+    });
+    rows.forEach((row, idx)=>{
+      if(idx >= rows.length - 1) return;
+      const rightInput = row.querySelector('.frag-right-overhang');
+      const nextLeftInput = rows[idx + 1]?.querySelector('.frag-left-overhang');
+      const rightValue = rightInput?.dataset.overhangSource === 'custom' ? sanitizeOverhangInput(rightInput.value || '') : '';
+      const leftValue = nextLeftInput?.dataset.overhangSource === 'custom' ? sanitizeOverhangInput(nextLeftInput.value || '') : '';
+      const syncedValue = rightValue || leftValue || '';
+      if(rightInput && !rightInput.readOnly) markCustomOverhang(rightInput, syncedValue);
+      if(nextLeftInput && !nextLeftInput.readOnly) markCustomOverhang(nextLeftInput, syncedValue);
+    });
+  }
+  function renumberFrags(){
+    Array.from(fragList.querySelectorAll('.frag-label')).forEach((el,i)=>{ el.textContent = 'Insert #'+(i+1); });
+    enforceFragCap();
+    updateFragOverhangInputs();
+  }
   let fragId = 0;
   function fragRow(seq=''){
     const id = ++fragId;
@@ -1720,9 +1909,17 @@ function initGoldenGate(container) {
     wrap.innerHTML = `
       <div class="frag-label">Insert #</div>
       <div class="frag-body">
-        <textarea class="frag-seq" placeholder=">insert\\nATG...">${seq}</textarea>
+        <div class="frag-overlap frag-overlap-top" style="margin-bottom:6px;">
+          <label class="aside frag-left-overhang-label">Left overhang (vector sticky, 4 bp)</label>
+          <input class="frag-left-overhang" type="text" spellcheck="false" autocomplete="off" maxlength="4" placeholder="Auto" readonly style="max-width:200px;font-family:'Courier New',monospace;background:#f8fafc;">
+        </div>
+        <textarea class="frag-seq" placeholder=">insert&#10;ATG...">${seq}</textarea>
+        <div class="frag-overlap frag-overlap-bottom" style="margin-top:6px;">
+          <label class="aside frag-right-overhang-label">Right overhang (vector sticky, 4 bp)</label>
+          <input class="frag-right-overhang" type="text" spellcheck="false" autocomplete="off" maxlength="4" placeholder="Auto" readonly style="max-width:200px;font-family:'Courier New',monospace;background:#f8fafc;">
+        </div>
         <div class="frag-tools">
-          <input type="file" class="file-frag" accept=".fa,.fasta,.fas,.txt" style="display:none">
+          <input type="file" class="file-frag" accept=".fa,.fasta,.fas,.txt,.gb,.gbk,.gbff,.genbank" style="display:none">
           <button class="btn demo btn-frag-flip" type="button" title="Reverse-complement this insert">Reverse complement</button>
           <button class="btn demo btn-frag-demo" type="button">Demo</button>
           <button class="ghost btn btn-frag-upload" type="button">Upload</button>
@@ -1749,13 +1946,34 @@ function initGoldenGate(container) {
     return Array.from(container.querySelectorAll('.frag-row')).map(r=>{
       const raw = r.querySelector('.frag-seq').value || '';
       const headerName = parseHeader(raw);
-      return { seq: raw, headerName };
+      return { seq: raw, headerName, rowEl: r };
     }).filter(f=> cleanFasta(f.seq).length>0 ).slice(0,6);
   }
 
   // Event delegation for fragment list
   window.addEventListener('resize', scheduleSync);
   fragList.addEventListener('input', scheduleSync);
+  fragList.addEventListener('input', (e)=>{
+    const ohInput = e.target.closest('.frag-left-overhang, .frag-right-overhang');
+    if(!ohInput || ohInput.readOnly) return;
+    const cleaned = sanitizeOverhangInput(ohInput.value);
+    if(ohInput.value !== cleaned) ohInput.value = cleaned;
+    ohInput.dataset.overhangSource = cleaned ? 'custom' : '';
+    ohInput.dataset.lastWarnedInvalidValue = '';
+    const row = ohInput.closest('.frag-row');
+    const rows = Array.from(fragList.querySelectorAll('.frag-row'));
+    const idx = rows.indexOf(row);
+    if(ohInput.classList.contains('frag-right-overhang')){
+      syncCustomJunctionValue(ohInput, rows[idx + 1]?.querySelector('.frag-left-overhang'));
+    }else if(ohInput.classList.contains('frag-left-overhang')){
+      syncCustomJunctionValue(ohInput, rows[idx - 1]?.querySelector('.frag-right-overhang'));
+    }
+  });
+  fragList.addEventListener('focusout', (e)=>{
+    const ohInput = e.target.closest('.frag-left-overhang, .frag-right-overhang');
+    if(!ohInput || ohInput.readOnly) return;
+    validateCustomOverhangOnBlur(ohInput);
+  });
   try{
     const mo = new MutationObserver(scheduleSync);
     mo.observe(fragList, {childList:true, subtree:true});
@@ -1778,13 +1996,13 @@ function initGoldenGate(container) {
     const inp=e.target.closest('.file-frag'); if(!inp) return;
     const row=e.target.closest('.frag-row'); if(!row) return;
     const ta=row.querySelector('.frag-seq'); const f=inp.files && inp.files[0];
+    if (f && VIZ && typeof VIZ.guardFileUploadSize === 'function' && VIZ.guardFileUploadSize(container || document.body, f, inp)) return;
     const r=new FileReader(); 
     r.onload=ev=>{ 
       const text = ev.target.result;
-      // Keep raw content (preserves FASTA headers) like QC
-      ta.value = text;
+      ta.value = CORE.formatSequenceUploadText(text, { genbankMode: 'sequence', fileBaseName: f.name });
     }; 
-    if(f) r.readAsText(f);
+    if(f) r.readAsText(f, 'UTF-8');
   });
 
   // Top buttons (all FIXED to use container)
@@ -1798,13 +2016,13 @@ function initGoldenGate(container) {
   container.querySelector('#btn-vector-upload').addEventListener('click', ()=> container.querySelector('#file-vector').click());
   container.querySelector('#file-vector').addEventListener('change', ()=>{
     const f=container.querySelector('#file-vector').files[0]; if(!f) return;
+    if (VIZ && typeof VIZ.guardFileUploadSize === 'function' && VIZ.guardFileUploadSize(container || document.body, f, container.querySelector('#file-vector'))) return;
     const r=new FileReader(); 
     r.onload=e=>{ 
-      // Keep raw content (preserves FASTA headers) like QC
       const text = e.target.result;
-      container.querySelector('#gg-vector').value = text;
+      container.querySelector('#gg-vector').value = CORE.formatSequenceUploadText(text, { genbankMode: 'sequence', fileBaseName: f.name });
     }; 
-    r.readAsText(f);
+    r.readAsText(f, 'UTF-8');
   });
 
   // Vector RC button
@@ -1826,7 +2044,7 @@ function initGoldenGate(container) {
   async function loadSampleSequences() {
     if (sampleSequences) return sampleSequences;
     const demoBase = new URL('modules/contents/demo/', window.location.href).toString();
-    const demoFiles = [
+    const demoFileNames = [
       'Golden_Gate_vector.txt',
       'Insert_1.txt',
       'Insert_2.txt',
@@ -1834,10 +2052,13 @@ function initGoldenGate(container) {
       'Insert_4.txt',
       'Insert_5.txt',
       'Insert_6.txt',
-    ].map(name => demoBase + name);
+    ];
+    const demoFiles = demoFileNames.map(name => demoBase + name);
 
     const results = [];
-    for (const path of demoFiles) {
+    for (let idx = 0; idx < demoFiles.length; idx++) {
+      const path = demoFiles[idx];
+      const fileName = demoFileNames[idx];
       try {
         const resp = await fetch(path);
         if (!resp.ok) {
@@ -1847,7 +2068,10 @@ function initGoldenGate(container) {
         const text = await resp.text();
         const parsed = parseFasta(text);
         if (parsed && parsed.length) {
-          results.push(...parsed);
+          parsed.forEach(record => {
+            record.demoFileName = fileName;
+            results.push(record);
+          });
         }
       } catch (e) {
         console.error('Failed to load demo file:', path, e);
@@ -1857,12 +2081,20 @@ function initGoldenGate(container) {
     sampleSequences = results;
     return sampleSequences;
   }
+  function getGoldenGateVectorSample(samples){
+    return (samples || []).find(s => s.demoFileName === 'Golden_Gate_vector.txt')
+      || (samples || []).find(s => /vector|psev/i.test((s.header || '').toLowerCase()));
+  }
+  function getGoldenGateInsertSamples(samples){
+    const vectorSample = getGoldenGateVectorSample(samples);
+    return (samples || []).filter(s => s !== vectorSample);
+  }
 
   // Vector demo button
   container.querySelector('#btn-vector-demo').addEventListener('click', async ()=>{
     const samples = await loadSampleSequences();
     console.log('Vector demo click, samples', samples.map(s=>s.header));
-    const vectorSample = samples.find(s => /vector|psev/i.test((s.header || '').toLowerCase()));
+    const vectorSample = getGoldenGateVectorSample(samples);
     if (vectorSample) {
       container.querySelector('#gg-vector').value = `>${vectorSample.header}\n${vectorSample.sequence}`;
       renderVectorMap();
@@ -1871,31 +2103,23 @@ function initGoldenGate(container) {
     }
   });
 
-  // Demo Set button - fill vector + first two inserts, set enzyme to BsaI
+  // Demo Set button - fill vector + Insert #1 only, set enzyme to BsaI
   container.querySelector('#demo-set-btn').addEventListener('click', async ()=>{
     const samples = await loadSampleSequences();
     console.log('Demo set click, samples', samples.map(s=>s.header));
     
-    const vectorSample = samples.find(s => /vector|psev/i.test((s.header || '').toLowerCase()));
-    const insertSamples = samples.filter(s => s !== vectorSample);
-    if (!vectorSample || insertSamples.length < 2) {
-      console.warn('Demo set: missing vector or not enough inserts');
+    const vectorSample = getGoldenGateVectorSample(samples);
+    const insertSamples = getGoldenGateInsertSamples(samples);
+    if (!vectorSample || insertSamples.length < 1) {
+      console.warn('Demo set: missing vector or insert #1');
       return;
     }
 
-    // Fill vector and run analysis
-    container.querySelector('#gg-vector').value = `>${vectorSample.header}\n${vectorSample.sequence}`;
-    renderVectorMap();
-    updateEnzymeInfo();
-    analyzeVectorFragments();
-
-    // Wait a bit for map/UI to settle
-    await new Promise(res => setTimeout(res, 50));
-
-    // Ensure at least two insert rows
-    while (fragList.querySelectorAll('.frag-row').length < 2) {
-      fragRow();
-    }
+    // Reset insert rows to a clean one-insert state so stale fragment/order/overhang state
+    // from previous demos or manual edits does not affect the demo assembly.
+    fragList.innerHTML = '';
+    fragId = 0;
+    fragRow();
 
     const rows = fragList.querySelectorAll('.frag-row');
     const fillInsert = (row, sample) => {
@@ -1903,14 +2127,19 @@ function initGoldenGate(container) {
       if (ta) ta.value = `>${sample.header}\n${sample.sequence}`;
     };
     fillInsert(rows[0], insertSamples[0]);
-    fillInsert(rows[1], insertSamples[1]);
 
-    // Set enzyme to Esp3I
+    // Set enzyme to BsaI
     const enzSel = container.querySelector('#gg-enzyme');
     if (enzSel) {
-      enzSel.value = 'Esp3I';
+      enzSel.value = 'BsaI';
       enzSel.dispatchEvent(new Event('change', { bubbles: true }));
     }
+
+    // Fill vector and rerun analysis in the final demo state.
+    container.querySelector('#gg-vector').value = `>${vectorSample.header}\n${vectorSample.sequence}`;
+    renderVectorMap();
+    updateEnzymeInfo();
+    analyzeVectorFragments();
   });
 
   // Insert demo buttons (event delegation for dynamically created buttons)
@@ -1922,8 +2151,7 @@ function initGoldenGate(container) {
       
       const samples = await loadSampleSequences();
       console.log('Insert demo click, samples', samples.map(s=>s.header), 'insertNum', insertNum);
-      const vectorSample = samples.find(s => /vector|psev/i.test((s.header || '').toLowerCase()));
-      const insertSamples = samples.filter(s => s !== vectorSample);
+      const insertSamples = getGoldenGateInsertSamples(samples);
       const insertSample = insertSamples[insertNum - 1];
       
       if (insertSample) {
@@ -1972,8 +2200,8 @@ function initGoldenGate(container) {
       console.log('Global demo click, sequences', sequences.map(s=>s.header));
       if (!sequences.length) throw new Error('No demo sequences found');
       
-      const vectorSample = sequences.find(s => /vector|psev/i.test((s.header || '').toLowerCase()));
-      const insertSamples = sequences.filter(s => s !== vectorSample);
+      const vectorSample = getGoldenGateVectorSample(sequences);
+      const insertSamples = getGoldenGateInsertSamples(sequences);
       if (!vectorSample || insertSamples.length === 0) {
         throw new Error('Demo sequences incomplete (need vector + inserts)');
       }
@@ -2051,16 +2279,6 @@ function initGoldenGate(container) {
         const totalBp = vecBodyLen + frags.reduce((sum, f) => sum + String(f.seq || '').replace(/^>.*$/gm, '').replace(/\s+/g, '').length, 0);
         warnings.push(...VIZ.validatePerformance(frags.length + 1, totalBp));
       }
-      if (vecBodyLen > 15000) {
-        warnings.push({
-          id: 'GG-MW-04',
-          message:
-            `Warning: Large vector sequence detected (${vecBodyLen} bp > 15 kb).\n` +
-            "Assembly efficiency may decrease with very large vectors.\n\n" +
-            "Click Cancel to review or OK to proceed."
-        });
-      }
-
       const enzObjPreflight = TYPEIIS[enz];
       const preflightInsertSiteNames = [];
       frags.forEach((f, idx) => {
@@ -2075,7 +2293,7 @@ function initGoldenGate(container) {
       if (preflightInsertSiteNames.length) {
         const uniq = Array.from(new Set(preflightInsertSiteNames));
         warnings.push({
-          id: 'GG-MW-05',
+            id: 'GG-MW-01',
           message:
             `Warning: Internal ${enz} sites detected in insert sequence(s).\n` +
             `Affected inserts: ${uniq.join(', ')}\n` +
@@ -2109,6 +2327,22 @@ function initGoldenGate(container) {
 
           const insertHeaders = frags.map(f=> f.headerName || null);
           const vectorName = ((vector.match(/^>([^\r\n]+)/m) || [])[1] || '').trim().split(/\s+/)[0] || null;
+          const customLeftOverhangs = frags.map((frag, idx)=>{
+            if(idx === 0) return '';
+            return sanitizeOverhangInput(frag.rowEl?.querySelector('.frag-left-overhang')?.value || '');
+          });
+          for(let i=0; i<frags.length - 1; i++){
+            const rightInput = frags[i]?.rowEl?.querySelector('.frag-right-overhang');
+            const leftInput = frags[i + 1]?.rowEl?.querySelector('.frag-left-overhang');
+            const rightValue = sanitizeOverhangInput(rightInput?.value || '');
+            const leftValue = sanitizeOverhangInput(leftInput?.value || '');
+            if((rightValue && rightValue.length !== 4) || (leftValue && leftValue.length !== 4)){
+              showModal('Internal overlap between Insert #' + (i+1) + ' and Insert #' + (i+2) + ' must be exactly 4 bp or left blank.');
+              return;
+            }
+            const customOH = leftValue || rightValue || '';
+            customLeftOverhangs[i + 1] = customOH;
+          }
 
           // If vector is not suitable for Golden Gate (0 or 1 site): N/A tables and gel with only uncut/cut=uncut
           if(!okForGG){
@@ -2164,7 +2398,11 @@ function initGoldenGate(container) {
           }
 
           // Normal case: vector has sites, design primers
-          const {report, primers} = await designGGPrimers(vector, frags, enz, clampN, tmTarget, Na, conc, preferVectorEnds);
+          const {report, primers} = await designGGPrimers(vector, frags, enz, clampN, tmTarget, Na, conc, {
+            preferVectorEnds,
+            backboneFragmentIndex: selectedFragmentIdx,
+            customLeftOverhangs
+          });
           window._ggPrimers = primers;
 
           const vecClean2 = cleanFasta(vector);
@@ -2179,7 +2417,7 @@ function initGoldenGate(container) {
             const cuts = (cutFrags && cutFrags.length) ? cutFrags.slice() : [];
             if(cuts.length){
               // Recompute backbone from precise cut positions
-              const vOH2 = deriveVectorOverhangs(vecClean2, enzObj2);
+              const vOH2 = deriveVectorOverhangs(vecClean2, enzObj2, selectedFragmentIdx);
               if(vOH2){
                 const N = vecClean2.length;
                 const circDist = (a,b)=> (b > a) ? (b - a) : (N - a + b);
@@ -2796,7 +3034,8 @@ function initQC(container) {
   /* ==================== UI: file loaders ==================== */
   function loadFileInto(fid,tid){
     const f=container.querySelector('#'+fid).files[0];if(!f)return showMWMessage('Choose a file');
-    const r=new FileReader();r.onload=e=>container.querySelector('#'+tid).value=e.target.result;r.readAsText(f);
+    if (VIZ && typeof VIZ.guardFileUploadSize === 'function' && VIZ.guardFileUploadSize(container || document.body, f, container.querySelector('#'+fid))) return;
+    const r=new FileReader();r.onload=e=>container.querySelector('#'+tid).value=CORE.formatSequenceUploadText(e.target.result, { genbankMode: 'sequence', fileBaseName: f.name });r.readAsText(f,'UTF-8');
   }
   const reVectorLoad = container.querySelector('#re-vector-load');
   if (reVectorLoad) reVectorLoad.onclick=()=>loadFileInto('re-vector-file','re-vector');

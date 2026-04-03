@@ -7,14 +7,13 @@
               <span>?</span>
               <span class="help-tooltip">
                 <strong style="display:block;margin-bottom:6px;">Vector sequence input</strong>
-                Paste your vector/plasmid DNA sequence in FASTA format (header line starting with <code>&gt;</code> is optional). Line breaks and spaces are ignored.
-                Use the buttons below to upload a FASTA/text file or to reverse-complement the sequence.
+                <strong>Formats:</strong> FASTA (optional <code>&gt;</code>), plain DNA, or GenBank (<code>.gb</code>, <code>.gbk</code>, <code>.gbff</code>, <code>.genbank</code>) with <code>LOCUS</code> and <code>ORIGIN</code>. The <strong>LOCUS</strong> name is used as the short sequence name. <strong>Upload</strong> without a header uses the <strong>file name</strong> (no extension) as <code>&gt;</code>name. SnapGene <code>.dna</code> is binary—export as GenBank or FASTA first. Whitespace ignored. Use Upload or Reverse complement as needed.
               </span>
             </span>
           </label>
           <textarea id="gg-vector" placeholder=">pESC-His&#10;GAGCAGACAA..." style="min-height:100px"></textarea>
           <div class="row end fasta-actions">
-            <input type="file" id="file-vector" accept=".fa,.fasta,.fas,.txt" style="display:none">
+            <input type="file" id="file-vector" accept=".fa,.fasta,.fas,.txt,.gb,.gbk,.gbff,.genbank" style="display:none">
             <button type="button" class="btn demo" id="vector-flip-btn">Reverse complement</button>
             <button class="btn demo" id="btn-vector-demo" type="button" data-sample="vector">Demo</button>
             <button class="ghost btn" id="btn-vector-upload" type="button">Upload</button>
@@ -27,8 +26,8 @@
               <span class="help-icon" tabindex="0" aria-label="Help: Insert sequence">
                 <span>?</span>
                 <span class="help-tooltip">
-                  <strong style="display:block;">Insert sequence input</strong>
-                  Paste your insert DNA sequence in FASTA format (header optional). The tool designs primers to amplify the insert with restriction sites compatible with the selected enzymes.
+                  <strong style="display:block;margin-bottom:6px;">Insert sequences</strong>
+                  Same formats as vector (FASTA, plain DNA, GenBank <code>.gb</code>/<code>.gbk</code>/<code>.gbff</code>/<code>.genbank</code>; file name as header when missing). The tool designs primers to amplify the insert with restriction sites compatible with the selected enzymes.
                 </span>
               </span>
             </label>
@@ -43,7 +42,7 @@
               <div class="insert-body" style="flex: 1;">
                 <textarea class="insert-seq" placeholder=">yeGFP&#10;ATGTCTAAAG..." style="min-height:100px"></textarea>
                 <div class="row end fasta-actions">
-                  <input type="file" class="insert-file" accept=".fa,.fasta,.fas,.txt" style="display:none;">
+                  <input type="file" class="insert-file" accept=".fa,.fasta,.fas,.txt,.gb,.gbk,.gbff,.genbank" style="display:none;">
                   <button type="button" class="btn demo insert-flip-btn">Reverse complement</button>
                   <button class="btn demo insert-demo-btn" type="button" data-sample="insert">Demo</button>
                   <button class="ghost btn insert-upload-btn" type="button">Upload</button>
@@ -74,7 +73,27 @@
     </div>
 
     <div class="box" id="settings-box">
-      <h3>Restriction enzyme settings</h3>
+      <h3>Assembly settings</h3>
+      <div class="assembly-preset-toolbar">
+        <div class="assembly-preset-main">
+          <label class="aside" for="assembly-preset-select" style="display:flex;align-items:center;gap:6px;">
+            <span>Parameter preset</span>
+            <span class="help-icon">
+              <span>?</span>
+              <span class="help-tooltip">
+                Save commonly used assembly settings in this browser. Select a preset to reuse it, or set one as the startup default for next time.
+              </span>
+            </span>
+          </label>
+          <select id="assembly-preset-select" class="assembly-preset-select"></select>
+        </div>
+        <div class="assembly-preset-actions">
+          <button class="btn demo assembly-preset-save" type="button">Save as New</button>
+          <button class="btn demo assembly-preset-update" type="button">Update</button>
+          <button class="btn ghost assembly-preset-delete" type="button">Delete</button>
+          <button class="btn assembly-preset-set-default" type="button">Set as Startup Default</button>
+        </div>
+      </div>
       <div class="grid cols-2" style="margin-top:8px;gap:12px">
         <div>
           <label class="aside">Restriction enzyme 1</label>

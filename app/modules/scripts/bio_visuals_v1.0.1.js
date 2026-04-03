@@ -639,6 +639,7 @@ function keepFirstFastaRecord(raw) {
 
 /**
  * Guard a design action against multiple FASTA headers per input field.
+ * MW-20: Only one FASTA record is allowed per input field.
  * If multiple headers are detected, shows MW modal:
  * - Cancel: return to input fields (no changes)
  * - OK: keep only the first FASTA record per offending field, then calls onProceed
@@ -653,9 +654,12 @@ export function guardSingleFastaPerField(container, elements, onProceed) {
   const offenders = els.filter(el => countFastaHeaders(el.value) > 1);
   if (!offenders.length) return false;
 
-  const msg = 'Only one sequence is allowed per input field; if multiple FASTA headers are detected, only the first sequence will be used.';
+  const warning = {
+    id: 'MW-20',
+    message: 'Only one sequence is allowed per input field; if multiple FASTA headers are detected, only the first sequence will be used.'
+  };
   const host = container || document.body;
-  showMWModal(host, msg, () => {
+  showMWWarnings(host, [warning], () => {
     offenders.forEach((el) => {
       el.value = keepFirstFastaRecord(el.value);
       try { el.dispatchEvent(new Event('input', { bubbles: true })); } catch {}
@@ -666,6 +670,40 @@ export function guardSingleFastaPerField(container, elements, onProceed) {
     try { offenders[0]?.focus?.(); } catch {}
   });
 
+  return true;
+}
+
+/**
+ * Guard a file upload against the shared 1 MB import limit.
+ * MW-22: Uploaded file exceeds the browser-side import limit.
+ *
+ * @param {HTMLElement} container
+ * @param {File|null|undefined} file
+ * @param {HTMLInputElement|null|undefined} inputEl
+ * @param {Object} options
+ * @param {number} options.maxSizeBytes
+ * @returns {boolean} true if upload is blocked, false otherwise
+ */
+export function guardFileUploadSize(container, file, inputEl, options = {}) {
+  const maxSizeBytes = Number.isFinite(options.maxSizeBytes) ? options.maxSizeBytes : 1024 * 1024;
+  if (!file || file.size <= maxSizeBytes) return false;
+
+  const host = container || document.body;
+  const close = () => {
+    try {
+      if (inputEl) inputEl.value = '';
+    } catch {}
+    try { inputEl?.focus?.(); } catch {}
+  };
+
+  const limitMb = (maxSizeBytes / 1024 / 1024).toFixed(0);
+  const sizeMb = (file.size / 1024 / 1024).toFixed(2);
+  showMWModal(
+    host,
+    `Uploaded file exceeds the ${limitMb} MB import limit and will not be loaded.\n\nCurrent file size: ${sizeMb} MB\n\nPlease choose a smaller file.`,
+    close,
+    close
+  );
   return true;
 }
 

@@ -7,13 +7,13 @@
           <span>?</span>
           <span class="help-tooltip">
             <strong style="display:block;margin-bottom:6px;">Vector sequence input</strong>
-            Paste your vector/plasmid DNA sequence in FASTA format (header optional). Line breaks and spaces are ignored. Use Upload or Reverse complement as needed.
+            <strong>Formats:</strong> FASTA (optional <code>&gt;</code>), plain DNA, or GenBank (<code>.gb</code>, <code>.gbk</code>, <code>.gbff</code>, <code>.genbank</code>) with <code>LOCUS</code> and <code>ORIGIN</code>. The <strong>LOCUS</strong> name is used as the short sequence name. <strong>Upload</strong> without a header uses the <strong>file name</strong> (no extension) as <code>&gt;</code>name. SnapGene <code>.dna</code> is binary—export as GenBank or FASTA first. Whitespace ignored. Use Upload or Reverse complement as needed.
           </span>
         </span>
       </label>
-      <textarea id="gg-vector" placeholder=">>pSEV2&#10;TTGAGATCCT..." style="min-height:220px"></textarea>
+      <textarea id="gg-vector" placeholder=">pSE_multi_AmpR&#10;tgtacGTGGTCTCGTCTTC" style="min-height:220px"></textarea>
       <div class="row end" id="left-upload-row">
-        <input type="file" id="file-vector" accept=".fa,.fasta,.fas,.txt" style="display:none">
+        <input type="file" id="file-vector" accept=".fa,.fasta,.fas,.txt,.gb,.gbk,.gbff,.genbank" style="display:none">
           <button class="btn demo" id="btn-vector-rc" type="button">Reverse complement</button>
           <button class="btn demo" id="btn-vector-demo" type="button">Demo</button>
           <button class="ghost btn" id="btn-vector-upload" type="button">Upload</button>
@@ -22,12 +22,12 @@
     <div id="right-panel">
       <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom: 8px;">
         <label style="display:flex;align-items:center;gap:8px; margin:0">
-          <strong>Assembly plan (FASTA)</strong>
-          <span class="help-icon" tabindex="0" aria-label="Help: Assembly plan">
+          <strong>Insert sequence (FASTA)</strong>
+          <span class="help-icon" tabindex="0" aria-label="Help: Insert sequence">
             <span>?</span>
             <span class="help-tooltip">
               <strong style="display:block;margin-bottom:6px;">Insert sequences</strong>
-              Add insert fragments in order (FASTA supported). The tool designs primers and overhangs for Golden Gate assembly using the selected Type IIS enzyme.
+              Same formats as vector (FASTA, plain DNA, GenBank <code>.gb</code>/<code>.gbk</code>/<code>.gbff</code>/<code>.genbank</code>; file name as header when missing). Add fragments in order. The tool designs Type IIS primers and 4-bp overhangs for Golden Gate with the selected enzyme.
             </span>
           </span>
         </label>
@@ -45,10 +45,18 @@
         <div class="frag-row" data-frag-id="0">
           <div class="frag-label">Insert #1</div>
           <div class="frag-body">
+            <div class="frag-overlap frag-overlap-top" style="margin-bottom:6px;">
+              <label class="aside frag-left-overhang-label">Left overhang (auto from vector, 4 bp)</label>
+              <input class="frag-left-overhang" type="text" spellcheck="false" autocomplete="off" maxlength="4" placeholder="Auto" readonly style="max-width:200px;font-family:'Courier New',monospace;background:#f8fafc;">
+            </div>
             <textarea class="frag-seq" placeholder=">insert&#10;ATG..." style="min-height:100px"></textarea>
+            <div class="frag-overlap frag-overlap-bottom" style="margin-top:6px;">
+              <label class="aside frag-right-overhang-label">Right overhang (effective, 4 bp)</label>
+              <input class="frag-right-overhang" type="text" spellcheck="false" autocomplete="off" maxlength="4" placeholder="Auto" readonly style="max-width:200px;font-family:'Courier New',monospace;background:#f8fafc;">
+            </div>
             <div class="frag-tools" style="display: flex; flex-direction: column; margin-top: 6px;">
               <div class="row end">
-                <input type="file" class="file-frag" accept=".fa,.fasta,.fas,.txt" style="display:none">
+                <input type="file" class="file-frag" accept=".fa,.fasta,.fas,.txt,.gb,.gbk,.gbff,.genbank" style="display:none">
                 <button class="btn demo btn-frag-flip" type="button" title="Reverse-complement this insert">Reverse complement</button>
                 <button class="btn demo btn-frag-demo" type="button">Demo</button>
                 <button class="ghost btn btn-frag-upload" type="button">Upload</button>
@@ -87,6 +95,26 @@
     </div>
     <div class="box" id="gg-settings-box">
       <h3>Assembly settings</h3>
+      <div class="assembly-preset-toolbar">
+        <div class="assembly-preset-main">
+          <label class="aside" for="assembly-preset-select" style="display:flex;align-items:center;gap:6px;">
+            <span>Parameter preset</span>
+            <span class="help-icon">
+              <span>?</span>
+              <span class="help-tooltip">
+                Save commonly used assembly settings in this browser. Select a preset to reuse it, or set one as the startup default for next time.
+              </span>
+            </span>
+          </label>
+          <select id="assembly-preset-select" class="assembly-preset-select"></select>
+        </div>
+        <div class="assembly-preset-actions">
+          <button class="btn demo assembly-preset-save" type="button">Save as New</button>
+          <button class="btn demo assembly-preset-update" type="button">Update</button>
+          <button class="btn ghost assembly-preset-delete" type="button">Delete</button>
+          <button class="btn assembly-preset-set-default" type="button">Set as Startup Default</button>
+        </div>
+      </div>
       <!-- Enzyme selection row -->
       <div class="grid cols-2" style="margin-top:8px;gap:12px">
         <div>

@@ -75,6 +75,15 @@ export async function initModule(moduleName, moduleContentEl) {
   kickoffCommonFeaturesLoadIfNeeded(moduleName);
 
   switch (moduleName) {
+    case 'workspace': {
+      const mod = await import('./modules/scripts/integrated_workspace_v1.0.1.js').catch(() => null);
+      if (mod && typeof mod.initIntegratedWorkspace === 'function') {
+        mod.initIntegratedWorkspace(moduleContentEl);
+      } else if (window.initIntegratedWorkspace) {
+        window.initIntegratedWorkspace(moduleContentEl);
+      }
+      return;
+    }
     case 'golden-gate': {
       await loadModuleScriptOnce('./modules/scripts/golden_gate_v1.0.1.js').catch(() => {});
       if (window.initGoldenGate) window.initGoldenGate(moduleContentEl);
@@ -87,7 +96,7 @@ export async function initModule(moduleName, moduleContentEl) {
     }
     case 'user': {
       await loadModuleScriptOnce('./modules/scripts/user_cloning_v1.0.1.js').catch(() => {});
-      if (window.initUSERModule) window.initUSERModule();
+      if (window.initUSERModule) window.initUSERModule(moduleContentEl);
       return;
     }
     case 'overlap-pcr': {

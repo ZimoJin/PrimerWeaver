@@ -42,9 +42,11 @@ const geneticCode = {
 
 export function cleanDNA(seq) {
   if (!seq) return '';
-  const lines = String(seq).split(/\r?\n/);
-  const dnaLines = lines.filter(line => !line.trim().startsWith('>'));
-  return Core.normalizeSeq(dnaLines.join(''));
+  const records = Core.parseFASTA(String(seq));
+  if (records.length) {
+    return Core.normalizeSeq(records[0].seq || '');
+  }
+  return Core.normalizeSeq(String(seq));
 }
 
 // Extract FASTA header (sequence name) from input
@@ -3423,6 +3425,15 @@ function updateDNAPreview(rowNum) {
 
 async function onDesignClickDNAMode() {
   console.log('onDesignClickDNAMode called');
+  const container = document.getElementById('module-content') || document.body;
+  const templateEl = $('template-seq');
+  if (VIZ && typeof VIZ.guardSingleFastaPerField === 'function') {
+    const shown = VIZ.guardSingleFastaPerField(container, [templateEl], () => {
+      window.setTimeout(() => { onDesignClickDNAMode(); }, 0);
+    });
+    if (shown) return;
+  }
+
   const rawTemplate = $('template-seq').value;
   console.log('Raw template length:', rawTemplate ? rawTemplate.length : 0);
   let template = cleanDNA(rawTemplate);
@@ -3459,7 +3470,8 @@ async function onDesignClickDNAMode() {
   addOverlapWarnings(warnings, userFOverlap, 'DNA-F', 15, 40);
   addOverlapWarnings(warnings, userROverlap, 'DNA-R', 15, 40);
   if (VIZ && VIZ.validatePerformance) {
-    warnings.push(...VIZ.validatePerformance(edits.length, template.length));
+    const totalBp = stripFASTAHeaders(rawTemplate).length;
+    warnings.push(...VIZ.validatePerformance(edits.length, totalBp));
   }
   const okMW = await confirmMWWarnings(warnings);
   if (!okMW) return;
@@ -4101,21 +4113,15 @@ export function initMutagenesisModule(container) {
     fileInput.addEventListener('change', (event) => {
       const file = event.target.files[0];
       if (!file) return;
-      
-      // Check file size (limit to 1MB)
-      const maxSize = 1024 * 1024; // 1MB
-      if (file.size > maxSize) {
-        alert(`File size exceeds the limit of 1MB. Please upload a smaller file.\n\nCurrent file size: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
-        event.target.value = ''; // Clear the file input
-        return;
-      }
+      const container = document.getElementById('module-content') || document.body;
+      if (VIZ && typeof VIZ.guardFileUploadSize === 'function' && VIZ.guardFileUploadSize(container, file, event.target)) return;
       
       const reader = new FileReader();
       reader.onload = function(e) {
         const content = e.target.result;
         const templateTextarea = $('template-seq');
         if (templateTextarea) {
-          templateTextarea.value = content;
+          templateTextarea.value = Core.formatSequenceUploadText(content, { genbankMode: 'sequence', fileBaseName: file.name });
           // Trigger input event to detect ORFs
           templateTextarea.dispatchEvent(new Event('input', { bubbles: true }));
         }
@@ -4123,7 +4129,7 @@ export function initMutagenesisModule(container) {
       reader.onerror = function() {
         alert('Failed to read file, please try again.');
       };
-      reader.readAsText(file);
+      reader.readAsText(file, 'UTF-8');
       
       // Clear the file input so the same file can be selected again
       event.target.value = '';

@@ -24,6 +24,19 @@ const NN = {
 const LOOP_PENALTY = { 3: 5.7, 4: 5.6, 5: 4.9, 6: 4.4, 7: 4.5, 8: 4.6, 9: 4.6 };
 
 const Rgas = 1.987; // cal/(mol*K)
+const QC_PRESET_STORAGE_KEY = "primerweaver_qc_presets_v1";
+const QC_DEFAULT_PRESET_KEY = "primerweaver_qc_default_preset_id_v1";
+const QC_SYSTEM_DEFAULT_PRESET = Object.freeze({
+  id: "system-default",
+  name: "System Default",
+  values: Object.freeze({
+    na: 50,
+    mg: 2.0,
+    conc: 500,
+    tmTarget: 55
+  })
+});
+const QC_PRESET_FIELDS = ["na", "mg", "conc", "tmTarget"];
 
 // --- HELPERS ---
 
@@ -1406,11 +1419,577 @@ function showQCWarningModal(container, message, onConfirm, onCancel) {
   document.addEventListener('keydown', handleEscape);
 }
 
+function guardQCFileUploadSize(container, file, inputEl, maxSizeBytes = 1024 * 1024) {
+  if (!file || file.size <= maxSizeBytes) return false;
+  const close = () => {
+    try {
+      if (inputEl) inputEl.value = '';
+    } catch {}
+    try { inputEl?.focus?.(); } catch {}
+  };
+  const sizeMb = (file.size / 1024 / 1024).toFixed(2);
+  showQCWarningModal(
+    container,
+    `Uploaded file exceeds the 1 MB import limit and will not be loaded.\n\nCurrent file size: ${sizeMb} MB\n\nPlease choose a smaller file.`,
+    close,
+    close
+  );
+  return true;
+}
+
+function ensureQCPresetModal(container) {
+  let modal = container.querySelector('#qc-preset-modal');
+  if (modal) return modal;
+
+  const style = document.createElement('style');
+  style.textContent = `
+    #qc-preset-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1000001;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .qc-preset-modal-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+    }
+    .qc-preset-modal-content {
+      position: relative;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      animation: qcPresetModalSlideIn 0.3s ease-out;
+    }
+    @keyframes qcPresetModalSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    .qc-preset-modal-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 20px 24px;
+      background: #fff7ed;
+      border-bottom: 1px solid #fde68a;
+    }
+    .qc-preset-modal-icon {
+      font-size: 1.5rem;
+      line-height: 1;
+    }
+    .qc-preset-modal-header h3 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: #92400e;
+      font-weight: 600;
+    }
+    .qc-preset-modal-body {
+      padding: 24px;
+      flex: 1;
+      overflow-y: auto;
+    }
+    .qc-preset-modal-body p {
+      margin: 0 0 14px 0;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #374151;
+      white-space: pre-line;
+    }
+    .qc-preset-modal-input {
+      width: 100%;
+      min-height: 40px;
+      padding: 8px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font: inherit;
+      color: #111827;
+      background: #ffffff;
+      box-sizing: border-box;
+    }
+    .qc-preset-modal-input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+    .qc-preset-modal-error {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: #b91c1c;
+      min-height: 1.2em;
+    }
+    .qc-preset-modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      background: #f9fafb;
+    }
+    .qc-preset-modal-footer .btn {
+      min-width: 80px;
+    }
+    .qc-preset-modal-footer .btn.ghost {
+      background: #e5e7eb;
+      color: #374151;
+    }
+    .qc-preset-modal-footer .btn.ghost:hover {
+      background: #d1d5db;
+    }
+    .qc-preset-modal-footer .btn:not(.ghost) {
+      background: #3b82f6;
+      color: white;
+    }
+    .qc-preset-modal-footer .btn:not(.ghost):hover {
+      background: #2563eb;
+    }
+  `;
+  document.head.appendChild(style);
+
+  modal = document.createElement('div');
+  modal.id = 'qc-preset-modal';
+  modal.style.display = 'none';
+  modal.innerHTML =
+    '<div class="qc-preset-modal-overlay"></div>' +
+    '<div class="qc-preset-modal-content">' +
+      '<div class="qc-preset-modal-header">' +
+        '<span class="qc-preset-modal-icon">⚠️</span>' +
+        '<h3 id="qc-preset-modal-title">Preset</h3>' +
+      '</div>' +
+      '<div class="qc-preset-modal-body">' +
+        '<p id="qc-preset-modal-message"></p>' +
+        '<input id="qc-preset-modal-input" class="qc-preset-modal-input" type="text" style="display:none">' +
+        '<div id="qc-preset-modal-error" class="qc-preset-modal-error"></div>' +
+      '</div>' +
+      '<div class="qc-preset-modal-footer">' +
+        '<button id="qc-preset-modal-cancel" class="btn ghost" type="button">Cancel</button>' +
+        '<button id="qc-preset-modal-confirm" class="btn" type="button">OK</button>' +
+      '</div>' +
+    '</div>';
+
+  const parent = container || document.body;
+  parent.appendChild(modal);
+  return modal;
+}
+
+function showQCPresetDialog(container, options) {
+  const modal = ensureQCPresetModal(container);
+  const opts = options || {};
+  const mode = opts.mode === 'input' ? 'input' : 'confirm';
+  const titleEl = modal.querySelector('#qc-preset-modal-title');
+  const messageEl = modal.querySelector('#qc-preset-modal-message');
+  const inputEl = modal.querySelector('#qc-preset-modal-input');
+  const errorEl = modal.querySelector('#qc-preset-modal-error');
+  const confirmBtn = modal.querySelector('#qc-preset-modal-confirm');
+  const cancelBtn = modal.querySelector('#qc-preset-modal-cancel');
+  const overlay = modal.querySelector('.qc-preset-modal-overlay');
+  const iconEl = modal.querySelector('.qc-preset-modal-icon');
+
+  if (titleEl) titleEl.textContent = String(opts.title || 'Preset');
+  if (messageEl) messageEl.textContent = String(opts.message || '');
+  if (iconEl) iconEl.textContent = mode === 'input' ? '📝' : '⚠️';
+  if (confirmBtn) confirmBtn.textContent = String(opts.confirmText || 'OK');
+  if (cancelBtn) cancelBtn.textContent = String(opts.cancelText || 'Cancel');
+  if (errorEl) errorEl.textContent = '';
+
+  if (inputEl) {
+    if (mode === 'input') {
+      inputEl.style.display = 'block';
+      inputEl.value = String(opts.defaultValue || '');
+      inputEl.placeholder = String(opts.placeholder || '');
+    } else {
+      inputEl.style.display = 'none';
+      inputEl.value = '';
+      inputEl.placeholder = '';
+    }
+  }
+
+  modal.style.display = 'flex';
+
+  const handleEscape = (e) => {
+    if (e.key === 'Escape' && modal.style.display !== 'none') {
+      handleCancel();
+    } else if (e.key === 'Enter' && mode === 'input' && document.activeElement === inputEl) {
+      handleConfirm();
+    }
+  };
+
+  const closeModal = () => {
+    modal.style.display = 'none';
+    document.removeEventListener('keydown', handleEscape);
+  };
+
+  const handleConfirm = () => {
+    if (mode === 'input') {
+      const value = inputEl ? inputEl.value : '';
+      const validationMessage = typeof opts.validate === 'function' ? opts.validate(value) : '';
+      if (validationMessage) {
+        if (errorEl) errorEl.textContent = validationMessage;
+        if (inputEl) inputEl.focus();
+        return;
+      }
+      closeModal();
+      if (typeof opts.onConfirm === 'function') opts.onConfirm(value);
+      return;
+    }
+
+    closeModal();
+    if (typeof opts.onConfirm === 'function') opts.onConfirm();
+  };
+
+  const handleCancel = () => {
+    closeModal();
+    if (typeof opts.onCancel === 'function') opts.onCancel();
+  };
+
+  const newConfirmBtn = confirmBtn.cloneNode(true);
+  const newCancelBtn = cancelBtn.cloneNode(true);
+  confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+  cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+
+  newConfirmBtn.onclick = handleConfirm;
+  newCancelBtn.onclick = handleCancel;
+  if (overlay) overlay.onclick = handleCancel;
+  document.addEventListener('keydown', handleEscape);
+
+  if (mode === 'input' && inputEl) {
+    setTimeout(() => {
+      inputEl.focus();
+      inputEl.select();
+    }, 0);
+  }
+}
+
+function isQCLocalStorageAvailable() {
+  try {
+    if (typeof window === "undefined" || !window.localStorage) return false;
+    const probeKey = "__primerweaver_qc_probe__";
+    window.localStorage.setItem(probeKey, "1");
+    window.localStorage.removeItem(probeKey);
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
+function sanitizeQCPresetValues(values) {
+  const source = values || {};
+  const fallback = QC_SYSTEM_DEFAULT_PRESET.values;
+  const na = parseFloat(source.na);
+  const mg = parseFloat(source.mg);
+  const conc = parseFloat(source.conc);
+  const tmTarget = parseFloat(source.tmTarget);
+
+  return {
+    na: isFinite(na) ? na : fallback.na,
+    mg: isFinite(mg) ? mg : fallback.mg,
+    conc: isFinite(conc) ? conc : fallback.conc,
+    tmTarget: isFinite(tmTarget) ? tmTarget : fallback.tmTarget
+  };
+}
+
+function createQCPresetSnapshot(preset) {
+  const source = preset || {};
+  return {
+    id: String(source.id || QC_SYSTEM_DEFAULT_PRESET.id),
+    name: String(source.name || QC_SYSTEM_DEFAULT_PRESET.name),
+    values: sanitizeQCPresetValues(source.values)
+  };
+}
+
+function readQCUserPresets() {
+  if (!isQCLocalStorageAvailable()) return [];
+
+  try {
+    const raw = window.localStorage.getItem(QC_PRESET_STORAGE_KEY);
+    if (!raw) return [];
+
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed
+      .map((item, index) => {
+        if (!item || typeof item !== "object") return null;
+        const id = String(item.id || ("qc-user-preset-" + (index + 1)));
+        if (id === QC_SYSTEM_DEFAULT_PRESET.id) return null;
+
+        return {
+          id: id,
+          name: String(item.name || ("Preset " + (index + 1))),
+          values: sanitizeQCPresetValues(item.values)
+        };
+      })
+      .filter(Boolean);
+  } catch (err) {
+    return [];
+  }
+}
+
+function writeQCUserPresets(presets) {
+  if (!isQCLocalStorageAvailable()) return false;
+
+  try {
+    const safePresets = Array.isArray(presets)
+      ? presets
+          .filter(preset => preset && preset.id && preset.id !== QC_SYSTEM_DEFAULT_PRESET.id)
+          .map(createQCPresetSnapshot)
+      : [];
+    window.localStorage.setItem(QC_PRESET_STORAGE_KEY, JSON.stringify(safePresets));
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
+function readQCStartupPresetId() {
+  if (!isQCLocalStorageAvailable()) return QC_SYSTEM_DEFAULT_PRESET.id;
+
+  try {
+    const raw = window.localStorage.getItem(QC_DEFAULT_PRESET_KEY);
+    return raw ? String(raw) : QC_SYSTEM_DEFAULT_PRESET.id;
+  } catch (err) {
+    return QC_SYSTEM_DEFAULT_PRESET.id;
+  }
+}
+
+function writeQCStartupPresetId(presetId) {
+  if (!isQCLocalStorageAvailable()) return false;
+
+  try {
+    window.localStorage.setItem(QC_DEFAULT_PRESET_KEY, String(presetId || QC_SYSTEM_DEFAULT_PRESET.id));
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
+function getAllQCPresets() {
+  return [createQCPresetSnapshot(QC_SYSTEM_DEFAULT_PRESET)].concat(readQCUserPresets());
+}
+
+function getQCPresetById(presetId) {
+  const targetId = String(presetId || "");
+  const presets = getAllQCPresets();
+  for (let i = 0; i < presets.length; i++) {
+    if (presets[i].id === targetId) return presets[i];
+  }
+  return null;
+}
+
+function getResolvedQCStartupPreset() {
+  const presetId = readQCStartupPresetId();
+  const preset = getQCPresetById(presetId);
+  if (preset) return preset;
+
+  writeQCStartupPresetId(QC_SYSTEM_DEFAULT_PRESET.id);
+  return createQCPresetSnapshot(QC_SYSTEM_DEFAULT_PRESET);
+}
+
+function collectQCPresetValues(container) {
+  const getFieldValue = (fieldId) => {
+    const input = container.querySelector("#" + fieldId);
+    return input ? input.value : QC_SYSTEM_DEFAULT_PRESET.values[fieldId];
+  };
+
+  return sanitizeQCPresetValues({
+    na: getFieldValue("na"),
+    mg: getFieldValue("mg"),
+    conc: getFieldValue("conc"),
+    tmTarget: getFieldValue("tmTarget")
+  });
+}
+
+function applyQCPresetValues(container, values) {
+  const safeValues = sanitizeQCPresetValues(values);
+  QC_PRESET_FIELDS.forEach((fieldId) => {
+    const input = container.querySelector("#" + fieldId);
+    if (!input) return;
+    input.value = String(safeValues[fieldId]);
+  });
+}
+
+function updateQCPresetStatus(container, activePresetId, message) {
+  const statusEl = container.querySelector("#qc-preset-status");
+  if (!statusEl) return;
+
+  if (!isQCLocalStorageAvailable()) {
+    statusEl.textContent = "Custom presets are unavailable because browser local storage is not available.";
+    return;
+  }
+
+  statusEl.textContent = "Saved presets are stored in this browser. Select a preset to load its values, then use Set as Startup Default if you want it to open automatically next time.";
+}
+
+function renderQCPresetOptions(container, selectedPresetId, message) {
+  const select = container.querySelector("#qc-preset-select");
+  if (!select) return;
+
+  const presets = getAllQCPresets();
+  const availableIds = presets.map(preset => preset.id);
+  const resolvedId = availableIds.includes(selectedPresetId)
+    ? selectedPresetId
+    : getResolvedQCStartupPreset().id;
+
+  select.innerHTML = presets
+    .map(preset => '<option value="' + preset.id + '">' + preset.name + '</option>')
+    .join("");
+  select.value = resolvedId;
+
+  const updateBtn = container.querySelector("#qc-preset-update");
+  const deleteBtn = container.querySelector("#qc-preset-delete");
+  const isSystemPreset = resolvedId === QC_SYSTEM_DEFAULT_PRESET.id;
+  if (updateBtn) updateBtn.disabled = isSystemPreset;
+  if (deleteBtn) deleteBtn.disabled = isSystemPreset;
+
+  updateQCPresetStatus(container, resolvedId, message);
+}
+
+function buildQCUserPreset(name, values) {
+  return {
+    id: "qc-user-" + Date.now().toString(36) + "-" + Math.random().toString(16).slice(2, 8),
+    name: String(name || "").trim(),
+    values: sanitizeQCPresetValues(values)
+  };
+}
+
+function setupQCPresetControls(container) {
+  const startupPreset = getResolvedQCStartupPreset();
+  applyQCPresetValues(container, startupPreset.values);
+  renderQCPresetOptions(container, startupPreset.id);
+
+  const select = container.querySelector("#qc-preset-select");
+  const saveBtn = container.querySelector("#qc-preset-save");
+  const updateBtn = container.querySelector("#qc-preset-update");
+  const deleteBtn = container.querySelector("#qc-preset-delete");
+  const setDefaultBtn = container.querySelector("#qc-preset-set-default");
+
+  if (select) {
+    select.onchange = function () {
+      const preset = getQCPresetById(select.value) || getResolvedQCStartupPreset();
+      applyQCPresetValues(container, preset.values);
+      renderQCPresetOptions(container, preset.id);
+    };
+  }
+
+  if (saveBtn) {
+    saveBtn.onclick = function () {
+      if (!isQCLocalStorageAvailable()) {
+        renderQCPresetOptions(container, select ? select.value : startupPreset.id, "Unable to save: local storage is unavailable.");
+        return;
+      }
+
+      showQCPresetDialog(container, {
+        mode: 'input',
+        title: 'Save Parameter Preset',
+        message: 'Enter a name for this Primer QC parameter preset.',
+        placeholder: 'e.g. Standard Taq Buffer',
+        confirmText: 'Save',
+        validate: (value) => {
+          if (!String(value || '').trim()) return 'Please enter a preset name.';
+          return '';
+        },
+        onConfirm: (value) => {
+          const presetName = String(value || '').trim();
+          const presets = readQCUserPresets();
+          const newPreset = buildQCUserPreset(presetName, collectQCPresetValues(container));
+          presets.push(newPreset);
+          writeQCUserPresets(presets);
+          renderQCPresetOptions(container, newPreset.id, "Saved preset \"" + newPreset.name + "\".");
+        },
+        onCancel: () => {
+          renderQCPresetOptions(container, select ? select.value : startupPreset.id, "Save cancelled.");
+        }
+      });
+    };
+  }
+
+  if (updateBtn) {
+    updateBtn.onclick = function () {
+      const activeId = select ? select.value : QC_SYSTEM_DEFAULT_PRESET.id;
+      if (activeId === QC_SYSTEM_DEFAULT_PRESET.id) {
+        renderQCPresetOptions(container, activeId, "System Default cannot be overwritten. Use Save as New instead.");
+        return;
+      }
+
+      const presets = readQCUserPresets();
+      const nextPresets = presets.map((preset) => {
+        if (preset.id !== activeId) return preset;
+        return {
+          id: preset.id,
+          name: preset.name,
+          values: collectQCPresetValues(container)
+        };
+      });
+      writeQCUserPresets(nextPresets);
+      renderQCPresetOptions(container, activeId, "Updated the selected preset.");
+    };
+  }
+
+  if (deleteBtn) {
+    deleteBtn.onclick = function () {
+      const activeId = select ? select.value : QC_SYSTEM_DEFAULT_PRESET.id;
+      if (activeId === QC_SYSTEM_DEFAULT_PRESET.id) {
+        renderQCPresetOptions(container, activeId, "System Default cannot be deleted.");
+        return;
+      }
+
+      const activePreset = getQCPresetById(activeId);
+      showQCPresetDialog(container, {
+        title: 'Delete Parameter Preset',
+        message: 'Delete preset "' + (activePreset ? activePreset.name : activeId) + '"?',
+        confirmText: 'Delete',
+        onConfirm: () => {
+          const nextPresets = readQCUserPresets().filter((preset) => preset.id !== activeId);
+          writeQCUserPresets(nextPresets);
+          if (readQCStartupPresetId() === activeId) {
+            writeQCStartupPresetId(QC_SYSTEM_DEFAULT_PRESET.id);
+          }
+          applyQCPresetValues(container, QC_SYSTEM_DEFAULT_PRESET.values);
+          renderQCPresetOptions(container, QC_SYSTEM_DEFAULT_PRESET.id, "Deleted the preset and switched to System Default.");
+        },
+        onCancel: () => {
+          renderQCPresetOptions(container, activeId, "Delete cancelled.");
+        }
+      });
+    };
+  }
+
+  if (setDefaultBtn) {
+    setDefaultBtn.onclick = function () {
+      const activeId = select ? select.value : QC_SYSTEM_DEFAULT_PRESET.id;
+      writeQCStartupPresetId(activeId);
+      renderQCPresetOptions(container, activeId, "This preset will load automatically next time.");
+    };
+  }
+}
+
 function initQC_V4(container) {
   // Make sure container is set
   if (!container) {
     container = document.getElementById('module-content') || document.body;
   }
+
+  setupQCPresetControls(container);
   
   // Reset button
   const resetBtn = container.querySelector("#global-reset");
@@ -1521,6 +2100,7 @@ function initQC_V4(container) {
     fileFwd.addEventListener('change', (e) => {
       const f = e.target.files[0];
       if (!f) return;
+      if (guardQCFileUploadSize(container, f, e.target)) return;
       const r = new FileReader();
       r.onload = (ev) => {
         const fwd = container.querySelector("#fwd");
@@ -1549,6 +2129,7 @@ function initQC_V4(container) {
     fileRev.addEventListener('change', (e) => {
       const f = e.target.files[0];
       if (!f) return;
+      if (guardQCFileUploadSize(container, f, e.target)) return;
       const r = new FileReader();
       r.onload = (ev) => {
         const rev = container.querySelector("#rev");

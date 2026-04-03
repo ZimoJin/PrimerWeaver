@@ -8,6 +8,16 @@
 
 import * as Core from './core_v1.0.1.js';
 import * as VIZ from './bio_visuals_v1.0.1.js';
+import { setupAssemblyParameterPresets } from './assembly_parameter_presets_v1.0.1.js';
+
+let USER_ROOT = document;
+
+function scopedById(id) {
+  if (USER_ROOT && USER_ROOT.querySelector) {
+    return USER_ROOT.querySelector('#' + id) || document.getElementById(id);
+  }
+  return document.getElementById(id);
+}
 
 function ensureHelpIcon(labelEl, tooltipHtml, ariaLabel = 'Help') {
   if (!labelEl) return;
@@ -26,7 +36,7 @@ function ensureHelpIcon(labelEl, tooltipHtml, ariaLabel = 'Help') {
 }
 
 function attachHelpToInput(inputId, tooltipHtml, ariaLabel) {
-  const input = document.getElementById(inputId);
+  const input = scopedById(inputId);
   if (!input) return;
   const wrapper = input.parentElement;
   const label = wrapper?.querySelector?.('label');
@@ -34,7 +44,7 @@ function attachHelpToInput(inputId, tooltipHtml, ariaLabel) {
 }
 
 function attachHelpToTextarea(textareaId, tooltipHtml, ariaLabel) {
-  const textarea = document.getElementById(textareaId);
+  const textarea = scopedById(textareaId);
   if (!textarea) return;
   const wrapper = textarea.parentElement;
   const label = wrapper?.querySelector?.('label');
@@ -77,7 +87,7 @@ function drawUSERAssemblyFigure(insertCount, container) {
 // ==================== Utility Functions ====================
 
 function $(id) {
-  return document.getElementById(id);
+  return scopedById(id);
 }
 
 function parseFASTA(text) {
@@ -2291,12 +2301,14 @@ function initVectorUpload() {
   $('vector-file').addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    const container = document.getElementById('module-content') || document.body;
+    if (VIZ && typeof VIZ.guardFileUploadSize === 'function' && VIZ.guardFileUploadSize(container, file, e.target)) return;
     const reader = new FileReader();
     reader.onload = (event) => {
-      $('vector-seq').value = event.target.result;
+      $('vector-seq').value = Core.formatSequenceUploadText(event.target.result, { genbankMode: 'sequence', fileBaseName: file.name });
       updateVectorPreview();
     };
-    reader.readAsText(file);
+    reader.readAsText(file, 'UTF-8');
   });
   
   $('vector-flip-btn').addEventListener('click', () => {
@@ -2440,7 +2452,7 @@ function initInsertUpload() {
           <textarea class="insert-seq" placeholder=">insert${insertCount}&#10;ATGCGTAGCTA..."></textarea>
           <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 6px;">
             <div class="row end" style="gap: 6px;">
-              <input type="file" class="insert-file" accept=".fa,.fasta,.fas,.txt" style="display: none;">
+              <input type="file" class="insert-file" accept=".fa,.fasta,.fas,.txt,.gb,.gbk,.gbff,.genbank" style="display: none;">
               <button class="btn demo xs insert-flip-btn" type="button">Reverse complement</button>
               <button class="btn demo xs insert-demo-btn" type="button">Demo</button>
               <button class="ghost btn xs insert-upload-btn" type="button">Upload</button>
@@ -2496,12 +2508,14 @@ function setupInsertRowListeners(row) {
     fileInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (!file) return;
+      const container = document.getElementById('module-content') || document.body;
+      if (VIZ && typeof VIZ.guardFileUploadSize === 'function' && VIZ.guardFileUploadSize(container, file, e.target)) return;
       const reader = new FileReader();
       reader.onload = (event) => {
         const textarea = row.querySelector('.insert-seq');
-        if (textarea) textarea.value = event.target.result;
+        if (textarea) textarea.value = Core.formatSequenceUploadText(event.target.result, { genbankMode: 'sequence', fileBaseName: file.name });
       };
-      reader.readAsText(file);
+      reader.readAsText(file, 'UTF-8');
     });
   }
   
@@ -2671,12 +2685,12 @@ function validateUPrimerPattern(primer, opts = {}) {
   if (!prefix || !core) {
     return { ok: false, reason: 'Primer must be 5\' overlap-U-core 3\'' };
   }
-  // Enforce 5' A N{6-13} U 3' rule: first base must be A, overlap length 6-13
+  // Enforce 5' A N{4-13} U 3' rule: first base must be A, overlap length 4-13
   if (prefix[0] !== 'A') {
     return { ok: false, reason: 'Overlap must start with A (5\' A...)' };
   }
-  if (prefix.length < 6 || prefix.length > 13) {
-    return { ok: false, reason: 'Overlap length must be between 6 and 13 bp before U' };
+  if (prefix.length < 4 || prefix.length > 13) {
+    return { ok: false, reason: 'Overlap length must be between 4 and 13 bp before U' };
   }
   // Basic nucleotide check around U (prefix last base and core first base) must be DNA IUPAC
   const preBase = prefix.slice(-1);
@@ -2922,7 +2936,7 @@ function showConfirmModal(message, onConfirm, onCancel) {
 
 function initDesignButton() {
   $('design-btn').addEventListener('click', () => {
-    const container = document.getElementById('module-content') || document.body;
+    const container = (USER_ROOT && USER_ROOT.querySelector && USER_ROOT.querySelector('#module-content')) || document.getElementById('module-content') || USER_ROOT || document.body;
     const seqEls = [
       $('vector-seq'),
       ...Array.from(document.querySelectorAll('#inserts-container .insert-seq'))
@@ -2984,7 +2998,7 @@ function initDesignButton() {
             const msg = 'USER Primer format error:\n' +
               (!fCheck.ok ? `Forward: ${fCheck.reason}\n` : '') +
               (!rCheck.ok ? `Reverse: ${rCheck.reason}\n` : '') +
-              '\nPrimers must follow 5\' A N{6-13} U core 3\' rule.\n' +
+              '\nPrimers must follow 5\' A N{4-13} U core 3\' rule.\n' +
               'Return or Cancel to modify primers.';
             if (VIZ && VIZ.showMWModal) {
               VIZ.showMWModal(container, msg, () => {}, () => {});
@@ -3395,7 +3409,7 @@ function renderGel(results, vector, inserts) {
 }
 
 function showWarning(message) {
-  const host = document.getElementById('module-content') || document.body;
+  const host = (USER_ROOT && USER_ROOT.querySelector && USER_ROOT.querySelector('#module-content')) || document.getElementById('module-content') || USER_ROOT || document.body;
   if (VIZ && typeof VIZ.showMWModal === 'function') {
     VIZ.showMWModal(host, message || '', () => {}, () => {});
     return;
@@ -3413,10 +3427,28 @@ function showError(message) {
 
 // ==================== Initialize ====================
 
-function initUSERModule() {
+function initUSERModule(container) {
+  USER_ROOT = container && container.querySelector ? container : document;
+
+  setupAssemblyParameterPresets(USER_ROOT, {
+    scope: 'user-assembly',
+    label: 'USER cloning settings',
+    placeholder: 'e.g. Standard USER cloning',
+    fields: [
+      { key: 'pcrForward', selector: '#pcr-forward', defaultValue: '' },
+      { key: 'pcrReverse', selector: '#pcr-reverse', defaultValue: '' },
+      { key: 'targetTm', selector: '#target-tm', defaultValue: '55' },
+      { key: 'overlapTm', selector: '#overlap-tm', defaultValue: '10' },
+      { key: 'overlapLen', selector: '#overlap-len', defaultValue: '9' },
+      { key: 'primerConc', selector: '#primer-conc', defaultValue: '500' },
+      { key: 'naConc', selector: '#na-conc', defaultValue: '50' },
+      { key: 'mgConc', selector: '#mg-conc', defaultValue: '2.0' }
+    ]
+  });
+
   // Add inline help tooltips (page-level)
-  attachHelpToTextarea('vector-seq', "Paste your vector/plasmid DNA sequence in FASTA format (header optional). Line breaks and spaces are ignored.", 'Help: Vector sequence');
-  ensureHelpIcon(document.querySelector('#right-panel > label'), "Add insert fragments in order (FASTA supported). USER cloning uses a dU site to create complementary sticky ends between vector and inserts.", 'Help: Assembly plan');
+  attachHelpToTextarea('vector-seq', "<strong style=\"display:block;margin-bottom:6px;\">Vector sequence</strong><strong>Formats:</strong> FASTA (optional &gt;), plain DNA, or GenBank (.gb, .gbk, .gbff, .genbank) with LOCUS and ORIGIN. <strong>LOCUS</strong> is the short name. Upload without a header uses the <strong>file name</strong> (no extension) as &gt;name. SnapGene .dna is binary—export as GenBank or FASTA first. Whitespace ignored.", 'Help: Vector sequence');
+  ensureHelpIcon((USER_ROOT.querySelector && USER_ROOT.querySelector('#right-panel > label')) || document.querySelector('#right-panel > label'), "Add insert fragments in order (FASTA supported). USER cloning uses a dU site to create complementary sticky ends between vector and inserts.", 'Help: Assembly plan');
   attachHelpToInput('pcr-forward', "Vector PCR forward primer sequence (5'→3'). If it contains U, format is typically overlap + U + core.", 'Help: Vector PCR forward primer');
   attachHelpToInput('pcr-reverse', "Vector PCR reverse primer sequence (5'→3'). If it contains U, format is typically overlap + U + core.", 'Help: Vector PCR reverse primer');
   attachHelpToInput('target-tm', "Target melting temperature for the core (annealing) region of primers.", 'Help: Target core Tm');
@@ -3436,6 +3468,15 @@ function initUSERModule() {
   updateVectorPreview();
   updateInsertControls();
   updateAddInsertButton();
+
+  if (USER_ROOT && typeof USER_ROOT === 'object') {
+    USER_ROOT.__workspaceRefresh = () => {
+      try { updateVectorPreview(); } catch (e) {}
+      setTimeout(() => {
+        try { updateVectorPreview(); } catch (e) {}
+      }, 80);
+    };
+  }
 }
 
 // Export for dynamic loading

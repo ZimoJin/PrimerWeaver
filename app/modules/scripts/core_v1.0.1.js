@@ -148,6 +148,146 @@ export function splitHeaderAndSeqBlock(lines) {
   return { header, seq };
 }
 
+export function isLikelyGenBank(raw = "") {
+  const text = String(raw || "");
+  // Case-insensitive: some exports use different casing; require both LOCUS and ORIGIN blocks
+  return /^\s*LOCUS\b/im.test(text) && /^\s*ORIGIN\b/im.test(text);
+}
+
+export function parseGenBank(raw = "") {
+  const text = String(raw || "").trim();
+  if (!text) return [];
+  if (!isLikelyGenBank(text)) return [];
+
+  const blocks = text.split(/^\s*\/\/\s*$/m);
+  const records = [];
+
+  blocks.forEach((block, index) => {
+    const source = String(block || "").trim();
+    if (!source) return;
+
+    const lines = source.split(/\r?\n/);
+    let locus = "";
+    let definition = "";
+    let collectingDefinition = false;
+    let collectingOrigin = false;
+    const seqLines = [];
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+
+      if (!locus) {
+        const locusMatch = line.match(/^\s*LOCUS\s+([^\s]+)/i);
+        if (locusMatch) locus = locusMatch[1].trim();
+      }
+
+      if (!collectingOrigin) {
+        const definitionMatch = line.match(/^\s*DEFINITION\s+(.+)$/i);
+        if (definitionMatch) {
+          definition = definitionMatch[1].trim();
+          collectingDefinition = true;
+          continue;
+        }
+
+        if (collectingDefinition) {
+          if (/^\s{12}\S/.test(line)) {
+            definition += " " + line.trim();
+            continue;
+          }
+          collectingDefinition = false;
+        }
+
+        if (/^\s*ORIGIN\b/i.test(line)) {
+          collectingOrigin = true;
+          continue;
+        }
+      } else {
+        if (/^\s*\/\//.test(line)) break;
+        seqLines.push(line.replace(/[^A-Za-z]/g, ""));
+      }
+    }
+
+    const seq = normalizeSeq(seqLines.join(""));
+    if (!seq) return;
+
+    // Prefer LOCUS (short accession-style name); DEFINITION is often a long sentence.
+    records.push({
+      header: (locus || definition || `sequence${index + 1}`).replace(/\s+/g, " ").trim(),
+      seq
+    });
+  });
+
+  return records;
+}
+
+/**
+ * Derive a safe FASTA header token from an uploaded file name (no path, no common extensions).
+ * @param {string} filename
+ * @returns {string} May be empty if nothing usable remains.
+ */
+export function sanitizeSequenceUploadFileBaseName(filename = "") {
+  let base = String(filename || "").replace(/^.*[/\\]/, "");
+  base = base.replace(/\.(fa|fasta|fas|txt|gb|gbk|gbff|genbank|dna|seq|gbxml)$/i, "");
+  base = base.replace(/[\r\n\t>]/g, " ").replace(/\s+/g, " ").trim();
+  return base.slice(0, 240);
+}
+
+export function formatSequenceUploadText(raw = "", options = {}) {
+  const text = String(raw || "");
+  const trimmed = text.trim();
+  if (!trimmed) return "";
+
+  const fileBaseName = typeof options.fileBaseName === "string"
+    ? sanitizeSequenceUploadFileBaseName(options.fileBaseName)
+    : "";
+
+  // Binary or damaged UTF-8 (e.g. SnapGene .dna / proprietary) → invalid char U+FFFD
+  const ffdCount = (trimmed.match(/\uFFFD/g) || []).length;
+  if (ffdCount > 0 && (ffdCount >= 4 || ffdCount / trimmed.length > 0.0005)) {
+    return "";
+  }
+
+  if (isLikelyGenBank(trimmed)) {
+    const records = parseGenBank(trimmed);
+    if (!records.length) return "";
+    const mode = options.genbankMode === "fasta" ? "fasta" : "sequence";
+    if (mode === "sequence" && records.length === 1) {
+      const h = (records[0].header && records[0].header.trim())
+        || fileBaseName
+        || "sequence";
+      return ">" + h + "\n" + records[0].seq;
+    }
+    return records.map((record, index) => {
+      const header = record.header || `sequence${index + 1}`;
+      return ">" + header + "\n" + record.seq;
+    }).join("\n");
+  }
+
+  // FASTA: preserve original (headers, wrapping)
+  if (/^\s*>/m.test(trimmed)) {
+    return text;
+  }
+
+  // Plain DNA/RNA letters only (no ">"), e.g. pasted sequence without header
+  const flat = trimmed.replace(/\s+/g, "");
+  const only = normalizeSeq(flat);
+  if (only.length >= 10 && flat.length > 0) {
+    const ratio = only.length / flat.length;
+    if (ratio >= 0.75) {
+      const mode = options.genbankMode === "fasta" ? "fasta" : "sequence";
+      const h = fileBaseName || (mode === "fasta" ? "sequence" : "");
+      if (mode === "sequence") {
+        if (h) return ">" + h + "\n" + only;
+        return only;
+      }
+      return ">" + h + "\n" + only;
+    }
+  }
+
+  // Not GenBank, not FASTA, not plain sequence (e.g. feature lists, CSV, wrong format)
+  return "";
+}
+
 /**
  * Parse a multi-FASTA or raw sequence input.
  * Key behaviors:
@@ -162,6 +302,9 @@ export function splitHeaderAndSeqBlock(lines) {
 export function parseFASTA(raw = "") {
   const text = raw.trim();
   if (!text) return [];
+
+  const genbankRecords = parseGenBank(text);
+  if (genbankRecords.length) return genbankRecords;
 
   const lines = text.split(/\r?\n/);
   const records = [];

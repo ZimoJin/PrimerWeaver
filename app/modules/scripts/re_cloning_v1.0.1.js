@@ -1,5 +1,6 @@
 import * as CORE from './core_v1.0.1.js';
 import * as VIZ from './bio_visuals_v1.0.1.js';
+import { setupAssemblyParameterPresets } from './assembly_parameter_presets_v1.0.1.js';
 
 export function initRECloning(container){
   if (typeof window !== 'undefined') {
@@ -9,8 +10,33 @@ export function initRECloning(container){
     window._ggPrimers = null;
   }
 
+  setupAssemblyParameterPresets(container || document, {
+    scope: 'restriction-assembly',
+    label: 'restriction cloning settings',
+    placeholder: 'e.g. Standard restriction cloning',
+    fields: [
+      { key: 'enzyme1', selector: '#re-enzyme1', defaultValue: '' },
+      { key: 'enzyme2', selector: '#re-enzyme2', defaultValue: '' },
+      { key: 'clamp', selector: '#gg-clamp', defaultValue: '5' },
+      { key: 'tmTarget', selector: '#gg-tmTarget', defaultValue: '55' },
+      { key: 'conc', selector: '#gg-conc', defaultValue: '500' },
+      { key: 'na', selector: '#gg-na', defaultValue: '50' },
+      { key: 'mg', selector: '#gg-mg', defaultValue: '2.0' }
+    ]
+  });
+
   (function(){
-  function cleanFasta(raw){ return (raw||'').toUpperCase().replace(/^>.*$/gm,'').replace(/[^ACGT]/g,''); }
+  function cleanFasta(raw){
+    const text = String(raw || '').trim();
+    if (!text) return '';
+
+    const records = CORE.parseFASTA(text);
+    if (records && records.length > 0) {
+      return String(records[0].seq || '').toUpperCase().replace(/[^ACGT]/g, '');
+    }
+
+    return text.toUpperCase().replace(/[^ACGT]/g, '');
+  }
   const comp = {A:'T',T:'A',G:'C',C:'G'};
   const IUPAC_COMP = {
     A:"T", T:"A", C:"G", G:"C", R:"Y", Y:"R", S:"S", W:"W",
@@ -1082,12 +1108,26 @@ function subseqCircular(seq, start, len){
       fileInput.addEventListener('change', (e) => {
         const f = e.target.files[0];
         if (!f) return;
+        const container = document.getElementById('module-content') || document.body;
+        if (VIZ && typeof VIZ.guardFileUploadSize === 'function' && VIZ.guardFileUploadSize(container, f, e.target)) return;
         const r = new FileReader();
         r.onload = (ev) => {
+          const raw = ev.target.result;
           const textarea = row.querySelector('.insert-seq');
-          if (textarea) textarea.value = ev.target.result;
+          if (!textarea) return;
+          const out = CORE.formatSequenceUploadText(raw, { genbankMode: 'sequence', fileBaseName: f.name });
+          textarea.value = out;
+          const rawLen = String(raw || '').replace(/\s/g, '').length;
+          if (!String(out || '').trim() && rawLen > 40) {
+            const bin = /\uFFFD/.test(String(raw));
+            const msg = bin
+              ? 'Could not read this file as text (replacement characters detected). SnapGene .dna files are binary: use File → Export → GenBank or FASTA, then upload the exported .gb/.fasta file.'
+              : 'Could not extract a DNA sequence. Use a standard GenBank file (LOCUS … ORIGIN …) or FASTA. Feature-only or CSV exports from vector software are not valid GenBank.';
+            if (window._ggShowModal) window._ggShowModal(msg);
+            else alert(msg);
+          }
         };
-        r.readAsText(f);
+        r.readAsText(f, 'UTF-8');
       });
     }
     
@@ -1178,7 +1218,7 @@ function subseqCircular(seq, start, len){
         <textarea class="insert-seq" placeholder=">insert${insertCount}&#10;ATGCGTAGCTA..."></textarea>
         <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 6px;">
           <div class="row end" style="gap: 6px;">
-            <input type="file" class="insert-file" accept=".fa,.fasta,.fas,.txt" style="display: none;">
+            <input type="file" class="insert-file" accept=".fa,.fasta,.fas,.txt,.gb,.gbk,.gbff,.genbank" style="display: none;">
             <button type="button" class="btn demo insert-flip-btn">Reverse complement</button>
             <button class="btn demo insert-demo-btn" type="button" data-sample="insert">Demo</button>
             <button class="ghost btn insert-upload-btn" type="button">Upload</button>
@@ -1238,15 +1278,27 @@ function subseqCircular(seq, start, len){
       vectorFileInput.addEventListener('change', (e) => {
         const f = e.target.files[0];
         if (!f) return;
+        const container = document.getElementById('module-content') || document.body;
+        if (VIZ && typeof VIZ.guardFileUploadSize === 'function' && VIZ.guardFileUploadSize(container, f, e.target)) return;
         const r = new FileReader();
         r.onload = (event) => {
+          const raw = event.target.result;
           const textarea = document.getElementById('gg-vector');
-          if (textarea) {
-            textarea.value = event.target.result;
-            updateVectorPreview();
+          if (!textarea) return;
+          const out = CORE.formatSequenceUploadText(raw, { genbankMode: 'sequence', fileBaseName: f.name });
+          textarea.value = out;
+          const rawLen = String(raw || '').replace(/\s/g, '').length;
+          if (!String(out || '').trim() && rawLen > 40) {
+            const bin = /\uFFFD/.test(String(raw));
+            const msg = bin
+              ? 'Could not read this file as text (replacement characters detected). SnapGene .dna files are binary: use File → Export → GenBank or FASTA, then upload the exported .gb/.fasta file.'
+              : 'Could not extract a DNA sequence. Use a standard GenBank file (LOCUS … ORIGIN …) or FASTA. Feature-only or CSV exports from vector software are not valid GenBank.';
+            if (window._ggShowModal) window._ggShowModal(msg);
+            else alert(msg);
           }
+          updateVectorPreview();
         };
-        r.readAsText(f);
+        r.readAsText(f, 'UTF-8');
       });
     }
     
@@ -1377,7 +1429,8 @@ function subseqCircular(seq, start, len){
       const vector = records[0];
       const seq = window.CORE.normalizeSeq(vector.seq);
       const len = seq.length;
-      const name = vector.name || 'Vector';
+      // CORE.parseFASTA returns { header, seq } (not .name); match Gibson's wrapper behavior
+      const name = (vector.header || vector.name || '').trim() || 'Vector';
       
       // Get enzyme sites for annotation
       const enzyme1Name = document.getElementById('re-enzyme1').value.trim();
@@ -1566,6 +1619,17 @@ function subseqCircular(seq, start, len){
       window.currentREBackboneSeq = window.currentREFragments[selectedIdx].seq;
     }
   });
+
+  if (container && typeof container === 'object') {
+    container.__workspaceRefresh = () => {
+      try { updateVectorPreview(); } catch (e) {}
+      try { calculateAndDisplayVectorFragments(); } catch (e) {}
+      setTimeout(() => {
+        try { updateVectorPreview(); } catch (e) {}
+        try { calculateAndDisplayVectorFragments(); } catch (e) {}
+      }, 80);
+    };
+  }
 
   document.getElementById('gg-clear').addEventListener('click', ()=>{
     const resWrap = document.getElementById('results-wrap');
