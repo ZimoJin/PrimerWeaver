@@ -271,20 +271,20 @@ function initGoldenGate(container) {
   }
 
   // Fallback core-primer pickers (app-main.js used to provide these globals).
-  function pickCorePrimerForwardFallback(seq, tmTarget, Na, conc){
+  function pickCorePrimerForwardFallback(seq, tmTarget, Na, conc, Mg = 0){
     const s = (seq || '').toUpperCase();
     const minL = 18, maxL = 28;
     let best = s.slice(0, minL);
     for (let L = minL; L <= maxL; L++) {
       const cand = s.slice(0, L);
       const ok3 = /[GC]$/.test(cand);
-      const Tm = CORE.tmcalNN(cand, Na, 0, conc);
+      const Tm = CORE.tmcalNN(cand, Na, Mg, conc);
       if (ok3 && Tm >= tmTarget - 0.5) return cand;
       best = cand;
     }
     return best;
   }
-  function pickCorePrimerReverseFallback(seq, tmTarget, Na, conc){
+  function pickCorePrimerReverseFallback(seq, tmTarget, Na, conc, Mg = 0){
     const s = (seq || '').toUpperCase();
     const minL = 18, maxL = 28;
     let best = rc(s.slice(-minL));
@@ -292,7 +292,7 @@ function initGoldenGate(container) {
       const core = s.slice(-L);
       const p = rc(core);
       const ok3 = /[GC]$/.test(p);
-      const Tm = CORE.tmcalNN(p, Na, 0, conc);
+      const Tm = CORE.tmcalNN(p, Na, Mg, conc);
       if (ok3 && Tm >= tmTarget - 0.5) return p;
       best = p;
     }
@@ -307,12 +307,6 @@ function initGoldenGate(container) {
   attachHelpToInput(container, 'gg-na', "Monovalent cation concentration used for salt-corrected Tm calculation. Typical range: 10-200 mM.", 'Help: Na+ concentration');
   attachHelpToInput(container, 'gg-mg', "Divalent cation concentration used for Tm calculation. Set to 0 if Mg²⁺ is absent from reaction. Typical range: 0.5-5 mM.", 'Help: Mg2+ concentration');
 
-  // ===== Nearest-Neighbor Thermodynamic Parameters =====
-  const NN={'AA':{dH:-7.9,dS:-22.2},'TT':{dH:-7.9,dS:-22.2},'AT':{dH:-7.2,dS:-20.4},'TA':{dH:-7.2,dS:-21.3},
-            'CA':{dH:-8.5,dS:-22.7},'TG':{dH:-8.5,dS:-22.7},'GT':{dH:-8.4,dS:-22.4},'AC':{dH:-8.4,dS:-22.4},
-            'CT':{dH:-7.8,dS:-21.0},'AG':{dH:-7.8,dS:-21.0},'GA':{dH:-8.2,dS:-22.2},'TC':{dH:-8.2,dS:-22.2},
-            'CG':{dH:-10.6,dS:-27.2},'GC':{dH:-9.8,dS:-24.4},'GG':{dH:-8.0,dS:-19.9},'CC':{dH:-8.0,dS:-19.9}};
-  const R = 1.987; // cal/(mol·K)
   // Use IUPAC_COMP from CORE for complement mapping
   const comp = CORE.IUPAC_COMP;
 
@@ -504,10 +498,44 @@ function initGoldenGate(container) {
     return frags;
   }
 
-  // ===== Tm (NN model from core) =====
-  // Use CORE.tmcalNN directly
-  function tmNEB(seq, Na_mM = 50, conc_nM = 500) {
-    return CORE.tmcalNN(seq, Na_mM, 0, conc_nM);
+  // ===== Tm & dimer helpers (Core) =====
+  function tmNEB(seq, Na_mM = 50, conc_nM = 500, Mg_mM = 0) {
+    return CORE.tmcalNN(seq, Na_mM, Mg_mM, conc_nM);
+  }
+
+  function readGGThermo(containerEl, tempC) {
+    const root = containerEl || container;
+    const Na = parseFloat(root.querySelector('#gg-na')?.value ?? root.querySelector('#na')?.value ?? '50');
+    const Mg = parseFloat(root.querySelector('#gg-mg')?.value ?? root.querySelector('#mg')?.value ?? '0');
+    const tm = tempC ?? parseFloat(root.querySelector('#gg-tmTarget')?.value ?? root.querySelector('#tmTarget')?.value ?? root.querySelector('#pqc-tmTarget')?.value ?? '55');
+    return CORE.resolveThermoOpts({ Na_mM: Na, Mg_mM: Mg, tempC: tm });
+  }
+
+  function scanPrimerDimer(seqA, seqB, thermo, minOverlap = 3) {
+    if (!seqA || !seqB) return null;
+    const result = CORE.dimerScan(seqA, seqB, thermo);
+    if (!result || !result.overlap || result.overlap.length < minOverlap) return null;
+    const cls = CORE.classifyDG(result.dG, result.touches3);
+    if (cls.cls === 'ok') return null;
+    return {
+      off: result.offset,
+      side: result.touches3 ? 'A3' : 'B3',
+      k: result.overlap.length,
+      dG: result.dG,
+      overlap: result.overlap,
+      cls,
+      align: result.align || CORE.buildDimerAlignment(seqA, seqB, result.offset)
+    };
+  }
+
+  function bestPCRDimer(A, B, thermo, minOverlap = 3) {
+    return scanPrimerDimer(A, B, thermo, minOverlap);
+  }
+
+  function hairpinRisk(p, thermo) {
+    const result = CORE.hairpinScan(p, thermo);
+    if (!result) return false;
+    return CORE.classifyDG(result.dG, result.touches3).cls !== 'ok';
   }
 
   // ===== Primer picking (with fallbacks) =====
@@ -574,6 +602,7 @@ function initGoldenGate(container) {
       };
 
   async function designGGPrimers(vectorRaw, frags, enzymeName, clampN, tmTarget, Na, conc, options = {}){
+    const Mg = options.Mg ?? 0;
     const enz = TYPEIIS[enzymeName];
     const vec = cleanFasta(vectorRaw);
     const report = {warnings:[], vector:{len:vec.length}};
@@ -774,8 +803,8 @@ function initGoldenGate(container) {
         primers.push({name, error:'Empty sequence', labelF: primerLabelF, labelR: primerLabelR, insertName: headerName, baseTag});
         continue;
       }
-      const Fcore = pickCorePrimerForward(seq, tmTarget, Na, conc);
-      const Rcore = pickCorePrimerReverse(seq, tmTarget, Na, conc);
+      const Fcore = pickCorePrimerForward(seq, tmTarget, Na, conc, Mg);
+      const Rcore = pickCorePrimerReverse(seq, tmTarget, Na, conc, Mg);
       const clamp = makeSmartClamp(clampN);
       const offsetLen = enz.cutF || 1;
       const offsetF = randN(offsetLen);
@@ -805,8 +834,8 @@ function initGoldenGate(container) {
         OH_L: leftOH,
         OH_R: rightOH,
         F, R, Fcore, Rcore,
-        tmF: tmNEB(Fcore,Na,conc),
-        tmR: tmNEB(Rcore,Na,conc),
+        tmF: tmNEB(Fcore, Na, conc, Mg),
+        tmR: tmNEB(Rcore, Na, conc, Mg),
         labelF: primerLabelF,
         labelR: primerLabelR,
         insertName: headerName,
@@ -944,40 +973,6 @@ function initGoldenGate(container) {
     </table>`;
   }
 
-  // Simple dimer checks (k>=5 at 3' end) with "I" alignment guide
-  function renderAlignment(A, Brc, off){
-    let minI = Math.min(0, off);
-    let maxI = Math.max(A.length, Brc.length+off);
-    let lineA = "", lineB = "", lineM = "";
-    for(let pos=minI; pos<maxI; pos++){
-      const i = pos;
-      const j = pos - off;
-      const a = (i>=0 && i<A.length) ? A[i] : " ";
-      const b = (j>=0 && j<Brc.length) ? Brc[j] : " ";
-      lineA += a;
-      lineB += b;
-      lineM += (a!==" " && b!==" " && comp[a]===b) ? "I": " ";
-    }
-    return [
-      "5' "+lineA+" 3'",
-      "   "+lineM,
-      "3' "+lineB+" 5' (rc)"
-    ].join("\\n");
-  }
-  // Use CORE.dimerScan for dimer detection
-  function bestPCRDimer(A, B, kmin=5){
-    const result = CORE.dimerScan(A, B);
-    if (!result || !result.overlap) return null;
-    const k = result.overlap.length;
-    if (k < kmin) return null;
-    const align = renderAlignment(A.toUpperCase(), rc(B.toUpperCase()), result.offset);
-    return {
-      off: result.offset,
-      side: result.touches3 ? 'A3' : 'B3',
-      k: k,
-      align: align
-    };
-  }
   // Use CORE.threePrimeDG to check for palindromic tail
   function selfTail6YES(p){
     if(p.length<6) return false;
@@ -985,16 +980,6 @@ function initGoldenGate(container) {
     const rcTail = rc(tail);
     return tail === rcTail;
   }
-  // Use CORE.hairpinScan for hairpin detection
-  function hairpinYES(p){
-    const result = CORE.hairpinScan(p);
-    if (!result) return false;
-    const endWin = 5;
-    const p3 = p.length - 1;
-    const touches3 = (result.end >= p3 - endWin + 1 && result.end <= p3);
-    return result.stem >= 5 && touches3;
-  }
-
   // === QC v1.3-style helpers for Golden Gate ===
   function cleanSeq(r){
     return (r||"").toUpperCase().replace(/[^ACGT]/g,"");
@@ -1007,134 +992,25 @@ function initGoldenGate(container) {
   function hasHomopolymer(s,n){
     return new RegExp("A{"+n+",}|C{"+n+",}|G{"+n+",}|T{"+n+",}").test((s||"").toUpperCase());
   }
-  function duplexDG37(seq){
-    const s = (seq||"").toUpperCase();
-    if(s.length<2) return NaN;
-    let dH=0,dS=0;
-    for(let i=0;i<s.length-1;i++){
-      const p = NN[s.slice(i,i+2)];
-      if(!p) return NaN;
-      dH += p.dH;
-      dS += p.dS;
-    }
-    dH += 0.2;
-    dS += -5.7;
-    const T = 310.15; // 37°C
-    return dH - T*dS/1000;
-  }
   function fmt2(x){return isFinite(x) ? x.toFixed(2) : "--";}
   function badge(cls,txt){return '<span class="badge '+cls+'">'+txt+'</span>';}
-  function classifyDG(dg,t3){
-    if(!isFinite(dg)) return {label:"None",cls:"ok"};
-    let label,cls;
-    if(dg<=-7){label="Very strong";cls="bad";}
-    else if(dg<=-5){label="Strong";cls="bad";}
-    else if(dg<=-3){label="Moderate";cls="warn";}
-    else {label="Weak";cls="ok";}
-    if(t3 && cls!=="ok") label="3' "+label;
-    return {label,cls};
-  }
-  function dimerScan(seqA, seqB){
-    const A = (seqA||"").toUpperCase();
-    const B = (seqB||"").toUpperCase();
-    const Brev = B.split("").reverse().join("");
-    const n=A.length, m=Brev.length;
-    const minLen=3;
-    let best=null;
-    for(let offset=-m+1; offset<=n-1; offset++){
-      let cur="", aStart=null, bStart=null;
-      for(let i=0;i<n;i++){
-        const j = i-offset;
-        if(j<0 || j>=m){
-          if(cur.length>=minLen) recordSeg(cur,aStart,bStart,offset);
-          cur=""; aStart=null; bStart=null;
-          continue;
-        }
-        const a=A[i], b=Brev[j];
-        if(comp[a]===b){
-          if(cur.length===0){aStart=i;bStart=j;}
-          cur+=a;
-        }else{
-          if(cur.length>=minLen) recordSeg(cur,aStart,bStart,offset);
-          cur=""; aStart=null; bStart=null;
-        }
-      }
-      if(cur.length>=minLen) recordSeg(cur,aStart,bStart,offset);
-    }
-    function recordSeg(seg,aStart,bStart,offset){
-      const dg = duplexDG37(seg);
-      const aEnd=aStart+seg.length-1;
-      const bEnd=bStart+seg.length-1;
-      const touches3 = (aEnd>=A.length-3) || (bEnd>=Brev.length-3);
-      if(
-        !best ||
-        dg<best.dg-0.1 ||
-        (Math.abs(dg-best.dg)<=0.1 && touches3 && !best.touches3)
-      ){
-        best = {seg,dg,len:seg.length,touches3,offset};
-      }
-    }
-    if(!best) return null;
-    let minI=Math.min(0,best.offset);
-    let maxI=Math.max(n,m+best.offset);
-    let lineA="",lineB="",lineM="";
-    for(let pos=minI; pos<maxI; pos++){
-      const i=pos;
-      const j=pos-best.offset;
-      const a = (i>=0 && i<n) ? A[i] : " ";
-      const b = (j>=0 && j<m) ? Brev[j] : " ";
-      lineA+=a;
-      lineB+=b;
-      lineM += (a!==" " && b!==" " && comp[a]===b) ? "|" : " ";
-    }
-    const align = "5' "+lineA+" 3'\n   "+lineM+"\n3' "+lineB+" 5'";
-    return {seg:best.seg,dg:best.dg,len:best.len,touches3:best.touches3,align};
-  }
-  function threePrimeDG(seq){
-    const s = (seq||"").toUpperCase();
-    if(s.length<5) return NaN;
-    return duplexDG37(s.slice(-5));
-  }
-  function hairpinScan(seq){
-    const s = (seq||"").toUpperCase();
-    const n = s.length;
-    const minStem=4, minLoop=3, threeWin=5;
-    let best=null;
-    for(let i=0;i<n;i++){
-      for(let j=i+minLoop+minStem;j<n;j++){
-        let a=i,b=j,seg="";
-        while(a>=0 && b<n && comp[s[a]]===s[b]){
-          seg = s[a] + seg;
-          a--; b++;
-        }
-        if(seg.length>=minStem){
-          const dg = duplexDG37(seg);
-          const touches3 = (j>=n-threeWin) || (b-1>=n-threeWin);
-          if(!best || dg<best.dg-0.1){
-            best = {seg,dg,touches3};
-          }
-        }
-      }
-    }
-    if(!best) return null;
-    return {seg:best.seg,dg:best.dg,touches3:best.touches3};
-  }
-  function analyzePrimer(label, fullSeq, coreSeq, Na, conc){
+  function analyzePrimer(label, fullSeq, coreSeq, Na, Mg, conc, tempC){
     const seq = cleanSeq(fullSeq);
     const core = cleanSeq(coreSeq || fullSeq);
     if(!seq || !core) return {label,empty:true};
+    const thermo = CORE.resolveThermoOpts({ Na_mM: Na, Mg_mM: Mg, tempC: tempC ?? 37 });
     const lenCore = core.length;
     const gcCore = CORE.gcPct(core);
-    const tmCore = tmNEB(core, Na, conc);
-    const tmFull = tmNEB(seq, Na, conc);
+    const tmCore = tmNEB(core, Na, conc, Mg);
+    const tmFull = tmNEB(seq, Na, conc, Mg);
     const clamp = has3GCClamp(seq);
-    const homopoly = hasHomopolymer(seq,4);
-    const dg3 = threePrimeDG(seq);
+    const homopoly = CORE.hasHomopolymer(seq, 4);
+    const dg3 = CORE.threePrimeDG(seq, 5, thermo);
     const dg3Bad = isFinite(dg3) && dg3<=-3;
-    const selfD = dimerScan(seq,seq);
-    const selfClass = selfD ? classifyDG(selfD.dg,selfD.touches3) : {label:"None",cls:"ok"};
-    const hp = hairpinScan(seq);
-    const hpClass = hp ? classifyDG(hp.dg,hp.touches3) : {label:"None",cls:"ok"};
+    const selfD = CORE.selfDimerScan(seq, thermo);
+    const selfClass = selfD ? CORE.classifyDG(selfD.dG, selfD.touches3) : {label:"None",cls:"ok"};
+    const hp = CORE.hairpinScan(seq, thermo);
+    const hpClass = hp ? CORE.classifyDG(hp.dG, hp.touches3) : {label:"None",cls:"ok"};
     return {
       label,seq,core,lenCore,gcCore,tmCore,tmFull,
       clamp,homopoly,dg3,dg3Bad,
@@ -1143,10 +1019,10 @@ function initGoldenGate(container) {
       empty:false
     };
   }
-  function qcPairGG(F,R){
+  function qcPairGG(F,R, thermo){
     if(!F || !R || F.empty || R.empty) return null;
-    const d = dimerScan(F.seq,R.seq);
-    const info = d ? classifyDG(d.dg,d.touches3) : {label:"None",cls:"ok"};
+    const d = CORE.dimerScan(F.seq, R.seq, thermo);
+    const info = d ? CORE.classifyDG(d.dG, d.touches3) : {label:"None",cls:"ok"};
     return {dimer:d,info};
   }
 
@@ -1154,7 +1030,10 @@ function initGoldenGate(container) {
   function renderPrimerBlocks(primers){
     // Merge primer design + QC into one table per insert
     const Na = parseFloat(container.querySelector('#gg-na').value || '50');
+    const Mg = parseFloat(container.querySelector('#gg-mg')?.value || '0');
+    const tmTarget = parseFloat(container.querySelector('#gg-tmTarget')?.value || '60');
     const conc = parseFloat(container.querySelector('#gg-conc').value || '500');
+    const thermo = CORE.resolveThermoOpts({ Na_mM: Na, Mg_mM: Mg, tempC: tmTarget });
 
     // Build formatted sequence cell + basic stats for one primer
     function buildSeqCell(seqCore, fullSeq, overhangSeq, clampLen, site){
@@ -1240,9 +1119,9 @@ function initGoldenGate(container) {
       const labelR = p.labelR || 'Reverse';
 
       // Use existing QC helpers; computed once here only
-      const Fqc = analyzePrimer(labelF, p.F, p.Fcore, Na, conc);
-      const Rqc = analyzePrimer(labelR, p.R, p.Rcore, Na, conc);
-      const pair = qcPairGG(Fqc, Rqc);  // includes cross-dimer info
+      const Fqc = analyzePrimer(labelF, p.F, p.Fcore, Na, Mg, conc, tmTarget);
+      const Rqc = analyzePrimer(labelR, p.R, p.Rcore, Na, Mg, conc, tmTarget);
+      const pair = qcPairGG(Fqc, Rqc, thermo);
 
       const Fseq = buildSeqCell(p.Fcore, p.F, p.OH_L, clampLen, site);
       const Rseq = buildSeqCell(p.Rcore, p.R, p.OH_R, clampLen, site);
@@ -1314,23 +1193,23 @@ function initGoldenGate(container) {
     });
     return out;
   }
-  function qcSummary(primers, k){
-    let issues=[];
-    primers.forEach((p,i)=>{
-      if(p.error) return;
-      const sdF = bestPCRDimer(p.F,p.F,5);
-      const sdR = bestPCRDimer(p.R,p.R,5);
-      const xd  = bestPCRDimer(p.F,p.R,5);
-      if(sdF) issues.push(`Insert #${i+1} Forward self-dimer (3' matches = ${sdF.k})`);
-      if(sdR) issues.push(`Insert #${i+1} Reverse self-dimer (3' matches = ${sdR.k})`);
-      if(xd)  issues.push(`Insert #${i+1} Cross-dimer F×R (3' matches = ${xd.k})`);
-      if(selfTail6YES(p.F)) issues.push(`Insert #${i+1} Forward has 6-bp palindromic tail`);
-      if(selfTail6YES(p.R)) issues.push(`Insert #${i+1} Reverse has 6-bp palindromic tail`);
-      if(hairpinYES(p.F)) issues.push(`Insert #${i+1} Forward hairpin risk`);
-      if(hairpinYES(p.R)) issues.push(`Insert #${i+1} Reverse hairpin risk`);
+  function qcSummary(primers, thermo){
+    const issues = [];
+    primers.forEach((p, i) => {
+      if (p.error) return;
+      const sdF = scanPrimerDimer(p.F, p.F, thermo, 3);
+      const sdR = scanPrimerDimer(p.R, p.R, thermo, 3);
+      const xd = scanPrimerDimer(p.F, p.R, thermo, 3);
+      if (sdF) issues.push(`Insert #${i + 1} Forward self-dimer (${sdF.cls.label}, ΔG≈${sdF.dG.toFixed(2)} kcal/mol)`);
+      if (sdR) issues.push(`Insert #${i + 1} Reverse self-dimer (${sdR.cls.label}, ΔG≈${sdR.dG.toFixed(2)} kcal/mol)`);
+      if (xd) issues.push(`Insert #${i + 1} Cross-dimer F×R (${xd.cls.label}, ΔG≈${xd.dG.toFixed(2)} kcal/mol)`);
+      if (selfTail6YES(p.F)) issues.push(`Insert #${i + 1} Forward has 6-bp palindromic tail`);
+      if (selfTail6YES(p.R)) issues.push(`Insert #${i + 1} Reverse has 6-bp palindromic tail`);
+      if (hairpinRisk(p.F, thermo)) issues.push(`Insert #${i + 1} Forward hairpin risk`);
+      if (hairpinRisk(p.R, thermo)) issues.push(`Insert #${i + 1} Reverse hairpin risk`);
     });
-    if(!issues.length) return '<div class="aside">No red flags with k<sub>min</sub>=5. Binding-region Tm shown in table.</div>';
-    return '<ul><li>'+issues.join('</li><li>')+'</li></ul>';
+    if (!issues.length) return '<div class="aside">No thermodynamic red flags (ΔG). Binding-region Tm shown in table.</div>';
+    return '<ul><li>' + issues.join('</li><li>') + '</li></ul>';
   }
 
   // ===== Gel (canvas, SnapGene-style) =====
@@ -2398,10 +2277,12 @@ function initGoldenGate(container) {
           }
 
           // Normal case: vector has sites, design primers
+          const Mg = parseFloat(container.querySelector('#gg-mg')?.value || '0');
           const {report, primers} = await designGGPrimers(vector, frags, enz, clampN, tmTarget, Na, conc, {
             preferVectorEnds,
             backboneFragmentIndex: selectedFragmentIdx,
-            customLeftOverhangs
+            customLeftOverhangs,
+            Mg
           });
           window._ggPrimers = primers;
 
@@ -2797,87 +2678,21 @@ function initQC(container) {
     return s;
   }
 
-  /* Tm helper using CORE.tmcalNN */
-  // Uses global tmNEB alias from CORE
-
-  /* Dimer checker + hairpin */
-  function renderAlignment(A, Brc, off){
-    let minI = Math.min(0, off);
-    let maxI = Math.max(A.length, Brc.length+off);
-    let lineA = "", lineB = "", lineM = "";
-    for(let pos=minI; pos<maxI; pos++){
-      const i = pos;
-      const j = pos - off;
-      const a = (i>=0 && i<A.length) ? A[i] : " ";
-      const b = (j>=0 && j<Brc.length) ? Brc[j] : " ";
-      lineA += a;
-      lineB += b;
-      lineM += (a!==" " && b!==" " && comp[a]===b) ? "I": " ";
-    }
-    return [
-      "5' "+lineA+" 3'",
-      "   "+lineM,
-      "3' "+lineB+" 5' (rc)"
-    ].join("\n");
-  }
-  // Use CORE.dimerScan for dimer detection, but convert to k-based format for compatibility
-  function bestPCRDimer(A, B, kmin=4){
-    const result = CORE.dimerScan(A, B);
-    if (!result || !result.overlap) return null;
-    // Convert dG-based result to k-based format for backward compatibility
-    const k = result.overlap.length;
-    if (k < kmin) return null;
-    // Generate alignment string
-    const align = renderAlignment(A.toUpperCase(), rc(B.toUpperCase()), result.offset);
-    return {
-      off: result.offset,
-      side: result.touches3 ? 'A3' : 'B3',
-      k: k,
-      align: align
-    };
-  }
-  function classifyByK(k){
-    if(k>=6) return {label:"Strong", cls:"bad"};
-    if(k===5) return {label:"Moderate", cls:"warn"};
-    if(k===4) return {label:"Weak", cls:"warn"};
-    return {label:"None", cls:"ok"};
-  }
-  // Use CORE.threePrimeDG to check for palindromic tail
-  function selfTail6YES(p){
-    if(p.length<6) return false;
-    const tail = p.slice(-6).toUpperCase();
-    const rcTail = rc(tail);
-    // Check if tail is palindromic (tail == reverse complement of itself)
-    return tail === rcTail;
-  }
-  // Use CORE.hairpinScan for hairpin detection
-  function hairpinYES(p){
-    const result = CORE.hairpinScan(p);
-    if (!result) return false;
-    // Check if hairpin touches 3' end (last 5 bases)
-    const endWin = 5;
-    const p3 = p.length - 1;
-    const touches3 = (result.end >= p3 - endWin + 1 && result.end <= p3);
-    // Require stem >= 5 and touching 3' end
-    return result.stem >= 5 && touches3;
-  }
-
   /* Primer picking for RE module */
-  // uses CORE aliases
-  function findSafeClamp(n, s1, s2, Fcore, Rcore, kmin, checks){
+  function findSafeClamp(n, s1, s2, Fcore, Rcore, thermo, minOverlap, checks){
     const MAX_TRY = 200;
     function okPrimer(p){
       if(checks.tail6 && selfTail6YES(p)) return false;
-      if(checks.hp && hairpinYES(p)) return false;
+      if(checks.hp && hairpinRisk(p, thermo)) return false;
       return true;
     }
     for(let t=0; t<MAX_TRY; t++){
       const clamp = randClamp(n);
       const F = clamp + s1 + Fcore;
       const R = clamp + s2 + Rcore;
-      const badFF = bestPCRDimer(F,F,kmin);
-      const badRR = bestPCRDimer(R,R,kmin);
-      const badFR = bestPCRDimer(F,R,kmin);
+      const badFF = scanPrimerDimer(F, F, thermo, minOverlap);
+      const badRR = scanPrimerDimer(R, R, thermo, minOverlap);
+      const badFR = scanPrimerDimer(F, R, thermo, minOverlap);
       if(badFF || badRR || badFR) continue;
       if(!okPrimer(F) || !okPrimer(R)) continue;
       return {clamp,F,R};
@@ -2908,25 +2723,30 @@ function initQC(container) {
     const vec = cleanFasta(vecRaw); const ins = cleanFasta(insRaw);
     if(!ins || ins.length<40) throw new Error('Insert too short (≥40 nt required).');
     const s1 = ENZ[enz1].site, s2 = ENZ[enz2].site;
+    const Mg = opts.Mg ?? 0;
+    const thermo = CORE.resolveThermoOpts({ Na_mM: opts.Na, Mg_mM: Mg, tempC: opts.tmTarget });
+    const minOverlap = Math.max(3, opts.kmin || 4);
 
-    const Fcore = pickCorePrimerForward(ins, opts.tmTarget, opts.Na, opts.conc);
-    const Rcore = pickCorePrimerReverse(ins, opts.tmTarget, opts.Na, opts.conc);
+    const Fcore = pickCorePrimerForward(ins, opts.tmTarget, opts.Na, opts.conc, Mg);
+    const Rcore = pickCorePrimerReverse(ins, opts.tmTarget, opts.Na, opts.conc, Mg);
 
-    const safe = findSafeClamp(opts.clampN, s1, s2, Fcore, Rcore, opts.kmin, {hp:opts.hp, tail6:opts.tail6});
+    const safe = findSafeClamp(opts.clampN, s1, s2, Fcore, Rcore, thermo, minOverlap, {hp:opts.hp, tail6:opts.tail6});
     const clamp = safe.clamp, F = safe.F, R = safe.R;
 
-    const tF = tmNEB(Fcore, opts.Na, opts.conc);
-    const tR = tmNEB(Rcore, opts.Na, opts.conc);
+    const tF = tmNEB(Fcore, opts.Na, opts.conc, Mg);
+    const tR = tmNEB(Rcore, opts.Na, opts.conc, Mg);
 
-    const bestFF = bestPCRDimer(F,F,opts.kmin);
-    const bestRR = bestPCRDimer(R,R,opts.kmin);
-    const bestFR = bestPCRDimer(F,R,opts.kmin);
-    const cF=classifyByK(bestFF?bestFF.k:0), cR=classifyByK(bestRR?bestRR.k:0), cX=classifyByK(bestFR?bestFR.k:0);
+    const bestFF = scanPrimerDimer(F, F, thermo, minOverlap);
+    const bestRR = scanPrimerDimer(R, R, thermo, minOverlap);
+    const bestFR = scanPrimerDimer(F, R, thermo, minOverlap);
+    const cF = bestFF ? bestFF.cls : {label:'None', cls:'ok'};
+    const cR = bestRR ? bestRR.cls : {label:'None', cls:'ok'};
+    const cX = bestFR ? bestFR.cls : {label:'None', cls:'ok'};
 
     const tail6F = opts.tail6 ? selfTail6YES(F) : false;
     const tail6R = opts.tail6 ? selfTail6YES(R) : false;
-    const hpF = opts.hp ? hairpinYES(F) : false;
-    const hpR = opts.hp ? hairpinYES(R) : false;
+    const hpF = opts.hp ? hairpinRisk(F, thermo) : false;
+    const hpR = opts.hp ? hairpinRisk(R, thermo) : false;
 
     return {F,R, Fcore,Rcore, tF,tR, enz1,enz2, clamp, s1,s2,
             gcF:CORE.gcPct(F), gcR:CORE.gcPct(R),
@@ -3054,7 +2874,8 @@ function initQC(container) {
   function badge(cls,txt){ return `<span class="badge ${cls}">${txt}</span>`; }
   function dimerRow(name, best, call){
     if(!best) return `<tr><td>${name}</td><td>${badge(call.cls, call.label)}</td><td></td></tr>`;
-    return `<tr><td>${name}</td><td>${badge(call.cls, call.label)}</td><td><pre class="code mono">${best.align}</pre><div class="aside">3' matches = ${best.k} bp; side=${best.side}</div></td></tr>`;
+    const dgTxt = isFinite(best.dG) ? `; ΔG≈${best.dG.toFixed(2)} kcal/mol` : '';
+    return `<tr><td>${name}</td><td>${badge(call.cls, call.label)}</td><td><pre class="code mono">${best.align}</pre><div class="aside">overlap = ${best.k} bp; side=${best.side}${dgTxt}</div></td></tr>`;
   }
   function kminFromUI(scope){
     const radios = container.querySelectorAll(`input[name="${scope}-kseg"]`);
@@ -3075,6 +2896,7 @@ function initQC(container) {
     const tmTarget=parseFloat(container.querySelector('#tmTarget').value||'60');
     const Na=parseFloat(container.querySelector('#na').value||'50');
     const conc=parseFloat(container.querySelector('#conc').value||'500');
+    const Mg=parseFloat(container.querySelector('#gg-mg')?.value ?? container.querySelector('#mg')?.value ?? '0');
     const kmin=kminFromUI('');
     const clampN=parseInt(container.querySelector('#clamp').value||'5',10);
 
@@ -3086,13 +2908,13 @@ function initQC(container) {
       container.querySelector('#re-enz2').value=e2;
     }
 
-    const opts={tmTarget:tmTarget, Na:Na, conc:conc, kmin:kmin, clampN:clampN, hp:hp, tail6:tail6};
+    const opts={tmTarget:tmTarget, Na:Na, Mg:Mg, conc:conc, kmin:kmin, clampN:clampN, hp:hp, tail6:tail6};
     let outEl=container.querySelector('#re-out');
     let sumEl=container.querySelector('#re-summary');
     try{
       const r = designRestrictionPrimers(vec, ins, e1, e2, opts);
       const ktxt = kmin===4 ? 'Low' : (kmin===5 ? 'Medium' : 'High');
-      sumEl.innerHTML = `<div class="aside">Restriction pair: <b>${r.enz1}</b> / <b>${r.enz2}</b> &nbsp;|&nbsp; Clamp="${r.clamp}" ${r.fallback?'<span class="badge warn">fallback</span>':''} &nbsp;|&nbsp; Target Tm=${fmt2(tmTarget)} °C (binding region only), Na⁺ ${Na} mM, Cp=${conc} nM, k<sub>min</sub>=${kmin} (${ktxt})</div>`;
+      sumEl.innerHTML = `<div class="aside">Restriction pair: <b>${r.enz1}</b> / <b>${r.enz2}</b> &nbsp;|&nbsp; Clamp="${r.clamp}" ${r.fallback?'<span class="badge warn">fallback</span>':''} &nbsp;|&nbsp; Target Tm=${fmt2(tmTarget)} °C (binding region only), Na⁺ ${Na} mM, Mg²⁺ ${Mg} mM, Cp=${conc} nM, k<sub>min</sub>=${kmin} (${ktxt})</div>`;
       const Fdisp = `<i class="overhang">${r.clamp}${r.s1}</i>${r.Fcore}`;
       const Rdisp = `<i class="overhang">${r.clamp}${r.s2}</i>${r.Rcore}`;
       outEl.innerHTML = `
@@ -3153,45 +2975,49 @@ function initQC(container) {
   if (pqcRun) pqcRun.onclick=()=>{
     const F=(container.querySelector('#pqc-fwd').value||'').trim().replace(/[^ACGTacgt]/g,'');
     const R=(container.querySelector('#pqc-rev').value||'').trim().replace(/[^ACGTacgt]/g,'');
-    const tmTarget=parseFloat(container.querySelector('#pqc-tmTarget').value||'60');
-    const Na=parseFloat(container.querySelector('#pqc-na').value||'50');
-    const conc=parseFloat(container.querySelector('#pqc-conc').value||'500');
-    const kmin=pqcKmin();
-    const hp=container.querySelector('#pqc-hp').checked;
-    const tail6=container.querySelector('#pqc-tail6').checked;
+    const thermo = readGGThermo(container, parseFloat(container.querySelector('#pqc-tmTarget').value || '60'));
+    const Na = thermo.Na_mM;
+    const Mg = thermo.Mg_mM;
+    const tmTarget = thermo.tempC;
+    const conc = parseFloat(container.querySelector('#pqc-conc').value || '500');
+    const minOverlap = Math.max(3, pqcKmin());
+    const hp = container.querySelector('#pqc-hp').checked;
+    const tail6 = container.querySelector('#pqc-tail6').checked;
 
     if(!F && !R){ container.querySelector('#pqc-out').innerHTML='<p class="aside">Enter at least one primer.</p>'; return; }
 
     function qc1(p){
       if(!p) return null;
+      const hpRes = hp ? CORE.hairpinScan(p, thermo) : null;
+      const hpCls = hpRes ? CORE.classifyDG(hpRes.dG, hpRes.touches3) : {label:'OK', cls:'ok'};
       return {
         len:p.length,
         gc:CORE.gcPct(p),
-        tm:tmNEB(p,Na,conc),
-        hp: hp ? hairpinYES(p) : false,
+        tm:tmNEB(p, Na, conc, Mg),
+        hp: hp ? hpCls : {label:'OK', cls:'ok'},
         tail6: tail6 ? selfTail6YES(p) : false,
-        sd: bestPCRDimer(p,p,kmin)
+        sd: scanPrimerDimer(p, p, thermo, minOverlap)
       };
     }
     const fq = qc1(F), rq = qc1(R);
-    const cross = (F && R) ? bestPCRDimer(F, R, kmin) : null;
+    const cross = (F && R) ? scanPrimerDimer(F, R, thermo, minOverlap) : null;
 
     function rowQC(label, q){
       if(!q) return '';
-      const c = classifyByK(q.sd ? q.sd.k : 0);
+      const c = q.sd ? q.sd.cls : {label:'None', cls:'ok'};
       return `
         <tr>
           <td>${label}</td>
           <td>${q.len}</td>
           <td>${fmt2(q.gc)}</td>
           <td>${fmt2(q.tm)}</td>
-          <td>${badge(q.hp ? 'bad' : 'ok', q.hp ? 'Hairpin' : 'OK')}</td>
+          <td>${badge(q.hp.cls, q.hp.label)}</td>
           <td>${badge(q.tail6 ? 'bad' : 'ok', q.tail6 ? 'Tail-6' : 'OK')}</td>
-          <td>${badge(c.cls, c.label)}</td>
-          <td>${q.sd ? `<pre class="code mono">${q.sd.align}</pre><div class="aside">3' matches = ${q.sd.k}</div>` : ''}</td>
+          <td>${badge(c.cls, c.label)}${q.sd && isFinite(q.sd.dG) ? ` <span class="aside">(ΔG≈${q.sd.dG.toFixed(2)})</span>` : ''}</td>
+          <td>${q.sd ? `<pre class="code mono">${q.sd.align}</pre><div class="aside">overlap = ${q.sd.k} bp</div>` : ''}</td>
         </tr>`;
     }
-    const crossC = classifyByK(cross ? cross.k : 0);
+    const crossC = cross ? cross.cls : {label:'None', cls:'ok'};
     container.querySelector('#pqc-out').innerHTML = `
       <table>
         <thead><tr><th>Primer</th><th>Len</th><th>GC%</th><th>Tm (°C)</th><th>Hairpin</th><th>Tail-6</th><th>Self-dimer</th><th>Alignment</th></tr></thead>
@@ -3201,8 +3027,8 @@ function initQC(container) {
         </tbody>
       </table>
       <h3>Cross-dimer</h3>
-      <div>${badge(crossC.cls, crossC.label)}</div>
-      ${cross ? `<pre class="code mono">${cross.align}</pre><div class="aside">3' matches = ${cross.k}</div>` : ''}
+      <div>${badge(crossC.cls, crossC.label)}${cross && isFinite(cross.dG) ? ` <span class="aside">(ΔG≈${cross.dG.toFixed(2)} kcal/mol, Tm ref ${fmt2(tmTarget)} °C, Na⁺ ${Na} mM, Mg²⁺ ${Mg} mM)</span>` : ''}</div>
+      ${cross ? `<pre class="code mono">${cross.align}</pre><div class="aside">overlap = ${cross.k} bp</div>` : ''}
     `;
   };
   const pqcClear = container.querySelector('#pqc-clear');

@@ -2418,12 +2418,21 @@ function highlightPrimerRegion(seq, startIndex, length) {
   );
 }
 
-function runPrimerQC(seq, tmTarget = 60) {
+function readMutagenesisThermo(tmTarget) {
+  const na = parseFloat(document.getElementById('primer-na')?.value) || 50;
+  const mg = parseFloat(document.getElementById('primer-mg')?.value) || 0;
+  const conc = parseFloat(document.getElementById('primer-conc')?.value) || 500;
+  const temp = tmTarget ?? parseFloat(document.getElementById('outer-tm')?.value) || 55;
+  return { Na_mM: na, Mg_mM: mg, conc_nM: conc, tmTarget: temp };
+}
+
+function runPrimerQC(seq, tmTarget) {
+  const p = readMutagenesisThermo(tmTarget);
   return Core.qcSinglePrimer(seq, {
-    Na_mM: 50,
-    Mg_mM: 0,
-    conc_nM: 500,
-    tmTarget,
+    Na_mM: p.Na_mM,
+    Mg_mM: p.Mg_mM,
+    conc_nM: p.conc_nM,
+    tmTarget: p.tmTarget,
     homopolymerMax: 4
   });
 }
@@ -2467,11 +2476,13 @@ function getQCLabel(qc) {
   return { hp, sd, homo };
 }
 
-function getCrossDimerLabel(seqA, seqB) {
+function getCrossDimerLabel(seqA, seqB, tmTarget) {
   if (!seqA || !seqB) return { label: 'N/A', cls: 'qc-ok' };
-  
-  const crossDimer = Core.dimerScan(seqA, seqB);
-  if (!crossDimer || !crossDimer.dG) {
+
+  const p = readMutagenesisThermo(tmTarget);
+  const thermo = Core.resolveThermoOpts({ Na_mM: p.Na_mM, Mg_mM: p.Mg_mM, tempC: p.tmTarget });
+  const crossDimer = Core.dimerScan(seqA, seqB, thermo);
+  if (!crossDimer || !isFinite(crossDimer.dG)) {
     return { label: 'None', cls: 'qc-ok' };
   }
   
@@ -2764,7 +2775,7 @@ function renderResults(results, origAA, finalAA, mutations, rawTemplate = null) 
       if (!info || !info.seq) continue;
       
       // Get QC for this primer
-      const qc = runPrimerQC(info.seq, 60);
+      const qc = runPrimerQC(info.seq);
       const qcLabel = getQCLabel(qc);
       
       const tr = document.createElement('tr');
@@ -3782,7 +3793,7 @@ function renderDNAEditResults(results, origSeq, finalSeq, edits, rawTemplate = n
         const row = document.createElement('tr');
         
         // Get QC for this primer
-        const qc = runPrimerQC(p.info.seq, 60);
+        const qc = runPrimerQC(p.info.seq);
         const qcLabel = getQCLabel(qc);
         const hpBadge = `<span class="qc-badge ${qcLabel.hp.cls}">${qcLabel.hp.label}</span>`;
         const sdBadge = `<span class="qc-badge ${qcLabel.sd.cls}">${qcLabel.sd.label}</span>`;
@@ -3962,6 +3973,44 @@ function detectAndUpdateORFs() {
   
   const candidates = getTopCDSCandidates(template, 10);
   updateORFSelect(candidates);
+}
+
+const MUTAGENESIS_PRESET_FIELDS = [
+  { key: 'outerTm', selector: '#outer-tm', defaultValue: '55' },
+  { key: 'overlapTm', selector: '#overlap-tm', defaultValue: '55' },
+  { key: 'primerConc', selector: '#primer-conc', defaultValue: '500' },
+  { key: 'primerNa', selector: '#primer-na', defaultValue: '50' },
+  { key: 'primerMg', selector: '#primer-mg', defaultValue: '2.0' },
+  { key: 'fOverlap', selector: '#f-overlap-seq', defaultValue: '' },
+  { key: 'rOverlap', selector: '#r-overlap-seq', defaultValue: '' }
+];
+
+async function initMutagenesisParameterPresets(container) {
+  const moduleRoot = container || document.getElementById('module-content') || document;
+  const presetRoot = moduleRoot.querySelector('section.pane') || moduleRoot;
+  if (!presetRoot.querySelector('#mutagenesis-preset-select')) {
+    return false;
+  }
+
+  try {
+    const { setupAssemblyParameterPresets } = await import('./assembly_parameter_presets_v1.0.1.js');
+    return setupAssemblyParameterPresets(moduleRoot, {
+      scope: 'mutagenesis-primer-params',
+      label: 'mutagenesis primer design parameters',
+      placeholder: 'e.g. Standard mutagenesis',
+      presetRootSelector: '.primer-params-header',
+      selectSelector: '#mutagenesis-preset-select',
+      saveSelector: '#mutagenesis-preset-save',
+      updateSelector: '#mutagenesis-preset-update',
+      deleteSelector: '#mutagenesis-preset-delete',
+      setDefaultSelector: '#mutagenesis-preset-set-default',
+      fields: MUTAGENESIS_PRESET_FIELDS,
+      defaultValues: Object.fromEntries(MUTAGENESIS_PRESET_FIELDS.map((f) => [f.key, f.defaultValue]))
+    });
+  } catch (err) {
+    console.error('Mutagenesis parameter preset init failed:', err);
+    return false;
+  }
 }
 
 export function initMutagenesisModule(container) {
@@ -4297,6 +4346,14 @@ export function initMutagenesisModule(container) {
     console.warn('Reset button not found');
   }
   
+  const bindPresets = () => initMutagenesisParameterPresets(moduleContainer || container);
+  bindPresets().then((ok) => {
+    if (!ok) {
+      setTimeout(() => { bindPresets(); }, 50);
+      setTimeout(() => { bindPresets(); }, 250);
+    }
+  });
+
   console.log('Mutagenesis module initialized successfully');
 }
 

@@ -101,7 +101,7 @@ export async function initModule(moduleName, moduleContentEl) {
     }
     case 'overlap-pcr': {
       await loadModuleScriptOnce('./modules/scripts/oe_pcr_v1.0.1.js').catch(() => {});
-      if (window.initOEPCRModule) window.initOEPCRModule();
+      if (window.initOEPCRModule) window.initOEPCRModule(moduleContentEl);
       return;
     }
     case 'multiplex-pcr': {

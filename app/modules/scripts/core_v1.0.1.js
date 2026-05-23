@@ -81,6 +81,11 @@ export function reverseComplementSeq(seq = "") {
   return out;
 }
 
+/** Reverse a sequence 5′→3′ without complementing (for antiparallel dimer alignment). */
+export function reverseSeq(seq = "") {
+  return normalizeSeq(seq).split("").reverse().join("");
+}
+
 /**
  * GC percentage (0-100). Returns 0 for empty strings.
  */
@@ -401,18 +406,69 @@ export const LOOP_PENALTY = {
 
 export const Rgas = 1.987; // cal/(mol*K)
 
+/** Default PCR thermodynamic context (dNTP fixed at 0). */
+export const DEFAULT_THERMO = Object.freeze({
+  tempC: 37,
+  Na_mM: 50,
+  Mg_mM: 0,
+  dNTP_mM: 0
+});
+
+/**
+ * Normalize thermodynamic options. dNTP is always forced to 0.
+ * @param {object} [opts]
+ * @returns {{tempC:number, Na_mM:number, Mg_mM:number, dNTP_mM:number}}
+ */
+export function resolveThermoOpts(opts = {}) {
+  const tempC = Number(opts.tempC);
+  const Na_mM = Number(opts.Na_mM);
+  const Mg_mM = Number(opts.Mg_mM);
+  return {
+    tempC: Number.isFinite(tempC) ? tempC : DEFAULT_THERMO.tempC,
+    Na_mM: Number.isFinite(Na_mM) ? Math.max(0, Na_mM) : DEFAULT_THERMO.Na_mM,
+    Mg_mM: Number.isFinite(Mg_mM) ? Math.max(0, Mg_mM) : DEFAULT_THERMO.Mg_mM,
+    dNTP_mM: 0
+  };
+}
+
+/**
+ * Effective monovalent cation concentration (M) for salt correction.
+ * von Ahsen (2001): [Na_eq] = [Na+] + 4·√[Mg2+] (mM); dNTP held at 0.
+ */
+export function monovalentEqMolar(Na_mM, Mg_mM, dNTP_mM = 0) {
+  void dNTP_mM;
+  const eq_mM = Na_mM + 4.0 * Math.sqrt(Math.max(Mg_mM, 0));
+  return eq_mM / 1000.0;
+}
+
+/**
+ * SantaLucia salt correction applied to duplex entropy (cal/mol·K).
+ */
+export function saltCorrectedEntropy(dS, seqLen, Na_mM, Mg_mM, dNTP_mM = 0) {
+  const naEq = monovalentEqMolar(Na_mM, Mg_mM, dNTP_mM);
+  if (naEq <= 0 || seqLen < 2) return dS;
+  return dS + 0.368 * (seqLen - 1) * Math.log(naEq);
+}
+
+/** True when a single-strand sequence is self-complementary (palindromic). */
+export function isSelfComplementary(seq) {
+  const s = normalizeSeq(seq);
+  if (!s) return false;
+  return s === reverseComplementSeq(s);
+}
+
 /**
  * Accumulate nearest-neighbor parameters for the "worst case" (most stable)
  * compatible pairing of an IUPAC-aware sequence (single strand).
- * This is used as a risk-averse estimate of dH, dS for potential duplexes.
  *
  * @param {string} seq - DNA sequence (IUPAC allowed).
+ * @param {number} [tempC=37] - Temperature (°C) used to pick worst IUPAC step.
  * @returns {{dH:number, dS:number} | null}
  */
-export function accumulateNNWorst(seq) {
+export function accumulateNNWorst(seq, tempC = DEFAULT_THERMO.tempC) {
   const s = normalizeSeq(seq);
   if (s.length < 2) return null;
-  const Tref = 310.15; // 37 °C in Kelvin
+  const Tref = tempC + 273.15;
   let dH = 0;
   let dS = 0;
 
@@ -440,7 +496,6 @@ export function accumulateNNWorst(seq) {
     dS += bestStep.dS;
   }
 
-  // Terminal correction (initiation) — small adjustment
   dH += 0.2;
   dS += -5.7;
 
@@ -448,16 +503,37 @@ export function accumulateNNWorst(seq) {
 }
 
 /**
- * Approximate duplex ΔG°37 (kcal/mol) for a self-duplex of seq (risk-averse NN).
- * If isSymmetric is true, applies symmetry correction to entropy.
+ * Duplex ΔG (kcal/mol) at specified temperature with salt correction (dNTP = 0).
+ *
+ * @param {string} seq - One strand of duplex, 5′→3′.
+ * @param {object} [opts]
+ * @param {number} [opts.tempC=37]
+ * @param {number} [opts.Na_mM=50]
+ * @param {number} [opts.Mg_mM=0]
+ * @param {boolean} [opts.isSymmetric=false] - Apply −1.4 cal/mol·K symmetry correction.
  */
-export function duplexDG37Worst(seq, isSymmetric = false) {
-  const acc = accumulateNNWorst(seq);
+export function duplexDG(seq, opts = {}) {
+  const { tempC, Na_mM, Mg_mM, isSymmetric } = {
+    ...resolveThermoOpts(opts),
+    isSymmetric: !!opts.isSymmetric
+  };
+  const acc = accumulateNNWorst(seq, tempC);
   if (!acc) return NaN;
-  const T = 310.15; // 37 °C
-  let dS = acc.dS;
-  if (isSymmetric) dS -= 1.4; // symmetry correction
+  const s = normalizeSeq(seq);
+  const T = tempC + 273.15;
+  let dS = saltCorrectedEntropy(acc.dS, s.length, Na_mM, Mg_mM, 0);
+  if (isSymmetric) dS -= 1.4;
   return acc.dH - (T * dS) / 1000.0;
+}
+
+/**
+ * @deprecated Use duplexDG(seq, opts). Kept for backward compatibility.
+ */
+export function duplexDG37Worst(seq, isSymmetric = false, thermo = {}) {
+  if (typeof isSymmetric === "object" && isSymmetric !== null) {
+    return duplexDG(seq, isSymmetric);
+  }
+  return duplexDG(seq, { ...thermo, isSymmetric });
 }
 
 /**
@@ -480,11 +556,8 @@ export function tmcalNN(seq, Na_mM, Mg_mM, conc_nM) {
   const Cp = conc_nM * 1e-9; // total primer concentration in M
   if (Cp <= 0) return NaN;
 
-  // Effective monovalent concentration (very simplified)
-  // [Na_eq] = [Na+] + 4 * sqrt([Mg2+])  (mM)
-  const monovalentEq_mM = Na_mM + 4.0 * Math.sqrt(Math.max(Mg_mM, 0));
-  if (monovalentEq_mM <= 0) return NaN;
-  const monovalentEq = monovalentEq_mM / 1000.0; // to M
+  const monovalentEq = monovalentEqMolar(Na_mM, Mg_mM, 0);
+  if (monovalentEq <= 0) return NaN;
 
   const dH = acc.dH * 1000.0; // cal/mol
   const dS = acc.dS;          // cal/mol*K
@@ -529,7 +602,8 @@ export function getLoopPenalty(len) {
  *
  * This is a heuristic / approximate scan, not a full DP folding algorithm.
  */
-export function hairpinScan(seq) {
+export function hairpinScan(seq, thermo = {}) {
+  const opts = resolveThermoOpts(thermo);
   const s = normalizeSeq(seq);
   const n = s.length;
   const minStem = 3;
@@ -539,7 +613,6 @@ export function hairpinScan(seq) {
 
   for (let i = 0; i < n; i++) {
     for (let j = i + minStem + minLoop; j < n; j++) {
-      // Try to grow a stem around (i, j-1)
       let stem = 0;
       while (
         i + stem < j - minLoop - stem &&
@@ -553,13 +626,14 @@ export function hairpinScan(seq) {
         const loopSize = (j - i) - 2 * stem;
         if (loopSize < minLoop) continue;
 
-        const left = s.slice(i, i + stem);
-        const right = reverseComplementSeq(s.slice(j - stem, j));
-        const stemSeq = left + right;
-
-        const dG = duplexDG37Worst(stemSeq, true) + getLoopPenalty(loopSize);
+        const stemSeq = s.slice(i, i + stem);
+        const dG = duplexDG(stemSeq, {
+          ...opts,
+          isSymmetric: isSelfComplementary(stemSeq)
+        }) + getLoopPenalty(loopSize);
         if (!isFinite(dG)) continue;
 
+        const touches3 = j >= n - 3;
         if (!best || dG < best.dG) {
           best = {
             dG,
@@ -567,7 +641,8 @@ export function hairpinScan(seq) {
             loop: loopSize,
             start: i,
             end: j,
-            stemSeq
+            stemSeq,
+            touches3
           };
         }
       }
@@ -578,60 +653,110 @@ export function hairpinScan(seq) {
 }
 
 /**
- * Scan for the most stable duplex between two sequences (self- or cross-dimer).
- * This is a simplified local alignment for ΔG prediction, risk-averse NN model.
- *
- * Returns the worst dG and whether the interaction touches the 3' end of seqA.
+ * Build a text alignment for a dimer at a given offset.
  */
-export function dimerScan(seqA, seqB) {
+export function buildDimerAlignment(seqA, seqB, offset) {
+  const A = normalizeSeq(seqA);
+  const B = normalizeSeq(seqB);
+  const Brev = reverseSeq(B);
+  const n = A.length;
+  const m = Brev.length;
+  const minPos = Math.min(0, offset);
+  const maxPos = Math.max(n, m + offset);
+  let lineA = "";
+  let lineB = "";
+  let lineM = "";
+  for (let pos = minPos; pos < maxPos; pos++) {
+    const i = pos;
+    const j = pos - offset;
+    const a = i >= 0 && i < n ? A[i] : " ";
+    const b = j >= 0 && j < m ? Brev[j] : " ";
+    lineA += a;
+    lineB += b;
+    lineM += a !== " " && b !== " " && isComplementaryIUPAC(a, b) ? "|" : " ";
+  }
+  return "5' " + lineA + " 3'\n   " + lineM + "\n3' " + lineB + " 5'";
+}
+
+function recordDimerCandidate(best, candidate) {
+  if (!candidate || !isFinite(candidate.dG)) return best;
+  if (
+    !best ||
+    candidate.dG < best.dG - 0.1 ||
+    (Math.abs(candidate.dG - best.dG) <= 0.1 && candidate.touches3 && !best.touches3)
+  ) {
+    return candidate;
+  }
+  return best;
+}
+
+/**
+ * Scan for the most stable duplex between two sequences (self- or cross-dimer).
+ * Returns the worst ΔG and whether the interaction touches either 3′ end.
+ */
+export function dimerScan(seqA, seqB, thermo = {}) {
+  const opts = resolveThermoOpts(thermo);
   const a = normalizeSeq(seqA);
   const b = normalizeSeq(seqB);
-  const ra = a;              // 5'→3' of first strand
-  const rb = reverseComplementSeq(b); // 5'→3' complement of second strand
-
+  const ra = a;
+  // Antiparallel duplex: A (5′→3′) vs B written 3′→5′ as reverse(B), not revcomp(B).
+  const rb = reverseSeq(b);
   const la = ra.length;
   const lb = rb.length;
+  const minLen = 3;
   if (!la || !lb) return null;
 
   let best = null;
 
-  // We slide rb relative to ra, allowing partial overlaps.
-  // offset < 0 means rb starts before ra; offset >= 0 means rb starts inside ra.
   for (let offset = -lb + 1; offset < la; offset++) {
     let overlap = "";
+    let blockStartA = -1;
+
+    const flushBlock = (endA) => {
+      if (overlap.length < minLen) {
+        overlap = "";
+        blockStartA = -1;
+        return;
+      }
+      const idxOnBrev = endA - offset;
+      const endOnB = b.length - 1 - idxOnBrev;
+      const touches3 =
+        endA >= la - 3 || (endOnB >= 0 && endOnB >= b.length - 3);
+      const sym =
+        a === b && isSelfComplementary(overlap);
+      const dG = duplexDG(overlap, { ...opts, isSymmetric: sym });
+      if (isFinite(dG)) {
+        best = recordDimerCandidate(best, {
+          dG,
+          overlap,
+          seg: overlap,
+          len: overlap.length,
+          offset,
+          touches3,
+          align: buildDimerAlignment(a, b, offset)
+        });
+      }
+      overlap = "";
+      blockStartA = -1;
+    };
 
     for (let i = 0; i < lb; i++) {
       const ai = offset + i;
-      if (ai < 0 || ai >= la) continue;
+      if (ai < 0 || ai >= la) {
+        if (overlap.length) flushBlock(ai - 1);
+        continue;
+      }
       const c1 = ra[ai];
       const c2 = rb[i];
-
       if (isComplementaryIUPAC(c1, c2)) {
+        if (!overlap.length) blockStartA = ai;
         overlap += c1;
-      } else {
-        // break possible contiguous block; we only consider contiguous binding
-        if (overlap.length >= 2) {
-          const dG = duplexDG37Worst(overlap, false);
-          if (isFinite(dG)) {
-            const touches3 = (offset + i === la - 1); // last base of ra?
-            if (!best || dG < best.dG) {
-              best = { dG, overlap, offset, touches3 };
-            }
-          }
-        }
-        overlap = "";
+      } else if (overlap.length) {
+        flushBlock(ai - 1);
       }
     }
-
-    // End-of-scan flush
-    if (overlap.length >= 2) {
-      const dG = duplexDG37Worst(overlap, false);
-      if (isFinite(dG)) {
-        const touches3 = (offset + (overlap.length - 1) === la - 1);
-        if (!best || dG < best.dG) {
-          best = { dG, overlap, offset, touches3 };
-        }
-      }
+    if (overlap.length && blockStartA >= 0) {
+      flushBlock(blockStartA + overlap.length - 1);
     }
   }
 
@@ -641,8 +766,8 @@ export function dimerScan(seqA, seqB) {
 /**
  * Convenience wrapper to get the worst self-dimer of a sequence.
  */
-export function selfDimerScan(seq) {
-  return dimerScan(seq, seq);
+export function selfDimerScan(seq, thermo = {}) {
+  return dimerScan(seq, seq, thermo);
 }
 
 /**
@@ -673,15 +798,17 @@ export function classifyDG(dg, touches3) {
 }
 
 /**
- * Quick 3'-end stability descriptor for a primer.
- * Looks at the last 4 bases by default and estimates ΔG37Worst.
+ * Quick 3'-end stability descriptor for a primer (default last 5 bp).
  */
-export function threePrimeDG(seq, window = 4) {
+export function threePrimeDG(seq, window = 5, thermo = {}) {
   const s = normalizeSeq(seq);
   if (s.length < 2) return NaN;
   const w = Math.min(window, s.length);
   const tail = s.slice(-w);
-  return duplexDG37Worst(tail, true);
+  return duplexDG(tail, {
+    ...resolveThermoOpts(thermo),
+    isSymmetric: isSelfComplementary(tail)
+  });
 }
 
 // ============================================================================
@@ -697,15 +824,21 @@ export function qcSinglePrimer(seq, {
   Mg_mM = 0,
   conc_nM = 500,
   tmTarget = 60,
+  tempC,
   homopolymerMax = 4
 } = {}) {
+  const thermo = resolveThermoOpts({
+    Na_mM,
+    Mg_mM,
+    tempC: tempC ?? tmTarget
+  });
   const s = normalizeSeq(seq);
   const len = s.length;
   const gc = gcPct(s);
   const tm = tmcalNN(s, Na_mM, Mg_mM, conc_nM);
-  const hp = hairpinScan(s);
-  const sd = selfDimerScan(s);
-  const threeDG = threePrimeDG(s);
+  const hp = hairpinScan(s, thermo);
+  const sd = selfDimerScan(s, thermo);
+  const threeDG = threePrimeDG(s, 5, thermo);
 
   const homopolymerFlag = hasHomopolymer(s, homopolymerMax);
 
@@ -772,9 +905,14 @@ export function qcSinglePrimer(seq, {
  *   - cross-dimer assessment
  */
 export function qcPrimerPair(fwd, rev, options = {}) {
+  const thermo = resolveThermoOpts({
+    Na_mM: options.Na_mM,
+    Mg_mM: options.Mg_mM,
+    tempC: options.tempC ?? options.tmTarget
+  });
   const qF = qcSinglePrimer(fwd, options);
   const qR = qcSinglePrimer(rev, options);
-  const cross = dimerScan(fwd, rev);
+  const cross = dimerScan(fwd, rev, thermo);
   return {
     fwd: qF,
     rev: qR,
@@ -1804,7 +1942,8 @@ export function has3GCClamp(seq) {
  * matrix[i][j] describes the interaction between primers[i] and primers[j].
  * For i === j this is the self-dimer.
  */
-export function buildPrimerDimerMatrix(primers) {
+export function buildPrimerDimerMatrix(primers, thermo = {}) {
+  const opts = resolveThermoOpts(thermo);
   const arr = primers.map((p, i) => ({
     index: i,
     label: p.label || p.name || `primer_${i + 1}`,
@@ -1824,7 +1963,7 @@ export function buildPrimerDimerMatrix(primers) {
         matrix[i][j] = matrix[j][i] = null;
         continue;
       }
-      const d = dimerScan(a, b);
+      const d = dimerScan(a, b, opts);
       if (!d) {
         matrix[i][j] = matrix[j][i] = {
           dG: NaN,
@@ -1973,7 +2112,12 @@ export function evalOverlap(seq, options = {}) {
   const len = s.length;
   const gc = gcPct(s);
   const tm = tmcalNN(s, Na_mM, Mg_mM, conc_nM);
-  const dG = duplexDG37Worst(s, true);
+  const dG = duplexDG(s, {
+    Na_mM,
+    Mg_mM,
+    tempC: tmTarget,
+    isSymmetric: isSelfComplementary(s)
+  });
   const tmDiff = isFinite(tm) ? Math.abs(tm - tmTarget) : NaN;
 
   return {

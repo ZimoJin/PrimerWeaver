@@ -2135,13 +2135,14 @@ function renderResults(results, vector, inserts) {
   const naConc = parseFloat($('na-conc').value) || 50;
   const mgConc = parseFloat($('mg-conc').value) || 0;
   const primerConc = parseFloat($('primer-conc').value) || 500;
+  const tmTarget = parseFloat($('target-tm')?.value) || 60;
 
   // Render primer sets (spans 2 columns)
   const primersCell = document.createElement('div');
   primersCell.id = 'cell-primers';
   primersCell.className = 'box';
   primersCell.innerHTML = '<h3>Primer sets</h3>';
-  primersCell.innerHTML += renderPrimerSets(results.primers, naConc, mgConc, primerConc);
+  primersCell.innerHTML += renderPrimerSets(results.primers, naConc, mgConc, primerConc, tmTarget);
   resultsContent.appendChild(primersCell);
 
   // Left column wrapper: keeps assembly diagram + overlap table stacked tightly,
@@ -2245,7 +2246,7 @@ function renderResults(results, vector, inserts) {
   resultsDiv.classList.add('show');
 }
 
-function renderPrimerSets(primers, naConc, mgConc, primerConc) {
+function renderPrimerSets(primers, naConc, mgConc, primerConc, tmTarget = 60) {
   let html = '';
   
   primers.forEach((primer, idx) => {
@@ -2257,9 +2258,9 @@ function renderPrimerSets(primers, naConc, mgConc, primerConc) {
     const labelR = primer.insertName ? `${primer.insertName}-R` : `Reverse`;
 
     // Analyze primers using Core functions
-    const fwdAnalysis = analyzePrimer(labelF, primer.forward.full, primer.forward.core, naConc, mgConc, primerConc);
-    const revAnalysis = analyzePrimer(labelR, primer.reverse.full, primer.reverse.core, naConc, mgConc, primerConc);
-    const crossDimer = qcPair(fwdAnalysis, revAnalysis);
+    const fwdAnalysis = analyzePrimer(labelF, primer.forward.full, primer.forward.core, naConc, mgConc, primerConc, tmTarget);
+    const revAnalysis = analyzePrimer(labelR, primer.reverse.full, primer.reverse.core, naConc, mgConc, primerConc, tmTarget);
+    const crossDimer = qcPair(fwdAnalysis, revAnalysis, naConc, mgConc, tmTarget);
 
     // Build sequence display
     const fwdSeq = buildSeqCell(primer.forward.core, primer.forward.full, primer.forward.overlap);
@@ -2388,7 +2389,7 @@ function getSimpleQCLabel(dg, touches3) {
   return { label, cls };
 }
 
-function analyzePrimer(label, fullSeq, coreSeq, naConc, mgConc, primerConc) {
+function analyzePrimer(label, fullSeq, coreSeq, naConc, mgConc, primerConc, tmTarget = 60) {
   const seq = Core.normalizeSeq(fullSeq);
   const core = Core.normalizeSeq(coreSeq || fullSeq);
   
@@ -2396,24 +2397,24 @@ function analyzePrimer(label, fullSeq, coreSeq, naConc, mgConc, primerConc) {
     return { label, empty: true };
   }
 
+  const thermo = Core.resolveThermoOpts({
+    Na_mM: naConc,
+    Mg_mM: mgConc,
+    tempC: tmTarget
+  });
   const lenCore = core.length;
   const gcCore = Core.gcPct(core);
   const tmCore = Core.tmcalNN(core, naConc, mgConc, primerConc);
   const tmFull = Core.tmcalNN(seq, naConc, mgConc, primerConc);
   
-  // Check homopolymer (≥4 repeats)
   const homopoly = hasHomopolymer(seq, 4);
-  
-  // Check 3' end stability
-  const dg3 = Core.threePrimeDG(seq);
+  const dg3 = Core.threePrimeDG(seq, 5, thermo);
   const dg3Bad = isFinite(dg3) && dg3 <= -3;
   
-  // Self-dimer
-  const selfDimer = Core.selfDimerScan(seq);
+  const selfDimer = Core.selfDimerScan(seq, thermo);
   const selfDimerClass = getSimpleQCLabel(selfDimer ? selfDimer.dG : NaN, selfDimer ? selfDimer.touches3 : false);
   
-  // Hairpin
-  const hairpin = Core.hairpinScan(seq);
+  const hairpin = Core.hairpinScan(seq, thermo);
   const hairpinClass = getSimpleQCLabel(hairpin ? hairpin.dG : NaN, hairpin ? hairpin.touches3 : false);
 
   return {
@@ -2435,11 +2436,16 @@ function analyzePrimer(label, fullSeq, coreSeq, naConc, mgConc, primerConc) {
   };
 }
 
-function qcPair(fwdAnalysis, revAnalysis) {
+function qcPair(fwdAnalysis, revAnalysis, naConc, mgConc, tmTarget = 60) {
   if (!fwdAnalysis || !revAnalysis || fwdAnalysis.empty || revAnalysis.empty) {
     return null;
   }
-  const dimer = Core.dimerScan(fwdAnalysis.seq, revAnalysis.seq);
+  const thermo = Core.resolveThermoOpts({
+    Na_mM: naConc,
+    Mg_mM: mgConc,
+    tempC: tmTarget
+  });
+  const dimer = Core.dimerScan(fwdAnalysis.seq, revAnalysis.seq, thermo);
   const info = getSimpleQCLabel(dimer ? dimer.dG : NaN, dimer ? dimer.touches3 : false);
   return { dimer, info };
 }

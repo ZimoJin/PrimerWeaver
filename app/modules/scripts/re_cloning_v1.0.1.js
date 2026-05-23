@@ -249,45 +249,28 @@ function subseqCircular(seq, start, len){
     return seq.slice(start) + seq.slice(0,(start+len)%N);
   }
 
-  const NN = {'AA':{dH:-7.9,dS:-22.2},'TT':{dH:-7.9,dS:-22.2},'AT':{dH:-7.2,dS:-20.4},'TA':{dH:-7.2,dS:-21.3},
-  'CA':{dH:-8.5,dS:-22.7},'TG':{dH:-8.5,dS:-22.7},'GT':{dH:-8.4,dS:-22.4},'AC':{dH:-8.4,dS:-22.4},
-  'CT':{dH:-7.8,dS:-21.0},'AG':{dH:-7.8,dS:-21.0},'GA':{dH:-8.2,dS:-22.2},'TC':{dH:-8.2,dS:-22.2},
-  'CG':{dH:-10.6,dS:-27.2},'GC':{dH:-9.8,dS:-24.4},'GG':{dH:-8.0,dS:-19.9},'CC':{dH:-8.0,dS:-19.9}};
-  const Rgas = 1.987;
-  function tmNEB(seq, Na_mM=50, conc_nM=500){
-    const s=seq.toUpperCase(); if(!s || s.length<2) return NaN;
-    let dH=0, dS=0;
-    for(let i=0;i<s.length-1;i++){
-      const p=NN[s.slice(i,i+2)]; if(!p) return NaN;
-      dH+=p.dH; dS+=p.dS;
-    }
-    dH+=0.2; dS+=-5.7;
-    const Cp=conc_nM*1e-9;
-    const Tm1M_K=(1000*dH)/(dS + Rgas*Math.log(Cp));
-    const m=Na_mM/1000;
-    const fgc=((s.match(/[GC]/g)||[]).length)/s.length;
-    const term=((4.29*fgc - 3.95)*Math.log(m) + 0.94*Math.log(m)**2) * 1e-5;
-    return (1/(1/Tm1M_K + term)) - 273.15;
+  function tmNEB(seq, Na_mM = 50, conc_nM = 500, Mg_mM = 0) {
+    return CORE.tmcalNN(seq, Na_mM, Mg_mM, conc_nM);
   }
 
-  function pickCorePrimerForward(seq, tmTarget, Na, conc){
+  function pickCorePrimerForward(seq, tmTarget, Na, conc, Mg = 0){
     const minL=18, maxL=28; let best=seq.slice(0,minL);
     for(let L=minL; L<=maxL; L++){
       const cand=seq.slice(0,L);
       const ok3=/[GC]$/.test(cand);
-      const Tm=tmNEB(cand,Na,conc);
+      const Tm=tmNEB(cand,Na,conc,Mg);
       if(ok3 && Tm>=tmTarget-0.5) return cand;
       best=cand;
     }
     return best;
   }
-  function pickCorePrimerReverse(seq, tmTarget, Na, conc){
+  function pickCorePrimerReverse(seq, tmTarget, Na, conc, Mg = 0){
     const minL=18, maxL=28; let best=rc(seq.slice(-minL));
     for(let L=minL; L<=maxL; L++){
       const core=seq.slice(-L);
       const p=rc(core);
       const ok3=/[GC]$/.test(p);
-      const Tm=tmNEB(p,Na,conc);
+      const Tm=tmNEB(p,Na,conc,Mg);
       if(ok3 && Tm>=tmTarget-0.5) return p;
       best=p;
     }
@@ -333,7 +316,7 @@ function subseqCircular(seq, start, len){
     return m[1].trim().split(/\s+/)[0];
   }
 
-  function designREPrimers(insertRaw, enz1Name, enz2Name, clampN, tmTarget, Na, conc){
+  function designREPrimers(insertRaw, enz1Name, enz2Name, clampN, tmTarget, Na, conc, Mg = 0){
     const insertClean = cleanFasta(insertRaw||'');
     const headerName = parseHeader(insertRaw);
     const primers = [];
@@ -353,8 +336,8 @@ function subseqCircular(seq, start, len){
     const siteF = enz1.site;
     const siteR = enz2.site;
 
-    const Fcore = pickCorePrimerForward(insertClean, tmTarget, Na, conc);
-    const Rcore = pickCorePrimerReverse(insertClean, tmTarget, Na, conc);
+    const Fcore = pickCorePrimerForward(insertClean, tmTarget, Na, conc, Mg);
+    const Rcore = pickCorePrimerReverse(insertClean, tmTarget, Na, conc, Mg);
     const clamp = makeSmartClamp(clampN);
 
     const F = clamp + siteF + Fcore;
@@ -371,8 +354,8 @@ function subseqCircular(seq, start, len){
       OH_L:enz1.sticky || '',
       OH_R:enz2.sticky || '',
       F,R,Fcore,Rcore,
-      tmF:tmNEB(Fcore,Na,conc),
-      tmR:tmNEB(Rcore,Na,conc),
+      tmF:tmNEB(Fcore,Na,conc,Mg),
+      tmR:tmNEB(Rcore,Na,conc,Mg),
       labelF:(headerName?headerName+'('+enz1Name+')-F':'Insert1-F'),
       labelR:(headerName?headerName+'('+enz2Name+')-R':'Insert1-R'),
       insertName:headerName||null,
@@ -450,142 +433,32 @@ function subseqCircular(seq, start, len){
     </table>`;
   }
 
-  const NN2 = NN;
   function cleanSeq(r){ return (r||"").toUpperCase().replace(/[^ACGT]/g,""); }
   function has3GCClamp(s){
     if(!s.length) return false;
     const c = s[s.length-1];
     return c==="G" || c==="C";
   }
-  function hasHomopolymer(s,n){ return new RegExp("A{"+n+",}|C{"+n+",}|G{"+n+",}|T{"+n+",}").test((s||"").toUpperCase()); }
-  function duplexDG37(seq){
-    const s = (seq||"").toUpperCase();
-    if(s.length<2) return NaN;
-    let dH=0,dS=0;
-    for(let i=0;i<s.length-1;i++){
-      const p = NN2[s.slice(i,i+2)];
-      if(!p) return NaN;
-      dH += p.dH;
-      dS += p.dS;
-    }
-    dH += 0.2;
-    dS += -5.7;
-    const T = 310.15;
-    return dH - T*dS/1000;
-  }
+  function hasHomopolymer(s,n){ return CORE.hasHomopolymer(s, n); }
   function fmt2(x){return isFinite(x)?x.toFixed(2):"--";}
   function badge(cls,txt){return '<span class="badge '+cls+'">'+txt+'</span>';}
-  function classifyDG(dg,t3){
-    if(!isFinite(dg)) return {label:"None",cls:"ok"};
-    let label,cls;
-    if(dg<=-7){label="Very strong";cls="bad";}
-    else if(dg<=-5){label="Strong";cls="bad";}
-    else if(dg<=-3){label="Moderate";cls="warn";}
-    else {label="Weak";cls="ok";}
-    if(t3 && cls!=="ok") label="3' "+label;
-    return {label,cls};
-  }
-  function dimerScan(seqA, seqB){
-    const A = (seqA||"").toUpperCase();
-    const B = (seqB||"").toUpperCase();
-    const Brev = B.split("").reverse().join("");
-    const n=A.length, m=Brev.length;
-    const minLen=3;
-    let best=null;
-    for(let offset=-m+1; offset<=n-1; offset++){
-      let cur="", aStart=null, bStart=null;
-      for(let i=0;i<n;i++){
-        const j = i-offset;
-        if(j<0 || j>=m){
-          if(cur.length>=minLen) recordSeg(cur,aStart,bStart,offset);
-          cur=""; aStart=null; bStart=null;
-          continue;
-        }
-        const a=A[i], b=Brev[j];
-        if(comp[a]===b){
-          if(cur.length===0){aStart=i;bStart=j;}
-          cur+=a;
-        }else{
-          if(cur.length>=minLen) recordSeg(cur,aStart,bStart,offset);
-          cur=""; aStart=null; bStart=null;
-        }
-      }
-      if(cur.length>=minLen) recordSeg(cur,aStart,bStart,offset);
-    }
-    function recordSeg(seg,aStart,bStart,offset){
-      const dg = duplexDG37(seg);
-      const aEnd=aStart+seg.length-1;
-      const bEnd=bStart+seg.length-1;
-      const touches3 = (aEnd>=A.length-3) || (bEnd>=Brev.length-3);
-      if(
-        !best ||
-        dg<best.dg-0.1 ||
-        (Math.abs(dg-best.dg)<=0.1 && touches3 && !best.touches3)
-      ){
-        best = {seg,dg,len:seg.length,touches3,offset};
-      }
-    }
-    if(!best) return null;
-    let minI=Math.min(0,best.offset);
-    let maxI=Math.max(n,m+best.offset);
-    let lineA="",lineB="",lineM="";
-    for(let pos=minI; pos<maxI; pos++){
-      const i=pos;
-      const j=pos-best.offset;
-      const a=(i>=0 && i<n)?A[i]:" ";
-      const b=(j>=0 && j<m)?Brev[j]:" ";
-      lineA+=a;
-      lineB+=b;
-      lineM += (a!==" " && b!==" " && comp[a]===b)?"|":" ";
-    }
-    const align = "5' "+lineA+" 3'\n   "+lineM+"\n3' "+lineB+" 5'";
-    return {seg:best.seg,dg:best.dg,len:best.len,touches3:best.touches3,align};
-  }
-  function threePrimeDG(seq){
-    const s = (seq||"").toUpperCase();
-    if(s.length<5) return NaN;
-    return duplexDG37(s.slice(-5));
-  }
-  function hairpinScan(seq){
-    const s = (seq||"").toUpperCase();
-    const n = s.length;
-    const minStem=4, minLoop=3;
-    let best=null;
-    for(let i=0;i<n;i++){
-      for(let j=i+minLoop+minStem;j<n;j++){
-        let a=i,b=j,seg="";
-        while(a>=0 && b<n && comp[s[a]]===s[b]){
-          seg = s[a] + seg;
-          a--; b++;
-        }
-        if(seg.length>=minStem){
-          const dg = duplexDG37(seg);
-          const touches3 = (j>=n-5) || (b-1>=n-5);
-          if(!best || dg<best.dg-0.1){
-            best = {seg,dg,touches3};
-          }
-        }
-      }
-    }
-    if(!best) return null;
-    return {seg:best.seg,dg:best.dg,touches3:best.touches3};
-  }
-  function analyzePrimer(label, fullSeq, coreSeq, Na, conc){
+  function analyzePrimer(label, fullSeq, coreSeq, Na, Mg, conc, tempC){
     const seq = cleanSeq(fullSeq);
     const core = cleanSeq(coreSeq || fullSeq);
     if(!seq || !core) return {label,empty:true};
+    const thermo = CORE.resolveThermoOpts({ Na_mM: Na, Mg_mM: Mg, tempC: tempC ?? 37 });
     const lenCore = core.length;
     const gcCore = gcPct(core);
-    const tmCore = tmNEB(core, Na, conc);
-    const tmFull = tmNEB(seq, Na, conc);
+    const tmCore = tmNEB(core, Na, conc, Mg);
+    const tmFull = tmNEB(seq, Na, conc, Mg);
     const clamp = has3GCClamp(seq);
     const homopoly = hasHomopolymer(seq,4);
-    const dg3 = threePrimeDG(seq);
+    const dg3 = CORE.threePrimeDG(seq, 5, thermo);
     const dg3Bad = isFinite(dg3) && dg3<=-3;
-    const selfD = dimerScan(seq,seq);
-    const selfClass = selfD ? classifyDG(selfD.dg,selfD.touches3) : {label:"None",cls:"ok"};
-    const hp = hairpinScan(seq);
-    const hpClass = hp ? classifyDG(hp.dg,hp.touches3) : {label:"None",cls:"ok"};
+    const selfD = CORE.selfDimerScan(seq, thermo);
+    const selfClass = selfD ? CORE.classifyDG(selfD.dG, selfD.touches3) : {label:"None",cls:"ok"};
+    const hp = CORE.hairpinScan(seq, thermo);
+    const hpClass = hp ? CORE.classifyDG(hp.dG, hp.touches3) : {label:"None",cls:"ok"};
     return {
       label,seq,core,lenCore,gcCore,tmCore,tmFull,
       clamp,homopoly,dg3,dg3Bad,
@@ -594,10 +467,10 @@ function subseqCircular(seq, start, len){
       empty:false
     };
   }
-  function qcPair(F,R){
+  function qcPair(F,R, thermo){
     if(!F || !R || F.empty || R.empty) return null;
-    const d = dimerScan(F.seq,R.seq);
-    const info = d ? classifyDG(d.dg,d.touches3) : {label:"None",cls:"ok"};
+    const d = CORE.dimerScan(F.seq, R.seq, thermo);
+    const info = d ? CORE.classifyDG(d.dG, d.touches3) : {label:"None",cls:"ok"};
     return {dimer:d,info};
   }
 
@@ -646,6 +519,9 @@ function subseqCircular(seq, start, len){
 
   function renderPrimerBlocks(primers){
     const Na = parseFloat(document.getElementById('gg-na').value || '50');
+    const Mg = parseFloat(document.getElementById('gg-mg')?.value || '0');
+    const tmTarget = parseFloat(document.getElementById('gg-tmTarget')?.value || '60');
+    const thermo = CORE.resolveThermoOpts({ Na_mM: Na, Mg_mM: Mg, tempC: tmTarget });
     const conc = parseFloat(document.getElementById('gg-conc').value || '500');
 
     let out = '';
@@ -667,9 +543,9 @@ function subseqCircular(seq, start, len){
       const labelF = p.labelF || 'Forward';
       const labelR = p.labelR || 'Reverse';
 
-      const Fqc = analyzePrimer(labelF, p.F, p.Fcore, Na, conc);
-      const Rqc = analyzePrimer(labelR, p.R, p.Rcore, Na, conc);
-      const pair = qcPair(Fqc, Rqc);
+      const Fqc = analyzePrimer(labelF, p.F, p.Fcore, Na, Mg, conc, tmTarget);
+      const Rqc = analyzePrimer(labelR, p.R, p.Rcore, Na, Mg, conc, tmTarget);
+      const pair = qcPair(Fqc, Rqc, thermo);
 
       const Fseq = buildSeqCell(p.Fcore, p.F, p.OH_L, clampLen, p.siteF || '');
       const Rseq = buildSeqCell(p.Rcore, p.R, p.OH_R, clampLen, p.siteR || '');
@@ -1702,6 +1578,7 @@ function subseqCircular(seq, start, len){
       const clampN   = parseInt(document.getElementById('gg-clamp').value||'5',10);
       const tmTarget = parseFloat(document.getElementById('gg-tmTarget').value||'55');
       const Na       = parseFloat(document.getElementById('gg-na').value||'50');
+      const Mg       = parseFloat(document.getElementById('gg-mg')?.value || '0');
       const conc     = parseFloat(document.getElementById('gg-conc').value||'500');
 
       const vecClean = cleanFasta(vectorRaw);
@@ -1902,7 +1779,7 @@ function subseqCircular(seq, start, len){
         if (!ok) return;
       }
 
-      const design = designREPrimers(insertRaw, effEnz1Name, effEnz2Name, clampN, tmTarget, Na, conc);
+      const design = designREPrimers(insertRaw, effEnz1Name, effEnz2Name, clampN, tmTarget, Na, conc, Mg);
       const primers = design.primers;
       const pcrSize = design.pcrSize;
       const insertLen = design.insertLen;

@@ -1748,6 +1748,7 @@ function displayResults(results) {
   const naConc = parseFloat($('na-conc').value) || 50;
   const mgConc = parseFloat($('mg-conc').value) || 0;
   const primerConc = parseFloat($('primer-conc').value) || 500;
+  const tmTarget = parseFloat($('target-tm')?.value) || 60;
   
   // Parse vector and insert for diagram and gel
   const vectorText = $('vector-seq').value.trim();
@@ -1760,7 +1761,7 @@ function displayResults(results) {
   primersCell.id = 'cell-primers';
   primersCell.className = 'box';
   primersCell.innerHTML = '<h3>Primer sets</h3>';
-  primersCell.innerHTML += renderPrimerSets(results, naConc, mgConc, primerConc);
+  primersCell.innerHTML += renderPrimerSets(results, naConc, mgConc, primerConc, tmTarget);
   resultsContent.appendChild(primersCell);
   
   // Left column wrapper: keeps assembly diagram + overlap table stacked tightly,
@@ -1868,7 +1869,7 @@ function displayResults(results) {
   resultsDiv.classList.add('show');
 }
 
-function renderPrimerSets(results, naConc, mgConc, primerConc) {
+function renderPrimerSets(results, naConc, mgConc, primerConc, tmTarget = 60) {
   let html = '';
   
   const vectorBaseName = extractFASTAHeader($('vector-seq')?.value || '') || 'Vector';
@@ -1882,9 +1883,9 @@ function renderPrimerSets(results, naConc, mgConc, primerConc) {
   };
 
   // Vector primers
-  const vecFwdAnalysis = analyzePrimer(vectorFLabel, results.vector.F.seq, results.vector.F.coreSeq, naConc, mgConc, primerConc);
-  const vecRevAnalysis = analyzePrimer(vectorRLabel, results.vector.R.seq, results.vector.R.coreSeq, naConc, mgConc, primerConc);
-  const vecCrossDimer = qcPair(vecFwdAnalysis, vecRevAnalysis);
+  const vecFwdAnalysis = analyzePrimer(vectorFLabel, results.vector.F.seq, results.vector.F.coreSeq, naConc, mgConc, primerConc, tmTarget);
+  const vecRevAnalysis = analyzePrimer(vectorRLabel, results.vector.R.seq, results.vector.R.coreSeq, naConc, mgConc, primerConc, tmTarget);
+  const vecCrossDimer = qcPair(vecFwdAnalysis, vecRevAnalysis, naConc, mgConc, tmTarget);
   
   const vecFwdSeq = buildSeqCellWithU(results.vector.F.coreSeq, results.vector.F.seq, results.vector.F.overlapSeq);
   const vecRevSeq = buildSeqCellWithU(results.vector.R.coreSeq, results.vector.R.seq, results.vector.R.overlapSeq);
@@ -1954,9 +1955,9 @@ function renderPrimerSets(results, naConc, mgConc, primerConc) {
   const rLabel = `${insertBaseName}-R`;
   const insertTitle = firstIns.name ? `Insert #${firstIndex} (${firstIns.name}, len: ${firstIns.length} bp)` : `Insert #${firstIndex} (len: ${firstIns.length} bp)`;
   
-  const insFwdAnalysis = analyzePrimer(fLabel, firstIns.F.seq, firstIns.F.coreSeq, naConc, mgConc, primerConc);
-  const insRevAnalysis = analyzePrimer(rLabel, firstIns.R.seq, firstIns.R.coreSeq, naConc, mgConc, primerConc);
-  const insCrossDimer = qcPair(insFwdAnalysis, insRevAnalysis);
+  const insFwdAnalysis = analyzePrimer(fLabel, firstIns.F.seq, firstIns.F.coreSeq, naConc, mgConc, primerConc, tmTarget);
+  const insRevAnalysis = analyzePrimer(rLabel, firstIns.R.seq, firstIns.R.coreSeq, naConc, mgConc, primerConc, tmTarget);
+  const insCrossDimer = qcPair(insFwdAnalysis, insRevAnalysis, naConc, mgConc, tmTarget);
   
   const insFwdSeq = buildSeqCellWithU(firstIns.F.coreSeq, firstIns.F.seq, firstIns.F.overlapSeq);
   const insRevSeq = buildSeqCellWithU(firstIns.R.coreSeq, firstIns.R.seq, firstIns.R.overlapSeq);
@@ -2013,9 +2014,9 @@ function renderPrimerSets(results, naConc, mgConc, primerConc) {
       const rL = `Insert${idx}-R`;
       const title = ins.name ? `Insert #${idx} (${ins.name}, len: ${ins.length} bp)` : `Insert #${idx} (len: ${ins.length} bp)`;
       
-      const fa = analyzePrimer(fL, ins.F.seq, ins.F.coreSeq, naConc, mgConc, primerConc);
-      const ra = analyzePrimer(rL, ins.R.seq, ins.R.coreSeq, naConc, mgConc, primerConc);
-      const cd = qcPair(fa, ra);
+      const fa = analyzePrimer(fL, ins.F.seq, ins.F.coreSeq, naConc, mgConc, primerConc, tmTarget);
+      const ra = analyzePrimer(rL, ins.R.seq, ins.R.coreSeq, naConc, mgConc, primerConc, tmTarget);
+      const cd = qcPair(fa, ra, naConc, mgConc, tmTarget);
       
       const fSeq = buildSeqCellWithU(ins.F.coreSeq, ins.F.seq, ins.F.overlapSeq);
       const rSeq = buildSeqCellWithU(ins.R.coreSeq, ins.R.seq, ins.R.overlapSeq);
@@ -2219,7 +2220,7 @@ function getSimpleQCLabel(dg, touches3) {
   return { label, cls };
 }
 
-function analyzePrimer(label, fullSeq, coreSeq, naConc, mgConc, primerConc) {
+function analyzePrimer(label, fullSeq, coreSeq, naConc, mgConc, primerConc, tmTarget = 60) {
   // Normalize sequences (replace U with T for calculations)
   const seq = Core.normalizeSeq(fullSeq);
   const core = Core.normalizeSeq(coreSeq || fullSeq);
@@ -2237,15 +2238,18 @@ function analyzePrimer(label, fullSeq, coreSeq, naConc, mgConc, primerConc) {
   const homopoly = hasHomopolymer(seq, 4);
   
   // Check 3' end stability
-  const dg3 = Core.threePrimeDG(seq);
+  const thermo = Core.resolveThermoOpts({
+    Na_mM: naConc,
+    Mg_mM: mgConc,
+    tempC: tmTarget ?? 60
+  });
+  const dg3 = Core.threePrimeDG(seq, 5, thermo);
   const dg3Bad = isFinite(dg3) && dg3 <= -3;
   
-  // Self-dimer
-  const selfDimer = Core.selfDimerScan(seq);
+  const selfDimer = Core.selfDimerScan(seq, thermo);
   const selfDimerClass = getSimpleQCLabel(selfDimer ? selfDimer.dG : NaN, selfDimer ? selfDimer.touches3 : false);
   
-  // Hairpin
-  const hairpin = Core.hairpinScan(seq);
+  const hairpin = Core.hairpinScan(seq, thermo);
   const hairpinClass = getSimpleQCLabel(hairpin ? hairpin.dG : NaN, hairpin ? hairpin.touches3 : false);
 
   return {
@@ -2267,11 +2271,16 @@ function analyzePrimer(label, fullSeq, coreSeq, naConc, mgConc, primerConc) {
   };
 }
 
-function qcPair(fwdAnalysis, revAnalysis) {
+function qcPair(fwdAnalysis, revAnalysis, naConc, mgConc, tmTarget = 60) {
   if (!fwdAnalysis || !revAnalysis || fwdAnalysis.empty || revAnalysis.empty) {
     return null;
   }
-  const dimer = Core.dimerScan(fwdAnalysis.seq, revAnalysis.seq);
+  const thermo = Core.resolveThermoOpts({
+    Na_mM: naConc,
+    Mg_mM: mgConc,
+    tempC: tmTarget
+  });
+  const dimer = Core.dimerScan(fwdAnalysis.seq, revAnalysis.seq, thermo);
   const info = getSimpleQCLabel(dimer ? dimer.dG : NaN, dimer ? dimer.touches3 : false);
   return { dimer, info };
 }

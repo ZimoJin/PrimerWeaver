@@ -2,6 +2,7 @@
 // Purpose: Design primers to join multiple DNA fragments together using Overlap Extension PCR
 
 import * as VIZ from './bio_visuals_v1.0.1.js';
+import { setupAssemblyParameterPresets } from './assembly_parameter_presets_v1.0.1.js';
 
 /**
  * Show warning modal (similar to QC module)
@@ -1073,10 +1074,15 @@ function runPrimerQC(seq, targetTm, conc_nM = 500, na_mM = 50, mg_mM = 0) {
   const tm = tmSaltCorrected(seq, conc_nM, na_mM, mg_mM);
   const gc = gcContent(seq);
   const hasHomo = Core.hasHomopolymer(seq, 4);
-  
-  const hairpin = Core.duplexDG37Worst(seq, true);
-  const selfDimer = Core.duplexDG37Worst(seq, false);
-  
+  const thermo = Core.resolveThermoOpts({
+    Na_mM: na_mM,
+    Mg_mM: mg_mM,
+    tempC: targetTm ?? 60
+  });
+
+  const hairpin = Core.hairpinScan(seq, thermo);
+  const selfDimer = Core.selfDimerScan(seq, thermo);
+
   return {
     tm,
     gc,
@@ -1098,10 +1104,11 @@ function getQCLabel(qc) {
   };
 }
 
-function getCrossDimerLabel(seqA, seqB) {
+function getCrossDimerLabel(seqA, seqB, na_mM = 50, mg_mM = 0, tempC = 60) {
   if (!seqA || !seqB) return { label: 'N/A', cls: 'ok' };
-  const dimer = Core.duplexDG37Worst(seqA + seqB, false);
-  if (!dimer || !dimer.dG) return { label: 'None', cls: 'ok' };
+  const thermo = Core.resolveThermoOpts({ Na_mM: na_mM, Mg_mM: mg_mM, tempC });
+  const dimer = Core.dimerScan(seqA, seqB, thermo);
+  if (!dimer || !isFinite(dimer.dG)) return { label: 'None', cls: 'ok' };
   const dG = dimer.dG;
   if (dG <= -7) return { label: 'Very strong', cls: 'bad' };
   if (dG <= -5) return { label: 'Strong', cls: 'bad' };
@@ -1960,10 +1967,11 @@ function renderResults(primerResults, linkers) {
     const conc_nM = parseFloat($('primer-conc').value) || 500;
     const na_mM = parseFloat($('na-conc').value) || 50;
     const mg_mM = parseFloat($('mg-conc').value) || 0;
+    const targetTm = parseFloat($('core-tm').value) || 55;
     
     // Forward primer
     if (result.F) {
-      const qc = runPrimerQC(result.F.seq, 60, conc_nM, na_mM, mg_mM);
+      const qc = runPrimerQC(result.F.seq, targetTm, conc_nM, na_mM, mg_mM);
       const qcLabel = getQCLabel(qc);
       
       const tr = document.createElement('tr');
@@ -1972,7 +1980,7 @@ function renderResults(primerResults, linkers) {
       
       let crossDimerCell = '';
       if (result.R) {
-        const crossDimerLabel = getCrossDimerLabel(result.F.seq, result.R.seq);
+        const crossDimerLabel = getCrossDimerLabel(result.F.seq, result.R.seq, na_mM, mg_mM, targetTm);
         const crossDimerBadge = `<span class="badge ${crossDimerLabel.cls}">${crossDimerLabel.label}</span>`;
         crossDimerCell = `<td rowspan="2" style="text-align:center; vertical-align:middle;">${crossDimerBadge}</td>`;
       }
@@ -2046,7 +2054,7 @@ function renderResults(primerResults, linkers) {
     
     // Reverse primer
     if (result.R) {
-      const qc = runPrimerQC(result.R.seq, 60, conc_nM, na_mM, mg_mM);
+      const qc = runPrimerQC(result.R.seq, targetTm, conc_nM, na_mM, mg_mM);
       const qcLabel = getQCLabel(qc);
       
       const tr = document.createElement('tr');
@@ -2470,16 +2478,32 @@ function downloadAssembledFASTA() {
 
 // ==================== Initialization ====================
 
-function initOEPCRModule() {
+function initOEPCRModule(container) {
+  const root = (container && container.querySelector) ? container : document;
   if (typeof window !== 'undefined') {
     window.VIZ = VIZ;
   }
   // Check if elements exist (for both standalone and embedded modes)
-  if (!$('fragment-rows')) {
+  if (!root.querySelector('#fragment-rows') && !$('fragment-rows')) {
     // If elements don't exist yet, wait a bit and try again
-    setTimeout(initOEPCRModule, 100);
+    setTimeout(() => initOEPCRModule(container), 100);
     return;
   }
+
+  setupAssemblyParameterPresets(root, {
+    scope: 'overlap-pcr-primer-params',
+    label: 'overlap PCR primer design parameters',
+    placeholder: 'e.g. Standard overlap PCR',
+    fields: [
+      { key: 'coreTm', selector: '#core-tm', defaultValue: '55' },
+      { key: 'overlapTm', selector: '#overlap-tm', defaultValue: '55' },
+      { key: 'primerConc', selector: '#primer-conc', defaultValue: '500' },
+      { key: 'naConc', selector: '#na-conc', defaultValue: '50' },
+      { key: 'mgConc', selector: '#mg-conc', defaultValue: '2.0' },
+      { key: 'fOverlap', selector: '#f-overlap-seq', defaultValue: '' },
+      { key: 'rOverlap', selector: '#r-overlap-seq', defaultValue: '' }
+    ]
+  });
   
   initializeFragmentRows();
   // populateHostSelect() is no longer needed here since each row has its own selector

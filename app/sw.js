@@ -3,7 +3,7 @@
 // Goal: speed up repeat visits + module switching by serving assets from Cache Storage.
 
 // Bump cache version to ensure updated assets are picked up immediately.
-const CACHE_NAME = 'primerweaver-app-v1.1.11';
+const CACHE_NAME = 'primerweaver-app-v1.1.18';
 
 // Keep install lightweight to avoid blocking first load.
 const SHELL_ASSETS = [
@@ -23,8 +23,10 @@ const PRECACHE_ASSETS = [
   './modules/RE_cloning_v1.0.1.html',
   './modules/mutagenesis_v1.0.1.html',
   './modules/multiplex_pcr_v1.0.1.html',
+  './modules/Integrated_Workspace_V1.0.1.html',
 
   './modules/scripts/core_v1.0.1.js',
+  './modules/scripts/assembly_parameter_presets_v1.0.1.js',
   './modules/scripts/bio_visuals_v1.0.1.js',
   './modules/scripts/codon_v1.0.1.js',
   './modules/scripts/common_features_v1.0.1.js',
@@ -36,6 +38,7 @@ const PRECACHE_ASSETS = [
   './modules/scripts/multiplex_pcr_v1.0.1.js',
   './modules/scripts/qc_v1.0.1.js',
   './modules/scripts/re_cloning_v1.0.1.js',
+  './modules/scripts/integrated_workspace_v1.0.1.js',
 
   './modules/contents/demo/Golden_Gate_vector.txt',
   './modules/contents/demo/pESC-His.txt',

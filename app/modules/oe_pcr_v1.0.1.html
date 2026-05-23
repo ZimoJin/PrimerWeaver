@@ -45,9 +45,33 @@
   </div>
 
   <div style="margin-top:12px;">
-    <h2 style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible;">
-      <span>Primer Design Parameters</span>
-    </h2>
+    <div class="primer-params-header">
+      <h2 style="display:flex;align-items:center;gap:6px;position:relative;overflow:visible;margin:0;">
+        <span>Primer Design Parameters</span>
+      </h2>
+      <div class="assembly-preset-toolbar assembly-preset-toolbar--inline">
+        <div class="assembly-preset-group">
+          <div class="assembly-preset-main" style="position:relative;overflow:visible;">
+            <label class="aside" for="assembly-preset-select" style="display:flex;align-items:center;gap:6px;">
+              <span>Parameter preset</span>
+              <span class="help-icon">
+                <span>?</span>
+                <span class="help-tooltip">
+                  Save commonly used primer design settings in this browser. Select a preset to reuse it, or set one as the startup default for next time.
+                </span>
+              </span>
+            </label>
+            <select id="assembly-preset-select" class="assembly-preset-select"></select>
+          </div>
+          <div class="assembly-preset-actions">
+            <button class="btn demo assembly-preset-save" type="button">Save as New</button>
+            <button class="btn demo assembly-preset-update" type="button">Update</button>
+            <button class="btn ghost assembly-preset-delete" type="button">Delete</button>
+            <button class="btn assembly-preset-set-default" type="button">Set as Startup Default</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="grid cols-5" style="margin-top:10px; position: relative; overflow: visible;">
       <div style="position: relative; overflow: visible;">
         <label class="aside" style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible;">

@@ -3,6 +3,7 @@
 
 import * as Core from './core_v1.0.1.js';
 import * as VIZ from './bio_visuals_v1.0.1.js';
+import { setupAssemblyParameterPresets } from './assembly_parameter_presets_v1.0.1.js';
 
 // ==================== Utility Functions ====================
 
@@ -368,13 +369,14 @@ function designMultiplexPrimers(targets, opts = {}) {
 
 // ==================== QC Functions ====================
 
-function runPrimerQC(seq, conc_nM = 500, na_mM = 50, mg_mM = 0) {
+function runPrimerQC(seq, conc_nM = 500, na_mM = 50, mg_mM = 0, tempC = 60) {
   const tm = tmSaltCorrected(seq, conc_nM, na_mM, mg_mM);
   const gc = gcContent(seq);
   const hasHomo = Core.hasHomopolymer(seq, 4);
-  
-  const hairpin = Core.hairpinScan(seq);
-  const selfDimer = Core.selfDimerScan(seq);
+  const thermo = Core.resolveThermoOpts({ Na_mM: na_mM, Mg_mM: mg_mM, tempC });
+
+  const hairpin = Core.hairpinScan(seq, thermo);
+  const selfDimer = Core.selfDimerScan(seq, thermo);
   
   return {
     tm,
@@ -397,9 +399,9 @@ function getQCLabel(qc) {
   };
 }
 
-function getCrossDimerLabel(seqA, seqB) {
+function getCrossDimerLabel(seqA, seqB, thermo = {}) {
   if (!seqA || !seqB) return { label: 'N/A', cls: 'qc-ok' };
-  const dimer = Core.dimerScan(seqA, seqB);
+  const dimer = Core.dimerScan(seqA, seqB, thermo);
   if (!dimer || !isFinite(dimer.dG)) return { label: 'None', cls: 'qc-ok' };
   const dG = dimer.dG;
   if (dG <= -7) return { label: 'Very Strong', cls: 'qc-bad' };
@@ -414,9 +416,9 @@ function getCrossDimerLabel(seqA, seqB) {
  * @param {string} seqB - Primer B sequence
  * @returns {number|null} ΔG value, returns null if no dimer
  */
-function getCrossDimerDG(seqA, seqB) {
+function getCrossDimerDG(seqA, seqB, thermo = {}) {
   if (!seqA || !seqB) return null;
-  const dimer = Core.dimerScan(seqA, seqB);
+  const dimer = Core.dimerScan(seqA, seqB, thermo);
   if (!dimer || !isFinite(dimer.dG)) return null;
   return dimer.dG;
 }
@@ -427,9 +429,9 @@ function getCrossDimerDG(seqA, seqB) {
  * @param {string} seqB - Primer B sequence
  * @returns {Object|null} {dG, touches3} or null if no dimer
  */
-function getCrossDimerInfo(seqA, seqB) {
+function getCrossDimerInfo(seqA, seqB, thermo = {}) {
   if (!seqA || !seqB) return null;
-  const dimer = Core.dimerScan(seqA, seqB);
+  const dimer = Core.dimerScan(seqA, seqB, thermo);
   if (!dimer || !isFinite(dimer.dG)) return null;
   return {
     dG: dimer.dG,
@@ -447,7 +449,7 @@ function getCrossDimerInfo(seqA, seqB) {
  * @param {number} threshold - Conflict threshold (ΔG, default -6 kcal/mol)
  * @returns {boolean} Whether there is conflict
  */
-function hasSevereCrossDimerConflict(pair1, pair2, threshold = -6) {
+function hasSevereCrossDimerConflict(pair1, pair2, threshold = -6, thermo = {}) {
   // Check all possible cross combinations:
   // pair1.F vs pair2.F, pair1.F vs pair2.R
   // pair1.R vs pair2.F, pair1.R vs pair2.R
@@ -460,7 +462,7 @@ function hasSevereCrossDimerConflict(pair1, pair2, threshold = -6) {
   ];
   
   for (const [seqA, seqB] of combinations) {
-    const dimerInfo = getCrossDimerInfo(seqA, seqB);
+    const dimerInfo = getCrossDimerInfo(seqA, seqB, thermo);
     if (!dimerInfo) continue;
     
     const { dG, touches3 } = dimerInfo;
@@ -491,7 +493,7 @@ function hasSevereCrossDimerConflict(pair1, pair2, threshold = -6) {
  * @param {number} conflictThreshold - Conflict threshold (ΔG, default -6 kcal/mol)
  * @returns {Array} Pooling results [{pool: number, target: string, primers: {...}}]
  */
-function poolPrimersByThermodynamics(primerPairs, conflictThreshold = -6) {
+function poolPrimersByThermodynamics(primerPairs, conflictThreshold = -6, thermo = {}) {
   const n = primerPairs.length;
   if (n === 0) return [];
   
@@ -499,7 +501,7 @@ function poolPrimersByThermodynamics(primerPairs, conflictThreshold = -6) {
   const conflicts = Array.from({ length: n }, () => []);
   for (let i = 0; i < n; i++) {
     for (let j = i + 1; j < n; j++) {
-      if (hasSevereCrossDimerConflict(primerPairs[i].primers, primerPairs[j].primers, conflictThreshold)) {
+      if (hasSevereCrossDimerConflict(primerPairs[i].primers, primerPairs[j].primers, conflictThreshold, thermo)) {
         conflicts[i].push(j);
         conflicts[j].push(i);
       }
@@ -623,6 +625,11 @@ function poolPrimersBySize(primerPairs, sizeTolerance = 10) {
 function poolPrimers(primerPairs, opts = {}) {
   const conflictThreshold = opts.conflictThreshold || -6;
   const sizeTolerance = opts.sizeTolerance || 20;
+  const thermo = Core.resolveThermoOpts({
+    Na_mM: opts.na_mM,
+    Mg_mM: opts.mg_mM,
+    tempC: opts.targetTm
+  });
   const n = primerPairs.length;
   
   if (n === 0) {
@@ -652,7 +659,7 @@ function poolPrimers(primerPairs, opts = {}) {
       const reasons = [];
       
       // Check thermodynamic conflict (cross-dimer)
-      if (hasSevereCrossDimerConflict(pair1.primers, pair2.primers, conflictThreshold)) {
+      if (hasSevereCrossDimerConflict(pair1.primers, pair2.primers, conflictThreshold, thermo)) {
         hasConflict = true;
         reasons.push('dimer');
       }
@@ -740,7 +747,7 @@ function poolPrimers(primerPairs, opts = {}) {
   
   // For backward compatibility, also calculate separate pools
   // (but these are not used for the final result)
-  const thermodynamicPools = poolPrimersByThermodynamics(primerPairs, conflictThreshold);
+  const thermodynamicPools = poolPrimersByThermodynamics(primerPairs, conflictThreshold, thermo);
   const sizePools = sizeTolerance > 0 ? poolPrimersBySize(primerPairs, sizeTolerance) : null;
   
   return {
@@ -807,6 +814,11 @@ function getHeatmapColor(dG) {
  * @returns {Object} Dimer matrix
  */
 function buildDimerMatrix(primerResults) {
+  const thermo = Core.resolveThermoOpts({
+    Na_mM: parseFloat($('na-conc')?.value) || 50,
+    Mg_mM: parseFloat($('mg-conc')?.value) || 0,
+    tempC: parseFloat($('target-tm')?.value) || 60
+  });
   const allPrimers = [];
   
   // Collect all primers
@@ -833,7 +845,7 @@ function buildDimerMatrix(primerResults) {
       if (i === j) {
         row.push({ dG: null, label: '-', isDiagonal: true });
       } else {
-        const dG = getCrossDimerDG(allPrimers[i].seq, allPrimers[j].seq);
+        const dG = getCrossDimerDG(allPrimers[i].seq, allPrimers[j].seq, thermo);
         const heatmapInfo = getHeatmapColor(dG);
         row.push({
           dG: dG,
@@ -1389,13 +1401,15 @@ function renderResults(primerResults) {
   const conc_nM = parseFloat($('primer-conc').value) || 500;
   const na_mM = parseFloat($('na-conc').value) || 50;
   const mg_mM = parseFloat($('mg-conc').value) || 0;
-  
+  const targetTm = parseFloat($('target-tm').value) || 60;
+  const thermo = Core.resolveThermoOpts({ Na_mM: na_mM, Mg_mM: mg_mM, tempC: targetTm });
+
   for (const result of successful) {
     const targetName = result.target.name;
     const primers = result.primers;
     
     // Forward primer
-    const fwdQC = runPrimerQC(primers.forward.seq, conc_nM, na_mM, mg_mM);
+    const fwdQC = runPrimerQC(primers.forward.seq, conc_nM, na_mM, mg_mM, targetTm);
     const fwdQCLabel = getQCLabel(fwdQC);
     
     // Check cross-dimer conflicts with other primer pairs
@@ -1415,7 +1429,7 @@ function renderResults(primerResults) {
       ];
       
       for (const [seqA, seqB] of combinations) {
-        const dG = getCrossDimerDG(seqA, seqB);
+        const dG = getCrossDimerDG(seqA, seqB, thermo);
         if (dG !== null && (worstCrossDimerDG === null || dG < worstCrossDimerDG)) {
           worstCrossDimerDG = dG;
           worstCrossDimerTarget = otherResult.target.name;
@@ -1484,7 +1498,7 @@ function renderResults(primerResults) {
     tbody.appendChild(fwdTr);
     
     // Reverse primer
-    const revQC = runPrimerQC(primers.reverse.seq, conc_nM, na_mM, mg_mM);
+    const revQC = runPrimerQC(primers.reverse.seq, conc_nM, na_mM, mg_mM, targetTm);
     const revQCLabel = getQCLabel(revQC);
     
     const revTr = document.createElement('tr');
@@ -2088,6 +2102,23 @@ function initMultiplexPCRModule(container) {
   if (!container) {
     container = document;
   }
+
+  setupAssemblyParameterPresets(container, {
+    scope: 'multiplex-pcr-primer-params',
+    label: 'multiplex PCR primer design parameters',
+    placeholder: 'e.g. Standard multiplex PCR',
+    fields: [
+      { key: 'targetTm', selector: '#target-tm', defaultValue: '55' },
+      { key: 'tmTolerance', selector: '#tm-tolerance', defaultValue: '2.5' },
+      { key: 'primerConc', selector: '#primer-conc', defaultValue: '500' },
+      { key: 'naConc', selector: '#na-conc', defaultValue: '50' },
+      { key: 'mgConc', selector: '#mg-conc', defaultValue: '2.0' },
+      { key: 'sizeTolerance', selector: '#size-tolerance', defaultValue: '20' },
+      { key: 'overlapFwd', selector: '#overlap-seq-fwd', defaultValue: '' },
+      { key: 'overlapRev', selector: '#overlap-seq-rev', defaultValue: '' }
+    ]
+  });
+
   // 模式切换
   const modeDesign = $('mode-design');
   const modeQC = $('mode-qc');

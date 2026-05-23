@@ -2,10 +2,10 @@ const SYSTEM_PRESET_ID = 'system-default';
 const SYSTEM_PRESET_NAME = 'System Default';
 
 function ensurePresetStyles() {
-  if (document.getElementById('assembly-preset-style')) return;
+  if (document.getElementById('assembly-preset-style-v3')) return;
 
   const style = document.createElement('style');
-  style.id = 'assembly-preset-style';
+  style.id = 'assembly-preset-style-v3';
   style.textContent = `
     .assembly-preset-toolbar{
       display:grid;
@@ -122,25 +122,82 @@ function ensurePresetStyles() {
       background:#f9fafb;
     }
     @media (max-width: 1100px){
-      .assembly-preset-toolbar{
+      .assembly-preset-toolbar:not(.assembly-preset-toolbar--inline){
         grid-template-columns:1fr;
         align-items:stretch;
       }
-      .assembly-preset-actions{
+      .assembly-preset-toolbar:not(.assembly-preset-toolbar--inline) .assembly-preset-actions{
         width:100%;
         justify-content:flex-start;
       }
     }
     @media (max-width: 768px){
-      .assembly-preset-main,
-      .assembly-preset-main select,
-      .assembly-preset-actions{
+      .assembly-preset-toolbar:not(.assembly-preset-toolbar--inline) .assembly-preset-main,
+      .assembly-preset-toolbar:not(.assembly-preset-toolbar--inline) .assembly-preset-main select,
+      .assembly-preset-toolbar:not(.assembly-preset-toolbar--inline) .assembly-preset-actions{
         width:100%;
         max-width:none;
       }
-      .assembly-preset-actions{
+      .assembly-preset-toolbar:not(.assembly-preset-toolbar--inline) .assembly-preset-actions{
         justify-content:flex-start;
         flex-wrap:wrap;
+      }
+    }
+    /* Primer-design modules: title left, preset right (QC-style) */
+    .primer-params-header{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px 16px;
+      align-items:end;
+      margin-bottom:10px;
+    }
+    .primer-params-header > h2{
+      margin:0;
+      align-self:center;
+    }
+    .assembly-preset-toolbar--inline{
+      margin:0;
+      display:block;
+      grid-template-columns:unset;
+    }
+    .primer-params-header .assembly-preset-group{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      min-width:0;
+      width:100%;
+      flex-wrap:nowrap;
+    }
+    .assembly-preset-toolbar--inline .assembly-preset-main{
+      flex:1 1 auto;
+      min-width:0;
+    }
+    .assembly-preset-toolbar--inline .assembly-preset-main label.aside{
+      margin:0 0 6px 0;
+      white-space:nowrap;
+    }
+    .assembly-preset-toolbar--inline .assembly-preset-actions{
+      flex:0 0 auto;
+      margin-top:18px;
+      flex-wrap:nowrap;
+      justify-content:flex-end;
+    }
+    @media (max-width: 900px){
+      .primer-params-header{
+        grid-template-columns:1fr;
+        align-items:stretch;
+      }
+      .primer-params-header > h2{
+        align-self:auto;
+      }
+      .assembly-preset-toolbar--inline .assembly-preset-group{
+        flex-wrap:wrap;
+      }
+      .assembly-preset-toolbar--inline .assembly-preset-actions{
+        margin-top:0;
+        flex-wrap:wrap;
+        justify-content:flex-start;
+        width:100%;
       }
     }
   `;
@@ -423,8 +480,35 @@ function applyPresetValues(container, config, values) {
   }
 }
 
+function resolvePresetSelectors(options) {
+  return {
+    select: options.selectSelector || '.assembly-preset-select',
+    save: options.saveSelector || '.assembly-preset-save',
+    update: options.updateSelector || '.assembly-preset-update',
+    delete: options.deleteSelector || '.assembly-preset-delete',
+    setDefault: options.setDefaultSelector || '.assembly-preset-set-default'
+  };
+}
+
+function queryPresetEl(container, config, key) {
+  const sel = config.selectors[key];
+  if (!sel) return null;
+  return container.querySelector(sel);
+}
+
+function resolvePresetContainer(container, options) {
+  if (!container) return document;
+  if (options.presetRootSelector) {
+    const scoped = container.querySelector(options.presetRootSelector);
+    if (scoped) return scoped;
+  }
+  const pane = container.querySelector('section.pane');
+  if (pane) return pane;
+  return container;
+}
+
 function renderPresetOptions(container, config, selectedPresetId) {
-  const select = container.querySelector('.assembly-preset-select');
+  const select = queryPresetEl(container, config, 'select');
   if (!select) return;
 
   const presets = getAllPresets(config);
@@ -436,14 +520,14 @@ function renderPresetOptions(container, config, selectedPresetId) {
   select.innerHTML = presets.map((preset) => `<option value="${preset.id}">${preset.name}</option>`).join('');
   select.value = resolvedId;
 
-  const updateBtn = container.querySelector('.assembly-preset-update');
-  const deleteBtn = container.querySelector('.assembly-preset-delete');
+  const updateBtn = queryPresetEl(container, config, 'update');
+  const deleteBtn = queryPresetEl(container, config, 'delete');
   const disableEdit = resolvedId === SYSTEM_PRESET_ID || !isLocalStorageAvailable();
   if (updateBtn) updateBtn.disabled = disableEdit;
   if (deleteBtn) deleteBtn.disabled = disableEdit;
 
-  const saveBtn = container.querySelector('.assembly-preset-save');
-  const setDefaultBtn = container.querySelector('.assembly-preset-set-default');
+  const saveBtn = queryPresetEl(container, config, 'save');
+  const setDefaultBtn = queryPresetEl(container, config, 'setDefault');
   if (saveBtn) saveBtn.disabled = !isLocalStorageAvailable();
   if (setDefaultBtn) setDefaultBtn.disabled = !isLocalStorageAvailable();
 }
@@ -465,12 +549,16 @@ function notifyUnavailable(container, config) {
 function setupAssemblyParameterPresets(container, options) {
   ensurePresetStyles();
 
+  const root = resolvePresetContainer(container, options || {});
+  const selectors = resolvePresetSelectors(options || {});
+
   const config = {
     scope: String(options.scope || 'assembly'),
     label: String(options.label || 'assembly settings'),
     storageKey: `primerweaver_${options.scope}_presets_v1`,
     defaultKey: `primerweaver_${options.scope}_default_preset_id_v1`,
     fields: Array.isArray(options.fields) ? options.fields : [],
+    selectors,
     systemDefaultPreset: createPresetSnapshot({
       fields: Array.isArray(options.fields) ? options.fields : []
     }, {
@@ -481,17 +569,23 @@ function setupAssemblyParameterPresets(container, options) {
     afterApply: options.afterApply
   };
 
-  const select = container.querySelector('.assembly-preset-select');
-  const saveBtn = container.querySelector('.assembly-preset-save');
-  const updateBtn = container.querySelector('.assembly-preset-update');
-  const deleteBtn = container.querySelector('.assembly-preset-delete');
-  const setDefaultBtn = container.querySelector('.assembly-preset-set-default');
-  if (!select) return;
+  const select = queryPresetEl(root, config, 'select');
+  const saveBtn = queryPresetEl(root, config, 'save');
+  const updateBtn = queryPresetEl(root, config, 'update');
+  const deleteBtn = queryPresetEl(root, config, 'delete');
+  const setDefaultBtn = queryPresetEl(root, config, 'setDefault');
+  if (!select) {
+    console.warn(`[Parameter preset] Select not found for ${config.label} (${selectors.select})`);
+    return false;
+  }
+
+  // Field values live in the wider module container when provided.
+  const valueRoot = container || root;
 
   const applyStartupPreset = () => {
     const startupPreset = getResolvedStartupPreset(config);
-    applyPresetValues(container, config, startupPreset.values);
-    renderPresetOptions(container, config, startupPreset.id);
+    applyPresetValues(valueRoot, config, startupPreset.values);
+    renderPresetOptions(root, config, startupPreset.id);
   };
 
   applyStartupPreset();
@@ -499,18 +593,18 @@ function setupAssemblyParameterPresets(container, options) {
 
   select.onchange = function () {
     const preset = getPresetById(config, select.value) || getResolvedStartupPreset(config);
-    applyPresetValues(container, config, preset.values);
-    renderPresetOptions(container, config, preset.id);
+    applyPresetValues(valueRoot, config, preset.values);
+    renderPresetOptions(root, config, preset.id);
   };
 
   if (saveBtn) {
     saveBtn.onclick = function () {
       if (!isLocalStorageAvailable()) {
-        notifyUnavailable(container, config);
+        notifyUnavailable(root, config);
         return;
       }
 
-      showPresetDialog(container, {
+      showPresetDialog(root, {
         mode: 'input',
         title: 'Save Parameter Preset',
         message: `Enter a name for this ${config.label} preset.`,
@@ -522,9 +616,9 @@ function setupAssemblyParameterPresets(container, options) {
         },
         onConfirm: (value) => {
           const presets = readUserPresets(config);
-          presets.push(buildUserPreset(config, value, collectPresetValues(container, config)));
+          presets.push(buildUserPreset(config, value, collectPresetValues(valueRoot, config)));
           writeUserPresets(config, presets);
-          renderPresetOptions(container, config, presets[presets.length - 1].id);
+          renderPresetOptions(root, config, presets[presets.length - 1].id);
         }
       });
     };
@@ -539,11 +633,11 @@ function setupAssemblyParameterPresets(container, options) {
         return {
           id: preset.id,
           name: preset.name,
-          values: collectPresetValues(container, config)
+          values: collectPresetValues(valueRoot, config)
         };
       });
       writeUserPresets(config, nextPresets);
-      renderPresetOptions(container, config, activeId);
+      renderPresetOptions(root, config, activeId);
     };
   }
 
@@ -552,7 +646,7 @@ function setupAssemblyParameterPresets(container, options) {
       const activeId = select.value || SYSTEM_PRESET_ID;
       if (activeId === SYSTEM_PRESET_ID) return;
       const activePreset = getPresetById(config, activeId);
-      showPresetDialog(container, {
+      showPresetDialog(root, {
         title: 'Delete Parameter Preset',
         message: `Delete preset "${activePreset ? activePreset.name : activeId}"?`,
         confirmText: 'Delete',
@@ -562,8 +656,8 @@ function setupAssemblyParameterPresets(container, options) {
           if (readStartupPresetId(config) === activeId) {
             writeStartupPresetId(config, SYSTEM_PRESET_ID);
           }
-          applyPresetValues(container, config, config.systemDefaultPreset.values);
-          renderPresetOptions(container, config, SYSTEM_PRESET_ID);
+          applyPresetValues(valueRoot, config, config.systemDefaultPreset.values);
+          renderPresetOptions(root, config, SYSTEM_PRESET_ID);
         }
       });
     };
@@ -572,13 +666,15 @@ function setupAssemblyParameterPresets(container, options) {
   if (setDefaultBtn) {
     setDefaultBtn.onclick = function () {
       if (!isLocalStorageAvailable()) {
-        notifyUnavailable(container, config);
+        notifyUnavailable(root, config);
         return;
       }
       writeStartupPresetId(config, select.value || SYSTEM_PRESET_ID);
-      renderPresetOptions(container, config, select.value || SYSTEM_PRESET_ID);
+      renderPresetOptions(root, config, select.value || SYSTEM_PRESET_ID);
     };
   }
+
+  return true;
 }
 
 export { setupAssemblyParameterPresets };

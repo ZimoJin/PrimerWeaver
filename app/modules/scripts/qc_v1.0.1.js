@@ -1,3 +1,5 @@
+import * as Core from './core_v1.0.1.js';
+
 // --- CORE CONSTANTS ---
 const comp = { A: "T", T: "A", G: "C", C: "G" };
 const IUPAC_MAP = {
@@ -7,23 +9,6 @@ const IUPAC_MAP = {
   H: ["A", "C", "T"], V: ["A", "C", "G"], N: ["A", "C", "G", "T"]
 };
 
-// SantaLucia (1998) / Allawi (1997) NN parameters
-const NN = {
-  AA: { dH: -7.9, dS: -22.2 }, TT: { dH: -7.9, dS: -22.2 },
-  AT: { dH: -7.2, dS: -20.4 }, TA: { dH: -7.2, dS: -21.3 },
-  CA: { dH: -8.5, dS: -22.7 }, TG: { dH: -8.5, dS: -22.7 },
-  GT: { dH: -8.4, dS: -22.4 }, AC: { dH: -8.4, dS: -22.4 },
-  CT: { dH: -7.8, dS: -21.0 }, AG: { dH: -7.8, dS: -21.0 },
-  GA: { dH: -8.2, dS: -22.2 }, TC: { dH: -8.2, dS: -22.2 },
-  CG: { dH: -10.6, dS: -27.2 }, GC: { dH: -9.8, dS: -24.4 },
-  GG: { dH: -8.0, dS: -19.9 }, CC: { dH: -8.0, dS: -19.9 }
-};
-
-// Loop Entropy Penalty (approximate from SantaLucia 2004)
-// This fixes the "False Positive Hairpin" issue.
-const LOOP_PENALTY = { 3: 5.7, 4: 5.6, 5: 4.9, 6: 4.4, 7: 4.5, 8: 4.6, 9: 4.6 };
-
-const Rgas = 1.987; // cal/(mol*K)
 const QC_PRESET_STORAGE_KEY = "primerweaver_qc_presets_v1";
 const QC_DEFAULT_PRESET_KEY = "primerweaver_qc_default_preset_id_v1";
 const QC_SYSTEM_DEFAULT_PRESET = Object.freeze({
@@ -59,307 +44,36 @@ function hasHomopolymer(seq, n) {
   return new RegExp("A{" + n + ",}|C{" + n + ",}|G{" + n + ",}|T{" + n + ",}").test(seq);
 }
 
-function baseSet(b) {
-  if (IUPAC_MAP[b]) return IUPAC_MAP[b];
-  return /[ACGT]/.test(b) ? [b] : [];
-}
-
-function isComplementaryIUPAC(b1, b2) {
-  const s1 = baseSet(b1);
-  const s2 = baseSet(b2);
-  if (!s1.length || !s2.length) return false;
-  for (let i = 0; i < s1.length; i++) {
-    for (let j = 0; j < s2.length; j++) {
-      if (comp[s1[i]] === s2[j]) return true;
-    }
-  }
-  return false;
-}
-
-// Get entropy penalty for a hairpin loop of size 'len'
-function getLoopPenalty(len) {
-  if (len < 3) return 999; 
-  if (LOOP_PENALTY[len]) return LOOP_PENALTY[len];
-  // Linear approx for longer loops
-  return 4.6 + (0.1 * (len - 9));
-}
-
-// --- THERMODYNAMICS ENGINE ---
-
-function accumulateNNWorst(seq) {
-  const s = seq.toUpperCase();
-  if (s.length < 2) return null;
-  const Tref = 310.15; // 37 C
-  let dH = 0;
-  let dS = 0;
-
-  for (let i = 0; i < s.length - 1; i++) {
-    const b1 = s[i];
-    const b2 = s[i + 1];
-    const set1 = baseSet(b1);
-    const set2 = baseSet(b2);
-    if (!set1.length || !set2.length) return null;
-
-    let bestStep = null;
-    // Iterate all IUPAC possibilities, pick strongest (Risk Averse)
-    for (let x = 0; x < set1.length; x++) {
-      for (let y = 0; y < set2.length; y++) {
-        const dinuc = set1[x] + set2[y];
-        const p = NN[dinuc];
-        if (!p) continue;
-        const dG = p.dH - (Tref * p.dS) / 1000.0;
-        if (!bestStep || dG < bestStep.dG) {
-          bestStep = { dH: p.dH, dS: p.dS, dG: dG };
-        }
-      }
-    }
-    if (!bestStep) return null;
-    dH += bestStep.dH;
-    dS += bestStep.dS;
-  }
-  
-  // Terminal corrections (initiation)
-  dH += 0.2;
-  dS += -5.7;
-
-  return { dH: dH, dS: dS };
-}
-
-function duplexDG37Worst(seq, isSymmetric = false) {
-  const acc = accumulateNNWorst(seq);
-  if (!acc) return NaN;
-  const T = 310.15;
-  let dS = acc.dS;
-  // Symmetry correction for self-dimers (-1.4 eu)
-  if (isSymmetric) dS -= 1.4; 
-  return acc.dH - (T * dS) / 1000.0;
-}
-
-// Tm with Mg2+ and Na+ correction (von Ahsen / Owczarzy approximation)
-function tmcalNN(seq, Na_mM, Mg_mM, conc_nM) {
-  const s = seq.toUpperCase();
-  if (s.length < 2) return NaN;
-  const acc = accumulateNNWorst(s);
-  if (!acc) return NaN;
-
-  const Cp = conc_nM * 1e-9;
-  
-  // Calculate equivalent Monovalent cations
-  // Let's use the von Ahsen 2001 approximation: [Na_eq] = [Na+] + 4*sqrt([Mg++]) (in mM)
-  const monovalentEq = (Na_mM + 4.0 * Math.sqrt(Mg_mM)) / 1000.0; // Molar
-
-  if (monovalentEq <= 0) return NaN;
-
-  const dH = acc.dH * 1000; // cal
-  const dS = acc.dS; // eu
-
-  // R ln(C/4) for non-symmetric, R ln(C) is rarely used for primers, usually C/4 or C/2.
-  // Standard primer Tm uses Cp/4 (for non-self).
-  const entropy = dS + Rgas * Math.log(Cp/4); 
-  
-  const Tm_1M = dH / entropy; // Kelvin
-
-  // Let's stick to the log salt correction on the Entropy term which is more accurate physically
-  const dS_salt = dS + 0.368 * (s.length - 1) * Math.log(monovalentEq); 
-  // Re-calc Tm with salt-adjusted entropy
-  const Tm_salt_K = dH / (dS_salt + Rgas * Math.log(Cp/4));
-  
-  return Tm_salt_K - 273.15;
-}
-
 function fmt2(x) { return isFinite(x) ? x.toFixed(2) : "--"; }
 function badge(cls, txt) { return '<span class="badge ' + cls + '">' + txt + "</span>"; }
 
-function classifyDG(dg, touches3) {
-  if (!isFinite(dg)) return { label: "None", cls: "ok" };
-  let label, cls;
-  if (dg <= -7) { label = "Very strong (<= -7)"; cls = "bad"; }
-  else if (dg <= -5) { label = "Strong (-7 ~ -5)"; cls = "bad"; }
-  else if (dg <= -3) { label = "Moderate (-5 ~ -3)"; cls = "warn"; }
-  else { label = "Weak (> -3)"; cls = "ok"; }
-  if (touches3 && cls !== "ok") label = "3' " + label;
-  return { label: label, cls: cls };
+function thermoCtx(Na_mM, Mg_mM, tempC) {
+  return Core.resolveThermoOpts({ Na_mM, Mg_mM, tempC });
 }
 
-// --- NEW SCANNING LOGIC ---
+// --- QC BUNDLE (thermodynamics via core_v1.0.1.js) ---
 
-// 1. Hairpin Scan with Loop Entropy
-function hairpinScan(seq) {
-  const s = normalizeSeq(seq);
-  const n = s.length;
-  const minStem = 3; 
-  const minLoop = 3;
-  let best = null;
-
-  for (let i = 0; i < n; i++) {
-    for (let j = i + minStem + minLoop; j < n; j++) {
-      let a = i;
-      let b = j;
-      let seg = "";
-      
-      // Extend stem inwards
-      while (a >= 0 && b < n && isComplementaryIUPAC(s[a], s[b])) {
-        seg = s[a] + seg;
-        if (seg.length >= minStem) {
-          const stemDG = duplexDG37Worst(seg);
-          const loopLen = (b - a) - 1;
-          const loopDG = getLoopPenalty(loopLen);
-          const netDG = stemDG + loopDG;
-
-          if (netDG < 0) { // Only record if thermodynamically stable
-            const touches3 = j >= n - 5;
-            if (!best || netDG < best.dg - 0.1) {
-              best = { seg: seg, dg: netDG, touches3: touches3 };
-            }
-          }
-        }
-        a--;
-        b++;
-      }
-    }
-  }
-  if (!best) return null;
-  return { seg: best.seg, dg: best.dg, touches3: best.touches3 };
-}
-
-// 2. Dimer Scan with Bubble/Gap Tolerance
-function dimerScan(seqA, seqB) {
-  const A = normalizeSeq(seqA);
-  const B = normalizeSeq(seqB);
-  const Brev = B.split("").reverse().join("");
-  const n = A.length;
-  const m = B.length;
-  if (!n || !m) return null;
-  
-  const isSelf = (seqA === seqB);
-  let best = null;
-
-  for (let offset = -m + 1; offset <= n - 1; offset++) {
-    // Collect matches
-    let islands = [];
-    let cur = { start: -1, end: -1, seq: "" };
-
-    for (let i = 0; i < n; i++) {
-      const j = i - offset;
-      if (j < 0 || j >= m) continue;
-      
-      if (isComplementaryIUPAC(A[i], Brev[j])) {
-        if (cur.seq === "") cur.start = i;
-        cur.seq += A[i];
-        cur.end = i;
-      } else {
-        if (cur.seq !== "") {
-          islands.push(cur);
-          cur = { start: -1, end: -1, seq: "" };
-        }
-      }
-    }
-    if (cur.seq !== "") islands.push(cur);
-
-    if (islands.length === 0) continue;
-
-    // Stitch islands separated by 1 mismatch
-    for (let k = 0; k < islands.length; k++) {
-      let runDG = 0;
-      let runSeq = islands[k].seq;
-      let runEnd = islands[k].end;
-      
-      // Calculate first block energy
-      runDG += duplexDG37Worst(islands[k].seq, isSelf); // Base energy
-
-      // Look ahead for single base mismatch bridge
-      if (k + 1 < islands.length) {
-        const gap = islands[k+1].start - islands[k].end - 1;
-        if (gap === 1) {
-          const nextBlockDG = duplexDG37Worst(islands[k+1].seq, isSelf);
-          // Penalty for internal mismatch/bubble (~3.5 kcal)
-          const bubblePenalty = 3.5; 
-          const mergedDG = runDG + nextBlockDG + bubblePenalty;
-          
-          if (mergedDG < runDG) {
-            // The merge is stronger than the single piece
-            runDG = mergedDG;
-            runSeq += "." + islands[k+1].seq; // visual marker
-            runEnd = islands[k+1].end;
-            k++; // Skip next
-          }
-        }
-      }
-
-      if (runSeq.length >= 3 && runDG < -1.0) {
-        // Calculate touches 3'
-        const bEndOnRev = runEnd - offset;
-        const bEndOnB = (m - 1) - bEndOnRev;
-        const touches3 = (runEnd >= n - 3) || (bEndOnB >= m - 3);
-
-        if (!best || runDG < best.dg - 0.1) {
-          best = {
-            dg: runDG,
-            len: runSeq.length, // approximate
-            touches3: touches3,
-            offset: offset
-          };
-        }
-      }
-    }
-  }
-
-  if (!best) return null;
-
-  // Reconstruct Visuals for the best offset
-  const off = best.offset;
-  let minPos = Math.min(0, off);
-  let maxPos = Math.max(n, m + off);
-  let lA = "", lB = "", lM = "";
-
-  for (let pos = minPos; pos < maxPos; pos++) {
-    const i = pos;
-    const j = pos - off;
-    const a = (i >= 0 && i < n) ? A[i] : " ";
-    const b = (j >= 0 && j < m) ? Brev[j] : " ";
-    
-    let mChar = " ";
-    if (a !== " " && b !== " ") {
-      if (isComplementaryIUPAC(a, b)) mChar = "|";
-      else mChar = "."; // Mismatch in alignment zone
-    }
-    lA += a; lB += b; lM += mChar;
-  }
-
-  return {
-    dg: best.dg,
-    len: best.len,
-    touches3: best.touches3,
-    align: "5' " + lA + " 3'\n   " + lM + "\n3' " + lB + " 5'"
-  };
-}
-
-
-function threePrimeDG(seq) {
-  const s = normalizeSeq(seq);
-  if (s.length < 5) return NaN;
-  // Last 5 bases
-  return duplexDG37Worst(s.slice(-5));
-}
-
-// --- QC BUNDLE ---
-
-function qcPrimer(label, raw, Na_mM, Mg_mM, conc_nM) {
+function qcPrimer(label, raw, Na_mM, Mg_mM, conc_nM, tempC) {
   const seq = normalizeSeq(raw);
   if (!seq) return { label: label, empty: true };
 
+  const thermo = thermoCtx(Na_mM, Mg_mM, tempC);
   const len = seq.length;
   const gc = gcPct(seq);
-  const tm = tmcalNN(seq, Na_mM, Mg_mM, conc_nM);
+  const tm = Core.tmcalNN(seq, Na_mM, Mg_mM, conc_nM);
   const clamp = has3GCClamp(seq);
   const homopoly = hasHomopolymer(seq, 4);
-  const dg3 = threePrimeDG(seq);
-  
-  const selfD = dimerScan(seq, seq);
-  const selfClass = selfD ? classifyDG(selfD.dg, selfD.touches3) : { label: "None", cls: "ok" };
+  const dg3 = Core.threePrimeDG(seq, 5, thermo);
 
-  const hp = hairpinScan(seq);
-  const hpClass = hp ? classifyDG(hp.dg, hp.touches3) : { label: "None", cls: "ok" };
+  const selfD = Core.selfDimerScan(seq, thermo);
+  const selfClass = selfD
+    ? Core.classifyDG(selfD.dG, selfD.touches3)
+    : { label: "None", cls: "ok" };
+
+  const hp = Core.hairpinScan(seq, thermo);
+  const hpClass = hp
+    ? Core.classifyDG(hp.dG, hp.touches3)
+    : { label: "None", cls: "ok" };
 
   let score = 100;
   if (gc < 40 || gc > 60) score -= 10;
@@ -381,10 +95,12 @@ function qcPrimer(label, raw, Na_mM, Mg_mM, conc_nM) {
   };
 }
 
-function qcPair(F, R) {
+function qcPair(F, R, thermo) {
   if (!F || !R || F.empty || R.empty) return null;
-  const d = dimerScan(F.seq, R.seq);
-  const info = d ? classifyDG(d.dg, d.touches3) : { label: "None", cls: "ok" };
+  const d = Core.dimerScan(F.seq, R.seq, thermo);
+  const info = d
+    ? Core.classifyDG(d.dG, d.touches3)
+    : { label: "None", cls: "ok" };
   return { dimer: d, info: info };
 }
 
@@ -921,7 +637,10 @@ function buildQCPreflightWarnings(fList, rList, fRaw, rRaw, Na, Mg, conc, target
     });
   } else {
     const anyExtremeDG = [...fAnalyses, ...rAnalyses].some(p => {
-      const dg = duplexDG37Worst(p.normalized, true);
+      const dg = Core.duplexDG(p.normalized, {
+        ...Core.resolveThermoOpts({ Na_mM: Na, Mg_mM: Mg, tempC: targetTm }),
+        isSymmetric: true
+      });
       return isFinite(dg) && dg < -25;
     });
     if (anyExtremeDG) {
@@ -1125,7 +844,7 @@ function renderResultCard(F, R, pair, index, targetTm){
   const blocks = [];
   function addDimerBlock(title, info, obj){
     if (!obj) return;
-    const desc = info.label + ' · ΔG ≈ ' + fmt2(obj.dg) + ' kcal/mol' +
+    const desc = info.label + ' · ΔG ≈ ' + fmt2(obj.dG) + ' kcal/mol' +
       (obj.touches3 ? ' · <strong style="color:var(--danger)">Touches 3\'</strong>' : '');
     blocks.push(
       '<div class="struct-block">' +
@@ -2050,9 +1769,10 @@ function initQC_V4(container) {
           const fInfo = pair.forward || { label: "Forward " + (i+1), seq: "" };
           const rInfo = pair.reverse || { label: "Reverse " + (i+1), seq: "" };
 
-          const F = qcPrimer(fInfo.label, fInfo.seq, Na, Mg, conc);
-          const R = qcPrimer(rInfo.label, rInfo.seq, Na, Mg, conc);
-          const pairResult = qcPair(F, R);
+          const thermo = thermoCtx(Na, Mg, targetTm);
+          const F = qcPrimer(fInfo.label, fInfo.seq, Na, Mg, conc, targetTm);
+          const R = qcPrimer(rInfo.label, rInfo.seq, Na, Mg, conc, targetTm);
+          const pairResult = qcPair(F, R, thermo);
 
           allHtml += renderResultCard(F, R, pairResult, i+1, targetTm);
         }

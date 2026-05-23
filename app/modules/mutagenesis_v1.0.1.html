@@ -169,6 +169,76 @@
     background: #fef3c7;
     color: #92400e;
   }
+
+  /* Primer params header: title left, preset right (same as OE-PCR / Multiplex) */
+  .primer-params-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 16px;
+    align-items: end;
+    margin-bottom: 10px;
+  }
+  .primer-params-header > h2 {
+    margin: 0;
+    align-self: center;
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+  .primer-params-header .assembly-preset-toolbar--inline {
+    margin: 0;
+    display: block;
+  }
+  .primer-params-header .assembly-preset-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    width: 100%;
+    flex-wrap: nowrap;
+  }
+  .primer-params-header .assembly-preset-main {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .primer-params-header .assembly-preset-main label.aside {
+    margin: 0 0 6px 0;
+    white-space: nowrap;
+  }
+  .primer-params-header .assembly-preset-main select {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .primer-params-header .assembly-preset-actions {
+    flex: 0 0 auto;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: 18px;
+    width: auto;
+  }
+  .primer-params-header .assembly-preset-actions .btn {
+    width: auto;
+    flex: 0 0 auto;
+  }
+  @media (max-width: 900px) {
+    .primer-params-header {
+      grid-template-columns: 1fr;
+    }
+    .primer-params-header .assembly-preset-group {
+      flex-wrap: wrap;
+    }
+    .primer-params-header .assembly-preset-actions {
+      margin-top: 0;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      width: 100%;
+    }
+  }
 </style>
 
 <section class="pane" style="position: relative; overflow: visible;">
@@ -311,9 +381,33 @@
   </div>
 
   <div style="margin-top:24px;">
-    <h2 style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible;">
-      <span>Primer Design Parameters</span>
-    </h2>
+    <div class="primer-params-header">
+      <h2>Primer Design Parameters</h2>
+      <div class="assembly-preset-toolbar assembly-preset-toolbar--inline">
+        <div class="assembly-preset-group">
+          <div class="assembly-preset-main" style="position:relative;overflow:visible;">
+            <label class="aside" for="mutagenesis-preset-select" style="display:flex;align-items:center;gap:6px;">
+              <span>Parameter preset</span>
+              <span class="help-icon">
+                <span>?</span>
+                <span class="help-tooltip">
+                  Save commonly used primer design settings in this browser. Select a preset to reuse it, or set one as the startup default for next time.
+                </span>
+              </span>
+            </label>
+            <select id="mutagenesis-preset-select" class="assembly-preset-select">
+              <option value="system-default">System Default</option>
+            </select>
+          </div>
+          <div class="assembly-preset-actions">
+            <button class="btn demo assembly-preset-save" id="mutagenesis-preset-save" type="button">Save as New</button>
+            <button class="btn demo assembly-preset-update" id="mutagenesis-preset-update" type="button">Update</button>
+            <button class="btn ghost assembly-preset-delete" id="mutagenesis-preset-delete" type="button">Delete</button>
+            <button class="btn assembly-preset-set-default" id="mutagenesis-preset-set-default" type="button">Set as Startup Default</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="grid cols-5" style="margin-top:10px; position: relative; overflow: visible;">
       <div style="position: relative; overflow: visible;">
         <label class="aside" style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible;">
