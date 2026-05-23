@@ -429,6 +429,18 @@ a:not(.btn):not(.cta):hover {
     line-height: 1.6;
 }
 
+.faq-content .reference,
+.about-content .reference {
+    font-size: 0.95em;
+    margin: 0.5em 0 0;
+    line-height: 1.6;
+}
+
+.faq-content .reference a,
+.about-content .reference a {
+    word-break: break-word;
+}
+
 .menu .dropdown {
     position: relative;
     display: inline-block;
@@ -1731,6 +1743,39 @@ header {
 }
 @media (prefers-color-scheme: dark) {
     .faq-section-heading { color: #93c5fd; }
+}
+
+.update-page .update-entry {
+    border-top: 1px solid var(--border, #e2e8f0);
+    padding-top: 20px;
+}
+.update-page .update-version {
+    margin: 0 0 12px;
+    font-size: 1.15rem;
+}
+.update-page .update-date {
+    font-weight: 400;
+    font-size: 0.95rem;
+}
+.update-page .update-category {
+    margin: 16px 0 8px;
+    font-size: 0.95rem;
+    color: #475569;
+}
+.update-page .update-list {
+    margin: 0 0 4px;
+    padding-left: 1.25em;
+}
+.update-page .update-list li {
+    margin-bottom: 6px;
+}
+.update-page .update-list-numbered {
+    list-style: decimal;
+    padding-left: 1.5em;
+}
+@media (prefers-color-scheme: dark) {
+    .update-page .update-category { color: #94a3b8; }
+    .update-page .update-entry { border-top-color: #334155; }
 }
 
 .faq-item {

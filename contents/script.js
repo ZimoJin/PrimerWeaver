@@ -20,6 +20,9 @@ function getDocLabel(id) {
     return docsList.find(d => d.id === id)?.label || 'Documents';
 }
 
+/** Official PrimerWeaver publication (NAR Web Server issue). */
+const PRIMERWEAVER_CITATION_HTML = `Jin, Z., Kim, Y. E., Ignea, C., 2026. PrimerWeaver: An integrated web server for primer design in molecular biology workflows. <em>Nucleic Acids Research</em>, 54, gkag399. <a href="https://doi.org/10.1093/nar/gkag399" target="_blank" rel="noopener noreferrer">https://doi.org/10.1093/nar/gkag399</a>`;
+
 function escapeHtml(str) {
     return String(str)
         .replace(/&/g, '&amp;')
@@ -68,6 +71,7 @@ const routes = {
     '/tools': appDashboard, // The '/tools' route now points to the appDashboard
     '/docs': docs,
     '/help': help,
+    '/update': update,
     '/about': about,
 };
 
@@ -643,7 +647,7 @@ function help() {
     <summary>How do I cite the server?</summary>
     <div>
         <p>If you use PrimerWeaver in your research, please cite the following publication:</p>
-        <p><em>PrimerWeaver: an integrated web server for primer design in molecular biology workflows.</em></p>
+        <p class="reference">${PRIMERWEAVER_CITATION_HTML}</p>
     </div>
     </details>
 </div>
@@ -672,9 +676,37 @@ function help() {
         <ul>
         <li><strong>Tm Calculation:</strong> Uses the nearest-neighbor method (SantaLucia, 1998) with empirically derived ΔH° and ΔS° values for DNA dinucleotide steps. Tm is calculated as: Tm = (ΔH° − T°) / ΔS°.</li>
         <li><strong>Secondary Structure:</strong> Uses Gibbs free energy (ΔG) estimates based on Watson–Crick base pairing and stacking interactions. Hairpin and dimer ΔG values predict secondary structure stability (more negative = more stable).</li>
-        <li><strong>Validation:</strong> All calculations have been benchmarked against published data and widely used tools (Primer3, SnapGene). Accuracy is typically within ±1–2°C for Tm in standard PCR buffers.</li>
+        <li><strong>Cross-tool comparison:</strong> Tm and ΔG are computed with published nearest-neighbor parameters; comparisons with other platforms (see FAQ on Tm differences) illustrate implementation-dependent variation, not a claim of superior accuracy.</li>
         </ul>
-        <p><strong>Caveat:</strong> Actual PCR Tm may vary ±2–3°C depending on polymerase, dNTP concentration, and buffer composition. Always validate experimentally.</p>
+        <p><strong>Caveat:</strong> Calculated Tm and ΔG are guides for primer design. Actual annealing behavior depends on buffer, polymerase, and assay setup—validate in your own PCR when performance matters.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-info"></use></svg>
+    <details class="faq-content">
+    <summary>Why does Tm differ from SnapGene, Benchling, Multiple Primer Analyzer, or other tools?</summary>
+    <div>
+        <p><strong>We do not claim that PrimerWeaver is more accurate than other platforms.</strong> Many widely used tools rely on the same nearest-neighbor thermodynamic framework yet can report different Tm values because of differences in implementation and default settings (e.g., monovalent/divalent salt, primer concentration).</p>
+        <p>Benchmarking in our publication (Fig.&nbsp;2; Supplementary Table&nbsp;S1), including comparisons with SnapGene, Benchling, and Multiple Primer Analyzer, is meant to show this <strong>cross-platform variation</strong>, not to rank tools. In PrimerWeaver, these parameters are user-adjustable so estimates can be aligned with your PCR conditions.</p>
+        <p><strong>Practical takeaway:</strong> Treat calculated Tm as a guide for primer design—not as a single experimentally defined “ground truth.” Validate annealing conditions in your own assay when performance matters.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-pool"></use></svg>
+    <details class="faq-content">
+    <summary>Why is multiplex pooling different from tools like PrimerPooler?</summary>
+    <div>
+        <p><strong>We do not claim that PrimerWeaver is more accurate than PrimerPooler.</strong> The tools address different tasks:</p>
+        <ul>
+        <li><strong>PrimerWeaver Multiplex PCR:</strong> Automated <strong>primer design</strong> plus compatibility-aware pooling. The number of pools is chosen from thermodynamic (and, in design mode, size/off-target) constraints—not set manually by the user.</li>
+        <li><strong>PrimerPooler:</strong> Partitions an <strong>existing</strong> primer set into pools; you can specify how many pools you want—useful when sequences are fixed and you need a target tube count.</li>
+        </ul>
+        <p>In our publication, benchmark primers were designed by PrimerWeaver; PrimerPooler does not design primers and received those sequences as input. Comparisons with PrimerPooler’s default “computer suggested” pool count illustrate that default, not the limit of the tool when a pool number is specified.</p>
+        <p><strong>Practical takeaway:</strong> Use PrimerWeaver for integrated design and pool suggestions. If you already have primers and need a <strong>user-defined pool count</strong>, consider PrimerPooler. In <strong>QC mode</strong>, PrimerWeaver pools existing primers mainly by thermodynamics (no size/off-target rules).</p>
     </div>
     </details>
 </div>
@@ -988,6 +1020,39 @@ function help() {
 `;
 }
 
+function update() {
+    return `
+<section class="card update-page" style="padding:22px 28px">
+<h2 style="margin-bottom: 8px;">Updates</h2>
+<p class="muted" style="margin-top: 0; margin-bottom: 28px;">Release notes for the PrimerWeaver web server.</p>
+
+<article class="update-entry">
+    <h3 class="update-version">v1.0.3 <span class="update-date muted">May 2026</span></h3>
+    <ol class="update-list update-list-numbered">
+        <li>Disclosure statements added to FAQs (tool comparisons and benchmarking context).</li>
+        <li>Minor bug fix: parameter presets enabled for <strong>Multiplex PCR</strong>, <strong>Overlap PCR</strong>, and <strong>Mutagenesis</strong> (modules that previously lacked working preset controls).</li>
+        <li>Minor bug fix: unified ΔG calculation across modules.</li>
+    </ol>
+</article>
+
+<article class="update-entry">
+    <h3 class="update-version">v1.0.2 <span class="update-date muted">April 2026</span></h3>
+    <ol class="update-list update-list-numbered">
+        <li>GenBank file formats (<code>*.gb</code>, <code>*.gbk</code>, <code>*.gbff</code>, and <code>*.genbank</code>) are supported in design and cloning module sequence inputs (Primer QC accepts FASTA/plain text only).</li>
+        <li>User-defined design parameters can be retained across browser sessions via lightweight <strong>local storage</strong> (no cookies). Users can save, reuse, and optionally set default parameter presets; if none is defined, system defaults are applied.</li>
+        <li>New <strong>Integrated Cloning Workspace</strong> module: switch between supported cloning strategies without leaving the current form or re-entering the same input sequences.</li>
+        <li>Web documentation revised to clarify design logic, plus <strong>Warnings and Edge Cases</strong>.</li>
+    </ol>
+</article>
+
+<article class="update-entry">
+    <h3 class="update-version">v1.0.1 <span class="update-date muted">March 2026</span></h3>
+    <p class="muted" style="margin: 0;">Initial public release. PrimerWeaver launched as a browser-based platform for primer quality control, multiplex PCR, overlap extension PCR, site-directed mutagenesis, and cloning workflows (restriction enzyme, Golden Gate, Gibson, and USER), with all calculations performed locally in the user’s browser.</p>
+</article>
+</section>
+`;
+}
+
 function about() {
     return `
 <svg width="0" height="0" style="position:absolute">
@@ -1061,9 +1126,12 @@ function about() {
             <li>Allawi, H. T., &amp; SantaLucia, J. (1997). Thermodynamics of internal mismatches in DNA. <em>Biochemistry</em>.</li>
             <li>SantaLucia, J. (2004). Thermodynamics of DNA structural motifs. <em>Annu. Rev. Biophys. Biomol. Struct.</em>.</li>
         </ul>
-        <p class="small muted" style="margin-bottom: 0;">
-            Workflow modules are informed by established molecular biology methods, including Golden Gate (Engler <em>et&nbsp;al.</em>), Gibson Assembly (Gibson <em>et&nbsp;al.</em>), and overlap-extension PCR (Horton <em>et&nbsp;al.</em>), as summarized in the PrimerWeaver documentation.
-            If you use PrimerWeaver in academic work, please cite the PrimerWeaver web server and the relevant primary method references.
+        <p class="small muted" style="margin-bottom: 0.5em;">
+            If you use PrimerWeaver in academic work, please cite:
+        </p>
+        <p class="reference">${PRIMERWEAVER_CITATION_HTML}</p>
+        <p class="small muted" style="margin-top: 1em; margin-bottom: 0;">
+            Workflow modules are informed by established molecular biology methods, including Golden Gate (Engler <em>et&nbsp;al.</em>), Gibson Assembly (Gibson <em>et&nbsp;al.</em>), and overlap-extension PCR (Horton <em>et&nbsp;al.</em>), as summarized in the PrimerWeaver documentation. Thermodynamic calculations also build on the nearest-neighbor parameters cited above.
         </p>
     </div>
     </div>
