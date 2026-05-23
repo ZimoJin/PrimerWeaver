@@ -63,6 +63,12 @@ app/                        # Web app shell (loads modules)
     contents/                # Demo assets and figures used by modules
 ```
 
+## Citation
+
+If you use PrimerWeaver in your research, please cite:
+
+> Jin, Z., Kim, Y. E., Ignea, C., 2026. PrimerWeaver: An integrated web server for primer design in molecular biology workflows. *Nucleic Acids Research*, 54, gkag399. https://doi.org/10.1093/nar/gkag399
+
 ## MW (Message Warning) system
 
 Modules use a shared "MW" modal for warnings/confirmations:
