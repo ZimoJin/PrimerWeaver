@@ -2422,7 +2422,7 @@ function readMutagenesisThermo(tmTarget) {
   const na = parseFloat(document.getElementById('primer-na')?.value) || 50;
   const mg = parseFloat(document.getElementById('primer-mg')?.value) || 0;
   const conc = parseFloat(document.getElementById('primer-conc')?.value) || 500;
-  const temp = tmTarget ?? parseFloat(document.getElementById('outer-tm')?.value) || 55;
+  const temp = tmTarget ?? (parseFloat(document.getElementById('outer-tm')?.value) || 55);
   return { Na_mM: na, Mg_mM: mg, conc_nM: conc, tmTarget: temp };
 }
 

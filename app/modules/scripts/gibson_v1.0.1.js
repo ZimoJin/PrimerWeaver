@@ -1212,20 +1212,17 @@ function initDesignButton() {
       window.currentAssembledName = vecName ? `${vecName}_Gibson` : 'Gibson_Assembly';
 
       };
-      const warningsBox = $('warnings-box');
-      if (warningsBox) {
-        if (warnings.length > 0) {
-          warningsBox.innerHTML = '';
-          warnings.forEach(warning => {
-            const p = document.createElement('p');
-            p.textContent = warning.message;
-            warningsBox.appendChild(p);
-          });
-        }
+      if (warnings.length > 0 && VIZ && typeof VIZ.showMWWarnings === 'function') {
+        VIZ.showMWWarnings(container, warnings, () => {
+          try {
+            proceed();
+          } catch (error) {
+            showError(error.message);
+          }
+        }, () => {});
+        return;
       }
-      if (warnings.length === 0) {
-        proceed();
-      }
+      proceed();
     } catch (error) {
       showError(error.message);
     }
