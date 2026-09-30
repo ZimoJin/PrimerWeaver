@@ -310,6 +310,7 @@
           <p style="margin: 0 0 8px 0;"><strong>Examples:</strong></p>
           <ul style="margin: 4px 0 8px 20px; padding: 0; list-style: disc;">
             <li style="margin-bottom: 4px;"><strong>V55A</strong>: Start=55, New=A (single AA swap)</li>
+            <li style="margin-bottom: 4px;"><strong>W55*</strong>: Start=55, New=* (introduce a stop codon)</li>
             <li style="margin-bottom: 4px;"><strong>V55ASA</strong>: Start=55, New=ASA (1 AA → 3 AAs)</li>
             <li style="margin-bottom: 4px;"><strong>VKL[55-57]→GA</strong>: Start=55, End=57, New=GA (3 AAs → 2 AAs)</li>
             <li style="margin-bottom: 4px;"><strong>Insert after 55</strong>: Operation=Insertion, Start=55, New=GGG</li>
@@ -522,17 +523,17 @@
   <div id="results-section" style="margin-top:24px; display: none;">
     <h3>Results</h3>
     <div style="margin-top:12px;">
-      <strong>Original protein (from template)</strong>
+      <strong id="original-sequence-label">Original protein (from template)</strong>
       <div id="aa-original" class="aa-block" style="margin-top:4px;"></div>
     </div>
 
     <div style="margin-top:16px;">
-      <strong>Final mutated protein</strong>
+      <strong id="final-sequence-label">Final mutated protein</strong>
       <div id="aa-translation" class="aa-block" style="margin-top:4px;"></div>
     </div>
 
     <div style="margin-top:16px;">
-      <strong>Mutation summary</strong>
+      <strong id="mutation-summary-label">Mutation summary</strong>
       <div id="summary" class="aside" style="margin-top:4px;"></div>
     </div>
 

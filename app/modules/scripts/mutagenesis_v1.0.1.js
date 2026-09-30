@@ -40,6 +40,24 @@ const geneticCode = {
   GGT: 'G', GGC: 'G', GGA: 'G', GGG: 'G'
 };
 
+const VALID_AA_SEQUENCE = /^[ACDEFGHIKLMNPQRSTVWY*]+$/;
+
+export function normalizeAASequence(value) {
+  const compact = String(value || '').replace(/\s+/g, '').toUpperCase();
+  // `*` is the canonical one-letter stop symbol. Accept the common textual
+  // aliases when the whole field denotes one stop codon.
+  if (compact === 'STOP' || compact === 'TER') return '*';
+  return compact;
+}
+
+function assertValidAASequence(value) {
+  const normalized = normalizeAASequence(value);
+  if (normalized && !VALID_AA_SEQUENCE.test(normalized)) {
+    throw new Error(`Invalid amino-acid sequence "${value}". Use one-letter amino-acid codes; use * for a stop codon.`);
+  }
+  return normalized;
+}
+
 export function cleanDNA(seq) {
   if (!seq) return '';
   const records = Core.parseFASTA(String(seq));
@@ -128,12 +146,17 @@ export function detectLongestCDS(inputSeq) {
   for (let frame = 0; frame < 3; frame++) {
     const orfs = findORFsInFrame(revCompSeq, frame);
     orfs.forEach(orf => {
+      // The ORF was found in the reverse-complement scan, so `orf.seq` is
+      // already in coding (5' -> 3') orientation. Convert only the displayed
+      // interval back to coordinates on the input sequence.
+      const originalStart = clean.length - orf.end;
+      const originalEnd = clean.length - orf.start;
       allOrfs.push({
         ...orf,
+        start: originalStart,
+        end: originalEnd,
         strand: '-',
-        displayStrand: 'Reverse (-)',
-        originalSeq: orf.seq,  // Store for later RC conversion if needed
-        seqForUse: Core.reverseComplementSeq(orf.seq)  // Use RC version
+        displayStrand: 'Reverse (-)'
       });
     });
   }
@@ -155,6 +178,10 @@ export function getTopCDSCandidates(inputSeq, topN = 5) {
 // selectedCodon: optional, if provided use this codon instead of preferred
 export function applyAAMutation(template, hostCode, aaPos, newAA, selectedCodon = null) {
   const clean = cleanDNA(template);
+  const normalizedNewAA = assertValidAASequence(newAA);
+  if (normalizedNewAA.length !== 1) {
+    throw new Error('A single amino-acid substitution requires exactly one new amino-acid symbol.');
+  }
   const codonStart = (aaPos - 1) * 3;
   if (codonStart + 3 > clean.length) {
     throw new Error(`AA position ${aaPos} is out of range for this template.`);
@@ -165,12 +192,15 @@ export function applyAAMutation(template, hostCode, aaPos, newAA, selectedCodon 
   let targetCodon;
   if (selectedCodon) {
     // Use user-selected codon
-    targetCodon = selectedCodon;
+    targetCodon = cleanDNA(selectedCodon);
+    if (targetCodon.length !== 3 || geneticCode[targetCodon] !== normalizedNewAA) {
+      throw new Error(`Selected codon ${selectedCodon} does not encode amino acid ${normalizedNewAA}.`);
+    }
   } else {
     // Use preferred codon
-    const entries = getCodonEntries(hostCode, newAA);
+    const entries = getCodonEntries(hostCode, normalizedNewAA);
     if (!entries || entries.length === 0) {
-      throw new Error(`No codon usage data for amino acid ${newAA} in organism ${hostCode}.`);
+      throw new Error(`No codon usage data for amino acid ${normalizedNewAA} in organism ${hostCode}.`);
     }
     targetCodon = entries[0].codon;
   }
@@ -187,7 +217,7 @@ export function applyAAMutation(template, hostCode, aaPos, newAA, selectedCodon 
     oldCodon,
     newCodon: targetCodon,
     oldAA,
-    newAA
+    newAA: normalizedNewAA
   };
 }
 
@@ -198,6 +228,7 @@ export function applyAAMutation(template, hostCode, aaPos, newAA, selectedCodon 
 // selectedCodon: codon preference (only for single AA)
 export function applyAAEdit(template, hostCode, operation, aaStartPos, aaEndPos, newAAs, selectedCodon = null) {
   const clean = cleanDNA(template);
+  const normalizedNewAAs = assertValidAASequence(newAAs);
   
   // Calculate DNA positions
   const dnaStartPos = (aaStartPos - 1) * 3; // 0-based start of first codon
@@ -205,6 +236,9 @@ export function applyAAEdit(template, hostCode, operation, aaStartPos, aaEndPos,
   
   if (dnaStartPos >= clean.length) {
     throw new Error(`AA position ${aaStartPos} is out of range for this template.`);
+  }
+  if (aaEndPos < aaStartPos || dnaEndPos > clean.length) {
+    throw new Error(`Invalid AA position range: ${aaStartPos}-${aaEndPos}.`);
   }
   
   // Get old sequence info
@@ -214,16 +248,19 @@ export function applyAAEdit(template, hostCode, operation, aaStartPos, aaEndPos,
   // Build new DNA sequence from new amino acids
   // Use round-robin selection to avoid repetitive codon sequences (e.g., GGTGGTGGT for GGG)
   let newDNASeq = '';
-  if (newAAs && newAAs.length > 0) {
+  if (normalizedNewAAs && normalizedNewAAs.length > 0) {
     // Track codon usage for each amino acid to implement round-robin
     const aaCodonCounters = new Map();
     
-    for (let i = 0; i < newAAs.length; i++) {
-      const aa = newAAs[i];
+    for (let i = 0; i < normalizedNewAAs.length; i++) {
+      const aa = normalizedNewAAs[i];
       let codon;
-      if (i === 0 && selectedCodon && newAAs.length === 1) {
+      if (i === 0 && selectedCodon && normalizedNewAAs.length === 1) {
         // Use selected codon only for single AA
-        codon = selectedCodon;
+        codon = cleanDNA(selectedCodon);
+        if (codon.length !== 3 || geneticCode[codon] !== aa) {
+          throw new Error(`Selected codon ${selectedCodon} does not encode amino acid ${aa}.`);
+        }
       } else {
         // Use round-robin selection among top preferred codons to avoid repeats
         const entries = getCodonEntries(hostCode, aa);
@@ -256,9 +293,9 @@ export function applyAAEdit(template, hostCode, operation, aaStartPos, aaEndPos,
       // Replace AAs at position range with new AAs
       mutatedTemplate = clean.slice(0, dnaStartPos) + newDNASeq + clean.slice(dnaEndPos);
       if (aaStartPos === aaEndPos) {
-        editDescription = `${oldAAs}${aaStartPos}${newAAs}`;
+        editDescription = `${oldAAs}${aaStartPos}${normalizedNewAAs}`;
       } else {
-        editDescription = `${oldAAs}[${aaStartPos}-${aaEndPos}]→${newAAs}`;
+        editDescription = `${oldAAs}[${aaStartPos}-${aaEndPos}]→${normalizedNewAAs}`;
       }
       break;
       
@@ -269,7 +306,7 @@ export function applyAAEdit(template, hostCode, operation, aaStartPos, aaEndPos,
       // Example: AA 55 -> insert after codon 55, which ends at position 55*3 = 165 (0-based) = 166 (1-based)
       const insertPos = aaStartPos * 3; // Insert after this codon (0-based position)
       mutatedTemplate = clean.slice(0, insertPos) + newDNASeq + clean.slice(insertPos);
-      editDescription = `ins${aaStartPos}${newAAs}`;
+      editDescription = `ins${aaStartPos}${normalizedNewAAs}`;
       
       // For insertion, dnaStartPos and dnaEndPos should both be the insertion point
       // (no deletion, just insertion at this point)
@@ -296,7 +333,7 @@ export function applyAAEdit(template, hostCode, operation, aaStartPos, aaEndPos,
     oldDNASegment: operation === 'insertion' ? '' : oldDNASegment,  // No old segment for insertion
     newDNASeq,
     oldAAs: operation === 'insertion' ? '' : oldAAs,  // No old AAs for insertion
-    newAAs: newAAs || '',
+    newAAs: normalizedNewAAs,
     aaStartPos,
     aaEndPos,
     editDescription,
@@ -512,6 +549,10 @@ function designSingleFragmentPCR(mutatedTemplate, codonStart, opts = {}) {
   const R2OverlapTm = R2 && userROverlap ? tmSaltCorrected(userROverlap, conc_nM, na_mM, mg_mM) : null;
   
   const FmutMutIndex = Fmut && FmutOverlapTail ? FmutOverlapTail.length - 3 : null;
+  // In Rmut the forward mutation range is reversed. Because the mutation is
+  // the first three bases of RmutOverlapTail, it starts three bases from the
+  // end of that tail after reverse complementation.
+  const RmutMutIndex = Rmut && RmutOverlapTail ? RmutOverlapTail.length - 3 : null;
   
   // Get core Tm for F1 and R2 (excluding user-defined overlap)
   const F1CoreSeq = F1 && userFOverlap ? F1.slice(userFOverlap.length) : F1;
@@ -522,7 +563,7 @@ function designSingleFragmentPCR(mutatedTemplate, codonStart, opts = {}) {
   return {
     F1: makePrimerInfo(F1, F1Tm, null, 0, F1CoreTm, F1OverlapTm),
     Fmut: makePrimerInfo(Fmut, FmutTm, FmutMutIndex, 3, Fmut ? bestFmutCore?.tm : null, FmutOverlapTm),
-    Rmut: makePrimerInfo(Rmut, RmutTm, null, 3, Rmut ? bestRmutCore?.tm : null, RmutOverlapTm),
+    Rmut: makePrimerInfo(Rmut, RmutTm, RmutMutIndex, RmutMutIndex == null ? 0 : 3, Rmut ? bestRmutCore?.tm : null, RmutOverlapTm),
     R2: makePrimerInfo(R2, R2Tm, null, 0, R2CoreTm, R2OverlapTm),
     isSingleFragment: true,
     useLeftAnchor,
@@ -642,7 +683,7 @@ export function designOePcrPrimers(mutatedTemplate, codonStart, opts = {}) {
   const mutStartInForward = bestRmutCore.seq.length; // where mutation starts in forward
   const mutEndInForward = mutStartInForward + 3;
   const RmutLen = Rmut.length;
-  const RmutMutIndex = RmutLen - 1 - mutEndInForward; // position in RC
+  const RmutMutIndex = RmutLen - mutEndInForward; // half-open range mapped into RC
   const RmutMutLen = 3;
 
   // === Step 3: Design F1 and R2 (anchor primers from start/stop) ===
@@ -784,19 +825,11 @@ function designSingleFragmentPCRForDNAEdit(mutantTemplate, wtTemplate, editStart
   let useRightAnchor = false;
   let bestFmutCore = null;
   let bestRmutCore = null;
+  let fmutHL = { startIndex: null, length: 0 };
+  let rmutHL = { startIndex: null, length: 0 };
   
-  // Determine operation type based on editLen
-  const operation = editLen === 0 ? 'insertion' : (editLen < (editEnd - editStart) ? 'deletion' : 'replacement');
   const newSeq = clean.slice(editStart, editEnd); // The new sequence in mutant template
-  const newSeqRC = newSeq ? revComp(newSeq) : '';
 
-  function inferHighlight(seq, target) {
-    if (!seq || !target) return { startIndex: null, length: 0 };
-    const idx = seq.indexOf(target);
-    if (idx < 0) return { startIndex: null, length: 0 };
-    return { startIndex: idx, length: target.length };
-  }
-  
   if (leftAvailable < minFragmentLen && rightAvailable >= minFragmentLen) {
     // Edit too close to start: use Fmut (with edit) + R2 (right anchor)
     useRightAnchor = true;
@@ -824,6 +857,9 @@ function designSingleFragmentPCRForDNAEdit(mutantTemplate, wtTemplate, editStart
       bestFmutCore = { seq: coreSeq, len: coreSeq.length, tm: tmSaltCorrected(coreSeq, conc_nM, na_mM, mg_mM) };
     }
     Fmut = Fmut + bestFmutCore.seq;
+    if (newSeq.length) {
+      fmutHL = { startIndex: FmutLeftFlank.length, length: newSeq.length };
+    }
     
     // R2: from 3' end (reverse complement)
     let bestR2 = null;
@@ -889,6 +925,9 @@ function designSingleFragmentPCRForDNAEdit(mutantTemplate, wtTemplate, editStart
     const RmutRightFlank = cleanWT.slice(wtRightAnchorPos, wtRightAnchorPos + rightFlankLen);
     const RmutForward = bestRmutCore.seq + newSeq + RmutRightFlank;
     Rmut = revComp(RmutForward);
+    if (newSeq.length) {
+      rmutHL = { startIndex: RmutRightFlank.length, length: newSeq.length };
+    }
     
     Fmut = null;
     R2 = null;
@@ -910,6 +949,10 @@ function designSingleFragmentPCRForDNAEdit(mutantTemplate, wtTemplate, editStart
     const RmutRightFlank = cleanWT.slice(wtRightAnchorPos, wtRightAnchorPos + rightFlankLen);
     const RmutForward = leftCore + newSeq + RmutRightFlank;
     Rmut = revComp(RmutForward);
+    if (newSeq.length) {
+      fmutHL = { startIndex: FmutLeftFlank.length, length: newSeq.length };
+      rmutHL = { startIndex: RmutRightFlank.length, length: newSeq.length };
+    }
     bestRmutCore = { seq: leftCore, len: leftCore.length, tm: tmSaltCorrected(leftCore, conc_nM, na_mM, mg_mM) };
     
     F1 = null;
@@ -944,9 +987,6 @@ function designSingleFragmentPCRForDNAEdit(mutantTemplate, wtTemplate, editStart
   const R2CoreTm = R2CoreSeq ? tmSaltCorrected(R2CoreSeq, conc_nM, na_mM, mg_mM) : R2Tm;
   const R2OverlapTm = R2 && userROverlap ? tmSaltCorrected(userROverlap, conc_nM, na_mM, mg_mM) : null;
   
-  const fmutHL = inferHighlight(Fmut, newSeq);
-  const rmutHL = inferHighlight(Rmut, newSeqRC);
-
   return {
     F1: infoPrimer(F1, F1Tm, F1CoreTm, F1OverlapTm),
     Fmut: infoPrimer(Fmut, FmutTm, Fmut ? bestFmutCore?.tm : null, null, fmutHL.startIndex, fmutHL.length),
@@ -1440,6 +1480,13 @@ export function designOePcrPrimersForDNAEditDynamic(mutantTemplate, wtTemplate, 
 
   // Build primers
   let Fmut, RmutForward;
+  const mutationSeq = clean.slice(editStart, editEnd);
+  let activeCoreLeft = coreLeft;
+  let activeCoreRight = coreRight;
+  let activeCoreLeftStart = coreLeftStart;
+  let activeCoreRightStart = coreRightStart;
+  let fmutHL = { startIndex: null, length: 0 };
+  let rmutHL = { startIndex: null, length: 0 };
   
   if (isDeletion && overlapBest && overlapBest.isDeletionOverlap) {
     // For deletion: special primer structure
@@ -1482,7 +1529,7 @@ export function designOePcrPrimersForDNAEditDynamic(mutantTemplate, wtTemplate, 
     // - Fmut = overlap + coreRight(from 116)
     // - Rmut = revComp(coreLeft(to 91) + overlap)
     
-  const overlapSeq = overlapBest.seq;
+    const overlapSeq = overlapBest.seq;
     const leftFlankLen = overlapBest.leftFlankLen || 0;
     const rightFlankLen = overlapBest.rightFlankLen || 0;
     
@@ -1490,9 +1537,11 @@ export function designOePcrPrimersForDNAEditDynamic(mutantTemplate, wtTemplate, 
     // coreRight should start from where overlap's right flank ends
     const coreRightStartAdj = wtEndPos + rightFlankLen;
     let coreRightAdj = '';
+    let usedAdjustedRightCore = false;
     if (cleanWT && coreRightStartAdj < cleanWT.length) {
       const adjCore = findOptimalCore(cleanWT, coreRightStartAdj, 'right', coreTargetTm, coreMinLen, coreMaxLen);
       coreRightAdj = adjCore.seq;
+      usedAdjustedRightCore = coreRightAdj.length >= 8;
     }
     if (coreRightAdj.length < 8) {
       // Fallback to original coreRight if adjusted one is too short
@@ -1502,20 +1551,34 @@ export function designOePcrPrimersForDNAEditDynamic(mutantTemplate, wtTemplate, 
     // coreLeft should end where overlap's left flank starts
     const coreLeftEndAdj = editStart - leftFlankLen;
     let coreLeftAdj = '';
+    let usedAdjustedLeftCore = false;
     if (cleanWT && coreLeftEndAdj > 0) {
       const adjCore = findOptimalCore(cleanWT, coreLeftEndAdj, 'left', coreTargetTm, coreMinLen, coreMaxLen);
       coreLeftAdj = adjCore.seq;
+      usedAdjustedLeftCore = coreLeftAdj.length >= 8;
     }
     if (coreLeftAdj.length < 8) {
       // Fallback to original coreLeft if adjusted one is too short
       coreLeftAdj = coreLeft;
     }
+
+    activeCoreRight = coreRightAdj;
+    activeCoreLeft = coreLeftAdj;
+    activeCoreRightStart = usedAdjustedRightCore ? coreRightStartAdj : coreRightStart;
+    activeCoreLeftStart = usedAdjustedLeftCore ? coreLeftEndAdj - coreLeftAdj.length : coreLeftStart;
     
     // Fmut: overlap (5' tail with complete new seq) + coreRight (3' binding, starts after overlap)
     Fmut = overlapSeq + coreRightAdj;
     
     // RmutForward: coreLeft (binding, ends before overlap) + overlap (3' tail with complete new seq)
     RmutForward = coreLeftAdj + overlapSeq;
+
+    // Record the introduced bases by construction. Searching for newSeq can
+    // select a repeated occurrence elsewhere in the primer.
+    if (mutationSeq.length) {
+      fmutHL = { startIndex: leftFlankLen, length: mutationSeq.length };
+      rmutHL = { startIndex: rightFlankLen, length: mutationSeq.length };
+    }
     
   } else if (overlapBest && overlapBest.isReplacementOverlap) {
     // For LONG replacement/insertion (new seq >= ~20bp):
@@ -1546,12 +1609,26 @@ export function designOePcrPrimersForDNAEditDynamic(mutantTemplate, wtTemplate, 
     
     // RmutForward: coreLeft (binding to WT before edit) + rmutTail (3' tail with front half of new seq)
     RmutForward = coreLeft + rmutTail;
+    // Both primers carry a different contiguous part of a long edit.
+    fmutHL = { startIndex: 0, length: fmutTail.length };
+    rmutHL = { startIndex: 0, length: rmutTail.length };
     
   } else {
     // Fallback: simple overlap + core structure
     const overlapSeq = overlapBest.seq;
     Fmut = overlapSeq + coreRight;
     RmutForward = coreLeft + overlapSeq;
+    if (mutationSeq.length) {
+      const fmutIdx = Fmut.indexOf(mutationSeq);
+      const forwardIdx = RmutForward.indexOf(mutationSeq);
+      if (fmutIdx >= 0) fmutHL = { startIndex: fmutIdx, length: mutationSeq.length };
+      if (forwardIdx >= 0) {
+        rmutHL = {
+          startIndex: RmutForward.length - (forwardIdx + mutationSeq.length),
+          length: mutationSeq.length
+        };
+      }
+    }
   }
   
   const FmutTm = tmSaltCorrected(Fmut, conc_nM, na_mM, mg_mM);
@@ -1582,13 +1659,6 @@ export function designOePcrPrimersForDNAEditDynamic(mutantTemplate, wtTemplate, 
   const R2Final = (userROverlap ? userROverlap : '') + bestR2.seq;
   const R2FinalTm = tmSaltCorrected(R2Final, conc_nM, na_mM, mg_mM);
 
-  const newSeq = clean.slice(editStart, editEnd);
-  const newSeqRC = newSeq ? revComp(newSeq) : '';
-  const fmutIdx = newSeq ? (Fmut ? Fmut.indexOf(newSeq) : -1) : -1;
-  const rmutIdx = newSeqRC ? (Rmut ? Rmut.indexOf(newSeqRC) : -1) : -1;
-  const fmutHL = fmutIdx >= 0 ? { startIndex: fmutIdx, length: newSeq.length } : { startIndex: null, length: 0 };
-  const rmutHL = rmutIdx >= 0 ? { startIndex: rmutIdx, length: newSeqRC.length } : { startIndex: null, length: 0 };
-
   function infoPrimer(seq, tm, coreTm = null, overlapTm = null, mutStartIndex = null, mutLength = 0) { 
     return {
       seq, 
@@ -1603,8 +1673,8 @@ export function designOePcrPrimersForDNAEditDynamic(mutantTemplate, wtTemplate, 
   }
 
   // Calculate core Tms
-  const coreLeftTm = tmSaltCorrected(coreLeft, conc_nM, na_mM, mg_mM);
-  const coreRightTm = tmSaltCorrected(coreRight, conc_nM, na_mM, mg_mM);
+  const coreLeftTm = tmSaltCorrected(activeCoreLeft, conc_nM, na_mM, mg_mM);
+  const coreRightTm = tmSaltCorrected(activeCoreRight, conc_nM, na_mM, mg_mM);
   
   // Calculate overlap Tm (for Fmut and Rmut only, F1 and R2 don't have overlap)
   const overlapTmVal = overlapBest.tm;
@@ -1627,14 +1697,14 @@ export function designOePcrPrimersForDNAEditDynamic(mutantTemplate, wtTemplate, 
       overlapLen,
       overlapSeq: overlapBest.seq,
       overlapTm: overlapTmVal,
-      coreLeftSeq: coreLeft,
+      coreLeftSeq: activeCoreLeft,
       coreLeftTm,
-      coreLeftStart,
-      coreLeftLen: coreLeft.length,
-      coreRightSeq: coreRight,
+      coreLeftStart: activeCoreLeftStart,
+      coreLeftLen: activeCoreLeft.length,
+      coreRightSeq: activeCoreRight,
       coreRightTm,
-      coreRightStart,
-      coreRightLen: coreRight.length,
+      coreRightStart: activeCoreRightStart,
+      coreRightLen: activeCoreRight.length,
       overlapFromWT: !!overlapBest.fromWT,
       isDeletion,
       overlapBefore: overlapBest.overlapBefore || null,
@@ -1809,7 +1879,7 @@ function populateHostSelect() {
 function updateCodonSelect(rowNum, hostCode) {
   const aaToInput = $(`aa-to-${rowNum}`);
   const codonSelect = $(`codon-select-${rowNum}`);
-  const aaInput = aaToInput.value.trim().toUpperCase();
+  const aaInput = normalizeAASequence(aaToInput.value);
   
   if (!aaInput || !hostCode) {
     codonSelect.innerHTML = '<option value="">Select AA first</option>';
@@ -1904,8 +1974,6 @@ function initializeAAEditsTable() {
 
 // Setup event listeners for a specific row
 function setupAARowListenersForRow(rowNum) {
-  const hostCode = $('host-select').value;
-  
   // Position input change - update Current AA
   const posInput = $(`aa-pos-${rowNum}`);
   const endInput = $(`aa-end-${rowNum}`);
@@ -1920,7 +1988,7 @@ function setupAARowListenersForRow(rowNum) {
   const aaToInput = $(`aa-to-${rowNum}`);
   if (aaToInput) {
     aaToInput.addEventListener('input', () => {
-      updateCodonSelect(rowNum, hostCode);
+      updateCodonSelect(rowNum, $('host-select').value);
     });
   }
   
@@ -2055,7 +2123,7 @@ function parseMutations() {
     const operation = opEl ? (opEl.value || 'substitution') : 'substitution';
     const endPosVal = endPosEl ? endPosEl.value : '';
     const endPos = endPosVal ? parseInt(endPosVal, 10) : pos;
-    const newAAs = newAAsEl ? newAAsEl.value.trim().toUpperCase() : '';
+    const newAAs = newAAsEl ? normalizeAASequence(newAAsEl.value) : '';
     
     console.log(`Row ${i} values:`, { pos, operation, endPos, newAAs });
     
@@ -2071,7 +2139,7 @@ function parseMutations() {
       console.log(`Row ${i}: operation=${operation} but newAAs empty, skipping`);
       continue;
     }
-    
+
     // Get selected codon preference from dropdown
     const selectedCodon = codonSelect ? codonSelect.value : '';
     
@@ -2088,6 +2156,55 @@ function parseMutations() {
   }
   console.log('parseMutations: returning', rows.length, 'mutations');
   return rows;
+}
+
+function aaEditOriginalSpan(edit) {
+  if (edit.operation === 'insertion') {
+    return { start: edit.aaPos, end: edit.aaPos, isInsertion: true };
+  }
+  return { start: edit.aaPos - 1, end: edit.aaEndPos, isInsertion: false };
+}
+
+function aaEditLengthDelta(edit) {
+  const oldLength = edit.operation === 'insertion' ? 0 : edit.aaEndPos - edit.aaPos + 1;
+  const newLength = edit.operation === 'deletion' ? 0 : normalizeAASequence(edit.newAAs).length;
+  return newLength - oldLength;
+}
+
+export function resolveAAEditCoordinates(edit, precedingEdits = []) {
+  const span = aaEditOriginalSpan(edit);
+  let offset = 0;
+
+  for (const previous of precedingEdits) {
+    const previousSpan = aaEditOriginalSpan(previous);
+    if (span.isInsertion && !previousSpan.isInsertion &&
+        previousSpan.start < span.start && span.start < previousSpan.end) {
+      throw new Error(`AA edit ${edit.index || ''}: insertion point overlaps an earlier edited range.`.trim());
+    }
+    if (!span.isInsertion && previousSpan.isInsertion &&
+        span.start < previousSpan.start && previousSpan.start < span.end) {
+      throw new Error(`AA edit ${edit.index || ''}: range contains an earlier insertion point.`.trim());
+    }
+    if (!span.isInsertion && !previousSpan.isInsertion &&
+        Math.max(span.start, previousSpan.start) < Math.min(span.end, previousSpan.end)) {
+      throw new Error(`AA edit ${edit.index || ''}: range overlaps an earlier edited range.`.trim());
+    }
+
+    const previousIsBefore = previousSpan.isInsertion
+      ? previousSpan.start <= span.start
+      : previousSpan.end <= span.start;
+    if (previousIsBefore) offset += aaEditLengthDelta(previous);
+  }
+
+  if (span.isInsertion) {
+    const insertionPoint = edit.aaPos + offset;
+    return { aaPos: insertionPoint, aaEndPos: insertionPoint, offset };
+  }
+  return {
+    aaPos: edit.aaPos + offset,
+    aaEndPos: edit.aaEndPos + offset,
+    offset
+  };
 }
 
 function renderAASequences(origAA, finalAA, mutations, results = null) {
@@ -2255,7 +2372,14 @@ function renderDNASequences(origSeq, finalSeq, edits) {
   // Track position offset due to insertions/deletions in final sequence
   let posOffset = 0;
   
-  for (const edit of edits) {
+  // Calculate final coordinates in original-sequence order, not row order.
+  // This keeps highlights correct when a later row edits an earlier position.
+  const orderedEdits = [...edits].sort((a, b) => {
+    if (a.startPos !== b.startPos) return a.startPos - b.startPos;
+    return (a.index || 0) - (b.index || 0);
+  });
+
+  for (const edit of orderedEdits) {
     const startPos = edit.startPos; // 1-based inclusive
     const endPos = edit.endPos;     // 1-based inclusive
     const operation = edit.operation;
@@ -2392,6 +2516,15 @@ function renderDNASequences(origSeq, finalSeq, edits) {
   
   origEl.innerHTML = `<code style="font-family: monospace; word-break: break-all; font-size: 0.8rem;">${buildOriginalWithInsertionsDNA(origSeq || '', origEditPositions, insertions)}</code>`;
   finalEl.innerHTML = `<code style="font-family: monospace; word-break: break-all; font-size: 0.8rem;">${buildFinalWithDeletionsDNA(finalSeq || '', finalEditPositions, deletions)}</code>`;
+}
+
+function setResultSequenceLabels(isDNAMode) {
+  const originalLabel = $('original-sequence-label');
+  const finalLabel = $('final-sequence-label');
+  const summaryLabel = $('mutation-summary-label');
+  if (originalLabel) originalLabel.textContent = isDNAMode ? 'Original DNA (from template)' : 'Original protein (from template)';
+  if (finalLabel) finalLabel.textContent = isDNAMode ? 'Final edited DNA' : 'Final mutated protein';
+  if (summaryLabel) summaryLabel.textContent = isDNAMode ? 'Edit summary' : 'Mutation summary';
 }
 
 function escapeHtml(str) {
@@ -2612,6 +2745,7 @@ function downloadPrimersFASTA() {
 }
 
 function renderResults(results, origAA, finalAA, mutations, rawTemplate = null) {
+  setResultSequenceLabels(false);
   console.log('renderResults called');
   console.log('renderResults: results.length =', results.length);
   
@@ -2942,135 +3076,96 @@ function performDesign(template, hostCode, rawTemplate) {
 
   const results = [];
   let currentTemplate = template;
-  let wtTemplate = template; // Keep original for primer design
+  const appliedMutations = [];
 
   try {
     for (const mut of mutations) {
       const { operation, aaPos, aaEndPos, newAAs, selectedCodon } = mut;
-      
-      // Check if this is a simple single-AA substitution (use old method for compatibility)
-      const isSimpleSubstitution = operation === 'substitution' && 
-                                    aaPos === aaEndPos && 
-                                    newAAs.length === 1;
-      
-      let mInfo, primerInfo;
-      
-      if (isSimpleSubstitution) {
-        // Use original simple method for single AA substitution
-        mInfo = applyAAMutation(currentTemplate, hostCode, aaPos, newAAs, selectedCodon);
-        
-        primerInfo = designOePcrPrimers(
-        mInfo.mutatedTemplate,
-        mInfo.codonStart,
-        {
-            coreTargetTm: outerTm,
-          overlapTargetTm: overlapTm,
-          outerTargetTm: outerTm,
-          coreTargetLen: 20,
-          overlapTailLen: 13,
-          conc_nM,
-          na_mM,
-            mg_mM,
-            userFOverlap,
-            userROverlap
-        }
-      );
-        debugLogFmutRmutParts(`${mInfo.oldAA}${aaPos}${mInfo.newAA}`, primerInfo);
+      const stepWt = currentTemplate;
+      const stepCoords = resolveAAEditCoordinates(mut, appliedMutations);
 
+      // All AA edits use the same generic DNA-edit designer. This keeps a
+      // one-codon CDS substitution consistent with the equivalent 3 bp edit
+      // in DNA mode and avoids two divergent primer-design implementations.
+      const mInfo = applyAAEdit(
+        stepWt,
+        hostCode,
+        operation,
+        stepCoords.aaPos,
+        stepCoords.aaEndPos,
+        newAAs,
+        selectedCodon
+      );
+        
+      const editStart = mInfo.dnaStartPos; // 0-based in this step's template
+      let editEnd, editLen;
+        
+      if (operation === 'deletion') {
+        editEnd = editStart;
+        editLen = 0;
+      } else {
+        editEnd = editStart + mInfo.editLen;
+        editLen = mInfo.editLen;
+      }
+        
+      const opts = {
+        desiredCore: 20,
+        desiredOverlap: 20,
+        minOverlapTm: overlapTm,
+        maxSearchRadius: 60,
+        coreTargetTm: outerTm,
+        outerTargetTm: outerTm,
+        minCore: 12,
+        maxCore: 40,
+        conc_nM,
+        na_mM,
+        mg_mM,
+        userFOverlap,
+        userROverlap,
+        wtEndPos: operation === 'insertion' ? mInfo.dnaStartPos : mInfo.dnaEndPos
+      };
+        
+      const primerInfo = designOePcrPrimersForDNAEditDynamic(
+        mInfo.mutatedTemplate,
+        stepWt,
+        editStart,
+        editEnd,
+        editLen,
+        opts
+      );
+      let displayDescription;
+      if (operation === 'insertion') {
+        displayDescription = `ins${aaPos}${mInfo.newAAs}`;
+      } else if (operation === 'deletion') {
+        displayDescription = `Δ${mInfo.oldAAs}[${aaPos}-${aaEndPos}]`;
+      } else if (aaPos === aaEndPos) {
+        displayDescription = `${mInfo.oldAAs}${aaPos}${mInfo.newAAs}`;
+      } else {
+        displayDescription = `${mInfo.oldAAs}[${aaPos}-${aaEndPos}]→${mInfo.newAAs}`;
+      }
+      debugLogFmutRmutParts(displayDescription, primerInfo);
+        
       results.push({
         id: mut.index,
-          operation: 'substitution',
+        operation,
         aaPos,
-          aaEndPos,
-          oldAAs: mInfo.oldAA,
-          newAAs: mInfo.newAA,
-        oldCodon: mInfo.oldCodon,
-        newCodon: mInfo.newCodon,
-          description: `${mInfo.oldAA}${aaPos}${mInfo.newAA}`,
+        aaEndPos,
+        oldAAs: mInfo.oldAAs,
+        newAAs: mInfo.newAAs,
+        oldDNA: mInfo.oldDNASegment,
+        newDNA: mInfo.newDNASeq,
+        description: displayDescription,
         mutatedTemplate: mInfo.mutatedTemplate,
         F1: primerInfo.F1,
         Fmut: primerInfo.Fmut,
         Rmut: primerInfo.Rmut,
         R2: primerInfo.R2,
+        info: primerInfo.info,
         isSingleFragment: primerInfo.isSingleFragment || false
       });
-        
-      } else {
-        // Use new method for multi-AA edits (insertion, deletion, multi-AA substitution)
-        mInfo = applyAAEdit(currentTemplate, hostCode, operation, aaPos, aaEndPos, newAAs, selectedCodon);
-        
-        // Use DNA edit dynamic primer design (more flexible)
-        const editStart = mInfo.dnaStartPos; // 0-based
-        let editEnd, editLen;
-        
-        if (operation === 'insertion') {
-          // For insertion, edit region in mutant is where new sequence was inserted
-          editEnd = mInfo.dnaStartPos + mInfo.editLen;
-          editLen = mInfo.editLen;
-        } else if (operation === 'deletion') {
-          // For deletion, edit region in mutant is the junction point
-          editEnd = mInfo.dnaStartPos;
-          editLen = 0;
-        } else {
-          // For substitution, edit region is where new sequence replaced old
-          editEnd = mInfo.dnaStartPos + mInfo.editLen;
-          editLen = mInfo.editLen;
-        }
-        
-        const opts = {
-          desiredCore: 20,
-          desiredOverlap: 20,
-          minOverlapTm: overlapTm,
-          maxSearchRadius: 60,
-          coreTargetTm: outerTm,
-          outerTargetTm: outerTm,
-          minCore: 12,
-          maxCore: 40,
-          conc_nM,
-          na_mM,
-          mg_mM,
-          userFOverlap,
-          userROverlap
-        };
-        
-        // Set wtEndPos for correct right core calculation
-        if (operation === 'deletion' || operation === 'substitution') {
-          opts.wtEndPos = mInfo.dnaEndPos; // Where WT edit region ends
-        } else if (operation === 'insertion') {
-          opts.wtEndPos = mInfo.dnaStartPos; // Insertion point in WT
-        }
-        
-        primerInfo = designOePcrPrimersForDNAEditDynamic(
-          mInfo.mutatedTemplate,
-          wtTemplate,
-          editStart,
-          editEnd,
-          editLen,
-          opts
-        );
-        debugLogFmutRmutParts(mInfo.editDescription, primerInfo);
-        
-        results.push({
-          id: mut.index,
-          operation,
-          aaPos,
-          aaEndPos,
-          oldAAs: mInfo.oldAAs,
-          newAAs: mInfo.newAAs,
-          oldDNA: mInfo.oldDNASegment,
-          newDNA: mInfo.newDNASeq,
-          description: mInfo.editDescription,
-          mutatedTemplate: mInfo.mutatedTemplate,
-          F1: primerInfo.F1,
-          Fmut: primerInfo.Fmut,
-          Rmut: primerInfo.Rmut,
-          R2: primerInfo.R2,
-          info: primerInfo.info,
-          isSingleFragment: primerInfo.isSingleFragment || false
-        });
-      }
 
       currentTemplate = mInfo.mutatedTemplate;
+      appliedMutations.push(mut);
     }
   } catch (e) {
     console.error(e);
@@ -3098,9 +3193,65 @@ function performDesign(template, hostCode, rawTemplate) {
 
 // ===== DNA EDITING MODE FUNCTIONS =====
 
+function dnaEditOriginalSpan(edit) {
+  if (edit.operation === 'insertion') {
+    const boundary = edit.startPos;
+    return { start: boundary, end: boundary, isInsertion: true };
+  }
+  return { start: edit.startPos - 1, end: edit.endPos, isInsertion: false };
+}
+
+function dnaEditLengthDelta(edit) {
+  const oldLength = edit.operation === 'insertion' ? 0 : edit.endPos - edit.startPos + 1;
+  const newLength = edit.operation === 'deletion' ? 0 : cleanDNA(edit.newSeq || '').length;
+  return newLength - oldLength;
+}
+
+// UI coordinates always refer to the original input DNA. Resolve them into
+// the template produced by preceding rows so insertions/deletions do not move
+// later edits away from the requested bases.
+export function resolveDNAEditCoordinates(edit, precedingEdits = []) {
+  const span = dnaEditOriginalSpan(edit);
+  const referenceBoundary = span.start;
+  let offset = 0;
+
+  for (const previous of precedingEdits) {
+    const previousSpan = dnaEditOriginalSpan(previous);
+
+    if (span.isInsertion && !previousSpan.isInsertion &&
+        previousSpan.start < span.start && span.start < previousSpan.end) {
+      throw new Error(`Edit ${edit.index || ''}: insertion point overlaps an earlier edited range.`.trim());
+    }
+    if (!span.isInsertion && previousSpan.isInsertion &&
+        span.start < previousSpan.start && previousSpan.start < span.end) {
+      throw new Error(`Edit ${edit.index || ''}: range contains an earlier insertion point.`.trim());
+    }
+    if (!span.isInsertion && !previousSpan.isInsertion &&
+        Math.max(span.start, previousSpan.start) < Math.min(span.end, previousSpan.end)) {
+      throw new Error(`Edit ${edit.index || ''}: range overlaps an earlier edited range.`.trim());
+    }
+
+    const previousIsBefore = previousSpan.isInsertion
+      ? previousSpan.start <= referenceBoundary
+      : previousSpan.end <= referenceBoundary;
+    if (previousIsBefore) offset += dnaEditLengthDelta(previous);
+  }
+
+  if (span.isInsertion) {
+    const insertionPoint = edit.startPos + offset;
+    return { startPos: insertionPoint, endPos: insertionPoint, offset };
+  }
+  return {
+    startPos: edit.startPos + offset,
+    endPos: edit.endPos + offset,
+    offset
+  };
+}
+
 // Apply DNA sequence edits (deletion, replacement, insertion)
 export function applyDNAEdit(template, startPos, endPos, operation, newSeq = '') {
   const clean = cleanDNA(template);
+  const normalizedNewSeq = cleanDNA(newSeq);
   
   // Convert 1-based positions to 0-based
   // startPos is 1-based inclusive -> start is 0-based inclusive
@@ -3112,39 +3263,50 @@ export function applyDNAEdit(template, startPos, endPos, operation, newSeq = '')
   // Because: position 15 (1-based) = index 14 (0-based), and slice(0, 15) gives indices 0-14
   // So endPos (1-based inclusive) = endPos (0-based exclusive) is correct for slice
   
-  if (start < 0 || end > clean.length || start >= end) {
-    throw new Error(`Invalid position range: ${startPos}-${endPos} (sequence length: ${clean.length}bp)`);
-  }
-  
   let editedSeq;
+  let originalSegment = '';
+  let resultingSegment = '';
   
   switch(operation) {
     case 'deletion':
+      if (start < 0 || end > clean.length || start >= end) {
+        throw new Error(`Invalid position range: ${startPos}-${endPos} (sequence length: ${clean.length}bp)`);
+      }
       // Delete from start to end (inclusive in 1-based, exclusive in 0-based)
       // If startPos=10, endPos=15 (1-based), we delete positions 10-15 (6 bases)
       // start=9, end=15 (0-based), slice(0,9) + slice(15) removes indices 9-14 (6 bases) ✓
+      originalSegment = clean.slice(start, end);
       editedSeq = clean.slice(0, start) + clean.slice(end);
       break;
       
     case 'substitution':
+      if (start < 0 || end > clean.length || start >= end) {
+        throw new Error(`Invalid position range: ${startPos}-${endPos} (sequence length: ${clean.length}bp)`);
+      }
       // Replace sequence from start to end with newSeq
-      if (!newSeq || newSeq.length === 0) {
+      if (!normalizedNewSeq) {
         throw new Error('Substitution operation requires a new sequence.');
       }
-      editedSeq = clean.slice(0, start) + newSeq.toUpperCase() + clean.slice(end);
+      originalSegment = clean.slice(start, end);
+      resultingSegment = normalizedNewSeq;
+      editedSeq = clean.slice(0, start) + normalizedNewSeq + clean.slice(end);
       break;
       
     case 'insertion':
       // Insert newSeq AFTER startPos (matching AA mode logic)
       // If startPos is 10 (1-based), we want to keep positions 1-10 (indices 0-9), then insert.
       // slice(0, N) includes N items (indices 0 to N-1), so use startPos directly as the slice index
-      if (!newSeq || newSeq.length === 0) {
+      if (!normalizedNewSeq) {
         throw new Error('Insertion operation requires a sequence to insert.');
       }
       // Use startPos (1-based) directly as the slice index to insert AFTER the position
       // Example: startPos=10 (1-based) -> slice(0, 10) keeps indices 0-9 (10 bases), then insert
       const insertIndex = startPos; // Keep 1-based number as the slice index
-      editedSeq = clean.slice(0, insertIndex) + newSeq.toUpperCase() + clean.slice(insertIndex);
+      if (!Number.isInteger(insertIndex) || insertIndex < 1 || insertIndex > clean.length) {
+        throw new Error(`Invalid insertion position: ${startPos} (sequence length: ${clean.length}bp)`);
+      }
+      resultingSegment = normalizedNewSeq;
+      editedSeq = clean.slice(0, insertIndex) + normalizedNewSeq + clean.slice(insertIndex);
       break;
       
     default:
@@ -3157,9 +3319,9 @@ export function applyDNAEdit(template, startPos, endPos, operation, newSeq = '')
     startPos,
     endPos,
     operation,
-    newSeq,
-    originalSegment: clean.slice(start, end),
-    resultingSegment: editedSeq.slice(start, start + newSeq.length)
+    newSeq: normalizedNewSeq,
+    originalSegment,
+    resultingSegment
   };
 }
 
@@ -3171,9 +3333,9 @@ function createDNARow(rowNum) {
     <td>${rowNum}</td>
     <td>
       <select id="dna-op-${rowNum}" style="width:110px;">
-        <option value="substitution">Substitution</option>
+        <option value="substitution" selected>Replacement</option>
         <option value="insertion">Insertion</option>
-        <option value="deletion" selected>Deletion</option>
+        <option value="deletion">Deletion</option>
       </select>
     </td>
     <td><input id="dna-start-${rowNum}" type="number" min="1" style="width:80px;"></td>
@@ -3184,6 +3346,32 @@ function createDNARow(rowNum) {
   `;
   
   return tr;
+}
+
+// Keep the row fields consistent with the selected operation. In particular,
+// a deletion must never appear to accept a replacement sequence, and an
+// insertion has no end coordinate.
+function syncDNAEditRowUI(rowNum, { clearIrrelevant = false } = {}) {
+  const operationEl = $(`dna-op-${rowNum}`);
+  const endInput = $(`dna-end-${rowNum}`);
+  const newSeqInput = $(`dna-seq-${rowNum}`);
+  if (!operationEl || !endInput || !newSeqInput) return;
+
+  const operation = operationEl.value;
+  const isInsertion = operation === 'insertion';
+  const isDeletion = operation === 'deletion';
+
+  endInput.disabled = isInsertion;
+  endInput.required = !isInsertion;
+  endInput.placeholder = isInsertion ? 'Not used' : '';
+  if (isInsertion && clearIrrelevant) endInput.value = '';
+
+  newSeqInput.disabled = isDeletion;
+  newSeqInput.required = !isDeletion;
+  newSeqInput.placeholder = isDeletion ? 'Not used for deletion' : 'ATGC...';
+  if (isDeletion && clearIrrelevant) newSeqInput.value = '';
+
+  updateDNAPreview(rowNum);
 }
 
 // Initialize DNA edits table with default rows
@@ -3208,12 +3396,18 @@ function setupDNARowListenersForRow(rowNum) {
   // Preview update listeners
   const startInput = $(`dna-start-${rowNum}`);
   const endInput = $(`dna-end-${rowNum}`);
+  const operationInput = $(`dna-op-${rowNum}`);
   
   if (startInput) {
     startInput.addEventListener('input', () => updateDNAPreview(rowNum));
   }
   if (endInput) {
     endInput.addEventListener('input', () => updateDNAPreview(rowNum));
+  }
+  if (operationInput) {
+    operationInput.addEventListener('change', () => {
+      syncDNAEditRowUI(rowNum, { clearIrrelevant: true });
+    });
   }
   
   // Remove button
@@ -3223,6 +3417,8 @@ function setupDNARowListenersForRow(rowNum) {
       removeDNARow(rowNum);
     });
   }
+
+  syncDNAEditRowUI(rowNum);
 }
 
 // Setup event listeners for all DNA rows
@@ -3272,37 +3468,27 @@ function renumberDNARows() {
   const tbody = $('dna-edits-tbody');
   if (!tbody) return;
   
-  const dataRows = Array.from(tbody.querySelectorAll('tr[id^="dna-row-"]'));
-  
-  // Sort by current row number
-  dataRows.sort((a, b) => {
-    const aNum = parseInt(a.id.replace('dna-row-', ''));
-    const bNum = parseInt(b.id.replace('dna-row-', ''));
-    return aNum - bNum;
-  });
-  
-  // Clear and re-add in order
+  const rowState = Array.from(tbody.querySelectorAll('tr[id^="dna-row-"]'))
+    .sort((a, b) => parseInt(a.id.replace('dna-row-', '')) - parseInt(b.id.replace('dna-row-', '')))
+    .map(row => ({
+      operation: row.querySelector('select[id^="dna-op-"]')?.value || 'substitution',
+      startPos: row.querySelector('input[id^="dna-start-"]')?.value || '',
+      endPos: row.querySelector('input[id^="dna-end-"]')?.value || '',
+      newSeq: row.querySelector('input[id^="dna-seq-"]')?.value || ''
+    }));
+
+  // Recreate rows instead of reusing nodes with listeners that still close
+  // over their old row numbers.
   tbody.innerHTML = '';
-  dataRows.forEach((dataRow, idx) => {
-    const newNum = idx + 1;
-    dataRow.id = `dna-row-${newNum}`;
-    dataRow.querySelector('td:first-child').textContent = newNum;
-    
-    // Update all IDs in the row
-    const inputs = dataRow.querySelectorAll('input, select, button');
-    inputs.forEach(input => {
-      if (input.id) {
-        input.id = input.id.replace(/\d+$/, newNum);
-      }
-      if (input.getAttribute('data-row')) {
-        input.setAttribute('data-row', newNum);
-      }
-    });
-    
-    tbody.appendChild(dataRow);
-    
-    // Re-setup listeners
-    setupDNARowListenersForRow(newNum);
+  rowState.forEach((state, idx) => {
+    const rowNum = idx + 1;
+    const row = createDNARow(rowNum);
+    tbody.appendChild(row);
+    $(`dna-op-${rowNum}`).value = state.operation;
+    $(`dna-start-${rowNum}`).value = state.startPos;
+    $(`dna-end-${rowNum}`).value = state.endPos;
+    $(`dna-seq-${rowNum}`).value = state.newSeq;
+    setupDNARowListenersForRow(rowNum);
   });
 }
 
@@ -3347,7 +3533,7 @@ function parseDNAEdits() {
     const startPos = startPosEl.value.trim();
     const endPos = endPosEl ? endPosEl.value.trim() : '';
     const operation = operationEl.value;
-    const newSeq = newSeqEl ? newSeqEl.value.trim() : '';
+    const newSeq = operation === 'deletion' || !newSeqEl ? '' : cleanDNA(newSeqEl.value);
     
     console.log(`Row ${i} values:`, { startPos, endPos, operation, newSeq });
     
@@ -3357,15 +3543,27 @@ function parseDNAEdits() {
       continue;
     }
     
-    const start = parseInt(startPos);
-    const end = parseInt(endPos) || start;
+    const start = Number(startPos);
+    if (!Number.isInteger(start) || start < 1) {
+      throw new Error(`Row ${i}: Start position must be a positive whole number.`);
+    }
+
+    if (operation !== 'insertion' && !endPos) {
+      throw new Error(`Row ${i}: ${operation === 'deletion' ? 'Deletion' : 'Replacement'} requires an end position.`);
+    }
+
+    const end = operation === 'insertion' ? start : Number(endPos);
     
-    if (isNaN(start) || isNaN(end)) {
-      throw new Error(`Row ${i}: Invalid position numbers.`);
+    if (!Number.isInteger(end) || end < 1) {
+      throw new Error(`Row ${i}: End position must be a positive whole number.`);
     }
     
     if (start > end) {
       throw new Error(`Row ${i}: Start position must be ≤ end position.`);
+    }
+
+    if ((operation === 'substitution' || operation === 'insertion') && !newSeq) {
+      throw new Error(`Row ${i}: ${operation === 'insertion' ? 'Insertion' : 'Replacement'} requires a new sequence.`);
     }
     
     const editObj = {
@@ -3404,7 +3602,9 @@ function switchMutationMode(mode) {
 function updateDNAPreview(rowNum) {
   const template = cleanDNA($('template-seq').value);
   const startPos = parseInt($(`dna-start-${rowNum}`).value) || 0;
-  const endPos = parseInt($(`dna-end-${rowNum}`).value) || 0;
+  const operation = $(`dna-op-${rowNum}`)?.value || 'substitution';
+  const endInputValue = $(`dna-end-${rowNum}`)?.value.trim() || '';
+  const endPos = operation === 'insertion' ? startPos : (parseInt(endInputValue) || 0);
   const currentSeqEl = $(`dna-current-${rowNum}`);
   
   if (!currentSeqEl) return;
@@ -3412,6 +3612,14 @@ function updateDNAPreview(rowNum) {
   if (!template || !startPos) {
     currentSeqEl.value = '';
     currentSeqEl.placeholder = '-';
+    return;
+  }
+
+
+  if (operation !== 'insertion' && !endInputValue) {
+    currentSeqEl.value = '';
+    currentSeqEl.placeholder = 'Enter end';
+    currentSeqEl.style.color = '';
     return;
   }
   
@@ -3428,6 +3636,9 @@ function updateDNAPreview(rowNum) {
   
   const seq = template.slice(start, end);
   currentSeqEl.value = seq;
+  currentSeqEl.title = operation === 'insertion'
+    ? `Insert after position ${startPos}`
+    : `Positions ${startPos}-${endPos}`;
   currentSeqEl.style.color = '#27ae60';
   currentSeqEl.placeholder = '';
 }
@@ -3454,7 +3665,14 @@ async function onDesignClickDNAMode() {
     return;
   }
 
-  const edits = parseDNAEdits();
+  let edits;
+  try {
+    edits = parseDNAEdits();
+  } catch (e) {
+    console.error('Unable to parse DNA edits:', e);
+    alert(e.message || 'Invalid DNA edit definition.');
+    return;
+  }
   console.log('onDesignClickDNAMode: Received edits from parseDNAEdits:', edits);
   console.log('onDesignClickDNAMode: edits.length =', edits.length);
   console.log('onDesignClickDNAMode: edits content:', JSON.stringify(edits, null, 2));
@@ -3490,6 +3708,7 @@ async function onDesignClickDNAMode() {
   const results = [];
   let currentTemplate = template;
   const origSeq = currentTemplate;
+  const appliedEdits = [];
 
   try {
     console.log('onDesignClickDNAMode: Starting to process', edits.length, 'edits');
@@ -3498,19 +3717,20 @@ async function onDesignClickDNAMode() {
       // Store the state BEFORE this specific edit (this is the "WT" for primer design)
       // For Edit #1, stepWt = origSeq; for Edit #N, stepWt = result of Edit #(N-1)
       const stepWt = currentTemplate;
+      const stepCoords = resolveDNAEditCoordinates(edit, appliedEdits);
       
       console.log('onDesignClickDNAMode: Calling applyDNAEdit with:', {
         template: currentTemplate.substring(0, 50) + '...',
-        startPos: edit.startPos,
-        endPos: edit.endPos,
+        startPos: stepCoords.startPos,
+        endPos: stepCoords.endPos,
         operation: edit.operation,
         newSeq: edit.newSeq
       });
       
       const eInfo = applyDNAEdit(
         currentTemplate,
-        edit.startPos,
-        edit.endPos,
+        stepCoords.startPos,
+        stepCoords.endPos,
         edit.operation,
         edit.newSeq
       );
@@ -3523,7 +3743,7 @@ async function onDesignClickDNAMode() {
 
       // Build CDS-style description with lowercase nt
       const origNt = (eInfo.originalSegment || '').toLowerCase();
-      const newNt  = (edit.newSeq || '').toLowerCase();
+      const newNt  = (eInfo.newSeq || '').toLowerCase();
       let dnaDescription;
       if (edit.operation === 'substitution') {
         dnaDescription = edit.startPos === edit.endPos
@@ -3543,18 +3763,18 @@ async function onDesignClickDNAMode() {
         operation: edit.operation,
         startPos: edit.startPos,
         endPos: edit.endPos,
-        newSeq: edit.newSeq,
+        newSeq: eInfo.newSeq,
         originalSegment: eInfo.originalSegment,
         resultingSegment: eInfo.resultingSegment,
         editedTemplate: eInfo.editedTemplate,
         wtTemplate: stepWt, // Use the immediate predecessor as the template for primer design
-        // Store WT positions (1-based) for primer design
-        // Note: These positions are relative to stepWt (the template before this edit)
-        wtStartPos: edit.startPos,
-        wtEndPos: edit.endPos
+        // Resolved 1-based coordinates in the immediate predecessor template.
+        wtStartPos: stepCoords.startPos,
+        wtEndPos: stepCoords.endPos
       });
 
       currentTemplate = eInfo.editedTemplate;
+      appliedEdits.push(edit);
       console.log('onDesignClickDNAMode: Updated currentTemplate length:', currentTemplate.length);
     }
     
@@ -3573,6 +3793,7 @@ async function onDesignClickDNAMode() {
 }
 
 function renderDNAEditResults(results, origSeq, finalSeq, edits, rawTemplate = null) {
+  setResultSequenceLabels(true);
   console.log('renderDNAEditResults called');
   console.log('renderDNAEditResults: results.length =', results.length);
   console.log('renderDNAEditResults: origSeq.length =', origSeq.length);
@@ -3657,10 +3878,12 @@ function renderDNAEditResults(results, origSeq, finalSeq, edits, rawTemplate = n
       // WT: deletion region is [startPos, endPos] (1-based inclusive)
       // Mutant: deletion region is removed, so in mutantTemplate, editStart and editEnd are the same (junction)
       let editStart, editEnd;
+      const stepStartPos = editResult.wtStartPos ?? editResult.startPos;
+      const stepEndPos = editResult.wtEndPos ?? editResult.endPos;
       if (editResult.operation === 'deletion') {
         // For deletion: editStart is where deletion starts in WT (0-based)
         // In mutantTemplate, this position still exists (it's the junction)
-        editStart = Math.max(0, (editResult.startPos || 1) - 1);
+        editStart = Math.max(0, (stepStartPos || 1) - 1);
         // In mutantTemplate, after deletion, editEnd equals editStart (the junction point)
         // But we need WT endPos for right core calculation - we'll pass it via opts
         editEnd = editStart; // In mutantTemplate, junction is at editStart
@@ -3670,25 +3893,22 @@ function renderDNAEditResults(results, origSeq, finalSeq, edits, rawTemplate = n
           // For insertion: insert AFTER startPos (1-based), so in mutant template:
           // - editStart is startPos (0-based, which is startPos in 1-based since we insert after it)
           // - editEnd is editStart + newSeq.length (where new sequence ends in mutant)
-          editStart = editResult.startPos || 1; // Use 1-based directly (insert after this position)
+          editStart = stepStartPos || 1; // Use 1-based directly (insert after this position)
           editEnd = editStart + editLen; // new sequence inserted after startPos
         } else if (editResult.operation === 'substitution') {
           // For substitution: editStart is 0-based (startPos - 1)
-          editStart = Math.max(0, (editResult.startPos || 1) - 1);
+          editStart = Math.max(0, (stepStartPos || 1) - 1);
           editEnd = editStart + editLen; // new sequence replaces old region
         } else {
-          editStart = Math.max(0, (editResult.startPos || 1) - 1);
-          editEnd = (editResult.endPos || editResult.startPos || 1) - 1; // fallback
+          editStart = Math.max(0, (stepStartPos || 1) - 1);
+          editEnd = (stepEndPos || stepStartPos || 1) - 1; // fallback
         }
       }
 
-      // For deletion, pass WT endPos for correct right core calculation
-      // Set desiredOverlap to ~20bp for deletion, or based on editLen for substitution/insertion
-      let desiredOverlapVal = 20; // Default for deletion
-      if (editResult.operation === 'substitution' || editResult.operation === 'insertion') {
-        desiredOverlapVal = Math.min(20, Math.max(8, editLen || 20));
-      }
-      
+      // Use the same 20 bp assembly-overlap target as CDS mode. The dynamic
+      // designer still expands or contracts it to meet the requested Tm.
+      const desiredOverlapVal = 20;
+
       const opts = {
         desiredCore: 20, // This is just a starting point, will be optimized by findOptimalCore
         desiredOverlap: desiredOverlapVal,
@@ -3708,12 +3928,12 @@ function renderDNAEditResults(results, origSeq, finalSeq, edits, rawTemplate = n
       // This is needed for deletion, substitution, and insertion to correctly bind to WT template
       if (editResult.operation === 'deletion' || editResult.operation === 'substitution') {
         // editResult.endPos is 1-based inclusive, which equals 0-based exclusive
-        opts.wtEndPos = (editResult.endPos || editResult.startPos || 1);
+        opts.wtEndPos = (stepEndPos || stepStartPos || 1);
       } else if (editResult.operation === 'insertion') {
         // For insertion: insert AFTER startPos (1-based)
         // In WT template, insertion happens after startPos, so wtEndPos = startPos (1-based = 0-based exclusive for slice)
         // coreRight should start from WT position startPos (where insertion happens)
-        opts.wtEndPos = editResult.startPos || 1; // Use 1-based startPos directly
+        opts.wtEndPos = stepStartPos || 1; // Use the resolved insertion point
       }
 
       const designResult = designOePcrPrimersForDNAEditDynamic(
@@ -3899,11 +4119,8 @@ function selectORF(idx) {
   }
   
   const orf = detectedORFs[idx];
-  if (orf.strand === '-') {
-    currentCDS = orf.seqForUse || revComp(orf.seq);
-  } else {
-    currentCDS = orf.seq;
-  }
+  // ORFs on both strands are stored in their coding orientation.
+  currentCDS = orf.seq;
   
   const aa = translateDNA(currentCDS);
   $('orf-info').textContent = `Selected: ${aa.length} amino acids, starts with ${aa.slice(0, 5)}...`;
@@ -4252,6 +4469,7 @@ export function initMutagenesisModule(container) {
           const startInput = $('dna-start-1');
           const endInput = $('dna-end-1');
           if (opSelect) opSelect.value = 'deletion';
+          syncDNAEditRowUI(1, { clearIrrelevant: true });
           if (startInput) startInput.value = '100';
           if (endInput) endInput.value = '107';
           

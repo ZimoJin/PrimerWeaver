@@ -2801,7 +2801,11 @@ arabidopsis: {
 export function getCodonEntries(orgCode, aa) {
   const org = CODON_USAGE[orgCode];
   if (!org) return null;
-  const entry = org.aaTable[aa.toUpperCase()];
+  const rawKey = String(aa || '').trim().toUpperCase();
+  // Translated protein sequences use "*" for a termination codon, while
+  // the codon tables use STOP as their internal key.
+  const key = (rawKey === '*' || rawKey === 'TER') ? 'STOP' : rawKey;
+  const entry = org.aaTable[key];
   return entry ? entry.codons : null;
 }
 
@@ -2817,6 +2821,8 @@ export function getPreferredCodon(orgCode, aa) {
 export function getDegenerateCode(orgCode, aa) {
   const org = CODON_USAGE[orgCode];
   if (!org) return null;
-  const entry = org.aaTable[aa.toUpperCase()];
+  const rawKey = String(aa || '').trim().toUpperCase();
+  const key = (rawKey === '*' || rawKey === 'TER') ? 'STOP' : rawKey;
+  const entry = org.aaTable[key];
   return entry ? entry.degenerate || null : null;
 }

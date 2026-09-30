@@ -3,7 +3,7 @@
 // Goal: speed up repeat visits + module switching by serving assets from Cache Storage.
 
 // Bump cache version to ensure updated assets are picked up immediately.
-const CACHE_NAME = 'primerweaver-app-v1.1.18';
+const CACHE_NAME = 'primerweaver-app-v1.1.20';
 
 // Keep install lightweight to avoid blocking first load.
 const SHELL_ASSETS = [
