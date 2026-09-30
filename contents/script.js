@@ -1027,6 +1027,14 @@ function update() {
 <p class="muted" style="margin-top: 0; margin-bottom: 28px;">Release notes for the PrimerWeaver web server.</p>
 
 <article class="update-entry">
+    <h3 class="update-version">v1.0.5 <span class="update-date muted">September 2026</span></h3>
+    <ol class="update-list update-list-numbered">
+        <li>Stop codon inputs (<code>*</code>, <code>STOP</code>, and <code>TER</code>) are now supported for CDS protein mutations in the <strong>Mutagenesis</strong> module.</li>
+        <li>Minor bug fixes for the <strong>Mutagenesis</strong> module UI and primer highlight regions in DNA sequence editing.</li>
+    </ol>
+</article>
+
+<article class="update-entry">
     <h3 class="update-version">v1.0.4 <span class="update-date muted">July 2026</span></h3>
     <ol class="update-list update-list-numbered">
         <li>Minor bug fixes for the <strong>Mutagenesis</strong> and <strong>Gibson</strong> module UIs.</li>

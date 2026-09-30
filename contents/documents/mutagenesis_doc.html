@@ -206,6 +206,8 @@ Mutation positions are <strong>1-based</strong> and interpreted relative to the
   <li><strong>DNA sequence editing mode:</strong> positions refer to the input DNA sequence.</li>
 </ul>
 
+<p>In CDS mode, use the standard one-letter symbol <strong><code>*</code></strong> as the new amino acid to introduce a stop codon (for example, <code>W55*</code>). The aliases <code>STOP</code> and <code>TER</code> are also accepted when entered by themselves.</p>
+
 <p>The following operations are supported in both modes:</p>
 <ul>
   <li><strong>Substitution / Replacement:</strong>
@@ -459,7 +461,7 @@ thermodynamic calculations</strong>.
                     <tr>
                         <td><strong>Sequential multi-edit application</strong></td>
                         <td>Multiple mutation/edit rows are provided.</td>
-                        <td>Edits are applied <strong>in order</strong>, and each subsequent design step uses the template already modified by the previous step. This means row order can change the final intermediate context and primer design outcome.</td>
+                        <td>Edits are applied <strong>in order</strong>, and each subsequent design step uses the template already modified by the previous step. User-entered positions remain anchored to the original input/ORF and are mapped onto each intermediate template; overlapping edits are rejected as ambiguous.</td>
                     </tr>
                     <tr>
                         <td><strong>CDS mode codon selection behavior</strong></td>
