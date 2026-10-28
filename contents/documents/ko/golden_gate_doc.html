@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golden Gate 조립 - PrimerWeaver V1.0.6</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #333;
+            background: #f9fafb;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e40af;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2563eb;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            font-size: 1.5em;
+        }
+        h3 {
+            color: #3b82f6;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            font-size: 1.2em;
+        }
+        h4 {
+            color: #60a5fa;
+            margin-top: 1.2em;
+            margin-bottom: 0.6em;
+        }
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 1em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        strong {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c2410c;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .abstract {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+        .abstract p {
+            margin: 0;
+            font-style: italic;
+        }
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .section {
+            margin-bottom: 2.5em;
+        }
+        .version-info {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+            margin-top: 3em;
+            padding-top: 2em;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Golden Gate 조립 프라이머 설계기</h1>
+        
+        <div class="abstract">
+            <p>Golden Gate 조립 모듈은 Type IIS 제한효소(일반적으로 BsaI)와 T4 DNA 라이게이즈를 사용하는 흉터 없는 모듈형 DNA 조립용 프라이머를 설계합니다. 이 도구는 중간 정제 단계 없이 단일 원팟 반응에서 여러 DNA 절편을 정해진 순서와 방향으로 조립할 수 있게 하는 고유한 4 bp 오버행 생성을 자동화합니다. Golden Gate는 표준화된 생물학적 부품 라이브러리, 합성생물학 응용, 고처리량 유전 회로 구축, 반복 설계 워크플로에 특히 적합합니다.</p>
+        </div>
+
+        <div class="section">
+            <h2>빠른 시작 가이드</h2>
+            <ol>
+                <li>목적지 벡터와 삽입편 서열(최대 6개 절편)을 FASTA 또는 일반 텍스트 형식으로 해당 입력란에 원하는 조립 순서로 업로드하거나 붙여넣습니다. Type IIS 효소를 선택하고, 자동 검출된 벡터 백본을 확인한 뒤, 필요하면 설계 매개변수를 조정합니다.</li>
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/GGA_demo.png"
+                    style="max-width: 90%; height: auto; border-radius: 8px;"
+                >
+            </div>
+                <li>"프라이머 설계"를 클릭하여 오버행 서열이 통합된 프라이머를 생성합니다. 프라이머 표, 오버행 호환성 행렬, 예측 조립 도식을 검토합니다. 조립된 FASTA 파일을 다운로드하여 삽입편 방향이 의도한 설계와 일치하는지 확인합니다. 방향이 잘못되었으면 삽입편 서열을 역상보로 바꾼 뒤 프라이머를 다시 생성합니다.</li>
+
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>Golden Gate 조립 원리</h2>
+            
+            <p>Golden Gate 조립은 특정 DNA 서열을 인식하지만 인식 부위 바깥에서 절단하는 <strong>Type IIS 제한효소</strong>를 사용합니다. 이 고유한 성질 덕분에 <strong>예측 가능하고 맞춤화할 수 있는 오버행</strong>이 생성되어, 단일 반응에서 여러 DNA 절편의 <strong>방향성, 흉터 없는 연결</strong>이 가능해집니다. 결정적으로 제한효소 인식 부위는 조립 과정에서 제거되어 최종 구축물에 흉터가 남지 않습니다.</p>
+
+
+
+            <h3>오버행 설계 원리</h3>
+            <p>Golden Gate의 핵심 강점은 고유하고 서로 간섭하지 않는 오버행 설계에 있습니다. 각 절편 쌍 접합부는 조립의 다른 곳에 존재하지 않는 고유한 4 bp 오버행을 필요로 합니다.</p>
+            <ul>
+                <li><strong>4 bp 오버행:</strong> 1 bp 오프셋을 갖는 Type IIS 효소(예: BsaI)는 자연스럽게 4 bp 점착성 말단을 생성하며, 조립의 단순성을 유지하면서 충분한 특이성을 제공합니다</li>
+                <li><strong>방향성 조립:</strong> 한 절편의 정방향 오버행은 인접 절편의 역방향 오버행과 상보적이어야 합니다. 비상보적 오버행은 연결되지 않으므로 오조립이 방지됩니다</li>
+                <li><strong>흉터 없는 접합부:</strong> 조립 후 오버행을 둘러싼 Type IIS 인식 부위가 제거되어 절편 사이에 흉터 없는 접합부가 만들어집니다</li>
+               
+            </ul>
+           
+        </div>
+
+        <div class="section">
+            <h2>입력 형식</h2>
+            <p>벡터와 삽입편 입력은 모두 <strong>FASTA</strong>, <strong>일반 DNA 텍스트</strong>, 또는 <code>LOCUS</code>와 <code>ORIGIN</code> 블록이 있는 표준 <strong>GenBank</strong> 파일(<code>.gb</code>, <code>.gbk</code>, <code>.gbff</code>, <code>.genbank</code>)을 받습니다. <strong>LOCUS</strong>의 짧은 이름이 서열 제목으로 사용됩니다. 입력란당 <strong>하나의 서열</strong>만 허용되며, 여러 FASTA 헤더가 감지되면 <strong>첫 번째 서열만</strong> 사용됩니다. <code>&gt;</code> 헤더 없이 일반 서열을 업로드하면 확장자를 제외한 <strong>파일 이름</strong>이 이름으로 사용됩니다. 독점 바이너리 형식(예: SnapGene <code>.dna</code>)은 먼저 GenBank 또는 FASTA로 내보내야 합니다.</p>
+             <p>PrimerWeaver는 현재 <strong>네 개의 내장 Type IIs 제한효소</strong>를 지원합니다. 벡터 서열이 제공되면 시스템은 <strong>벡터 특징을 자동으로 식별</strong>하고 모든 <strong>Type IIs 제한효소 부위</strong>의 위치를 표시합니다. 벡터 지도는 표적 클로닝 영역의 시각화를 돕기 위해 회전할 수 있습니다. 선택한 <strong>벡터 백본 절편</strong>은 <strong>첫 삽입편 왼쪽 말단</strong>과 <strong>마지막 삽입편 오른쪽 말단</strong>에 사용되는 자동 4 bp 경계 오버행도 결정합니다.</p>
+
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/GGA_input.png"
+                    style="max-width: 60%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+            <h3>절편 관리</h3>
+            <ul>
+                <li><strong>절편 추가/제거:</strong> 다중 절편 조립을 위해 여러 DNA 서열을 추가합니다(2–10개 절편 권장; 더 큰 조립은 복잡도가 증가합니다)</li>
+                <li><strong>절편 순서 변경:</strong> 인터페이스 컨트롤로 조립 순서를 조정합니다. 순서가 최종 구축물의 구조를 결정합니다</li>
+                <li><strong>절편 이름:</strong> 프라이머를 명확히 식별하기 위해 FASTA 헤더에서 자동 추출되며 출력 보고서에 사용됩니다</li>
+                <li><strong>역상보 서열:</strong> 원하는 방향과 조립 방향에 맞추기 위해 개별 절편을 전환할 수 있습니다</li>
+                <li><strong>내부 오버랩 입력:</strong> 모든 내부 접합부에 쌍을 이루는 <strong>왼쪽/오른쪽 오버행(사용자 지정, 4 bp)</strong> 필드가 제공됩니다. 이 두 필드는 동일한 접합부 값을 반영합니다. 비워 두면 알고리즘이 서열에서 도출한 오버행을 자동 선택하고, <strong>정확히 4 bp</strong>의 사용자 지정 값을 입력하면 해당 접합부의 자동 선택을 덮어씁니다.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>설계 매개변수</h2>
+		
+	    <p>드롭다운 목록에서 선호하는 Type IIs 제한효소를 선택하거나 효소 이름으로 검색하십시오. <strong>제한효소</strong>가 선택되면 시스템은 자동으로 <strong>가장 긴 절단 절편</strong>을 기본 목적지 벡터 백본으로 식별합니다. 가장 긴 절편이 의도한 벡터 백본과 다르면 다른 절편을 수동으로 선택할 수 있습니다. 그 백본 선택은 <strong>첫</strong> 삽입편과 <strong>마지막</strong> 삽입편 말단에 할당되는 자동 경계 오버행을 직접 제어하며, 이 경계 값은 항상 수동 입력이 아니라 선택한 백본 해석에서 취합니다. 진행하기 전에 프라이머 설계 매개변수를 검토하고 필요하면 수정하십시오.</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>매개변수</th>
+                        <th>기본값</th>
+                        <th>범위</th>
+                        <th>설명</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Type IIS 효소</strong></td>
+                        <td>None</td>
+                        <td>BsaI, BsmBI, BbsI, and PaqCI.</td>
+                        <td>조립에 사용하는 Type IIS 제한효소입니다. 효소마다 인식 서열, 절단 오프셋, 오버행 길이가 다릅니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>목표 Tm (°C)</strong></td>
+                        <td>55</td>
+                        <td>40–75</td>
+                        <td>프라이머의 주형 결합 영역에 대한 목표 용융온도입니다(오버행 영역 제외). 프라이머 길이와 PCR 어닐링 온도에 영향을 줍니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>프라이머 농도 (nM)</strong></td>
+                        <td>500</td>
+                        <td>50–2000</td>
+                        <td>in silico Tm 계산에 가정하는 유효 프라이머 농도입니다. 일반 범위: 25-1000 nM.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Na⁺ 농도 (mM)</strong></td>
+                        <td>50</td>
+                        <td>0–200</td>
+                        <td>염 보정 Tm 계산에 사용하는 1가 양이온 농도입니다. 일반 범위: 10-200 mM.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mg²⁺ 농도 (mM)</strong></td>
+                        <td>2.0</td>
+                        <td>0–10</td>
+                        <td>Tm 계산에 사용하는 2가 양이온 농도입니다. 반응에 Mg²⁺가 없으면 0으로 설정하십시오. 일반 범위: 0.5-5 mM.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="section">
+            <h2>결과 및 출력</h2>
+            
+            <p>프라이머 설계 후 Golden Gate 조립 모듈은 실험 검증과 후속 클로닝을 돕기 위한 종합적인 결과 세트를 생성합니다.</p>
+
+            <h3>프라이머 표</h3>
+	    <p>설계된 프라이머 쌍은 프라이머 서열(5′→3′), 길이, GC 함량, 용융온도(Tm)를 포함한 구조화된 표로 보고됩니다. Tm 값은 <strong>어닐링 핵심 영역</strong>과 <strong>전체 길이 프라이머</strong> 모두에 대해 표시되어 증폭 적합성을 평가할 수 있습니다. 동종중합체 연속 서열, 헤어핀 구조, 자기 이합체, 교차 이합체 형성을 포함한 프라이머 품질 지표가 평가되고 표시되어 PCR 성능에 영향을 줄 수 있는 잠재 위험을 강조합니다. 명확성을 위해 프라이머 서열 안에서 <strong>Type IIS 인식 부위와 오버행 서열</strong>이 강조됩니다.</p>
+
+
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/GGA_primer_table.png"
+                    alt="Golden Gate 프라이머 표"
+                    style="max-width: 60%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+	    <h3>조립 도식 및 오버행 표</h3>
+	    <p>벡터 선형화, 삽입편 도입, 최종 플라스미드 조립을 포함한 클로닝 워크플로를 보여 주는 <strong>조립 플라스미드 도식</strong>이 생성됩니다. 이 도식은 절편 방향과 접합부 구조의 개념적 개요를 제공합니다. <strong>오버랩 표</strong>는 각 접합부의 오버행 쌍을 표시하여 인접 절편이 상보적인 점착성 말단을 갖는지 확인합니다. 이 표는 조립 구조가 올바르고 오버행 충돌이나 불일치가 없음을 빠르게 시각적으로 검증합니다.</p>
+
+
+	   <div style="text-align: center; margin: 2em 0;">
+  		<img
+    			src="contents/pictures/GGA_assembly_table.png"
+    			style="max-width: 60%; height: auto; border-radius: 8px;"
+  		 >
+	   </div>
+      
+
+            <h3>시뮬레이션 아가로스 젤 전기영동</h3>
+	    <p>PrimerWeaver는 주요 클로닝 단계의 실험 결과를 예측하기 위해 <strong>시뮬레이션 아가로스 젤 이미지</strong>를 생성합니다. 젤에는 다음이 포함됩니다.</p>
+
+            <ul>
+                <li>선택 가능한 DNA 래더(기본값: NEB 1 kb Plus DNA Ladder)</li>
+		<li>미절단 벡터</li>
+                <li>Type IIs 제한효소로 절단된 벡터</li>
+                <li>PCR 증폭 절편(절편당 한 레인, 예상 크기 표시)</li>
+                <li>조립된 플라스미드</li>
+            </ul>
+	    <p>예측 밴드 크기가 젤 옆에 주석으로 표시되어 사용자가 예상 절편 크기를 실험 결과와 비교하고 잠재적 클로닝 문제를 신속히 식별할 수 있습니다.</p>
+
+	   <div style="text-align: center; margin: 2em 0;">
+  		<img
+    			src="contents/pictures/GGA_gel.png"
+    			style="max-width: 60%; height: auto; border-radius: 8px;"
+  		 >
+	   </div>
+
+        </div>
+
+	<div class="section">
+            <h2>프라이머 설계 알고리즘</h2>
+            
+            <h3>프라이머 구조</h3>
+            <p>각 Golden Gate 프라이머는 세 기능 영역으로 구성됩니다.</p>
+            <ul>
+                <li><strong>어닐링 핵심 (3′):</strong> PCR 어닐링을 구동하는 주형 상보 영역(일반적으로 18–30 bp)</li>
+                <li><strong>오버행 영역 (5′):</strong> Type IIS 제한효소 인식 부위와 맞춤형 4 bp 오버행 서열을 포함합니다(일반적으로 11~12 bp)</li>
+                <li><strong>보호 염기 (5′ 측면):</strong> 절단 효율을 높이기 위해 제한효소 부위 상류에 두는 짧은 염기(보통 2–6 nt; 효소에 따라 다름)</li>
+            </ul>
+
+            <h3>설계 과정</h3>
+            <p>PrimerWeaver의 Golden Gate 프라이머 설계는 세 연결된 단계로 나뉩니다. <strong>벡터 말단 해석</strong>, <strong>접합부 오버행 할당</strong>, <strong>각 삽입편의 프라이머 꼬리 구축</strong>입니다. 이 단계는 아래에 요약됩니다.</p>
+
+            <h3>벡터 말단 해석</h3>
+            <p>벡터는 먼저 정규화된 뒤 선택한 <strong>Type IIS 제한효소</strong>에 대해 스캔됩니다. 표준 제한효소 클로닝과 달리 Golden Gate는 Type IIS 절단 후 정의된 4 bp 조립 오버행을 노출할 수 있는 벡터 맥락을 요구합니다. 모듈은 후보 절단 절편을 계산하고 기본값으로 가장 긴 것을 자동 선택한 뒤, 사용자가 그 백본 선택을 덮어쓸 수 있게 합니다. 선택한 백본 절편은 이어서 선택한 Type IIS 효소의 절단 기하에서 왼쪽과 오른쪽 벡터 오버행을 도출하는 데 사용됩니다. 그 벡터 유래 값은 <strong>첫 삽입편 왼쪽 오버행</strong>과 <strong>마지막 삽입편 오른쪽 오버행</strong>의 고정 경계 조건이 되며, 인터페이스는 벡터/효소/백본 해석이 바뀔 때마다 이 두 경계 필드를 자동으로 덮어씁니다.</p>
+            <p>이 해석에서 벡터가 사용 가능한 말단 오버행을 제공하지 않더라도 설계가 즉시 실패하지는 않습니다. 대신 모듈은 벡터 유래 말단을 사용할 수 없음을 기록하고 조립 경계에서 <strong>흉터 없는 접합부 규칙</strong>으로 대체합니다.</p>
+
+            <h3>접합부 오버행 할당</h3>
+            <p>벡터 제약이 정의된 뒤 알고리즘은 각 삽입편–삽입편 또는 벡터–삽입편 접합부에 4 bp 오버행을 할당합니다. 각 <strong>내부 접합부</strong>에 대해 모듈은 먼저 사용자가 쌍을 이루는 <strong>오른쪽 오버행 / 왼쪽 오버행</strong> 필드에 사용자 지정 접합부 값을 입력했는지 확인합니다. 비어 있지 않은 사용자 지정 값이 있으면 <strong>정확히 4 bp</strong>여야 하며 그 접합부에 직접 사용됩니다. 쌍을 이루는 두 필드가 모두 비어 있으면 알고리즘은 일반적으로 <strong>상류 삽입편의 마지막 4 bp</strong>와 <strong>하류 삽입편의 처음 4 bp</strong>를 사용하는 서열 유래 후보로 대체합니다. 이 고유 후보는 동종중합체 4-mer 또는 회문 4-mer와 같은 유효하지 않은 Golden Gate 오버행을 거부하도록 필터링됩니다.</p>
+            <p>이어서 모듈은 접합부 오버행의 완전한 조합을 한 접합부씩이 아니라 <strong>조립 수준</strong>에서 평가합니다. 오버행 세트는 역상보 짝까지 고려한 뒤에도 전체 패널이 고유하게 남을 때만 수락됩니다. 선택한 효소에 대한 충실도 행렬을 사용할 수 있으면 PrimerWeaver는 예측 연결 충실도로 유효 조합의 순위를 매기고 점수가 가장 높은 호환 세트를 사용합니다. 충실도 점수를 사용할 수 없으면 모듈은 충돌하지 않는 첫 번째 유효 조합으로 대체합니다. 따라서 사용자가 제공한 내부 4 bp 접합부는 장식적 주석이 아니라 전역 오버행 조합 문제에 대한 <strong>고정 제약</strong>으로 작용합니다.</p>
+
+            <h3>프라이머 꼬리 구축과 조립 재구성</h3>
+            <p>각 삽입편의 왼쪽과 오른쪽 오버행이 고정되면 모듈은 삽입편 말단에서 <strong>어닐링 핵심</strong>을 설계한 뒤, Type IIS 인식 부위, 스페이서 염기, 선택한 4 bp 오버행을 5′ 비어닐링 꼬리로 추가하여 전체 프라이머를 구성합니다. 이 단계에서 PrimerWeaver는 <strong>양쪽 삽입편 말단</strong>의 중복 오버랩 서열을 제거합니다. 왼쪽 말단에서는 선택한 4 bp 오버행과 정방향 어닐링 핵심 시작 사이의 가장 큰 <strong>접미사-접두사 중복</strong>을 잘라냅니다. 오른쪽 말단에서는 역방향 프라이머 핵심이 덮는 삽입편 서열 끝과 선택한 오른쪽 오버행 시작 사이의 가장 큰 중복을 잘라냅니다. 예를 들어 사용자 지정 왼쪽 오버행이 <code>ATG</code>로 끝나고 삽입편 핵심이 이미 <code>ATG</code>로 시작하거나, 삽입편이 이미 <code>AATG</code>로 끝나고 선택한 오른쪽 오버행이 <code>AATG</code>로 시작하면, 공유 서열은 최종 프라이머 꼬리에서 중복되지 않습니다. 따라서 전체 Golden Gate 프라이머는 다음 구조를 따릅니다.</p>
+            <p><strong>5′ 보호 클램프 + Type IIS 부위 + 오프셋 염기 + 선택한 4 bp 오버행 + 어닐링 핵심 3′</strong></p>
+            <p>프라이머 구축 후 모듈은 도출된 벡터 절단 위치와 선택한 접합부 오버행 논리에 따라 절단된 벡터 백본과 삽입편 블록을 결합하여 조립된 플라스미드를 재구성합니다. 벡터 유래 말단을 사용할 수 있으면 백본은 Type IIS 절단 위치에서 다시 추출되어 조립 서열 재구성의 물리적 백본으로 사용됩니다. 그렇지 않으면 모듈은 조립 서열 길이와 이후 시각화 보고를 위해 더 단순한 흉터 없는 연결 모델로 대체합니다.</p>
+            <h3>알고리즘의 예외 처리 논리</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>알고리즘 예외 상황</th>
+                        <th>Golden Gate 모듈의 현재 동작</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>벡터에 Type IIS 부위가 없거나 하나뿐임</strong></td>
+                        <td>모듈은 정상 Golden Gate 백본 해석을 시도하지 않습니다. 대신 벡터가 표준 Golden Gate 조립에 필요한 양측 Type IIS 절단 맥락을 제공할 수 없으므로 N/A 스타일 조립 출력을 보고합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>벡터 유래 말단 오버행을 깔끔하게 복구할 수 없음</strong></td>
+                        <td>명시적 벡터 말단 오버행을 도출할 수 없으면 알고리즘은 전체 설계를 즉시 포기하지 않고 첫 번째와 마지막 접합부에서 흉터 없는 경계 규칙으로 대체합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>사용자가 내부 4 bp 접합부를 수동으로 제공함</strong></td>
+                        <td>비어 있지 않은 내부 사용자 지정 오버행은 고정된 접합부 선택으로 취급됩니다. 쌍을 이루는 왼쪽/오른쪽 UI 필드는 동일한 접합부 값을 반영하며, 전역 오버행 검색은 그 미리 선택된 4 bp 제약을 수용해야 합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>내부 사용자 지정 접합부가 부분적으로만 채워짐</strong></td>
+                        <td>내부 오버랩 필드가 비어 있지 않지만 정확히 4 bp가 아니면, 모듈은 접합부를 조용히 추측하거나 채우지 않고 경고 대화상자로 설계를 차단합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>어떤 접합부 오버행도 독립적으로 선택할 수 없음</strong></td>
+                        <td>국소적으로 허용되는 오버행이 구축물의 다른 접합부 또는 그 역상보와 여전히 충돌할 수 있으므로, 알고리즘은 전체 조립 패널에 걸쳐 오버행 조합을 평가합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>충실도 행렬을 사용할 수 없음</strong></td>
+                        <td>모듈은 충돌하지 않는 첫 번째 유효 오버행 조합으로 대체하여 설계를 완료하지만, 더 이상 예측 연결 충실도로 조합의 순위를 매길 수 없습니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>선택한 오버행이 이미 삽입편 말단에 존재함</strong></td>
+                        <td>프라이머 구축 중 모듈은 선택한 4 bp 오버행과 프라이머 핵심이 이미 덮는 삽입편 서열 사이의 <strong>가장 큰 공유 오버랩</strong>을 확인합니다. 이는 <strong>왼쪽 경계</strong>와 <strong>오른쪽 경계</strong> 모두에서 평가되므로, 4 bp 오버행의 일부만 삽입편 시작 또는 끝에 이미 있어도 공유 서열이 중복되지 않습니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>삽입편 내부에 Type IIS 부위가 존재함</strong></td>
+                        <td>알고리즘은 여전히 프라이머를 구축할 수 있지만, 내부 효소 부위가 절단 중 삽입편을 조각내어 의도한 Golden Gate 조립 위상을 훼손할 수 있으므로 설계에 표시가 붙습니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>절편 순서가 전체 오버행 해를 바꿈</strong></td>
+                        <td>접합부 오버행은 이웃 절편 서열 맥락에서 할당되므로, 삽입편 순서를 바꾸면 한 접합부만이 아니라 전역 오버행 조합 문제가 바뀌고 다른 최종 프라이머 세트가 만들어질 수 있습니다.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>경고 및 예외 상황</h2>
+            <p>Golden Gate 조립 모듈은 공통 시각화 계층을 사용할 수 있을 때 사전 점검 검증과 확인 대화상자에 공유 <strong>MW (Message Warning)</strong> 프레임워크를 사용합니다. 일부 경고는 설계가 시작되기 전에 나타나고, 다른 경고는 모듈이 벡터 위상, Type IIS 부위, 후보 오버행 조합을 검사한 뒤에만 해석됩니다.</p>
+
+            <h3>일반 경고</h3>
+            <p>이 경고는 주로 공유 입력 검증과 상위 수준 Golden Gate 사전 점검에서 나옵니다. 대부분의 경우 사용자는 설정을 수정하려면 <strong>Cancel</strong>을, 계속하려면 <strong>OK</strong>를 클릭할 수 있습니다.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>범주</th>
+                        <th>유발 조건</th>
+                        <th>GGA 모듈의 현재 동작</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>차단 입력 안내</strong></td>
+                        <td>삽입편 절편이 제공되지 않았거나 Type IIS 효소가 선택되지 않음.</td>
+                        <td>설계가 즉시 중지되고, 계속하기 전에 삽입편을 하나 이상 추가하고 효소를 선택하도록 모듈이 요청합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-04</strong><br>정규화 후 유효 서열 없음</td>
+                        <td>유효한 IUPAC DNA 기호가 남아 있지 않아 정규화 후 벡터 또는 삽입편이 비어 있게 됨.</td>
+                        <td>사용자는 계속할 수 있지만, 해당 입력에 대한 설계는 비거나 정보가 없는 상태가 됩니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-05</strong><br>비-IUPAC 문자 제거</td>
+                        <td>입력에 지원되지 않는 문자가 포함되며, 프라이머와 관련된 3′ 영역 근처일 수도 있음.</td>
+                        <td>모듈은 정규화된 서열만 사용하여 계속 진행하며 이것이 프라이머 동작에 영향을 줄 수 있다고 경고합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-06</strong><br>축퇴 염기 감지</td>
+                        <td>벡터 또는 삽입편에 축퇴 IUPAC 염기가 포함됨.</td>
+                        <td>열역학 값은 가장 안정한 변이에서 보수적으로 추정되므로 보고된 Tm과 ΔG 값은 최악 조건 근사일 수 있습니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-10 to MW-15</strong><br>매개변수 범위 경고</td>
+                        <td>Na<sup>+</sup>, Mg<sup>2+</sup>, 프라이머 농도 또는 목표 Tm이 권장 범위 또는 열역학 검증 창을 벗어남.</td>
+                        <td>사용자는 계속할 수 있지만 Tm 예측과 프라이머 최적화의 신뢰도가 낮아질 수 있습니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-19</strong><br>큰 총 입력 크기</td>
+                        <td>벡터와 삽입편 입력 합계가 브라우저 측 계산에 부담이 될 정도로 큼.</td>
+                        <td>모듈은 설계와 렌더링 중 브라우저 성능이 저하될 수 있다고 경고합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-20</strong><br>한 필드에 여러 FASTA 헤더</td>
+                        <td>벡터 또는 삽입편 텍스트 영역에 FASTA 레코드가 둘 이상 포함됨.</td>
+                        <td>공유 MW 대화상자가 필드당 하나의 서열만 허용된다고 경고합니다. 사용자가 계속하면 설계 전에 필드가 <strong>첫 번째 FASTA 레코드</strong>로 잘립니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-22</strong><br>파일 업로드가 가져오기 한도 초과</td>
+                        <td>업로드된 벡터 또는 삽입편 파일이 <strong>1 MB</strong>보다 큼.</td>
+                        <td>서열 로드 전에 가져오기가 차단되며, 사용자는 더 작은 파일을 선택해야 합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GG-MW-01</strong><br>삽입편 내부 Type IIS 부위</td>
+                        <td>하나 이상의 삽입편이 이미 선택한 Golden Gate 효소의 인식 부위를 포함함.</td>
+                        <td>모듈은 이 삽입편이 조립 중 절단될 수 있다고 경고하고 재설계, 내부 부위 제거(domestication) 또는 효소 교체를 권장합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GG-MW-02</strong><br>내부 사용자 지정 오버랩 길이가 유효하지 않음</td>
+                        <td>내부 사용자 지정 오버랩 필드가 비어 있지 않지만 길이가 정확히 <strong>4 bp</strong>가 아님.</td>
+                        <td>모듈은 MW 대화상자를 띄웁니다. 필드를 비워 두는 것은 허용되지만, 비어 있지 않은 내부 오버랩은 설계를 계속하기 전에 정확히 4 bp여야 합니다.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>설계 경고</h3>
+            <p>이 경고와 예외 상황은 Golden Gate 설계 알고리즘과 출력 해석에 특화되어 있습니다.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>사례</th>
+                        <th>유발 조건</th>
+                        <th>GGA 모듈의 현재 동작</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>삽입편 수 상한</strong></td>
+                        <td>삽입편 행을 여섯 개보다 많이 추가하려고 함.</td>
+                        <td>현재 구현은 Golden Gate 설계를 <strong>여섯 개의 삽입편</strong>으로 제한합니다. 여섯 개의 삽입편이 있으면 인터페이스는 추가 추가를 비활성화하고, 내부 수집 논리도 처음 여섯 개의 비어 있지 않은 삽입편으로 자릅니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>벡터에 선택한 Type IIS 부위가 두 개 미만임</strong></td>
+                        <td>선택한 벡터에 선택한 효소의 부위가 없거나 하나뿐임.</td>
+                        <td>모듈은 완전한 Golden Gate 조립 설계를 만들지 않습니다. 출력은 <strong>N/A</strong>로 렌더링되고, 젤 모델은 미절단 벡터 또는 단일 절단으로 선형화된 벡터만 보여 줍니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>자동 백본 선택</strong></td>
+                        <td>벡터에 여러 절단 절편이 포함됨.</td>
+                        <td>모듈은 자동으로 <strong>가장 긴 절단 절편</strong>을 후보 백본으로 사용하고, 사용자가 그 선택을 확인하거나 덮어쓸 수 있도록 절편 선택기를 노출합니다. 선택한 백본을 바꾸면 자동 첫/마지막 삽입편 오버행도 다시 계산됩니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>경계 오버행 필드는 사용자가 편집할 수 없음</strong></td>
+                        <td>첫 삽입편 왼쪽 오버행과 마지막 삽입편 오른쪽 오버행은 선택한 벡터 백본에서 도출된 경계 조건임.</td>
+                        <td>그 두 필드는 자동 채워진 읽기 전용 값으로 표시됩니다. 벡터 서열, 효소, 또는 백본 선택이 바뀌면 모듈은 새로 도출된 경계 오버행으로 덮어씁니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>벡터 말단 오버행을 복구할 수 없음</strong></td>
+                        <td>모듈이 선택한 벡터 말단에서 Type IIS 오버행을 신뢰성 있게 도출할 수 없음.</td>
+                        <td>설계는 벡터 유래 오버행 제약 대신 절편 유래 말단 서열을 사용하는, 벡터 경계의 더 일반적인 <strong>흉터 없는 규칙</strong> 전략으로 대체됩니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>내부 접합부 오버행은 수동으로 고정하지 않으면 후보가 제한됨</strong></td>
+                        <td>내부 접합부를 비워 두면 알고리즘은 <strong>상류 삽입편의 마지막 4 bp</strong> 또는 <strong>하류 삽입편의 처음 4 bp</strong>라는 두 고유 후보만 고려합니다. 사용자가 사용자 지정 4 bp 내부 오버랩을 제공하면 그 수동 선택이 해당 접합부의 고유 후보 검색을 대체합니다.</td>
+                        <td>이렇게 하면 기본 설계는 흉터를 최소화하고 서열에서 도출되며, 클로닝 표준이나 부품 라이브러리가 요구할 때 특정 내부 4 bp 접합부를 고정할 수도 있습니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>동종중합체 / 회문 4-mer 거부</strong></td>
+                        <td>후보 오버행이 4 bp 동종중합체 또는 4 bp 회문임.</td>
+                        <td>잘못된 연결이나 모호성이 더 잘 일어나므로 그 후보는 유효 오버행 조합에서 제외됩니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>유효한 고유 접합부 세트를 찾지 못함</strong></td>
+                        <td>어떤 오버행 조합도 역상보와 함께 고유성 필터를 통과하지 못하거나, 충실도 최적화가 유효한 선호 세트를 식별할 수 없음.</td>
+                        <td>알고리즘은 각 접합부에 대한 기본 후보 선택으로 대체하므로, 오버행 세트가 최적이 아니어도 설계가 생성될 수 있습니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>충실도 점수를 사용할 수 없음</strong></td>
+                        <td>선택한 효소 / 접합부 세트에 대해 연결 충실도 행렬을 로드하거나 계산할 수 없음.</td>
+                        <td>설계는 계속 진행되지만 충실도 패널이 없을 수 있고, 오버행 세트는 최종 행렬 기반 순위 없이 선택됩니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>첫 / 마지막 오버행 대체</strong></td>
+                        <td>벡터 유래 말단 제약을 사용할 수 없음.</td>
+                        <td>첫 삽입편 왼쪽 오버행은 <strong>삽입편 #1의 5′ 말단</strong>으로, 마지막 삽입편 오른쪽 오버행은 <strong>말단 삽입편의 3′ 말단</strong>으로 대체됩니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>삽입편 내부 효소 부위</strong></td>
+                        <td>선택한 Type IIS 효소가 하나 이상의 삽입편 서열 내부를 절단함.</td>
+                        <td>프라이머는 여전히 생성될 수 있어도 해당 삽입편이 Golden Gate 반응 중 조각날 수 있으므로 경고가 표시됩니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>조립 도식은 개념도</strong></td>
+                        <td>성공한 모든 다중 절편 설계.</td>
+                        <td>조립 이미지는 길이 정확한 플라스미드 도면이 아니라 개념적 도식입니다. 사용자는 정확한 해석을 위해 서열 출력과 오버행 표에 의존해야 합니다.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <p><strong>실질적 해석:</strong> Golden Gate 조립에서 경고는 완전한 설계 실패보다는 종종 <strong>위상 또는 오버행 품질</strong>을 반영합니다. 사용자는 <strong>백본 선택기</strong>, <strong>오버행 표</strong>, 선택적 <strong>충실도 섹션</strong>, 최종 조립 서열과 함께 경고를 해석해야 합니다.</p>
+            </div>
+        </div>
+       
+    </div>
+</body>
+</html>

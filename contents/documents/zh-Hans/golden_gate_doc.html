@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golden Gate 组装 - PrimerWeaver V1.0.6</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #333;
+            background: #f9fafb;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e40af;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2563eb;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            font-size: 1.5em;
+        }
+        h3 {
+            color: #3b82f6;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            font-size: 1.2em;
+        }
+        h4 {
+            color: #60a5fa;
+            margin-top: 1.2em;
+            margin-bottom: 0.6em;
+        }
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 1em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        strong {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c2410c;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .abstract {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+        .abstract p {
+            margin: 0;
+            font-style: italic;
+        }
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .section {
+            margin-bottom: 2.5em;
+        }
+        .version-info {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+            margin-top: 3em;
+            padding-top: 2em;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Golden Gate 组装引物设计器</h1>
+        
+        <div class="abstract">
+            <p>Golden Gate 组装模块用于设计基于 IIS 型限制性内切酶（通常为 BsaI）和 T4 DNA 连接酶的无疤痕模块化 DNA 组装引物。该工具可自动创建独特的 4 bp 突出端，使多条 DNA 片段能够在单一一锅反应中按确定顺序和方向组装，无需中间纯化步骤。Golden Gate 特别适合标准化生物元件文库、合成生物学应用、高通量遗传回路构建以及迭代设计流程。</p>
+        </div>
+
+        <div class="section">
+            <h2>快速入门指南</h2>
+            <ol>
+                <li>将目的载体和插入片段序列（最多 6 个片段）以 FASTA 或纯文本格式按所需组装顺序上传或粘贴到相应输入框。选择 Type IIS 酶，核验自动识别的载体骨架，并在必要时调整设计参数。</li>
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/GGA_demo.png"
+                    style="max-width: 90%; height: auto; border-radius: 8px;"
+                >
+            </div>
+                <li>单击“设计引物”以生成带有突出端序列的引物。查看引物表、突出端兼容性矩阵和预测组装示意图。下载组装后的 FASTA 文件，确认插入片段方向与预期设计一致。若方向不正确，请将插入片段序列反向互补后重新生成引物。</li>
+
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>Golden Gate 组装原理</h2>
+            
+            <p>Golden Gate 组装采用<strong>IIS 型限制性内切酶</strong>，它们识别特定 DNA 序列但在识别位点之外切割。这一独特性质可产生<strong>可预测、可定制的突出端</strong>，从而在单一反应中实现多条 DNA 片段的<strong>定向、无疤痕连接</strong>。关键的是，限制性酶切识别位点在组装过程中被去除，最终构建体中不留下疤痕。</p>
+
+
+
+            <h3>突出端设计原理</h3>
+            <p>Golden Gate 的核心优势在于设计独特、互不干扰的突出端。每个片段对接头需要一个在组装其他位置不存在的独特 4 bp 突出端：</p>
+            <ul>
+                <li><strong>4 bp 突出端：</strong>偏移为 1 bp 的 Type IIS 酶（例如 BsaI）天然产生 4 bp 粘性末端，在保持组装简便性的同时提供足够特异性</li>
+                <li><strong>定向组装：</strong>一个片段上的正向突出端必须与相邻片段上的反向突出端互补；非互补突出端无法连接，从而防止错误组装</li>
+                <li><strong>无疤痕接头：</strong>组装后，突出端两侧的 Type IIS 识别位点被去除，从而在片段之间形成无疤痕接头</li>
+               
+            </ul>
+           
+        </div>
+
+        <div class="section">
+            <h2>输入格式</h2>
+            <p>载体和插入片段输入均接受 <strong>FASTA</strong>、<strong>纯 DNA 文本</strong>，或带有 <code>LOCUS</code> 和 <code>ORIGIN</code> 区块的标准 <strong>GenBank</strong> 文件（<code>.gb</code>、<code>.gbk</code>、<code>.gbff</code>、<code>.genbank</code>）。<strong>LOCUS</strong> 中的短名称用作序列标题。每个输入框只允许<strong>一条序列</strong>；若检测到多个 FASTA 标题，将<strong>仅使用第一条序列</strong>。若上传不含 <code>&gt;</code> 标题的纯序列，则使用<strong>文件名</strong>（不含扩展名）作为名称。专有二进制格式（例如 SnapGene <code>.dna</code>）须先导出为 GenBank 或 FASTA。</p>
+             <p>PrimerWeaver 目前支持<strong>四种内置 Type IIs 限制性内切酶</strong>。一旦提供载体序列，系统会<strong>自动识别载体特征</strong>，并显示所有<strong>Type IIs 限制性酶切位点</strong>的位置。载体图谱可旋转，以便于查看目标克隆区域。所选<strong>载体骨架片段</strong>还决定用于<strong>第一个插入片段左端</strong>和<strong>最后一个插入片段右端</strong>的自动 4 bp 边界突出端。</p>
+
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/GGA_input.png"
+                    style="max-width: 60%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+            <h3>片段管理</h3>
+            <ul>
+                <li><strong>添加/移除片段：</strong>添加多条 DNA 序列用于多片段组装（建议 2–10 个片段；更大组装会更复杂）</li>
+                <li><strong>重排片段：</strong>通过界面控件调整组装顺序；顺序决定最终构建体的结构</li>
+                <li><strong>片段名称：</strong>从 FASTA 标题自动提取，便于引物识别；用于输出报告</li>
+                <li><strong>反向互补：</strong>必要时可切换单个片段，以匹配所需方向和组装方向</li>
+                <li><strong>内部重叠输入：</strong>对于每个内部接头，提供成对的<strong>左/右突出端（自定义，4 bp）</strong>字段。这两个字段镜像同一接头值。留空可让算法自动选择序列衍生的突出端，或输入<strong>恰好 4 bp</strong> 的自定义值以覆盖该接头的自动选择。</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>设计参数</h2>
+		
+	    <p>请从下拉列表中选择首选 Type IIs 限制性内切酶，或按酶名搜索。一旦选择<strong>限制性内切酶</strong>，系统会自动将<strong>最长酶切片段</strong>识别为默认目的载体骨架。若最长片段并非预期载体骨架，可手动选择另一片段。该骨架选择直接控制分配给<strong>第一</strong>个和<strong>最后</strong>一个插入片段末端的自动边界突出端；这些边界值始终取自所选骨架解释，而非手动输入。请在继续前检查引物设计参数，并在必要时修改。</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>参数</th>
+                        <th>默认值</th>
+                        <th>范围</th>
+                        <th>说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Type IIS 酶</strong></td>
+                        <td>None</td>
+                        <td>BsaI, BsmBI, BbsI, and PaqCI.</td>
+                        <td>用于组装的 IIS 型限制性内切酶。不同酶具有不同的识别序列、切割偏移和突出端长度。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>目标 Tm（°C）</strong></td>
+                        <td>55</td>
+                        <td>40–75</td>
+                        <td>引物模板结合区的目标熔解温度（不含突出端区）。影响引物长度和 PCR 退火温度。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>引物浓度（nM）</strong></td>
+                        <td>500</td>
+                        <td>50–2000</td>
+                        <td>in silico Tm 计算所假定的有效引物浓度。常用范围：25-1000 nM。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Na⁺ 浓度（mM）</strong></td>
+                        <td>50</td>
+                        <td>0–200</td>
+                        <td>用于盐校正 Tm 计算的一价阳离子浓度。常用范围：10-200 mM。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mg²⁺ 浓度（mM）</strong></td>
+                        <td>2.0</td>
+                        <td>0–10</td>
+                        <td>用于 Tm 计算的二价阳离子浓度。若反应中不含 Mg²⁺，请设为 0。常用范围：0.5-5 mM。</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="section">
+            <h2>结果与输出</h2>
+            
+            <p>引物设计完成后，Golden Gate 组装模块会生成一套完整结果，便于实验验证和下游克隆。</p>
+
+            <h3>引物表</h3>
+	    <p>设计得到的引物对以结构化表格报告，包括引物序列（5′→3′）、长度、GC 含量和熔解温度（Tm）。Tm 值同时显示<strong>退火核心区</strong>和<strong>全长引物</strong>，便于评估扩增兼容性。引物质量指标（包括同聚物连续序列、发卡结构、自二聚体和交叉二聚体形成）会被评估并标记，以突出可能影响 PCR 性能的潜在风险。<strong>Type IIS 识别位点和突出端序列</strong>在引物序列中突出显示，以便查看。</p>
+
+
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/GGA_primer_table.png"
+                    alt="Golden Gate 引物表"
+                    style="max-width: 60%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+	    <h3>组装示意图与突出端表</h3>
+	    <p>系统会生成<strong>组装质粒示意图</strong>，说明克隆流程，包括载体线性化、插入片段引入和最终质粒组装。该图提供片段方向和接头结构的概念性概览。<strong>重叠区表</strong>显示每个接头处的突出端对，确认相邻片段具有互补粘性末端。该表可快速目视核验组装架构是否正确，以及是否存在突出端冲突或不匹配。</p>
+
+
+	   <div style="text-align: center; margin: 2em 0;">
+  		<img
+    			src="contents/pictures/GGA_assembly_table.png"
+    			style="max-width: 60%; height: auto; border-radius: 8px;"
+  		 >
+	   </div>
+      
+
+            <h3>模拟琼脂糖凝胶电泳</h3>
+	    <p>PrimerWeaver 会生成<strong>模拟琼脂糖凝胶图像</strong>，以预测关键克隆步骤的实验结果。凝胶包括：</p>
+
+            <ul>
+                <li>可选 DNA 分子量标准（默认：NEB 1 kb Plus DNA Ladder）</li>
+		<li>未酶切载体</li>
+                <li>经 Type IIs 限制性酶切的载体</li>
+                <li>PCR 扩增片段（每个片段一孔，显示预期大小）</li>
+                <li>组装后的质粒</li>
+            </ul>
+	    <p>预测条带大小标注在凝胶旁，便于用户将预期片段大小与实验结果比较，并迅速识别潜在克隆问题。</p>
+
+	   <div style="text-align: center; margin: 2em 0;">
+  		<img
+    			src="contents/pictures/GGA_gel.png"
+    			style="max-width: 60%; height: auto; border-radius: 8px;"
+  		 >
+	   </div>
+
+        </div>
+
+	<div class="section">
+            <h2>引物设计算法</h2>
+            
+            <h3>引物结构</h3>
+            <p>每条 Golden Gate 引物由三个功能区组成：</p>
+            <ul>
+                <li><strong>退火核心（3′）：</strong>驱动 PCR 退火的模板互补区（通常为 18–30 bp）</li>
+                <li><strong>突出端区（5′）：</strong>包含 Type IIS 限制性识别位点和可定制的 4 bp 突出端序列（通常为 11~12 bp）</li>
+                <li><strong>保护碱基（5′ 侧翼）：</strong>限制性位点上游的短碱基，用于提高酶切效率（通常为 2–6 nt；取决于酶）</li>
+            </ul>
+
+            <h3>设计流程</h3>
+            <p>PrimerWeaver 中的 Golden Gate 引物设计分为三个相互衔接的步骤：<strong>载体末端解释</strong>、<strong>接头突出端分配</strong>，以及<strong>为每个插入片段构建引物尾</strong>。这些步骤概述如下。</p>
+
+            <h3>载体末端解释</h3>
+            <p>载体首先被标准化，并针对所选<strong>Type IIS 限制性内切酶</strong>扫描。与标准限制性克隆不同，Golden Gate 需要一种载体上下文，使其在 Type IIS 酶切后能够暴露确定的 4 bp 组装突出端。模块计算候选酶切片段，默认自动选择最长片段，并允许用户覆盖该骨架选择。所选骨架片段随后用于从所选 Type IIS 酶的切割几何推导左侧和右侧载体突出端。这些载体衍生值成为<strong>第一个插入片段左突出端</strong>和<strong>最后一个插入片段右突出端</strong>的固定边界条件，每当载体/酶/骨架解释改变时，界面会自动覆盖这两个边界字段。</p>
+            <p>若载体在此解释下不能提供可用的末端突出端，设计不会立即失败。相反，模块记录无法获得载体衍生末端，并在组装边界回退到<strong>无疤痕接头规则</strong>。</p>
+
+            <h3>接头突出端分配</h3>
+            <p>载体约束定义后，算法为每个插入片段–插入片段或载体–插入片段接头分配 4 bp 突出端。对于每个<strong>内部接头</strong>，模块首先检查用户是否在成对的<strong>右突出端 / 左突出端</strong>字段中输入了自定义接头值。若存在非空自定义值，它必须<strong>恰好为 4 bp</strong>，并直接用于该接头。若两个成对字段均为空，算法回退到序列衍生候选，通常使用<strong>上游插入片段的最后 4 bp</strong>和<strong>下游插入片段的前 4 bp</strong>。这些天然候选会被过滤，以拒绝同聚物 4 聚体或回文 4 聚体等无效 Golden Gate 突出端。</p>
+            <p>模块随后在<strong>组装水平</strong>评估完整的接头突出端组合，而不是一次一个接头。只有在考虑反向互补配对后完整面板仍保持唯一时，突出端集合才会被接受。当所选酶有保真度矩阵可用时，PrimerWeaver 按预测连接保真度对有效组合排序，并使用得分最高的兼容集合。若保真度评分不可用，模块回退到第一个有效且无冲突的组合。因此，用户提供的内部 4 bp 接头是全局突出端组合问题的<strong>固定约束</strong>，而不是装饰性注释。</p>
+
+            <h3>引物尾构建与组装重建</h3>
+            <p>一旦每个插入片段的左右突出端固定，模块在插入片段末端设计<strong>退火核心</strong>，然后通过附加 Type IIS 识别位点、间隔碱基和所选 4 bp 突出端作为 5′ 非退火尾来构建完整引物。在此步骤中，PrimerWeaver 去除<strong>两个插入片段末端</strong>的冗余重叠序列。在左端，它修剪所选 4 bp 突出端与正向退火核心起点之间最大的<strong>后缀–前缀重复</strong>。在右端，它修剪反向引物核心所覆盖的插入片段序列末端与所选右侧突出端起点之间最大的重复。例如，若自定义左突出端以 <code>ATG</code> 结尾且插入片段核心已以 <code>ATG</code> 开始，或插入片段已以 <code>AATG</code> 结尾且所选右突出端以 <code>AATG</code> 开始，则共享序列不会在最终引物尾中重复。因此完整 Golden Gate 引物遵循此结构：</p>
+            <p><strong>5′ 保护夹 + Type IIS 位点 + 偏移碱基 + 所选 4 bp 突出端 + 退火核心 3′</strong></p>
+            <p>引物构建后，模块根据推导的载体切割位置和所选接头突出端逻辑，将酶切后的载体骨架与插入片段块组合，重建组装质粒。当载体衍生末端可用时，骨架从 Type IIS 切割位置重新提取，并用作组装序列重建的物理骨架。否则，模块回退到更简单的无疤痕拼接模型，用于报告组装序列长度和下游可视化。</p>
+            <h3>算法中的边界情况逻辑</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>算法边界情况</th>
+                        <th>Golden Gate 模块的当前行为</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>载体有零个或一个 Type IIS 位点</strong></td>
+                        <td>模块不尝试正常的 Golden Gate 骨架解释。相反，它报告 N/A 式组装输出，因为载体无法提供标准 Golden Gate 组装所需的双侧 Type IIS 酶切上下文。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>无法干净地恢复载体衍生末端突出端</strong></td>
+                        <td>若无法推导显式载体末端突出端，算法在第一和最后一个接头回退到无疤痕边界规则，而不是立即放弃整个设计。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>用户手动提供内部 4 bp 接头</strong></td>
+                        <td>非空的内部自定义突出端被视为固定接头选择。成对的左/右界面字段镜像同一接头值，全局突出端搜索必须容纳该预先选定的 4 bp 约束。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>内部自定义接头仅部分填写</strong></td>
+                        <td>若内部重叠字段非空但不是恰好 4 bp，模块会用警告对话框阻止设计，而不是静默猜测或补齐接头。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>无法独立选择任何一个接头突出端</strong></td>
+                        <td>算法在完整组装面板上评估突出端组合，因为局部可接受的突出端仍可能与构建体其他位置的另一接头或其反向互补冲突。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>保真度矩阵不可用</strong></td>
+                        <td>模块仍通过回退到第一个有效且无冲突的突出端组合来完成设计，但无法再按预测连接保真度对组合排序。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>所选突出端已存在于插入片段末端</strong></td>
+                        <td>在引物构建期间，模块检查所选 4 bp 突出端与引物核心已覆盖的插入片段序列之间的<strong>最大共享重叠</strong>。这在<strong>左边界</strong>和<strong>右边界</strong>都进行评估，因此即使 4 bp 突出端仅有一部分已存在于插入片段起点或终点，共享序列也不会重复。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>插入片段内部存在 Type IIS 位点</strong></td>
+                        <td>算法仍可构建引物，但设计会被标记，因为内部酶切位点可能在酶切过程中将插入片段切断，从而破坏预期的 Golden Gate 组装拓扑。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>片段顺序改变完整突出端解</strong></td>
+                        <td>由于接头突出端从相邻片段序列上下文分配，重排插入片段不仅改变一个接头，也改变全局突出端组合问题，并可能产生不同的最终引物集。</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>警告与边界情况</h2>
+            <p>Golden Gate 组装模块在公共可视化层可用时，使用共享的 <strong>MW（Message Warning）</strong>框架进行预检验证和确认对话框。一些警告出现在设计开始之前，另一些仅在模块检查载体拓扑、Type IIS 位点和候选突出端组合之后才被解释。</p>
+
+            <h3>一般警告</h3>
+            <p>这些警告大多来自共享输入验证和高层 Golden Gate 预检。在大多数情况下，用户可单击<strong>Cancel</strong>以修改设置，或单击<strong>OK</strong>继续。</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>类别</th>
+                        <th>触发条件</th>
+                        <th>GGA 模块的当前行为</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>阻断性输入提示</strong></td>
+                        <td>未提供插入片段，或未选择 Type IIS 酶。</td>
+                        <td>设计立即停止，模块要求用户在继续前至少添加一个插入片段并选择一种酶。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-04</strong><br>标准化后无有效序列</td>
+                        <td>载体或插入片段在标准化后变为空，因为没有剩余有效 IUPAC DNA 符号。</td>
+                        <td>用户仍可继续，但受影响输入的设计将变为空或无信息。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-05</strong><br>已移除非 IUPAC 字符</td>
+                        <td>输入包含不支持的字符，可能靠近与引物相关的 3′ 区。</td>
+                        <td>模块仅使用标准化序列继续，并警告这可能影响引物行为。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-06</strong><br>检测到简并碱基</td>
+                        <td>载体或插入片段含有简并 IUPAC 碱基。</td>
+                        <td>热力学值按最稳定变体保守估算，因此报告的 Tm 和 ΔG 值可能是最不利情况的近似。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-10 to MW-15</strong><br>参数范围警告</td>
+                        <td>Na<sup>+</sup>、Mg<sup>2+</sup>、引物浓度或目标 Tm 超出推荐范围或热力学验证窗口。</td>
+                        <td>用户仍可继续，但 Tm 预测和引物优化可能变得不太可靠。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-19</strong><br>总输入规模较大</td>
+                        <td>载体加插入片段的总输入大到足以对浏览器端计算造成压力。</td>
+                        <td>模块警告设计和渲染期间浏览器性能可能下降。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-20</strong><br>同一字段中有多个 FASTA 标题</td>
+                        <td>载体或插入片段文本框包含不止一条 FASTA 记录。</td>
+                        <td>共享 MW 对话框警告每个字段只允许一条序列。若用户继续，该字段会在设计继续前被裁剪为<strong>第一条 FASTA 记录</strong>。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-22</strong><br>文件上传超出导入限制</td>
+                        <td>上传的载体或插入片段文件大于 <strong>1 MB</strong>。</td>
+                        <td>在序列加载前阻止导入，用户必须选择更小的文件。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GG-MW-01</strong><br>插入片段内部 Type IIS 位点</td>
+                        <td>一个或多个插入片段已含所选 Golden Gate 酶的识别位点。</td>
+                        <td>模块警告这些插入片段可能在组装过程中被切割，并鼓励重新设计、驯化或更换酶。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GG-MW-02</strong><br>内部自定义重叠长度无效</td>
+                        <td>内部自定义重叠字段非空，但其长度不是恰好 <strong>4 bp</strong>。</td>
+                        <td>模块弹出 MW 对话框。允许将该字段留空，但任何非空内部重叠必须恰好为 4 bp，设计才能继续。</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>设计警告</h3>
+            <p>这些警告和边界情况针对 Golden Gate 设计算法和输出解释。</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>情况</th>
+                        <th>触发条件</th>
+                        <th>GGA 模块的当前行为</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>插入片段数量上限</strong></td>
+                        <td>尝试添加超过六行插入片段。</td>
+                        <td>当前实现将 Golden Gate 设计限制为<strong>六个插入片段</strong>。一旦存在六个插入片段，界面会禁用进一步添加，内部收集逻辑也会截断为前六个非空插入片段。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>载体中所选 Type IIS 位点少于两个</strong></td>
+                        <td>所选载体对所选酶含有零个或一个位点。</td>
+                        <td>模块不产生完整 Golden Gate 组装设计。输出渲染为 <strong>N/A</strong>，凝胶模型仅显示未切割载体或单切线性化载体。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>自动骨架选择</strong></td>
+                        <td>载体含有多个酶切片段。</td>
+                        <td>模块自动使用<strong>最长酶切片段</strong>作为候选骨架，并提供片段选择器以便用户核验或覆盖该选择。更改所选骨架也会重新计算自动的第一/最后一个插入片段突出端。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>边界突出端字段不可由用户编辑</strong></td>
+                        <td>第一个插入片段左突出端和最后一个插入片段右突出端是从所选载体骨架推导的边界条件。</td>
+                        <td>这两个字段显示为自动填充的只读值。若载体序列、酶或骨架选择改变，模块会用新推导的边界突出端覆盖它们。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>载体末端突出端不可恢复</strong></td>
+                        <td>模块无法可靠地在所选载体末端推导 Type IIS 突出端。</td>
+                        <td>设计在载体边界回退到更通用的<strong>无疤痕规则</strong>策略，使用片段衍生末端序列而不是载体衍生突出端约束。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>除非手动固定，内部接头突出端受候选限制</strong></td>
+                        <td>若内部接头留空，算法只考虑两个天然候选：<strong>上游插入片段的最后 4 bp</strong>或<strong>下游插入片段的前 4 bp</strong>。若用户提供自定义 4 bp 内部重叠，该手动选择会替换该接头的天然候选搜索。</td>
+                        <td>这使默认设计保持疤痕最小且源自序列，同时仍允许用户在克隆标准或元件文库要求时固定特定的内部 4 bp 接头。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>拒绝同聚物 / 回文 4 聚体</strong></td>
+                        <td>候选突出端是 4 bp 同聚物或 4 bp 回文。</td>
+                        <td>该候选被排除在有效突出端组合之外，因为它更容易发生错误连接或歧义。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>未找到有效的唯一接头集合</strong></td>
+                        <td>没有突出端组合能与反向互补一起通过唯一性过滤，或保真度优化无法识别有效的首选集合。</td>
+                        <td>算法回退到每个接头的默认候选选择，因此即使突出端集合次优，仍可能产生设计。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>保真度评分不可用</strong></td>
+                        <td>无法为所选酶 / 接头集合加载或计算连接保真度矩阵。</td>
+                        <td>设计仍继续，但保真度面板可能缺失，突出端集合在没有最终基于矩阵的排序下被选择。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>第一 / 最后一个突出端回退</strong></td>
+                        <td>载体衍生末端约束不可用。</td>
+                        <td>第一个插入片段左突出端回退到<strong>插入片段 #1 的 5′ 端</strong>，最后一个插入片段右突出端回退到<strong>末端插入片段的 3′ 端</strong>。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>插入片段内部酶切位点</strong></td>
+                        <td>所选 Type IIS 酶在一个或多个插入片段序列内部切割。</td>
+                        <td>显示警告，因为即使仍可生成引物，这些插入片段也可能在 Golden Gate 反应中被切断。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>组装示意图为示意</strong></td>
+                        <td>任何成功的多片段设计。</td>
+                        <td>组装图像是概念示意图，而非长度精确的质粒图；用户应依赖序列输出和突出端表进行精确解释。</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <p><strong>实际解读：</strong>在 Golden Gate 组装中，警告往往反映<strong>拓扑或突出端质量</strong>，而不是完全的设计失败。用户应将警告与<strong>骨架选择器</strong>、<strong>突出端表</strong>、可选的<strong>保真度部分</strong>以及最终组装序列一并解读。</p>
+            </div>
+        </div>
+       
+    </div>
+</body>
+</html>

@@ -2,50 +2,50 @@
       <div class="grid cols-2" id="top-grid">
         <div id="left-panel">
           <label style="margin-bottom:13px;display:flex;align-items:center;gap:8px">
-            <strong>Vector sequence (FASTA)</strong>
-            <span class="help-icon" tabindex="0" aria-label="Help: Vector sequence">
+            <strong data-i18n="ui.vectorSequence">Vector sequence (FASTA)</strong>
+            <span class="help-icon" tabindex="0" aria-label="Help: Vector sequence" data-i18n-aria-label="ui.helpVector">
               <span>?</span>
-              <span class="help-tooltip">
+              <span class="help-tooltip" data-i18n-html="ui.vectorHelpHtml">
                 <strong style="display:block;margin-bottom:6px;">Vector sequence input</strong>
-                <strong>Formats:</strong> FASTA (optional <code>&gt;</code>), plain DNA, or GenBank (<code>.gb</code>, <code>.gbk</code>, <code>.gbff</code>, <code>.genbank</code>) with <code>LOCUS</code> and <code>ORIGIN</code>. The <strong>LOCUS</strong> name is used as the short sequence name. <strong>Upload</strong> without a header uses the <strong>file name</strong> (no extension) as <code>&gt;</code>name. SnapGene <code>.dna</code> is binary—export as GenBank or FASTA first. Whitespace ignored. Use Upload or Reverse complement as needed.
+                <strong>Formats:</strong> FASTA (optional <code>&gt;</code>), plain DNA, or GenBank (<code>.gb</code>, <code>.gbk</code>, <code>.gbff</code>, <code>.genbank</code>) with <code>LOCUS</code> and <code>ORIGIN</code>. The <strong>LOCUS</strong> name is used as the short sequence name. <strong data-i18n="ui.upload">Upload</strong> without a header uses the <strong>file name</strong> (no extension) as <code>&gt;</code>name. SnapGene <code>.dna</code> is binary—export as GenBank or FASTA first. Whitespace ignored. Use Upload or Reverse complement as needed.
               </span>
             </span>
           </label>
           <textarea id="gg-vector" placeholder=">pESC-His&#10;GAGCAGACAA..." style="min-height:100px"></textarea>
           <div class="row end fasta-actions">
             <input type="file" id="file-vector" accept=".fa,.fasta,.fas,.txt,.gb,.gbk,.gbff,.genbank" style="display:none">
-            <button type="button" class="btn demo" id="vector-flip-btn">Reverse complement</button>
-            <button class="btn demo" id="btn-vector-demo" type="button" data-sample="vector">Demo</button>
-            <button class="ghost btn" id="btn-vector-upload" type="button">Upload</button>
+            <button type="button" class="btn demo" id="vector-flip-btn" data-i18n="ui.reverseComplement">Reverse complement</button>
+            <button class="btn demo" id="btn-vector-demo" type="button" data-sample="vector" data-i18n="ui.demo">Demo</button>
+            <button class="ghost btn" id="btn-vector-upload" type="button" data-i18n="ui.upload">Upload</button>
           </div>
         </div>
         <div id="right-panel">
           <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:13px;">
             <label style="display:flex;align-items:center;gap:8px; margin:0">
-              <strong>Insert sequence (FASTA)</strong>
-              <span class="help-icon" tabindex="0" aria-label="Help: Insert sequence">
+              <strong data-i18n="ui.insertSequence">Insert sequence (FASTA)</strong>
+              <span class="help-icon" tabindex="0" aria-label="Help: Insert sequence" data-i18n-aria-label="ui.helpInsert">
                 <span>?</span>
-                <span class="help-tooltip">
+                <span class="help-tooltip" data-i18n-html="re.insertHelpHtml">
                   <strong style="display:block;margin-bottom:6px;">Insert sequences</strong>
                   Same formats as vector (FASTA, plain DNA, GenBank <code>.gb</code>/<code>.gbk</code>/<code>.gbff</code>/<code>.genbank</code>; file name as header when missing). The tool designs primers to amplify the insert with restriction sites compatible with the selected enzymes.
                 </span>
               </span>
             </label>
-            <div style="display:flex; gap:8px; align-items:center; flex-shrink:0;">
-              <button class="demo btn" id="gg-demo-set" type="button">Demo Set</button>
-              <button class="ghost btn" id="global-reset" type="button">Reset</button>
+            <div class="module-primary-actions">
+              <button class="demo btn" id="gg-demo-set" type="button" data-i18n="ui.demoSet">Demo Set</button>
+              <button class="ghost btn" id="global-reset" type="button" data-i18n="ui.reset">Reset</button>
             </div>
           </div>
           <div id="inserts-container">
             <div class="insert-row" data-index="0" style="display:flex;gap:8px;">
-              <div class="insert-label" style="flex-shrink: 0; white-space: nowrap; margin-top: 0;">Insert #1:</div>
+              <div class="insert-label" style="flex-shrink: 0; white-space: nowrap; margin-top: 0;" data-i18n="ui.insertOneColon">Insert #1:</div>
               <div class="insert-body" style="flex: 1;">
                 <textarea class="insert-seq" placeholder=">yeGFP&#10;ATGTCTAAAG..." style="min-height:100px"></textarea>
                 <div class="row end fasta-actions">
                   <input type="file" class="insert-file" accept=".fa,.fasta,.fas,.txt,.gb,.gbk,.gbff,.genbank" style="display:none;">
-                  <button type="button" class="btn demo insert-flip-btn">Reverse complement</button>
-                  <button class="btn demo insert-demo-btn" type="button" data-sample="insert">Demo</button>
-                  <button class="ghost btn insert-upload-btn" type="button">Upload</button>
+                  <button type="button" class="btn demo insert-flip-btn" data-i18n="ui.reverseComplement">Reverse complement</button>
+                  <button class="btn demo insert-demo-btn" type="button" data-sample="insert" data-i18n="ui.demo">Demo</button>
+                  <button class="ghost btn insert-upload-btn" type="button" data-i18n="ui.upload">Upload</button>
                 </div>
               </div>
             </div>
@@ -57,11 +57,11 @@
     <div class="box" id="vector-preview-box">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
         <div>
-          <h3 style="margin:0">Vector map preview</h3>
-          <div class="aside">Auto-draws circular plasmid map from vector sequence</div>
+          <h3 style="margin:0" data-i18n="ui.vectorMapPreview">Vector map preview</h3>
+          <div class="aside" data-i18n="ui.vectorMapAside">Auto-draws circular plasmid map from vector sequence</div>
         </div>
         <div style="display:flex;gap:6px;align-items:center">
-          <span class="aside">Rotate</span>
+          <span class="aside" data-i18n="ui.rotate">Rotate</span>
           <input type="range" id="vector-map-rotation" min="0" max="360" value="0" step="1" style="width:130px">
           <span id="vector-map-rot-label" class="aside">0°</span>
         </div>
@@ -69,18 +69,18 @@
       <div style="display:flex;justify-content:center;">
         <canvas id="vector-map-canvas" width="520" height="320" class="asm-figure"></canvas>
       </div>
-      <div id="vector-map-stats" class="aside" style="margin-top:4px;text-align:center">Paste vector sequence above to update preview.</div>
+      <div id="vector-map-stats" class="aside" style="margin-top:4px;text-align:center" data-i18n="ui.pasteVectorPreview">Paste vector sequence above to update preview.</div>
     </div>
 
     <div class="box" id="settings-box">
-      <h3>Assembly settings</h3>
+      <h3 data-i18n="ui.assemblySettings">Assembly settings</h3>
       <div class="assembly-preset-toolbar">
         <div class="assembly-preset-main">
           <label class="aside" for="assembly-preset-select" style="display:flex;align-items:center;gap:6px;">
-            <span>Parameter preset</span>
+            <span data-i18n="ui.preset">Parameter preset</span>
             <span class="help-icon">
               <span>?</span>
-              <span class="help-tooltip">
+              <span class="help-tooltip" data-i18n-html="ui.presetHelpAssembly">
                 Save commonly used assembly settings in this browser. Select a preset to reuse it, or set one as the startup default for next time.
               </span>
             </span>
@@ -88,16 +88,16 @@
           <select id="assembly-preset-select" class="assembly-preset-select"></select>
         </div>
         <div class="assembly-preset-actions">
-          <button class="btn demo assembly-preset-save" type="button">Save as New</button>
-          <button class="btn demo assembly-preset-update" type="button">Update</button>
-          <button class="btn ghost assembly-preset-delete" type="button">Delete</button>
-          <button class="btn assembly-preset-set-default" type="button">Set as Startup Default</button>
+          <button class="btn demo assembly-preset-save" type="button" data-i18n="ui.saveNew">Save as New</button>
+          <button class="btn demo assembly-preset-update" type="button" data-i18n="ui.update">Update</button>
+          <button class="btn ghost assembly-preset-delete" type="button" data-i18n="ui.delete">Delete</button>
+          <button class="btn assembly-preset-set-default" type="button" data-i18n="ui.setDefault">Set as Startup Default</button>
         </div>
       </div>
       <div class="grid cols-2" style="margin-top:8px;gap:12px">
         <div>
-          <label class="aside">Restriction enzyme 1</label>
-          <input id="re-enzyme1" list="re-enzyme-list" placeholder="Type enzyme name e.g. BamHI">
+          <label class="aside" data-i18n="ui.enzyme1NoColon">Restriction enzyme 1</label>
+          <input id="re-enzyme1" list="re-enzyme-list" placeholder="Type enzyme name e.g. BamHI" data-i18n-placeholder="re.enzyme1Placeholder">
 <datalist id="re-enzyme-list">
             <option value="AatII" label="AatII (GACGTC)"></option>
             <option value="Acc65I" label="Acc65I (GGTACC)"></option>
@@ -195,47 +195,47 @@
           </datalist>
         </div>
         <div>
-          <label class="aside">Restriction enzyme 2</label>
-          <input id="re-enzyme2" list="re-enzyme-list" placeholder="Type enzyme name e.g. KpnI">
+          <label class="aside" data-i18n="ui.enzyme2NoColon">Restriction enzyme 2</label>
+          <input id="re-enzyme2" list="re-enzyme-list" placeholder="Type enzyme name e.g. KpnI" data-i18n-placeholder="re.enzyme2Placeholder">
         </div>
       </div>
 
       <div id="re-fragments-info" style="margin-top:8px">
-        <label for="re-backbone-select" class="aside">Vector backbone fragment</label>
+        <label for="re-backbone-select" class="aside" data-i18n="ui.vectorBackbone">Vector backbone fragment</label>
         <select id="re-backbone-select" style="margin-top:6px">
-          <option value="">No fragments available</option>
+          <option value="" data-i18n="ui.noFragments">No fragments available</option>
         </select>
         <span id="re-fragments-summary" class="aside" style="margin-left:8px;"></span>
       </div>
 
-      <h3 style="margin-top:16px;margin-bottom:12px">Primer Design Parameters</h3>
+      <h3 style="margin-top:16px;margin-bottom:12px" data-i18n="ui.primerParams">Primer Design Parameters</h3>
       <div class="grid cols-3" style="margin-top:10px; gap: 12px;">
         <div>
           <label class="aside" style="display:flex;align-items:center;gap:6px">
-            <span>Protective base (5' clamp)</span>
-            <span class="help-icon" tabindex="0" aria-label="Help: Protective base">
+            <span data-i18n="re.protectiveBase">Protective base (5' clamp)</span>
+            <span class="help-icon" tabindex="0" aria-label="Help: Protective base" data-i18n-aria-label="re.helpProtective">
               <span>?</span>
-              <span class="help-tooltip">Extra bases added to the 5' end of primers to improve restriction enzyme digestion efficiency. Typical values: 2–6.</span>
+              <span class="help-tooltip" data-i18n-html="ui.protectiveHelp">Extra bases added to the 5' end of primers to improve restriction enzyme digestion efficiency. Typical values: 2–6.</span>
             </span>
           </label>
           <input id="gg-clamp" type="number" value="5" min="0" max="10" step="1">
         </div>
         <div>
           <label class="aside" style="display:flex;align-items:center;gap:6px">
-            <span>Target Tm (°C)</span>
-            <span class="help-icon" tabindex="0" aria-label="Help: Target Tm">
+            <span data-i18n="ui.targetTm">Target Tm (°C)</span>
+            <span class="help-icon" tabindex="0" aria-label="Help: Target Tm" data-i18n-aria-label="re.helpTargetTm">
               <span>?</span>
-              <span class="help-tooltip">Target melting temperature for the core (annealing) region of each primer. Primers are optimized to be close to this value.</span>
+              <span class="help-tooltip" data-i18n-html="ui.targetTmHelp">Target melting temperature for the core (annealing) region of each primer. Primers are optimized to be close to this value.</span>
             </span>
           </label>
           <input id="gg-tmTarget" type="number" value="55" step="0.1">
         </div>
         <div>
           <label class="aside" style="display:flex;align-items:center;gap:6px">
-            <span>Primer conc. (nM)</span>
-            <span class="help-icon" tabindex="0" aria-label="Help: Primer concentration">
+            <span data-i18n="ui.primerConc">Primer conc. (nM)</span>
+            <span class="help-icon" tabindex="0" aria-label="Help: Primer concentration" data-i18n-aria-label="re.helpPrimerConc">
               <span>?</span>
-              <span class="help-tooltip">Effective primer concentration assumed for in silico Tm calculation. Typical range: 25-1000 nM.</span>
+              <span class="help-tooltip" data-i18n-html="ui.primerConcHelp">Effective primer concentration assumed for in silico Tm calculation. Typical range: 25-1000 nM.</span>
             </span>
           </label>
           <input id="gg-conc" type="number" value="500" step="10">
@@ -244,20 +244,20 @@
       <div class="grid cols-2" style="margin-top:12px; gap: 12px;">
         <div>
           <label class="aside" style="display:flex;align-items:center;gap:6px">
-            <span>Na⁺ (mM)</span>
-            <span class="help-icon" tabindex="0" aria-label="Help: Na+ concentration">
+            <span data-i18n="ui.sodium">Na⁺ (mM)</span>
+            <span class="help-icon" tabindex="0" aria-label="Help: Na+ concentration" data-i18n-aria-label="re.helpNa">
               <span>?</span>
-              <span class="help-tooltip">Monovalent cation concentration used for salt-corrected Tm calculation. Typical range: 10-200 mM.</span>
+              <span class="help-tooltip" data-i18n-html="ui.sodiumHelp">Monovalent cation concentration used for salt-corrected Tm calculation. Typical range: 10-200 mM.</span>
             </span>
           </label>
           <input id="gg-na" type="number" value="50" step="1">
         </div>
         <div>
           <label class="aside" style="display:flex;align-items:center;gap:6px">
-            <span>Mg²⁺ (mM)</span>
-            <span class="help-icon" tabindex="0" aria-label="Help: Mg2+ concentration">
+            <span data-i18n="ui.magnesium">Mg²⁺ (mM)</span>
+            <span class="help-icon" tabindex="0" aria-label="Help: Mg2+ concentration" data-i18n-aria-label="re.helpMg">
               <span>?</span>
-              <span class="help-tooltip">Divalent cation concentration used for Tm calculation. Set to 0 if Mg²⁺ is absent from reaction. Typical range: 0.5-5 mM.</span>
+              <span class="help-tooltip" data-i18n-html="ui.magnesiumHelp">Divalent cation concentration used for Tm calculation. Set to 0 if Mg²⁺ is absent from reaction. Typical range: 0.5-5 mM.</span>
             </span>
           </label>
           <input id="gg-mg" type="number" value="2.0" min="0" max="10" step="0.5">
@@ -265,39 +265,39 @@
       </div>
       <div style="margin-top:10px;">
         <div class="row" style="gap:8px;">
-          <button class="btn" id="gg-run">Design RE cloning primers</button>
+          <button class="btn" id="gg-run" data-i18n="re.design">Design RE cloning primers</button>
           <select id="gg-download-type" class="ghost btn">
-            <option value="primers">primer.txt</option>
-            <option value="fasta">assembled.fasta</option>
+            <option value="primers" data-i18n="ui.primerTxt">primer.txt</option>
+            <option value="fasta" data-i18n="ui.assembledFasta">assembled.fasta</option>
           </select>
-          <button class="ghost btn" id="gg-download-btn">Download</button>
+          <button class="ghost btn" id="gg-download-btn" data-i18n="ui.download">Download</button>
         </div>
       </div>
-      <button class="ghost btn" id="gg-clear" style="margin-left: auto; margin-top: auto;">Clear</button>
+      <button class="ghost btn" id="gg-clear" style="margin-left: auto; margin-top: auto;" data-i18n="ui.clear">Clear</button>
     </div>
   </div>
 
       <div id="results-wrap" class="results" style="display:none">
         <div id="cell-primers" class="box" style="margin-top:10px;">
-          <h3>Primer sets</h3>
+          <h3 data-i18n="ui.primerSets">Primer sets</h3>
           <div id="primer-table"></div>
         </div>
 
         <div id="cell-qc" class="box" style="display:none">
-          <h3>QC</h3>
+          <h3 data-i18n="re.qc">QC</h3>
           <div id="qc-out" class="aside"></div>
         </div>
 
         <div id="cell-asm">
           <div class="asm-card box">
-            <div class="asm-title">Assembled diagram</div>
+            <div class="asm-title" data-i18n="ui.assembledDiagram">Assembled diagram</div>
             <div style="text-align: center;">
               <img id="asm-img" class="asm-figure" src="" style="width:95%;display:none;margin:5px auto;">
               <div class="legend" id="asm-legend" style="display:block;text-align:center;"></div>
             </div>
           </div>
           <div class="box oh-table" style="margin-top:10px">
-            <h3>Sticky end table</h3>
+            <h3 data-i18n="ui.stickyEndTable">Sticky end table</h3>
             <div id="oh-table"></div>
           </div>
 
@@ -306,14 +306,14 @@
 
         <div id="gg-gel-section" class="box" style="display:none; margin-top:0px;">
           <div class="ggx-header" style="margin-top:0px;margin-bottom:5px; display: flex; justify-content: flex-end; align-items: center; gap: 8px;">
-            <h3>Simulated Gel</h3>
+            <h3 data-i18n="ui.simulatedGel">Simulated Gel</h3>
             <div style="display: flex; align-items: center; gap: 4px;">
-              <h4 style="margin:0;">Marker:</h4>
+              <h4 style="margin:0;" data-i18n="ui.marker">Marker:</h4>
               <select id="ggx-ladder" style="width:auto;font-size:12px">
-                <option value="neb1kbplus">NEB 1kb Plus DNA Ladder (default)</option>
-                <option value="neb1kb">NEB 1kb DNA Ladder</option>
-                <option value="thermo1kbruler">GeneRuler 1kb DNA Ladder</option>
-                <option value="thermo1kbplus">GeneRuler 1kb Plus DNA Ladder</option>
+                <option value="neb1kbplus" data-i18n="ui.ladderNeb1kbPlus">NEB 1kb Plus DNA Ladder (default)</option>
+                <option value="neb1kb" data-i18n="ui.ladderNeb1kb">NEB 1kb DNA Ladder</option>
+                <option value="thermo1kbruler" data-i18n="ui.ladderGeneRuler">GeneRuler 1kb DNA Ladder</option>
+                <option value="thermo1kbplus" data-i18n="ui.ladderGeneRulerPlus">GeneRuler 1kb Plus DNA Ladder</option>
               </select>
             </div>
           </div>
@@ -325,7 +325,7 @@
 
 <div id="gg-modal" class="modal-overlay">
   <div class="modal-card">
-    <p id="gg-modal-text">Please design primers first.</p>
-    <button class="btn" type="button" id="gg-modal-ok">OK</button>
+    <p id="gg-modal-text" data-i18n="ui.designFirst">Please design primers first.</p>
+    <button class="btn" type="button" id="gg-modal-ok" data-i18n="ui.ok">OK</button>
   </div>
 </div>

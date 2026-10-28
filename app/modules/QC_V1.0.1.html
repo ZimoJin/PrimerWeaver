@@ -1,51 +1,51 @@
 <section id="p-pqc" class="pane" style="position: relative; overflow: visible;">
   <div class="grid cols-2">
     <label style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible; margin-bottom: 8px;">
-      <strong>Forward primer (5'→3')</strong>
+      <strong data-i18n="qc.forwardPrimer">Forward primer (5'→3')</strong>
       <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
         <span style="display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.7rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
         <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 600px; padding: 14px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.6; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
-          <p style="margin: 0 0 8px 0;">Input or upload forward primers (FASTA format or raw sequences, one per line).</p>
-          <p style="margin: 0 0 8px 0;"><strong>Supported primer name formats:</strong></p>
+          <p style="margin: 0 0 8px 0;" data-i18n="qc.forwardHelp">Input or upload forward primers (FASTA format or raw sequences, one per line).</p>
+          <p style="margin: 0 0 8px 0;"><strong data-i18n="qc.supportedNames">Supported primer name formats:</strong></p>
           <ul style="margin: 4px 0 8px 20px; padding: 0; list-style: disc;">
-            <li style="margin-bottom: 4px;">Target1-F / Target1-R (with dash)</li>
-            <li style="margin-bottom: 4px;">Target1_F / Target1_R (with underscore)</li>
-            <li style="margin-bottom: 4px;">Target1F / Target1R (no separator)</li>
-            <li style="margin-bottom: 4px;">Target1-Forward / Target1-Reverse (full words)</li>
-            <li style="margin-bottom: 4px;">Target1_Forward / Target1_Reverse (full words with underscore)</li>
-            <li style="margin-bottom: 4px;">Target1-fwd / Target1-rev (abbreviated)</li>
-            <li style="margin-bottom: 4px;">Target1_FWD / Target1_REV (uppercase abbreviated)</li>
+            <li style="margin-bottom: 4px;" data-i18n="qc.nameDash">Target1-F / Target1-R (with dash)</li>
+            <li style="margin-bottom: 4px;" data-i18n="qc.nameUnderscore">Target1_F / Target1_R (with underscore)</li>
+            <li style="margin-bottom: 4px;" data-i18n="qc.nameNone">Target1F / Target1R (no separator)</li>
+            <li style="margin-bottom: 4px;" data-i18n="qc.nameWords">Target1-Forward / Target1-Reverse (full words)</li>
+            <li style="margin-bottom: 4px;" data-i18n="qc.nameWordsUnderscore">Target1_Forward / Target1_Reverse (full words with underscore)</li>
+            <li style="margin-bottom: 4px;" data-i18n="qc.nameAbbreviated">Target1-fwd / Target1-rev (abbreviated)</li>
+            <li style="margin-bottom: 4px;" data-i18n="qc.nameUppercase">Target1_FWD / Target1_REV (uppercase abbreviated)</li>
           </ul>
-          <p style="margin: 8px 0 0 0; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.2);">The tool will perform quality checks on each primer set.</p>
+          <p style="margin: 8px 0 0 0; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.2);" data-i18n="qc.qualityChecks">The tool will perform quality checks on each primer set.</p>
           <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
         </span>
       </span>
     </label>
-    <div style="display:flex; align-items:center; justify-content:space-between; gap: 8px;">
+    <div class="qc-reverse-heading">
       <label style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible; margin-bottom: 8px; margin: 0;">
-        <strong>Reverse primer (5'→3')</strong>
+        <strong data-i18n="qc.reversePrimer">Reverse primer (5'→3')</strong>
         <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
           <span style="display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.7rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
           <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 600px; padding: 14px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.6; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
-            <p style="margin: 0 0 8px 0;">Input or upload reverse primers (FASTA format or raw sequences, one per line).</p>
-            <p style="margin: 0 0 8px 0;"><strong>Supported primer name formats:</strong></p>
+            <p style="margin: 0 0 8px 0;" data-i18n="qc.reverseHelp">Input or upload reverse primers (FASTA format or raw sequences, one per line).</p>
+            <p style="margin: 0 0 8px 0;"><strong data-i18n="qc.supportedNames">Supported primer name formats:</strong></p>
             <ul style="margin: 4px 0 8px 20px; padding: 0; list-style: disc;">
-              <li style="margin-bottom: 4px;">Target1-F / Target1-R (with dash)</li>
-              <li style="margin-bottom: 4px;">Target1_F / Target1_R (with underscore)</li>
-              <li style="margin-bottom: 4px;">Target1F / Target1R (no separator)</li>
-              <li style="margin-bottom: 4px;">Target1-Forward / Target1-Reverse (full words)</li>
-              <li style="margin-bottom: 4px;">Target1_Forward / Target1_Reverse (full words with underscore)</li>
-              <li style="margin-bottom: 4px;">Target1-fwd / Target1-rev (abbreviated)</li>
-              <li style="margin-bottom: 4px;">Target1_FWD / Target1_REV (uppercase abbreviated)</li>
+              <li style="margin-bottom: 4px;" data-i18n="qc.nameDash">Target1-F / Target1-R (with dash)</li>
+              <li style="margin-bottom: 4px;" data-i18n="qc.nameUnderscore">Target1_F / Target1_R (with underscore)</li>
+              <li style="margin-bottom: 4px;" data-i18n="qc.nameNone">Target1F / Target1R (no separator)</li>
+              <li style="margin-bottom: 4px;" data-i18n="qc.nameWords">Target1-Forward / Target1-Reverse (full words)</li>
+              <li style="margin-bottom: 4px;" data-i18n="qc.nameWordsUnderscore">Target1_Forward / Target1_Reverse (full words with underscore)</li>
+              <li style="margin-bottom: 4px;" data-i18n="qc.nameAbbreviated">Target1-fwd / Target1-rev (abbreviated)</li>
+              <li style="margin-bottom: 4px;" data-i18n="qc.nameUppercase">Target1_FWD / Target1_REV (uppercase abbreviated)</li>
             </ul>
-            <p style="margin: 8px 0 0 0; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.2);">The tool will perform quality checks on each primer set.</p>
+            <p style="margin: 8px 0 0 0; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.2);" data-i18n="qc.qualityChecks">The tool will perform quality checks on each primer set.</p>
             <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
           </span>
         </span>
       </label>
-      <div style="display:flex; gap:8px; align-items:center; flex-shrink: 0;">
-        <button class="demo btn" id="demo-set-btn" type="button">Demo Set</button>
-        <button class="ghost btn" id="global-reset" type="button">Reset</button>
+      <div class="module-primary-actions">
+        <button class="demo btn" id="demo-set-btn" type="button" data-i18n="qc.demoSet">Demo Set</button>
+        <button class="ghost btn" id="global-reset" type="button" data-i18n="qc.reset">Reset</button>
       </div>
     </div>
   </div>
@@ -55,18 +55,18 @@
       <textarea id="fwd" placeholder=">primer1-F&#10;ATGGTGAGRAAGGGCGAGGAG&#10;>primer2-F&#10;GCTACCGTAACTGCGTAGCAA"></textarea>
       <div class="row end" style="margin-top:6px">
         <input type="file" id="file-fwd" accept=".fa,.fasta,.fas,.txt" style="display:none">
-        <button type="button" class="btn demo" id="fwdRC">Reverse complement</button>
-        <button class="btn demo" id="btn-fwd-demo" type="button">Demo</button>
-        <button class="ghost btn" id="btn-fwd-upload" type="button">Upload</button>
+        <button type="button" class="btn demo" id="fwdRC" data-i18n="qc.reverseComplement">Reverse complement</button>
+        <button class="btn demo" id="btn-fwd-demo" type="button" data-i18n="qc.demo">Demo</button>
+        <button class="ghost btn" id="btn-fwd-upload" type="button" data-i18n="qc.upload">Upload</button>
       </div>
     </div>
     <div>
       <textarea id="rev" placeholder=">primer1-R&#10;CTTGTACAGCTCGTCCATGCC&#10;>primer2-R&#10;TTGCTACGCAGTTACGGTAGC"></textarea>
       <div class="row end" style="margin-top:6px">
         <input type="file" id="file-rev" accept=".fa,.fasta,.fas,.txt" style="display:none">
-        <button type="button" class="btn demo" id="revRC">Reverse complement</button>
-        <button class="btn demo" id="btn-rev-demo" type="button">Demo</button>
-        <button class="ghost btn" id="btn-rev-upload" type="button">Upload</button>
+        <button type="button" class="btn demo" id="revRC" data-i18n="qc.reverseComplement">Reverse complement</button>
+        <button class="btn demo" id="btn-rev-demo" type="button" data-i18n="qc.demo">Demo</button>
+        <button class="ghost btn" id="btn-rev-upload" type="button" data-i18n="qc.upload">Upload</button>
       </div>
     </div>
   </div>
@@ -75,11 +75,11 @@
     <div class="qc-preset-group">
       <div class="qc-preset-main" style="position: relative; overflow: visible;">
         <label class="aside" for="qc-preset-select" style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible; margin: 0 0 6px 0; white-space: nowrap;">
-          <span>Parameter preset</span>
+          <span data-i18n="qc.preset">Parameter preset</span>
           <span class="help-icon">
             <span>?</span>
             <span class="help-tooltip" style="top: calc(100% + 10px); left: 0; width: 320px;">
-              <p style="margin: 0;">Save commonly used Primer QC parameter sets in this browser. Select a preset to load it, then use "Set as Startup Default" if you want it to open automatically next time.</p>
+              <p style="margin: 0;" data-i18n="qc.presetHelp">Save commonly used Primer QC parameter sets in this browser. Select a preset to load it, then use "Set as Startup Default" if you want it to open automatically next time.</p>
               <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
             </span>
           </span>
@@ -87,10 +87,10 @@
         <select id="qc-preset-select"></select>
       </div>
       <div class="qc-preset-actions">
-        <button class="btn demo" id="qc-preset-save" type="button">Save as New</button>
-        <button class="btn demo" id="qc-preset-update" type="button">Update</button>
-        <button class="btn ghost" id="qc-preset-delete" type="button">Delete</button>
-        <button class="btn" id="qc-preset-set-default" type="button">Set as Startup Default</button>
+        <button class="btn demo" id="qc-preset-save" type="button" data-i18n="qc.saveNew">Save as New</button>
+        <button class="btn demo" id="qc-preset-update" type="button" data-i18n="qc.update">Update</button>
+        <button class="btn ghost" id="qc-preset-delete" type="button" data-i18n="qc.delete">Delete</button>
+        <button class="btn" id="qc-preset-set-default" type="button" data-i18n="qc.setDefault">Set as Startup Default</button>
       </div>
     </div>
   </div>
@@ -103,11 +103,11 @@
 
 
 
-        <span>Na⁺ (mM)</span>
+        <span data-i18n="qc.sodium">Na⁺ (mM)</span>
         <span class="help-icon">
           <span>?</span>
           <span class="help-tooltip" style="top: calc(100% + 10px); left: 0; width: 280px;">
-            <p style="margin: 0;">Monovalent cation concentration used for salt-corrected Tm calculation. Typical range: 10-200 mM.</p>
+            <p style="margin: 0;" data-i18n="qc.sodiumHelp">Monovalent cation concentration used for salt-corrected Tm calculation. Typical range: 10-200 mM.</p>
             <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
           </span>
         </span>
@@ -118,11 +118,11 @@
       <label class="aside" style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible;">
 
 
-        <span>Mg²⁺ (mM)</span>
+        <span data-i18n="qc.magnesium">Mg²⁺ (mM)</span>
         <span class="help-icon">
           <span>?</span>
           <span class="help-tooltip" style="top: calc(100% + 10px); left: 0; width: 280px;">
-            <p style="margin: 0;">Divalent cation concentration used for Tm calculation. Set to 0 if Mg²⁺ is absent from reaction. Typical range: 0.5-5 mM.</p>
+            <p style="margin: 0;" data-i18n="qc.magnesiumHelp">Divalent cation concentration used for Tm calculation. Set to 0 if Mg²⁺ is absent from reaction. Typical range: 0.5-5 mM.</p>
             <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
           </span>
         </span>
@@ -132,11 +132,11 @@
     <div style="position: relative; overflow: visible;">
       <label class="aside" style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible;">
 
-        <span>Primer conc. (nM)</span>
+        <span data-i18n="qc.concentration">Primer conc. (nM)</span>
         <span class="help-icon">
           <span>?</span>
           <span class="help-tooltip" style="top: calc(100% + 10px); left: 0; width: 280px;">
-            <p style="margin: 0;">Effective primer concentration assumed for in silico Tm calculation. Typical range: 25-1000 nM.</p>
+            <p style="margin: 0;" data-i18n="qc.concentrationHelp">Effective primer concentration assumed for in silico Tm calculation. Typical range: 25-1000 nM.</p>
             <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
           </span>
         </span>
@@ -149,11 +149,11 @@
 
 
 
-        <span>Target Tm (°C)</span>
+        <span data-i18n="qc.targetTm">Target Tm (°C)</span>
         <span class="help-icon">
           <span>?</span>
           <span class="help-tooltip" style="top: calc(100% + 10px); left: 0; width: 280px;">
-            <p style="margin: 0;">Target melting temperature for evaluation. Tm values of evaluated primers are compared against this reference to assess annealing compatibility. Typical range: 50-65°C.</p>
+            <p style="margin: 0;" data-i18n="qc.targetTmHelp">Target melting temperature for evaluation. Tm values of evaluated primers are compared against this reference to assess annealing compatibility. Typical range: 50-65°C.</p>
             <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
           </span>
         </span>
@@ -163,8 +163,8 @@
   </div>
 
   <div class="row" style="margin-top:20px; justify-content: space-between;">
-    <button class="btn" id="run">Run QC</button>
-    <button class="btn ghost" id="clear">Clear</button>
+    <button class="btn" id="run" data-i18n="qc.run">Run QC</button>
+    <button class="btn ghost" id="clear" data-i18n="qc.clear">Clear</button>
   </div>
 
   <div id="results" style="margin-top:12px;"></div>
@@ -266,9 +266,16 @@
 .qc-preset-main select{
   width:100%;
 }
+.qc-reverse-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  flex-wrap:wrap;
+}
 .qc-preset-actions{
   display:flex;
-  flex-wrap:nowrap;
+  flex-wrap:wrap;
   align-items:center;
   gap:8px;
   justify-content:flex-end;

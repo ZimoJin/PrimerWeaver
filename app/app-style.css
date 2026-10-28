@@ -1,9 +1,14 @@
 /* app-style.css */
 :root { color-scheme: light dark; }
 
+html {
+  background-color: var(--card, #ffffff);
+}
+
 body {
-  /* THIS IS THE FIX: Makes the app background blend in */
-  background-color: transparent !important;
+  /* Match the parent shell card. Transparent left a white canvas under
+     dark-mode labels, so "Vector sequence" became white-on-white. */
+  background-color: var(--card, #ffffff);
   
   /* These are sensible defaults */
   padding: 1rem;
@@ -15,6 +20,29 @@ body {
   overflow-y: scroll;
   /* Prevent horizontal scroll from overflowing tooltips/elements */
   overflow-x: hidden;
+}
+
+.module-primary-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+:lang(ko) body,
+:lang(ko) button,
+:lang(ko) input,
+:lang(ko) select,
+:lang(ko) textarea {
+  font-family: system-ui, "Segoe UI", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+}
+
+:lang(zh) body,
+:lang(zh) button,
+:lang(zh) input,
+:lang(zh) select,
+:lang(zh) textarea {
+  font-family: system-ui, "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
 }
 
 /*
@@ -31,6 +59,10 @@ body {
 textarea,select,input{width:100%;border:1px solid var(--line);border-radius:10px;padding:8px;background:#fff;font:inherit;margin:0}
 button{font:inherit}
 textarea{min-height:120px;resize:vertical}
+.help-tooltip {
+  max-width: calc(100vw - 32px);
+}
+
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .row.end{justify-content:flex-end}
 .btn{border:0;border-radius:8px;padding:5px 10px;font-size:14px;background:var(--brand);color:#fff;cursor:pointer}
@@ -807,7 +839,10 @@ button:focus-visible {
     --card:  #0f172a;
   }
 
-  body { color: var(--ink); }
+  html, body {
+    background-color: var(--card);
+    color: var(--ink);
+  }
 
   /* Primary buttons (Run QC, Open App, Design, etc.) — softer blue, no glow */
   .btn:not(.ghost):not(.demo) {
@@ -1154,7 +1189,9 @@ button:focus-visible {
   [style*="background:#f8f9fa"],
   [style*="background: #f8f9fa"],
   [style*="background:#f9fafb"],
-  [style*="background: #f9fafb"] {
+  [style*="background: #f9fafb"],
+  [style*="background:#f8fafc"],
+  [style*="background: #f8fafc"] {
     background: #1e293b !important;
     color: #e2e8f0 !important;
   }
@@ -1440,4 +1477,49 @@ button:focus-visible {
   }
   .btn:focus, .btn:active, button:focus, button:active { animation: fadeOutlineDark 0.7s forwards; }
   .btn:focus-visible, button:focus-visible { animation: fadeOutlineDark 0.7s forwards; }
+}
+
+/* Mobile: keep Demo Set / Reset above the vector column (they live in the
+   insert header on desktop, which stacks after the vector below 980px). */
+@media (max-width: 979px) {
+  .module-primary-actions {
+    order: -1;
+    display: flex !important;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    flex: 1 0 100%;
+    width: 100%;
+    margin-left: 0 !important;
+    margin-bottom: 10px;
+  }
+
+  #top-grid {
+    display: flex !important;
+    flex-direction: column;
+  }
+  #top-grid > #right-panel {
+    display: contents !important;
+  }
+  #top-grid > #right-panel > :first-child {
+    display: contents !important;
+  }
+
+  #p-pqc > .grid.cols-2:first-of-type {
+    display: flex !important;
+    flex-direction: column;
+  }
+  #p-pqc .qc-reverse-heading {
+    display: contents;
+  }
+
+  #integrated-workspace-pane .workspace-header-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  #integrated-workspace-pane .workspace-header-actions {
+    order: -1;
+    justify-content: flex-end;
+  }
 }

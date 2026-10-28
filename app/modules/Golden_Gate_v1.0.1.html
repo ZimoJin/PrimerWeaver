@@ -2,72 +2,72 @@
   <div class="grid cols-2" id="top-grid">
     <div id="left-panel">
       <label style="display:flex;align-items:center;gap:8px">
-        <strong>Vector sequence (FASTA)</strong>
-        <span class="help-icon" tabindex="0" aria-label="Help: Vector sequence">
+        <strong data-i18n="ui.vectorSequence">Vector sequence (FASTA)</strong>
+        <span class="help-icon" tabindex="0" aria-label="Help: Vector sequence" data-i18n-aria-label="ui.helpVector">
           <span>?</span>
-          <span class="help-tooltip">
+          <span class="help-tooltip" data-i18n-html="ui.vectorHelpHtml">
             <strong style="display:block;margin-bottom:6px;">Vector sequence input</strong>
-            <strong>Formats:</strong> FASTA (optional <code>&gt;</code>), plain DNA, or GenBank (<code>.gb</code>, <code>.gbk</code>, <code>.gbff</code>, <code>.genbank</code>) with <code>LOCUS</code> and <code>ORIGIN</code>. The <strong>LOCUS</strong> name is used as the short sequence name. <strong>Upload</strong> without a header uses the <strong>file name</strong> (no extension) as <code>&gt;</code>name. SnapGene <code>.dna</code> is binary—export as GenBank or FASTA first. Whitespace ignored. Use Upload or Reverse complement as needed.
+            <strong>Formats:</strong> FASTA (optional <code>&gt;</code>), plain DNA, or GenBank (<code>.gb</code>, <code>.gbk</code>, <code>.gbff</code>, <code>.genbank</code>) with <code>LOCUS</code> and <code>ORIGIN</code>. The <strong>LOCUS</strong> name is used as the short sequence name. <strong data-i18n="ui.upload">Upload</strong> without a header uses the <strong>file name</strong> (no extension) as <code>&gt;</code>name. SnapGene <code>.dna</code> is binary—export as GenBank or FASTA first. Whitespace ignored. Use Upload or Reverse complement as needed.
           </span>
         </span>
       </label>
       <textarea id="gg-vector" placeholder=">pSE_multi_AmpR&#10;tgtacGTGGTCTCGTCTTC" style="min-height:220px"></textarea>
       <div class="row end" id="left-upload-row">
         <input type="file" id="file-vector" accept=".fa,.fasta,.fas,.txt,.gb,.gbk,.gbff,.genbank" style="display:none">
-          <button class="btn demo" id="btn-vector-rc" type="button">Reverse complement</button>
-          <button class="btn demo" id="btn-vector-demo" type="button">Demo</button>
-          <button class="ghost btn" id="btn-vector-upload" type="button">Upload</button>
+          <button class="btn demo" id="btn-vector-rc" type="button" data-i18n="ui.reverseComplement">Reverse complement</button>
+          <button class="btn demo" id="btn-vector-demo" type="button" data-i18n="ui.demo">Demo</button>
+          <button class="ghost btn" id="btn-vector-upload" type="button" data-i18n="ui.upload">Upload</button>
       </div>
     </div>
     <div id="right-panel">
       <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom: 8px;">
         <label style="display:flex;align-items:center;gap:8px; margin:0">
-          <strong>Insert sequence (FASTA)</strong>
-          <span class="help-icon" tabindex="0" aria-label="Help: Insert sequence">
+          <strong data-i18n="ui.insertSequence">Insert sequence (FASTA)</strong>
+          <span class="help-icon" tabindex="0" aria-label="Help: Insert sequence" data-i18n-aria-label="ui.helpInsert">
             <span>?</span>
-            <span class="help-tooltip">
+            <span class="help-tooltip" data-i18n-html="gg.insertHelpHtml">
               <strong style="display:block;margin-bottom:6px;">Insert sequences</strong>
               Same formats as vector (FASTA, plain DNA, GenBank <code>.gb</code>/<code>.gbk</code>/<code>.gbff</code>/<code>.genbank</code>; file name as header when missing). Add fragments in order. The tool designs Type IIS primers and 4-bp overhangs for Golden Gate with the selected enzyme.
             </span>
           </span>
         </label>
-        <div style="display:flex; gap:8px; align-items:center; flex-shrink:0;">
-          <button class="demo btn" id="demo-set-btn" type="button">Demo Set</button>
-          <button class="ghost btn" id="global-reset" type="button">Reset</button>
+        <div class="module-primary-actions">
+          <button class="demo btn" id="demo-set-btn" type="button" data-i18n="ui.demoSet">Demo Set</button>
+          <button class="ghost btn" id="global-reset" type="button" data-i18n="ui.reset">Reset</button>
         </div>
       </div>
       <div class="row" style="justify-content:flex-end;margin-bottom:6px;gap:6px">
         <button class="ghost btn" id="flip-order" type="button"
-          title="Reverse the order of inserts without changing sequences">Flip order</button>
-        <button class="ghost btn" id="frag-add" type="button">+ Add insert</button>
+          title="Reverse the order of inserts without changing sequences" data-i18n-title="ui.flipOrderTitle" data-i18n="ui.flipOrder">Flip order</button>
+        <button class="ghost btn" id="frag-add" type="button" data-i18n="ui.addInsert">+ Add insert</button>
       </div>
       <div id="frag-list">
         <div class="frag-row" data-frag-id="0">
-          <div class="frag-label">Insert #1</div>
+          <div class="frag-label" data-i18n="ui.insertOne">Insert #1</div>
           <div class="frag-body">
             <div class="frag-overlap frag-overlap-top" style="margin-bottom:6px;">
-              <label class="aside frag-left-overhang-label">Left overhang (auto from vector, 4 bp)</label>
-              <input class="frag-left-overhang" type="text" spellcheck="false" autocomplete="off" maxlength="4" placeholder="Auto" readonly style="max-width:200px;font-family:'Courier New',monospace;background:#f8fafc;">
+              <label class="aside frag-left-overhang-label" data-i18n="gg.leftOverhangAuto">Left overhang (auto from vector, 4 bp)</label>
+              <input class="frag-left-overhang" type="text" spellcheck="false" autocomplete="off" maxlength="4" placeholder="Auto" data-i18n-placeholder="ui.autoPlaceholder" readonly style="max-width:200px;font-family:'Courier New',monospace;background:#f8fafc;">
             </div>
             <textarea class="frag-seq" placeholder=">insert&#10;ATG..." style="min-height:100px"></textarea>
             <div class="frag-overlap frag-overlap-bottom" style="margin-top:6px;">
-              <label class="aside frag-right-overhang-label">Right overhang (effective, 4 bp)</label>
-              <input class="frag-right-overhang" type="text" spellcheck="false" autocomplete="off" maxlength="4" placeholder="Auto" readonly style="max-width:200px;font-family:'Courier New',monospace;background:#f8fafc;">
+              <label class="aside frag-right-overhang-label" data-i18n="gg.rightOverhangEffective">Right overhang (effective, 4 bp)</label>
+              <input class="frag-right-overhang" type="text" spellcheck="false" autocomplete="off" maxlength="4" placeholder="Auto" data-i18n-placeholder="ui.autoPlaceholder" readonly style="max-width:200px;font-family:'Courier New',monospace;background:#f8fafc;">
             </div>
             <div class="frag-tools" style="display: flex; flex-direction: column; margin-top: 6px;">
               <div class="row end">
                 <input type="file" class="file-frag" accept=".fa,.fasta,.fas,.txt,.gb,.gbk,.gbff,.genbank" style="display:none">
-                <button class="btn demo btn-frag-flip" type="button" title="Reverse-complement this insert">Reverse complement</button>
-                <button class="btn demo btn-frag-demo" type="button">Demo</button>
-                <button class="ghost btn btn-frag-upload" type="button">Upload</button>
+                <button class="btn demo btn-frag-flip" type="button" title="Reverse-complement this insert" data-i18n-title="ui.rcInsertTitle" data-i18n="ui.reverseComplement">Reverse complement</button>
+                <button class="btn demo btn-frag-demo" type="button" data-i18n="ui.demo">Demo</button>
+                <button class="ghost btn btn-frag-upload" type="button" data-i18n="ui.upload">Upload</button>
               </div>
             </div>
           </div>
           <div></div>
           <div class="frag-actions" style="width: 100%;">
-            <button class="ghost btn sm up" type="button" title="Move up" style="width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">▲</button>
-            <button class="ghost btn sm down" type="button" title="Move down" style="width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">▼</button>
-            <button class="ghost btn sm del" type="button" title="Delete" style="width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">×</button>
+            <button class="ghost btn sm up" type="button" title="Move up" data-i18n-title="ui.moveUp" style="width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">▲</button>
+            <button class="ghost btn sm down" type="button" title="Move down" data-i18n-title="ui.moveDown" style="width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">▼</button>
+            <button class="ghost btn sm del" type="button" title="Delete" data-i18n-title="ui.delete" style="width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">×</button>
           </div>
         </div>
       </div>
@@ -79,11 +79,11 @@
     <div class="box" id="gg-map-box">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
         <div>
-          <h3 style="margin:0;">Vector map preview</h3>
-          <div class="aside">Auto-draws circular plasmid map from vector sequence</div>
+          <h3 style="margin:0;" data-i18n="ui.vectorMapPreview">Vector map preview</h3>
+          <div class="aside" data-i18n="ui.vectorMapAside">Auto-draws circular plasmid map from vector sequence</div>
         </div>
         <div style="display:flex;gap:6px;align-items:center;">
-          <span class="aside">Rotate</span>
+          <span class="aside" data-i18n="ui.rotate">Rotate</span>
           <input id="gg-map-rotation" type="range" min="-180" max="180" value="0" step="1" style="width:130px;">
           <span id="gg-map-rot-label" class="aside">0°</span>
         </div>
@@ -91,17 +91,17 @@
       <div style="display:flex;justify-content:center;">
         <canvas id="gg-map-canvas" width="520" height="320" class="asm-figure"></canvas>
       </div>
-      <div id="gg-map-stats" class="aside" style="margin-top:4px;text-align:center">Paste vector sequence above to update preview.</div>
+      <div id="gg-map-stats" class="aside" style="margin-top:4px;text-align:center" data-i18n="ui.pasteVectorPreview">Paste vector sequence above to update preview.</div>
     </div>
     <div class="box" id="gg-settings-box">
-      <h3>Assembly settings</h3>
+      <h3 data-i18n="ui.assemblySettings">Assembly settings</h3>
       <div class="assembly-preset-toolbar">
         <div class="assembly-preset-main">
           <label class="aside" for="assembly-preset-select" style="display:flex;align-items:center;gap:6px;">
-            <span>Parameter preset</span>
+            <span data-i18n="ui.preset">Parameter preset</span>
             <span class="help-icon">
               <span>?</span>
-              <span class="help-tooltip">
+              <span class="help-tooltip" data-i18n-html="ui.presetHelpAssembly">
                 Save commonly used assembly settings in this browser. Select a preset to reuse it, or set one as the startup default for next time.
               </span>
             </span>
@@ -109,40 +109,40 @@
           <select id="assembly-preset-select" class="assembly-preset-select"></select>
         </div>
         <div class="assembly-preset-actions">
-          <button class="btn demo assembly-preset-save" type="button">Save as New</button>
-          <button class="btn demo assembly-preset-update" type="button">Update</button>
-          <button class="btn ghost assembly-preset-delete" type="button">Delete</button>
-          <button class="btn assembly-preset-set-default" type="button">Set as Startup Default</button>
+          <button class="btn demo assembly-preset-save" type="button" data-i18n="ui.saveNew">Save as New</button>
+          <button class="btn demo assembly-preset-update" type="button" data-i18n="ui.update">Update</button>
+          <button class="btn ghost assembly-preset-delete" type="button" data-i18n="ui.delete">Delete</button>
+          <button class="btn assembly-preset-set-default" type="button" data-i18n="ui.setDefault">Set as Startup Default</button>
         </div>
       </div>
       <!-- Enzyme selection row -->
       <div class="grid cols-2" style="margin-top:8px;gap:12px">
         <div>
-          <label class="aside">Type IIS enzyme</label>
+          <label class="aside" data-i18n="gg.typeIis">Type IIS enzyme</label>
           <select id="gg-enzyme">
-            <option value="">Please select enzyme...</option>
-            <option value="Esp3I">Esp3I / BsmBI / Eco31I (CGTCTC)</option>
-            <option value="BsaI">BsaI (GGTCTC)</option>
-            <option value="BbsI">BbsI (GAAGAC)</option>
-            <option value="PaqCI">PaqCI (CACCTGC)</option>
+            <option value="" data-i18n="gg.selectEnzyme">Please select enzyme...</option>
+            <option value="Esp3I" data-i18n="gg.esp3i">Esp3I / BsmBI / Eco31I (CGTCTC)</option>
+            <option value="BsaI" data-i18n="gg.bsai">BsaI (GGTCTC)</option>
+            <option value="BbsI" data-i18n="gg.bbsi">BbsI (GAAGAC)</option>
+            <option value="PaqCI" data-i18n="gg.paqci">PaqCI (CACCTGC)</option>
           </select>
         </div>
         <div>
-          <label class="aside">Detected enzyme (locked)</label>
+          <label class="aside" data-i18n="gg.detectedLocked">Detected enzyme (locked)</label>
           <select id="gg-enzyme-locked" disabled>
-            <option value="">Please select enzyme...</option>
-            <option value="Esp3I">Esp3I (CGTCTC)</option>
-            <option value="BsaI">BsaI (GGTCTC)</option>
-            <option value="BbsI">BbsI (GAAGAC)</option>
-            <option value="PaqCI">PaqCI (CACCTGC)</option>
+            <option value="" data-i18n="gg.selectEnzyme">Please select enzyme...</option>
+            <option value="Esp3I" data-i18n="gg.esp3iShort">Esp3I (CGTCTC)</option>
+            <option value="BsaI" data-i18n="gg.bsai">BsaI (GGTCTC)</option>
+            <option value="BbsI" data-i18n="gg.bbsi">BbsI (GAAGAC)</option>
+            <option value="PaqCI" data-i18n="gg.paqci">PaqCI (CACCTGC)</option>
           </select>
         </div>
       </div>
       <!-- Backbone fragment selector -->
       <div style="margin-top:8px">
-        <label class="aside">Vector backbone fragment</label>
+        <label class="aside" data-i18n="ui.vectorBackbone">Vector backbone fragment</label>
         <select id="gg-backbone-select" disabled>
-          <option value="">Analyze vector first...</option>
+          <option value="" data-i18n="gg.analyzeFirst">Analyze vector first...</option>
         </select>
       </div>
       <!-- Enzyme info display -->
@@ -150,39 +150,39 @@
       <!-- Parameters row -->
       <div class="grid cols-3" style="margin-top:10px;gap:12px">
         <div>
-          <label class="aside">Protective (5′)</label>
+          <label class="aside" data-i18n="gg.protective5">Protective (5′)</label>
           <input id="gg-clamp" type="number" value="5" min="0" max="10" step="1"/>
         </div>
         <div>
-          <label class="aside">Target Tm (°C)</label>
+          <label class="aside" data-i18n="ui.targetTm">Target Tm (°C)</label>
           <input id="gg-tmTarget" type="number" value="55" step="0.1"/>
         </div>
         <div>
-          <label class="aside">Primer conc. (nM)</label>
+          <label class="aside" data-i18n="ui.primerConc">Primer conc. (nM)</label>
           <input id="gg-conc" type="number" value="500" step="10"/>
         </div>
       </div>
       <div class="grid cols-2" style="margin-top:12px;gap:12px">
         <div>
-          <label class="aside">Na⁺ (mM)</label>
+          <label class="aside" data-i18n="ui.sodium">Na⁺ (mM)</label>
           <input id="gg-na" type="number" value="50" step="1"/>
         </div>
         <div>
-          <label class="aside">Mg²⁺ (mM)</label>
+          <label class="aside" data-i18n="ui.magnesium">Mg²⁺ (mM)</label>
           <input id="gg-mg" type="number" value="2.0" min="0" step="0.5"/>
         </div>
       </div>
       <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
         <div class="row" style="gap:8px;flex-wrap:nowrap">
-          <button class="btn" id="gg-run">Design Golden Gate Primers</button>
+          <button class="btn" id="gg-run" data-i18n="gg.design">Design Golden Gate Primers</button>
           <select id="gg-download-type" class="ghost btn" style="min-width: 110px; width: auto;">
-            <option value="primers">Primer.txt</option>
-            <option value="fasta">Assembled.fasta</option>
+            <option value="primers" data-i18n="gg.primerTxtCap">Primer.txt</option>
+            <option value="fasta" data-i18n="gg.assembledFastaCap">Assembled.fasta</option>
           </select>
-          <button class="ghost btn" id="gg-download-btn">Download</button>
+          <button class="ghost btn" id="gg-download-btn" data-i18n="ui.download">Download</button>
         </div>
       </div>
-      <button class="ghost btn" id="gg-clear" style="margin-left: auto; margin-top: auto;">Clear</button>
+      <button class="ghost btn" id="gg-clear" style="margin-left: auto; margin-top: auto;" data-i18n="ui.clear">Clear</button>
     </div>
   </div>
 
@@ -195,7 +195,7 @@
 <!-- Modal Dialog -->
 <div id="gg-modal" class="modal-overlay">
   <div class="modal-card">
-    <p id="gg-modal-text">Please design primers first.</p>
-    <button class="btn" type="button" id="gg-modal-ok">OK</button>
+    <p id="gg-modal-text" data-i18n="ui.designFirst">Please design primers first.</p>
+    <button class="btn" type="button" id="gg-modal-ok" data-i18n="ui.ok">OK</button>
   </div>
 </div>

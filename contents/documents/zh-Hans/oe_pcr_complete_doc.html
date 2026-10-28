@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>重叠延伸 PCR - PrimerWeaver V1.0.6</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #333;
+            background: #f9fafb;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e40af;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2563eb;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            font-size: 1.5em;
+        }
+        h3 {
+            color: #3b82f6;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            font-size: 1.2em;
+        }
+        h4 {
+            color: #60a5fa;
+            margin-top: 1.2em;
+            margin-bottom: 0.6em;
+        }
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 1em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        strong {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c2410c;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .abstract {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+        .abstract p {
+            margin: 0;
+            font-style: italic;
+        }
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .section {
+            margin-bottom: 2.5em;
+        }
+        .version-info {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+            margin-top: 3em;
+            padding-top: 2em;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>重叠延伸 PCR</h1>
+        
+        <div class="abstract">
+            <p>重叠 PCR（或重叠延伸 PCR，OE-PCR）模块通过对含互补重叠序列的引物进行合理设计，实现多个 DNA 片段的无疤痕组装。该工具会自动为每个片段设计引物对，在片段之间纳入用户指定的接头序列（DNA 或氨基酸），并优化重叠区长度和熔解温度以提高组装效率。该方法尤其适用于构建融合蛋白、连接模块化遗传元件，以及在无需限制性酶切位点的情况下创建嵌合序列。</p>
+        </div>
+
+        <div class="section">
+            <h2>快速入门指南</h2>
+            
+            <ol>
+                <li>按所需组装顺序添加 2 个或更多 FASTA 或纯文本格式的 DNA 片段。片段名称将从 FASTA 标题中自动提取，便于识别。可选择在片段之间指定接头序列（DNA 或氨基酸），调整设计参数（核心 Tm、重叠区 Tm、盐浓度），并为末端引物添加可选的 5′ 序列（例如限制性酶切位点或亲和标签）。</li>
+                
+                <div style="text-align: center; margin: 2em 0;">
+                    <img
+                        src="contents/pictures/oe_PCR_demo.png"
+                        alt="OE-PCR 片段输入界面"
+                        style="max-width: 90%; height: auto; border-radius: 8px;"
+                    >
+                </div>
+                
+                
+                
+                <li>单击“设计引物”以自动设计带有优化重叠区的引物对。检查引物序列、熔解温度、质量指标和预测的组装序列。结果可下载为 FASTA 格式。</li>
+                
+
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>重叠 PCR 原理</h2>
+            
+            <p>重叠 PCR 是一种通过设计含互补重叠区的引物，将多个 DNA 片段无疤痕组装的分子生物学技术。重叠 PCR 的流程包含多轮 PCR：初始轮次用重叠引物序列扩增各个片段，随后在组装 PCR 中，重叠片段退火并由 DNA 聚合酶延伸，从而在接头处形成无缺口、无额外序列的连续产物。</p>
+
+                        
+            <h3>关键设计原则</h3>
+            
+            
+            <p>重叠 PCR 引物设计遵循<strong>两阶段热力学策略</strong>，以分别满足片段扩增和重叠延伸的不同要求：</p>
+            <ul>
+                <li><strong>核心区（模板结合）：</strong>与模板互补的区域会被优化至用户设定的<strong>核心 Tm</strong>（通常为 55–65 °C），以确保第一步 PCR 中各片段扩增稳健且特异。</li>
+                <li><strong>重叠区（由延伸驱动）：</strong>重叠区用于在延伸 PCR 中支持相邻 PCR 产物之间的稳定退火，此时重叠片段互为引物。该区域的热力学稳定性直接决定重叠延伸效率和全长产物形成。</li>
+            </ul>
+            <p>通过独立优化这两个区域，本模块既能可靠扩增各个片段，又能最大限度地提高重叠延伸步骤的效率和特异性。</p>
+
+        </div>
+
+        <div class="section">
+            <h2>输入格式</h2>
+            
+            <p>本模块接受<strong>FASTA 或纯文本格式的 DNA 序列</strong>。可依次添加多个片段，并按用户指定的顺序组装。每个输入框仅允许<strong>一条序列</strong>；若检测到多个 FASTA 标题，将<strong>仅使用第一条序列</strong>。 </p>
+            
+            <p>可选的<strong>自定义重叠序列</strong>可附加到第一条正向引物和最后一条反向引物的 5′ 端。可选的<strong>接头序列</strong>可插入片段之间，例如氨基酸（蛋白接头、亲和标签）或核苷酸序列（如限制性酶切位点、柔性间隔序列）。 </p>
+
+                <div style="text-align: center; margin: 2em 0;">
+                    <img
+                        src="contents/pictures/oe_PCR_input.png"
+                        alt="OE-PCR 输入序列"
+                        style="max-width: 60%; height: auto; border-radius: 8px;"
+                    >
+                </div>
+ <h3>片段管理</h3>
+            <ul>
+                <li><strong>添加/移除片段：</strong>添加多条 DNA 序列用于多片段组装（建议 2–10 个片段；更大的组装会更复杂）</li>
+                <li><strong>重排片段：</strong>使用界面控件调整组装顺序；顺序决定最终构建体的结构</li>
+                <li><strong>片段名称：</strong>从 FASTA 标题自动提取，便于清晰识别引物；并用于输出报告</li>
+                <li><strong>反向互补：</strong>必要时可切换单个片段，以匹配所需方向和组装走向</li>
+            </ul>
+        </div>
+
+
+        <div class="section">
+            <h2>设计参数</h2>
+            
+            <p>开始引物设计前，请检查并调整以下参数，使其与您的 PCR 条件和组装要求相符。</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>参数</th>
+                        <th>默认值</th>
+                        <th>范围</th>
+                        <th>说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>核心引物 Tm（°C）</strong></td>
+                        <td>55</td>
+                        <td>40–75</td>
+                        <td>引物核心（模板结合）区的目标熔解温度。 </td>
+                    </tr>
+                    <tr>
+                        <td><strong>重叠区 Tm（°C）</strong></td>
+                        <td>55</td>
+                        <td>40–75</td>
+                        <td>为片段间退火而设计的重叠区目标熔解温度。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>引物浓度（nM）</strong></td>
+                        <td>500</td>
+                        <td>50–2000</td>
+                        <td>计算机模拟 Tm 计算所采用的有效引物浓度。常用范围：25-1000 nM。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Na⁺ 浓度（mM）</strong></td>
+                        <td>50</td>
+                        <td>0–200</td>
+                        <td>用于经盐校正的 Tm 计算的单价阳离子浓度。常用范围：10-200 mM。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mg²⁺ 浓度（mM）</strong></td>
+                        <td>2.0</td>
+                        <td>0–10</td>
+                        <td>用于 Tm 计算的二价阳离子浓度。如果反应中不含 Mg²⁺，请设为 0。常用范围：0.5-5 mM。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>正向末端序列</strong></td>
+                        <td>—</td>
+                        <td>可选</td>
+                        <td>附加到 F1 引物（第一片段正向）5′ 端的自定义 DNA 序列。不纳入 Tm 计算。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>反向末端序列</strong></td>
+                        <td>—</td>
+                        <td>可选</td>
+                        <td>附加到 RN 引物（最后片段反向，经反向互补）5′ 端的自定义 DNA 序列。不纳入 Tm 计算。</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            
+        </div>
+
+        <div class="section">
+            <h2>结果与输出</h2>
+            
+            <p>引物设计完成后，重叠 PCR 模块会生成一套完整结果，以便进行实验验证和下游克隆。 </p>
+            
+            <h3>引物表</h3>
+            <p>设计好的引物对以结构化表格呈现，包含完整引物序列信息（5′→3′）、长度、GC 含量和熔解温度（Tm）。Tm 值分别显示退火核心区和重叠区，便于评估扩增兼容性。引物质量指标（包括同聚物连续序列、发夹结构、自身二聚体和交叉二聚体形成）会被评估并标记，以突出可能影响 PCR 性能的潜在风险。重叠区在引物序列中以粗体突出显示，便于查看。 <p>
+          
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/oe_PCR_output_results.png"
+                    alt="OE-PCR 引物设计表格结果"
+                    style="max-width: 70%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+            <h3>组装序列</h3>
+            <p>模块会生成预测的最终组装构建体，显示所有片段连接后的完整拼接序列。引物结合区会突出显示以便查看。请下载 FASTA 格式文件，用于序列验证和下游分析</p>
+            
+        </div>
+
+        <div class="section">
+            <h2>引物设计算法</h2>
+            
+            <h3>引物结构</h3>
+		<p>每条重叠 PCR 引物由两个功能区组成：</p>
+		<ul>
+  			<li><strong>退火核心（3′）：</strong>驱动退火和扩增的模板互补区（通常为 18–30 bp）。</li>
+  			<li><strong>重叠区（5′）：</strong>与相邻片段互补的序列，通过引物引入，用于重叠 PCR 中的片段–片段退火和延伸（通常为 18–30 bp）。 </li>
+		</ul>
+         
+            <h3>设计流程</h3>
+            <p>在重叠 PCR 引物设计过程中，系统首先按用户定义的顺序将所有输入片段拼接，并纳入指定的<strong>接头序列</strong>，从而构建<strong>组装后的目标序列</strong>。随后在该组装序列上识别相邻片段之间的接头，并且<strong>重叠区由其相对于最终构建体的位置坐标定义</strong>，而不是由独立片段序列定义。这些重叠区可根据接头长度和接头上下文部分或完全跨越接头序列，因此<strong>绝不会被截断或丢弃</strong>。</p>
+	     <p>接头位置和重叠边界确定后，系统会在接头上游或下游扫描相应的原始片段序列，为每条引物设计<strong>退火核心（模板结合区）</strong>。核心长度会迭代调整，以在满足质控约束的同时达到目标熔解温度。最后，通过将优化后的退火核心与其指定重叠区<strong>按位置拼接</strong>来构建全长 OE-PCR 引物，确保每条引物引入正确的接头上下文，并在重叠延伸过程中忠实重建组装后的目标序列。<p>
+
+            <h3>算法中的边界情况逻辑</h3>
+            <p>若干边界情况直接在引物设计算法内部处理，而不仅仅作为面向用户的警告。最重要的分支概述如下。</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>算法边界情况</th>
+                        <th>重叠 PCR 模块的当前处理方式</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>有效片段少于两个</strong></td>
+                        <td>工作流程在引物构建前停止。系统会先忽略空行，仅当剩余至少<strong>两个非空片段</strong>时才继续设计。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>相邻片段之间的长接头</strong></td>
+                        <td>如果接头足够长，算法会优先在<strong>接头内部</strong>搜索重叠。报告的重叠 Tm 随后主要由接头重叠区段决定，而不是由完整引物尾部决定。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>短接头或无接头</strong></td>
+                        <td>如果接头较短或不存在，重叠区会由接头序列与两侧相邻片段的侧翼序列组合而成，因此接头重叠可跨越片段–接头–片段上下文，而不属于单一来源区域。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>在首选接头设置下未找到理想重叠</strong></td>
+                        <td>算法不会立即失败。它会继续扫描备选重叠长度和局部接头位置，然后在放弃前回退到基于 Tm 接近程度和长度罚分的<strong>得分最高的可用重叠</strong>。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>用于核心设计的片段末端非常短</strong></td>
+                        <td>核心设计步骤通常会迭代扫描引物结合长度以逼近目标 Tm。如果片段末端附近的序列上下文有限，即使无法完全匹配理想 Tm 目标，模块也会回退使用最佳可用末端序列。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>连接引物的组装取决于接头类别</strong></td>
+                        <td><strong>R1</strong> 和 <strong>F2</strong> 的内部组成随接头长度而变化：对于长接头，重叠尾部以接头为主；对于短接头或空接头，尾部则分布在接头和相邻片段序列上。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>构建体末端的可选末端序列</strong></td>
+                        <td>用户提供的正向和反向末端序列在核心/重叠设计之后附加，且不参与热力学优化。反向末端序列以反向互补兼容的方向并入最终反向引物。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>氨基酸接头输入</strong></td>
+                        <td>如果接头以氨基酸形式提供，模块会先清理氨基酸字符串，再按所选密码子表将其转换为 DNA，然后才开始重叠设计。下游重叠算法始终在 DNA 序列上工作，而不是在氨基酸符号上工作。</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+    </div>
+        <div class="section">
+            <h2>警告与边界情况</h2>
+            <p>重叠 PCR 模块使用共享的 <strong>MW（Message Warning）</strong> 层进行序列规范化和参数预检，并在片段数量、接头转换或末端重叠选择需要用户注意时，额外提示 OE-PCR 特有的边界情况。</p>
+
+            <h3>一般警告</h3>
+            <p>这些警告大多出现在最终引物组生成之前，表示序列输入或参数选择存在问题。大多数情况下，用户可以修改输入，或使用规范化后的值继续。</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>类别</th>
+                        <th>触发条件</th>
+                        <th>重叠 PCR 模块的当前处理方式</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>阻断性输入提示</strong></td>
+                        <td>未提供有效片段，或在忽略空行后剩余少于<strong>两个非空片段</strong>。</td>
+                        <td>设计立即停止，并要求用户提供足够的片段序列以进行组装。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-04</strong><br>规范化后无有效序列</td>
+                        <td>移除 FASTA 标题并清理非 IUPAC 字符后，某片段变为空。</td>
+                        <td>用户仍可继续，但受影响的片段已无法支持有意义的引物设计。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-05</strong><br>已移除非 IUPAC 字符</td>
+                        <td>片段输入中存在不支持的字符。</td>
+                        <td>模块仅使用规范化后的 DNA 继续，并警告有效模板可能与最初粘贴的文本不同。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-06</strong><br>检测到简并碱基</td>
+                        <td>一个或多个片段含有歧义 IUPAC 碱基。</td>
+                        <td>热力学数值根据最稳定变体进行保守估算，因此显示的 Tm 和 ΔG 值应视为近似值。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-10 至 MW-15</strong><br>参数范围警告</td>
+                        <td>Na<sup>+</sup>、Mg<sup>2+</sup>、引物浓度或<strong>核心引物 Tm</strong> 超出建议或经验证的范围。</td>
+                        <td>模块仍可继续，但在这些条件下热力学预测的可靠性会降低。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-19</strong><br>输入总量较大</td>
+                        <td>各片段的总序列输入超过共享的浏览器端警告阈值。</td>
+                        <td>共享警告层会报告，对于非常大的总输入量，计算可能变慢，但用户仍可继续。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-20</strong><br>同一输入框中有多个 FASTA 标题</td>
+                        <td>任一片段文本框包含不止一条 FASTA 记录。</td>
+                        <td>共享 MW 对话框会警告每个输入框仅允许一条序列。如果用户继续，该输入框会在设计继续前被截取为<strong>第一条 FASTA 记录</strong>。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-22</strong><br>上传文件超过导入限制</td>
+                        <td>上传的片段文件大于 <strong>1 MB</strong>。</td>
+                        <td>导入会在加载序列前被阻止，用户必须选择较小的文件。</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>设计相关警告</h3>
+            <p>这些边界情况源自 OE-PCR 特有的设计逻辑，尤其是片段拼接、接头转换和末端重叠处理。</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>情况</th>
+                        <th>触发条件</th>
+                        <th>重叠 PCR 模块的当前处理方式</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>末端重叠长度警告</strong></td>
+                        <td>用户提供的<strong>正向末端序列</strong>或<strong>反向末端序列</strong>超出建议的 <strong>15–30 bp</strong> 范围。</td>
+                        <td>模块会发出 OE 专用 MW 提示，但仍允许继续设计，并警告过短的重叠可能降低组装效率，而过长的重叠可能增加非预期重组。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>氨基酸接头含有不支持的符号</strong></td>
+                        <td>氨基酸接头包含无效的氨基酸符号。</td>
+                        <td>模块会报告被忽略的字符，建议清理接头，然后使用清理后的氨基酸序列重试设计。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>氨基酸接头转换失败</strong></td>
+                        <td>无法用所选宿主密码子表将氨基酸接头翻译为 DNA。</td>
+                        <td>设计停止，并报告接头转换错误以便修正。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>依赖于接头长度的重叠策略</strong></td>
+                        <td>相邻片段之间的接头长度差异很大。</td>
+                        <td>接头较长时，重叠优先设计在接头序列内；接头较短或不存在时，重叠跨越接头及侧翼片段序列。这可能改变对报告重叠 Tm 有贡献的碱基。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>片段末端非常短</strong></td>
+                        <td>接头附近的模板序列过短，无法支持通常的迭代核心扫描。</td>
+                        <td>模块会回退使用可用末端序列作为核心区，这会降低优化自由度，并可能产生比通常更短的退火核心。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>质控标记属于结果级注释</strong></td>
+                        <td>引物生成后检测到发夹、二聚体、同聚物或相关引物质控问题。</td>
+                        <td>这些问题会以内联方式出现在结果表中，而不是作为独立 MW 对话框，因此最终解读应结合质控徽章、组装序列和重叠布局。</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <p><strong>实际解读：</strong>在重叠 PCR 中，警告并不一定意味着引物设计失败。许多警告反映的是输入规范化或设计启发式方法。请注意，<strong>重叠区 Tm</strong> 会影响接头设计，但共享 MW 范围检查针对的是<strong>核心引物 Tm</strong> 字段。因此，解读结果时应结合引物质控表、组装序列以及每个接头处的实际片段/接头上下文。</p>
+            </div>
+        </div>
+</body>
+</html>

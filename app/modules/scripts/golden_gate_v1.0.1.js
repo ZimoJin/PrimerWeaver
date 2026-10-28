@@ -2,7 +2,14 @@ import * as CORE from './core_v1.0.1.js';
 import * as VIZ from './bio_visuals_v1.0.1.js';
 import { setupAssemblyParameterPresets } from './assembly_parameter_presets_v1.0.1.js';
 
-function ensureHelpIcon(labelEl, tooltipHtml, ariaLabel = 'Help') {
+const t = (key, params, fallback) => (
+  window.PW_I18N ? window.PW_I18N.t(key, params, fallback) : (fallback || key)
+);
+const applyI18n = (root) => {
+  if (window.PW_I18N && root) window.PW_I18N.apply(root);
+};
+
+function ensureHelpIcon(labelEl, tooltipHtml, ariaLabel = t('ui.helpGeneric', null, 'Help')) {
   if (!labelEl) return;
   if (labelEl.querySelector && labelEl.querySelector('.help-icon')) return;
 
@@ -39,8 +46,8 @@ function initGoldenGate(container) {
 
   setupAssemblyParameterPresets(container || document, {
     scope: 'golden-gate-assembly',
-    label: 'Golden Gate assembly settings',
-    placeholder: 'e.g. Standard Golden Gate',
+    label: t('gg.presetLabel', null, 'Golden Gate assembly settings'),
+    placeholder: t('gg.presetPlaceholder', null, 'e.g. Standard Golden Gate'),
     fields: [
       { key: 'enzyme', selector: '#gg-enzyme', defaultValue: 'Esp3I' },
       { key: 'clamp', selector: '#gg-clamp', defaultValue: '5' },
@@ -1412,7 +1419,7 @@ function initGoldenGate(container) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
       }
       const statsEl = container.querySelector('#gg-map-stats');
-      if (statsEl) statsEl.textContent = 'Paste vector sequence above to update preview.';
+      if (statsEl) statsEl.textContent = t('ui.pasteVectorPreview', null, 'Paste vector sequence above to update preview.');
       return;
     }
     
@@ -1454,7 +1461,7 @@ function initGoldenGate(container) {
         // Also update stats text
         const statsEl = container.querySelector('#gg-map-stats');
         if(statsEl){
-            if(!len) statsEl.textContent = 'Paste vector sequence above to update preview.';
+            if(!len) statsEl.textContent = t('ui.pasteVectorPreview', null, 'Paste vector sequence above to update preview.');
             else if(len < 50) statsEl.textContent = 'Vector too short to draw map (' + len + ' bp).';
             else if(!sites.length) statsEl.textContent = len + ' bp; no Type IIS sites detected.';
             else {
@@ -1543,7 +1550,7 @@ function initGoldenGate(container) {
 
     // Require enzyme selection for fragment analysis
     if(!enz){
-      backboneSelect.innerHTML = '<option value="">Please select enzyme...</option>';
+      backboneSelect.innerHTML = '<option value="">' + t('gg.selectEnzyme', null, 'Please select enzyme...') + '</option>';
       backboneSelect.disabled = true;
       vectorFragments = [];
       updateFragOverhangInputs();
@@ -1551,7 +1558,7 @@ function initGoldenGate(container) {
     }
 
     if(!seq || seq.length < 50){
-      backboneSelect.innerHTML = '<option value="">Analyze vector first...</option>';
+      backboneSelect.innerHTML = '<option value="">' + t('gg.analyzeFirst', null, 'Analyze vector first...') + '</option>';
       backboneSelect.disabled = true;
       vectorFragments = [];
       updateFragOverhangInputs();
@@ -1600,7 +1607,7 @@ function initGoldenGate(container) {
     fragments.forEach((frag, i) => {
       const opt = document.createElement('option');
       opt.value = i;
-      opt.textContent = 'Fragment ' + (i+1) + ': ' + frag.len + ' bp';
+      opt.textContent = t('ui.fragmentN', {n: i+1, len: frag.len}, 'Fragment {n}: {len} bp');
       if(frag.len > longestLen){
         longestLen = frag.len;
         longestIdx = i;
@@ -1693,7 +1700,7 @@ function initGoldenGate(container) {
       if((container || document.body).querySelector('#mw-modal')) return;
       if(input.dataset.lastWarnedInvalidValue === value) return;
       input.dataset.lastWarnedInvalidValue = value;
-      showModal('Custom overhang must be exactly 4 bp.');
+      showModal(t('gg.customOverhang4bp', null, 'Custom overhang must be exactly 4 bp.'));
       return;
     }
     input.dataset.lastWarnedInvalidValue = '';
@@ -1749,19 +1756,19 @@ function initGoldenGate(container) {
       if(leftInput){
         if(isLeftAutoOverhang(idx)){
           activateAutoOverhang(leftInput, autoOH && autoOH.leftInsertOH ? autoOH.leftInsertOH : '', 'Auto');
-          if(leftLabel) leftLabel.textContent = 'Left overhang (vector sticky, 4 bp)';
+          if(leftLabel) leftLabel.textContent = t('gg.leftOverhangVector', null, 'Left overhang (vector sticky, 4 bp)');
         }else{
           activateCustomOverhang(leftInput);
-          if(leftLabel) leftLabel.textContent = 'Left overhang (custom, 4 bp)';
+          if(leftLabel) leftLabel.textContent = t('gg.leftOverhangCustom', null, 'Left overhang (custom, 4 bp)');
         }
       }
       if(rightInput){
         if(isRightAutoOverhang(idx, rows.length)){
           activateAutoOverhang(rightInput, autoOH && autoOH.rightInsertOH ? autoOH.rightInsertOH : '', 'Auto');
-          if(rightLabel) rightLabel.textContent = 'Right overhang (vector sticky, 4 bp)';
+          if(rightLabel) rightLabel.textContent = t('gg.rightOverhangVector', null, 'Right overhang (vector sticky, 4 bp)');
         }else{
           activateCustomOverhang(rightInput);
-          if(rightLabel) rightLabel.textContent = 'Right overhang (custom, 4 bp)';
+          if(rightLabel) rightLabel.textContent = t('gg.rightOverhangCustom', null, 'Right overhang (custom, 4 bp)');
         }
       }
     });
@@ -1777,7 +1784,7 @@ function initGoldenGate(container) {
     });
   }
   function renumberFrags(){
-    Array.from(fragList.querySelectorAll('.frag-label')).forEach((el,i)=>{ el.textContent = 'Insert #'+(i+1); });
+    Array.from(fragList.querySelectorAll('.frag-label')).forEach((el,i)=>{ el.textContent = t('ui.insertN', {n: i+1}, 'Insert #{n}'); });
     enforceFragCap();
     updateFragOverhangInputs();
   }
@@ -1790,34 +1797,34 @@ function initGoldenGate(container) {
       <div class="frag-body">
         <div class="frag-overlap frag-overlap-top" style="margin-bottom:6px;">
           <label class="aside frag-left-overhang-label">Left overhang (vector sticky, 4 bp)</label>
-          <input class="frag-left-overhang" type="text" spellcheck="false" autocomplete="off" maxlength="4" placeholder="Auto" readonly style="max-width:200px;font-family:'Courier New',monospace;background:#f8fafc;">
+          <input class="frag-left-overhang" type="text" spellcheck="false" autocomplete="off" maxlength="4" placeholder="${t('ui.autoPlaceholder', null, 'Auto')}" data-i18n-placeholder="ui.autoPlaceholder" readonly style="max-width:200px;font-family:'Courier New',monospace;background:#f8fafc;">
         </div>
         <textarea class="frag-seq" placeholder=">insert&#10;ATG...">${seq}</textarea>
         <div class="frag-overlap frag-overlap-bottom" style="margin-top:6px;">
           <label class="aside frag-right-overhang-label">Right overhang (vector sticky, 4 bp)</label>
-          <input class="frag-right-overhang" type="text" spellcheck="false" autocomplete="off" maxlength="4" placeholder="Auto" readonly style="max-width:200px;font-family:'Courier New',monospace;background:#f8fafc;">
+          <input class="frag-right-overhang" type="text" spellcheck="false" autocomplete="off" maxlength="4" placeholder="${t('ui.autoPlaceholder', null, 'Auto')}" data-i18n-placeholder="ui.autoPlaceholder" readonly style="max-width:200px;font-family:'Courier New',monospace;background:#f8fafc;">
         </div>
         <div class="frag-tools">
           <input type="file" class="file-frag" accept=".fa,.fasta,.fas,.txt,.gb,.gbk,.gbff,.genbank" style="display:none">
-          <button class="btn demo btn-frag-flip" type="button" title="Reverse-complement this insert">Reverse complement</button>
-          <button class="btn demo btn-frag-demo" type="button">Demo</button>
-          <button class="ghost btn btn-frag-upload" type="button">Upload</button>
+          <button class="btn demo btn-frag-flip" type="button" title="Reverse-complement this insert" data-i18n="ui.reverseComplement">Reverse complement</button>
+          <button class="btn demo btn-frag-demo" type="button" data-i18n="ui.demo">Demo</button>
+          <button class="ghost btn btn-frag-upload" type="button" data-i18n="ui.upload">Upload</button>
         </div>
       </div>
       <div></div>
       <div class="frag-actions" style="width: 100%;">
-        <button class="ghost btn sm up" type="button" title="Move up" style="width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">▲</button>
-        <button class="ghost btn sm down" type="button" title="Move down" style="width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">▼</button>
-        <button class="ghost btn sm del" type="button" title="Delete" style="width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">✕</button>
+        <button class="ghost btn sm up" type="button" title="${t('ui.moveUp', null, 'Move up')}" data-i18n-title="ui.moveUp" style="width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">▲</button>
+        <button class="ghost btn sm down" type="button" title="${t('ui.moveDown', null, 'Move down')}" data-i18n-title="ui.moveDown" style="width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">▼</button>
+        <button class="ghost btn sm del" type="button" title="${t('ui.delete', null, 'Delete')}" data-i18n-title="ui.delete" style="width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">✕</button>
       </div>`;
-    fragList.appendChild(wrap); renumberFrags(); scheduleSync();
+    fragList.appendChild(wrap); applyI18n(wrap); renumberFrags(); scheduleSync();
   }
   // FIXED: This function now uses the container
   function enforceFragCap(){
     const count = fragList.querySelectorAll('.frag-row').length;
     const addBtn = container.querySelector('#frag-add');
     addBtn.disabled = count >= 6;
-    addBtn.textContent = count>=6 ? 'Max 6 inserts' : '+ Add insert';
+    addBtn.textContent = count>=6 ? t('ui.maxInserts', {n: 6}, 'Max {n} inserts') : t('ui.addInsert', null, '+ Add insert');
   }
 
   // FIXED: This function now uses the container
@@ -2122,12 +2129,12 @@ function initGoldenGate(container) {
       const vector = container.querySelector('#gg-vector').value;
       const frags  = collectFragments();
       if(!frags.length){
-        showModal('Please add at least one insert sequence.');
+        showModal(t('ui.pleaseAddInserts', null, 'Please add at least one insert sequence.'));
         return;
       }
       const enz   = container.querySelector('#gg-enzyme').value;
       if(!enz || !TYPEIIS[enz]){
-        showModal('Please select a Type IIS enzyme.');
+        showModal(t('gg.selectTypeIis', null, 'Please select a Type IIS enzyme.'));
         return;
       }
       const clampN    = parseInt(container.querySelector('#gg-clamp').value||'5',10);
@@ -2393,7 +2400,7 @@ function initGoldenGate(container) {
   container.querySelector('#gg-download-btn').addEventListener('click',()=>{
     try{
       if(!window._ggHasResults){
-        showModal('Please design primers first.');
+        showModal(t('ui.designFirst', null, 'Please design primers first.'));
         return;
       }
       const modeEl = container.querySelector('#gg-download-type');
@@ -2426,7 +2433,7 @@ function initGoldenGate(container) {
         }
 
         if (!text) {
-          showModal('No primer sequences available.');
+          showModal(t('ui.noPrimerSeqs', null, 'No primer sequences available.'));
           return;
         }
         const asm = (window._ggAssembledName || 'GoldenGate_assembled');
@@ -2442,7 +2449,7 @@ function initGoldenGate(container) {
         const seq = (window._ggAssembledSeq || '').toUpperCase();
         const name = window._ggAssembledName || 'GoldenGate_assembled';
         if(!seq){
-          showModal('Assembled plasmid sequence is not available. Please run the design first.');
+          showModal(t('ui.assembledUnavailableRun', null, 'Assembled plasmid sequence is not available. Please run the design first.'));
           return;
         }
         let fasta = '>' + name + '\n';
@@ -2514,7 +2521,7 @@ function initGoldenGate(container) {
     const primersCell = document.createElement('div');
     primersCell.id = 'cell-primers';
     primersCell.className = 'box';
-    primersCell.innerHTML = '<h3>Primer sets by insert</h3>';
+    primersCell.innerHTML = ('<h3>' + t('gg.primerSetsByInsert', null, 'Primer sets by insert') + '</h3>');
     console.log('renderGGResults: Calling renderPrimerBlocks...');
     primersCell.innerHTML += renderPrimerBlocks(primers);
     console.log('renderGGResults: renderPrimerBlocks completed');
@@ -2598,7 +2605,7 @@ function initGoldenGate(container) {
     gelCell.id = 'cell-gel';
     gelCell.className = 'box';
     gelCell.innerHTML = `
-      <h3>Simulated Gel</h3>
+      <h3>${t('ui.simulatedGel', null, 'Simulated Gel')}</h3>
       <div style="margin-top:5px; margin-bottom:10px;">
         <label class="aside" style="display:inline-block; margin-right:5px;">Marker:</label>
         <select id="ggx-ladder" style="width:auto; font-size:12px;">

@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>제한효소 클로닝 - PrimerWeaver V1.0.6</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #333;
+            background: #f9fafb;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e40af;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2563eb;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            font-size: 1.5em;
+        }
+        h3 {
+            color: #3b82f6;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            font-size: 1.2em;
+        }
+        h4 {
+            color: #60a5fa;
+            margin-top: 1.2em;
+            margin-bottom: 0.6em;
+        }
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 1em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        strong {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c2410c;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .abstract {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+        .abstract p {
+            margin: 0;
+            font-style: italic;
+        }
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .section {
+            margin-bottom: 2.5em;
+        }
+        .version-info {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+            margin-top: 3em;
+            padding-top: 2em;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>제한효소 클로닝 프라이머 설계기</h1>
+        
+        <div class="abstract">
+            <p>제한효소 클로닝 모듈은 제한효소를 사용하는 방향성 클로닝용 프라이머를 설계할 수 있게 합니다. 이 도구는 DNA 절편 양 말단에 제한효소 부위를 추가하는 프라이머 생성을 자동화하여, 제한효소로 절단된 벡터에 제어된 방향성 삽입을 가능하게 합니다. 이 고전적 클로닝 접근법은 단순한 구축물에 여전히 널리 사용되며, 플라스미드 구축을 위한 신뢰할 수 있고 비용 효율적인 방법을 제공합니다.</p>
+        </div>
+
+        <div class="section">
+            <h2>빠른 시작 가이드</h2>
+            <ol>
+                <li>목적지 벡터와 삽입편 서열을 해당 입력 필드에 업로드하거나 붙여넣습니다. 원하는 제한효소 세트를 선택하고, 자동으로 검출된 벡터 백본을 확인한 뒤, 필요하면 설계 매개변수를 조정합니다.</li>
+	   <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/re_demo.png"
+                    style="max-width: 90%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+                <li>"프라이머 설계"를 클릭하여 제한효소 부위가 추가된 프라이머를 생성합니다. 프라이머 서열(제한효소 부위가 강조됨), Tm 값 및 QC 지표를 검토합니다. 조립된 FASTA 파일을 다운로드하여 삽입편 방향이 의도한 설계와 일치하는지 확인합니다. 방향이 올바르지 않으면 삽입편 서열을 역상보한 뒤 프라이머를 다시 생성합니다.</li>
+
+
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>제한효소 클로닝 원리</h2>
+            
+            <p>제한효소 클로닝은 <strong>II형 제한 엔도뉴클레아제</strong>를 사용하여 삽입편과 벡터 모두에 호환되는 <strong>점착성 또는 평활 말단</strong>을 만든 뒤, <strong>T4 DNA ligase</strong>로 DNA 말단을 공유 결합으로 연결합니다. 일반적으로 <strong>점착성 말단 연결은 평활 말단 연결보다 훨씬 효율적</strong>입니다. 점착성 돌출단이 연결 전에 올바른 어닐링을 촉진하는 반면, 평활 말단 연결은 무작위 말단 충돌에만 의존하므로 효율이 낮습니다.</p>
+            <p>단일 효소 절단은 하나의 제한효소로 삽입편과 벡터를 모두 자릅니다. 이 전략은 단순하지만 삽입편이 어느 방향으로든 연결될 수 있고, 특히 평활 말단 클로닝에서 벡터 자가 연결 위험이 증가합니다. 단일 효소 절단에서는 <strong>벡터 탈인산화</strong>를 적용하여 자가 연결을 줄이고 클로닝 효율을 높일 수 있습니다.</p>
+	    <p><strong>이중 효소 절단</strong>은 서로 다른 두 제한효소를 사용하여 삽입편과 벡터의 각 말단에 <strong>비호환 말단</strong>을 만듭니다. 이 접근법은 <strong>방향성 클로닝</strong>을 강제하고, 벡터 자가 연결에 의한 배경을 줄이며, 일반적으로 더 높은 클로닝 효율을 제공합니다. 따라서 점착성 말단을 사용한 이중 절단이 대부분의 제한효소 클로닝 응용에 선호되는 전략입니다.</p>
+        </div>
+
+        <div class="section">
+            <h2>입력 형식</h2>
+            <p>벡터와 삽입편 입력은 모두 <strong>FASTA</strong>, <strong>일반 DNA 텍스트</strong> 또는 표준 <strong>GenBank</strong> 파일(<code>.gb</code>, <code>.gbk</code>, <code>.gbff</code>, <code>.genbank</code>)을 받으며 <code>LOCUS</code>와 <code>ORIGIN</code> 블록이 있어야 합니다. <strong>LOCUS</strong>의 짧은 이름이 서열 제목으로 사용됩니다. 입력 필드당 <strong>하나의 서열</strong>만 허용되며, 여러 FASTA 헤더가 감지되면 <strong>첫 번째 서열만</strong> 사용됩니다. <code>&gt;</code> 헤더 없이 일반 서열을 업로드하면 <strong>파일 이름</strong>(확장자 제외)이 이름으로 사용됩니다. 독점 바이너리 형식(예: SnapGene <code>.dna</code>)은 먼저 GenBank 또는 FASTA로 내보내야 합니다. FASTA 또는 GenBank의 절편 이름은 해당하는 경우 프라이머 명명에 사용됩니다.</p>
+            <p>PrimerWeaver는 현재 약 <strong>100개의 내장 II형 제한효소</strong>를 지원합니다. 벡터 서열이 제공되면 시스템은 <strong>벡터 특징을 자동으로 식별</strong>하고 모든 <strong>단일 절단 제한효소 부위</strong>의 위치를 표시합니다. 벡터 지도는 표적 클로닝 영역의 시각화를 돕기 위해 회전할 수 있습니다.</p>
+
+	<div style="text-align: center; margin: 2em 0;">
+  		<img
+    			src="contents/pictures/re_input.png"
+   			alt="제한효소 클로닝 모듈 입력"
+    			style="max-width: 60%; height: auto; border-radius: 8px;"
+  		 >
+	   </div>
+
+
+
+        <div class="section">
+            <h2>설계 매개변수</h2>
+		<p>드롭다운 목록에서 원하는 제한효소를 선택하거나 효소 이름으로 검색하십시오. <strong>두 제한효소</strong>가 선택되면 시스템은 <strong>가장 긴 절단 절편</strong>을 목적지 벡터 백본으로 자동 식별합니다. 가장 긴 절편이 의도한 벡터 백본과 일치하지 않으면 적절한 절편을 수동으로 선택할 수 있습니다. 진행하기 전에 프라이머 설계 매개변수를 검토하고 필요하면 수정하십시오.</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>매개변수</th>
+                        <th>기본값</th>
+                        <th>범위</th>
+                        <th>설명</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>제한효소 1</strong></td>
+                        <td>None</td>
+                        <td>지원되는 모든 효소</td>
+                        <td>삽입편 5' 말단에 추가되는 제한효소 부위입니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>제한효소 2</strong></td>
+                        <td>None</td>
+                        <td>지원되는 모든 효소</td>
+                        <td>삽입편 3' 말단에 추가되는 제한효소 부위입니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>목표 Tm(°C)</strong></td>
+                        <td>55</td>
+                        <td>40–75</td>
+                        <td>주형 결합 영역(제한효소 부위 제외)의 목표 용융 온도입니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>프라이머 농도(nM)</strong></td>
+                        <td>500</td>
+                        <td>50–2000</td>
+                        <td>in silico Tm 계산에 가정되는 유효 프라이머 농도입니다. 일반적인 범위: 25-1000 nM.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Na⁺ 농도(mM)</strong></td>
+                        <td>50</td>
+                        <td>0–200</td>
+                        <td>염 보정 Tm 계산에 사용되는 1가 양이온 농도입니다. 일반적인 범위: 10-200 mM.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mg²⁺ 농도(mM)</strong></td>
+                        <td>2.0</td>
+                        <td>0–10</td>
+                        <td>Tm 계산에 사용되는 2가 양이온 농도입니다. 반응에 Mg²⁺가 없으면 0으로 설정합니다. 일반적인 범위: 0.5-5 mM.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>결과 및 출력</h2>
+            <p>프라이머 설계 후 제한효소 클로닝 모듈은 실험적 검증과 후속 클로닝을 돕기 위한 포괄적인 결과 집합을 생성합니다.</p>
+
+            <h3>프라이머 표</h3>
+            <p>설계된 프라이머 쌍은 프라이머 서열(5′→3′), 길이, GC 함량 및 용융 온도(Tm)를 포함한 구조화된 표로 보고됩니다. Tm 값은 <strong>어닐링 핵심 영역</strong>과 <strong>전장 프라이머</strong> 모두에 대해 표시되어 증폭 적합성을 평가할 수 있습니다. 동종중합체 연속 서열, 헤어핀 구조, 자기 이합체 및 교차 이합체 형성을 포함한 프라이머 품질 지표가 평가되고 표시되어 PCR 성능에 영향을 줄 수 있는 잠재적 위험을 강조합니다. 프라이머에 추가된 <strong>제한효소 인식 부위</strong>는 프라이머 서열 내에서 <strong>굵게 강조</strong>되며, 보호 염기는 이탤릭으로 표시됩니다.</p>
+	
+	   <div style="text-align: center; margin: 2em 0;">
+  		<img
+    			src="contents/pictures/RE_primer_table.png"
+			alt="제한효소 클로닝 프라이머 표"
+    			style="max-width: 60%; height: auto; border-radius: 8px;"
+  		 >
+	   </div>
+
+            <h3>조립 도식 및 점착성 말단 표</h3>
+	    <p>벡터 선형화, 삽입편 도입 및 최종 플라스미드 조립을 포함한 클로닝 워크플로를 보여 주는 <strong>조립된 플라스미드 도식</strong>이 생성됩니다. 이 도식은 절편 방향과 접합부 구조에 대한 개념적 개요를 제공합니다. 점착성 말단을 사용하는 제한효소 클로닝 전략의 경우 <strong>접합부 수준 점착성 말단 표</strong>가 제공됩니다. 이 표는 각 연결 접합부의 왼쪽 및 오른쪽 점착성 말단(5′→3′)을 요약하여 말단 호환성과 방향성 클로닝 설계를 한눈에 확인할 수 있게 합니다.</p>
+
+	   <div style="text-align: center; margin: 2em 0;">
+  		<img
+    			src="contents/pictures/RE_assembly_tabel.png"
+			alt="제한효소 클로닝 조립 출력"
+    			style="max-width: 60%; height: auto; border-radius: 8px;"
+  		 >
+	   </div>
+
+            <h3>모의 아가로스 젤 전기영동</h3>
+	    <p>PrimerWeaver는 주요 클로닝 단계의 실험 결과를 예측하기 위해 <strong>모의 아가로스 젤 이미지</strong>를 생성합니다. 젤에는 다음이 포함됩니다.</p>
+            <ul>
+                <li>선택 가능한 DNA 래더(기본값: NEB 1 kb Plus DNA Ladder)</li>
+                <li>절단되지 않은 벡터</li>
+                <li>제한효소로 절단된 벡터</li>
+                <li>PCR로 증폭된 삽입편</li>
+                <li>조립된 플라스미드</li>
+                <li>조립된 플라스미드의 진단 제한효소 절단</li>
+            </ul>
+	    <p>예측된 밴드 크기가 젤 옆에 주석으로 표시되어 사용자가 예상 절편 크기를 실험 결과와 비교하고 잠재적 클로닝 문제를 빠르게 식별할 수 있습니다.</p>
+
+	   <div style="text-align: center; margin: 2em 0;">
+  		<img
+    			src="contents/pictures/RE_gel.png"
+			alt="제한효소 클로닝 모의 젤 출력"
+    			style="max-width: 60%; height: auto; border-radius: 8px;"
+  		 >
+	   </div>
+
+        </div>
+
+        <div class="section">
+            <h2>프라이머 설계 알고리즘</h2>
+            
+            <h3>프라이머 구조</h3>
+            <p>각 프라이머는 세 기능 영역으로 구성됩니다.</p>
+            <ul>
+                <li><strong>어닐링 핵심(3′):</strong> PCR 어닐링을 주도하는 주형 상보 영역(일반적으로 18–30 bp)</li>
+                <li><strong>제한효소 부위:</strong> 절단/연결을 가능하게 하기 위해 추가되는 효소 인식 서열(일반적으로 6–8 bp)</li>
+                <li><strong>보호 염기(5′ 측면):</strong> 절단 효율을 높이기 위해 제한효소 부위 상류에 두는 짧은 염기(일반적으로 2–6 nt; 효소에 따라 다름)</li>
+            </ul>
+
+            <h3>설계 과정</h3>
+            <p>PrimerWeaver의 제한효소 클로닝 설계는 세 연결된 단계로 나뉩니다. <strong>삽입편 프라이머 구성</strong>, <strong>벡터 절단 해석</strong>, <strong>연결을 고려한 조립 재구성</strong>입니다. 이 단계들은 아래에 요약되어 있습니다.</p>
+
+            <h3>삽입편 프라이머 구성</h3>
+            <p>모듈은 먼저 삽입편 서열을 정규화하고 삽입편 말단에서 직접 <strong>주형 결합 핵심</strong>을 설계합니다. 정방향 핵심은 삽입편 5′ 말단에서 선택되고, 역방향 핵심은 삽입편 말단의 역상보로서 3′ 말단에서 선택됩니다. 핵심 길이는 목표 Tm에 도달하거나 사용 가능한 최상의 말단 프라이머가 발견될 때까지 반복적으로 스캔됩니다. 가능한 경우 3′가 GC로 끝나는 프라이머가 선호됩니다.</p>
+            <p>삽입편 결합 핵심이 고정되면 전체 프라이머는 다음과 같이 조립됩니다.</p>
+            <p><strong>5′ 보호 클램프 + 제한효소 부위 + 어닐링 핵심 3′</strong></p>
+            <p>보호 클램프는 절단 효율을 높이기 위한 짧은 비자보상보 5′ 서열로 생성되며, 선택한 효소 인식 부위는 클램프와 어닐링 핵심 사이에 추가됩니다. 따라서 열역학 계산은 전체 5′ 클로닝 꼬리가 아니라 <strong>삽입편 결합 핵심</strong>에서 수행됩니다.</p>
+
+            <h3>벡터 절단 및 백본 선택</h3>
+            <p>벡터는 <strong>원형 분자</strong>로 취급됩니다. 선택한 각 제한효소에 대해 모듈은 모든 인식 부위를 식별하고 실제 절단 위치로 변환한 뒤, 원형 백본에서 생성되는 모든 절단 절편을 열거합니다. 가장 긴 절편이 기본 백본 후보로 사용되지만, 여러 절편이 생성되면 사용자는 백본 선택기에서 다른 절편을 수동으로 선택할 수 있습니다.</p>
+            <p>이어서 유지된 백본 절편의 두 말단에 존재하는 효소 정체로부터 절단 위상이 해석됩니다. 이로써 클로닝이 방향성 이중 절단, 유사 단일 절단, 또는 진정으로 비방향성인 연결 시나리오로 동작하는지가 결정됩니다.</p>
+
+            <h3>연결 및 조립 서열 재구성</h3>
+            <p>백본 절편이 선택된 후 모듈은 프라이머 서열만 보고하는 것이 아니라 조립된 플라스미드를 재구성합니다. 절편 가장자리에 남은 부분 인식 부위 잔여는 적절한 경우 유지된 백본에서 잘리고, 삽입편은 왼쪽 및 오른쪽 백본 말단의 효소 정체에 따라 백본에 대해 방향이 지정됩니다. 방향성 두 효소 클로닝에서는 프라이머가 운반하는 효소 부위가 실제 백본 위상과 정렬되도록 삽입편이 그대로 유지되거나 역상보될 수 있습니다.</p>
+            <p>최종 조립 서열은 다음과 같이 재구성됩니다.</p>
+            <p><strong>잘린 백본 + 오른쪽 말단 제한효소 부위 + 방향이 지정된 삽입편 + 왼쪽 말단 제한효소 부위</strong></p>
+            <p>동일한 해석이 접합부 점착성 말단 표, 조립된 플라스미드 요약, 모의 진단 절단 출력을 채우는 데 사용됩니다.</p>
+
+            <h3>알고리즘의 예외 사례 논리</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>알고리즘 예외 사례</th>
+                        <th>제한효소 클로닝 모듈의 현재 동작</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>두 효소 모두 벡터를 자르지 않음</strong></td>
+                        <td>모듈은 절단 백본을 전혀 정의할 수 없습니다. 클로닝 위상을 만들어 내는 대신 명시적인 N/A 스타일 결과를 반환하고, 선택한 효소에 벡터에서 사용할 수 있는 부위가 없음을 보고합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>하나의 효소만 벡터를 자름</strong></td>
+                        <td>설계는 절단 효소를 삽입편 양쪽 말단에 사용하여 <strong>단일 효소 모드</strong>로 자동 대체됩니다. 클로닝 가능한 설계는 유지되지만, 그 결과 연결은 비방향성이며 벡터 자가 연결 위험이 더 높습니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>벡터에 여러 부위가 존재함</strong></td>
+                        <td>모듈은 모든 절단 절편을 계산하고 가장 긴 절편을 기본 유지 백본으로 사용합니다. 해당 절편의 두 말단이 같은 효소에 의해 만들어지면, 명목상 이중 절단 설정에서도 백본은 <strong>유사 단일 효소</strong> 백본으로 취급됩니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>삽입편에 선택한 제한효소 부위가 포함됨</strong></td>
+                        <td>프라이머 설계 자체는 여전히 생성될 수 있지만, 모듈은 증폭된 삽입편도 선택한 효소 조합에 의해 잘릴 수 있음을 명시적으로 표시하며, 이는 실제 클로닝 해석을 바꿉니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>점착성 말단 호환성이 연결 해석을 바꿈</strong></td>
+                        <td>양쪽 말단이 평활이거나 두 효소가 동일한 점착성 말단을 만들면 조립은 비방향성 연결로 해석됩니다. 한쪽이 평활이고 다른 쪽이 점착성이면 모듈은 설계를 보고하지만 불리한 클로닝 위상으로 취급합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>삽입편 방향이 백본 말단 효소 정체에 따라 달라짐</strong></td>
+                        <td>조립된 서열은 벡터 뒤에 삽입편을 단순히 붙여서 만들어지지 않습니다. 모듈은 왼쪽 및 오른쪽 백본 말단 효소를 정방향 및 역방향 프라이머 효소 태그와 비교하고, 연결 위상을 내부적으로 일관되게 유지하기 위해 필요할 때 삽입편을 역상보합니다.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>경고 및 예외 사례</h2>
+            <p>제한효소 클로닝 모듈은 공유 시각화 계층을 사용할 수 있을 때 사전 점검 검증 및 확인 대화상자에 공유 <strong>MW(Message Warning)</strong> 시스템을 사용합니다. MW 계층을 사용할 수 없으면 모듈은 표준 브라우저 경고/확인 대화상자로 대체합니다. 실제로 이 모듈의 경고는 공유 검증 계층에서 상속된 <strong>일반 경고</strong> 메시지와 제한효소 클로닝 논리에 고유한 <strong>설계 경고</strong> 메시지의 두 그룹으로 나뉩니다.</p>
+
+            <h3>일반 경고</h3>
+            <p>이러한 경고는 설계가 시작되기 전에 생성되며 주로 잠재적 입력 품질 또는 매개변수 품질 문제를 나타냅니다. 대부분은 사용자가 <strong>취소</strong>를 클릭하여 입력을 수정하거나 <strong>확인</strong>을 클릭하여 현재 설정으로 계속 진행할 수 있습니다.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>범주</th>
+                        <th>발생 조건</th>
+                        <th>RE 모듈의 현재 동작</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>차단 입력 알림</strong></td>
+                        <td>삽입편 서열 없음, 벡터 서열 없음, 정규화된 삽입편/벡터 서열이 비어 있음, 또는 효소 선택 누락.</td>
+                        <td>설계가 즉시 중지되고 계속하기 전에 무엇을 제공해야 하는지를 알려 주는 알림이 표시됩니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-04</strong><br>정규화 후 유효한 서열 없음</td>
+                        <td>유효한 IUPAC DNA 기호가 남아 있지 않아 정규화 후 모든 문자가 제거됩니다.</td>
+                        <td>사용자는 입력을 수정하기 위해 취소하거나 계속 진행할 수 있지만, 그 결과 설계는 비어 있거나 정보가 부족합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-05</strong><br>비-IUPAC 문자 제거됨</td>
+                        <td>서열에 지원되지 않는 문자가 있으며, 특히 프라이머와 관련된 3′ 영역 근처에 나타나는 경우입니다.</td>
+                        <td>모듈은 정규화된 서열만 사용하여 계속 진행하며, 이것이 설계 동작을 바꿀 수 있음을 사용자에게 경고합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-06</strong><br>축퇴 염기 검출됨</td>
+                        <td>벡터 또는 삽입편에 IUPAC 축퇴 기호가 포함되어 있습니다.</td>
+                        <td>열역학적 값은 가장 안정한 변이에서 보수적으로 추정되므로, 보고된 Tm 및 ΔG 값은 최악 조건의 근사값일 수 있습니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-10~MW-13</strong><br>매개변수 범위 경고</td>
+                        <td>Na<sup>+</sup>, Mg<sup>2+</sup>, 프라이머 농도 또는 목표 Tm이 권장 설계 범위를 벗어납니다.</td>
+                        <td>사용자는 계속 진행할 수 있지만 Tm 예측과 프라이머 최적화의 신뢰도가 낮아질 수 있습니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-14</strong><br>높은 염 조합</td>
+                        <td>높은 Na<sup>+</sup>와 높은 Mg<sup>2+</sup>가 동시에 제공됩니다.</td>
+                        <td>모듈은 모델이 이중나선 안정성을 과대평가할 수 있음을 경고합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-15</strong><br>검증된 열역학 범위 밖</td>
+                        <td>매개변수 값이 열역학 모델의 검증된 범위를 벗어납니다.</td>
+                        <td>사용자는 계속 진행할 수 있지만 그 결과 Tm 값은 더 이상 물리적으로 의미가 없을 수 있습니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-19</strong><br>총 입력 크기가 큼</td>
+                        <td>벡터와 삽입편 입력의 합이 매우 큽니다(&gt; 1 MB).</td>
+                        <td>모듈은 느린 브라우저 측 실행에 대해 경고합니다. 이는 RE에 가장 관련 있는 실질적 성능 경고입니다. RE는 한 번에 하나의 벡터와 하나의 삽입편 설계를 처리하므로 일반적인 “항목이 너무 많음” 경고는 보통 트리거되지 않습니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-20</strong><br>한 필드에 여러 FASTA 헤더</td>
+                        <td>벡터 또는 삽입편 텍스트 영역에 FASTA 레코드가 둘 이상 포함되어 있습니다.</td>
+                        <td>공유 MW 대화상자가 필드당 하나의 서열만 허용됨을 경고합니다. 사용자가 계속 진행하면 설계를 이어가기 전에 필드가 <strong>첫 번째 FASTA 레코드</strong>로 잘립니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-22</strong><br>파일 업로드가 가져오기 제한을 초과함</td>
+                        <td>업로드한 벡터 또는 삽입편 파일이 <strong>1 MB</strong>보다 큽니다.</td>
+                        <td>서열을 불러오기 전에 가져오기가 차단되며, 사용자는 더 작은 파일을 선택해야 합니다.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>설계 경고</h3>
+            <p>이러한 경고는 제한효소 클로닝 알고리즘 자체에서 나옵니다. 일부는 선택한 효소 쌍의 해석을 바꾸기 때문에 확인 형식의 MW 대화상자로 표시되고, 다른 일부는 설계를 맥락에서 계속 검토할 수 있도록 결과 패널에 직접 추가됩니다.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>사례</th>
+                        <th>발생 조건</th>
+                        <th>RE 모듈의 현재 동작</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>첫 번째 삽입편만 사용됨</strong></td>
+                        <td>인터페이스에 삽입편 행이 둘 이상 있습니다.</td>
+                        <td>현재 RE 설계 흐름은 비어 있지 않은 모든 삽입편 행을 수집하지만, 프라이머 설계, 조립 예측 및 젤 시뮬레이션에는 <strong>첫 번째 비어 있지 않은 삽입편만</strong> 사용합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>선택한 두 효소가 모두 벡터에 없음</strong></td>
+                        <td>선택한 어느 효소에 대해서도 벡터에서 인식 부위가 발견되지 않습니다.</td>
+                        <td>모듈은 확인 MW 대화상자를 엽니다. 사용자가 계속 진행하면 출력 패널에 <strong>N/A</strong>가 표시되고 조립된 플라스미드는 생성되지 않으며, 조립 그래픽은 절단 없음 경우를 반영합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>벡터에서 효소 부위가 하나만 발견됨</strong></td>
+                        <td>선택한 두 효소 중 정확히 하나가 벡터를 자릅니다.</td>
+                        <td>모듈은 절단 효소를 양쪽 말단에 재사용하는 <strong>단일 효소 대체</strong>를 제공합니다. 설계는 계속될 수 있지만 클로닝은 비방향성이 되고 자가 연결 위험이 증가합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>다중 벡터 절단 부위</strong></td>
+                        <td>선택한 효소 중 하나 또는 둘 모두가 벡터를 둘 이상의 위치에서 자릅니다.</td>
+                        <td>모듈은 <strong>가장 긴 절단 절편</strong>을 후보 백본으로 자동 선택하고, 선택한 절편이 의도한 실험 백본과 일치하는지 확인하도록 사용자에게 경고합니다. 백본 드롭다운으로 자동 선택을 재정의할 수 있습니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>유사 단일 절단 백본</strong></td>
+                        <td>두 효소가 입력되었더라도 가장 긴 절편이 양쪽 말단에서 <strong>같은 효소</strong>로 둘러싸여 있습니다.</td>
+                        <td>모듈은 선택한 백본이 사실상 단일 효소 절단처럼 동작하므로 클로닝이 비방향성이고 벡터 배경이 증가할 수 있음을 경고합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>선택한 효소 부위가 삽입편 내부에 존재함</strong></td>
+                        <td>삽입편에 이미 선택한 제한효소 부위 중 하나 또는 둘이 포함되어 있습니다.</td>
+                        <td>클로닝 워크플로 동안 삽입편이 의도치 않게 잘릴 수 있으므로 점착성 말단 또는 접합부 출력에 경고가 추가됩니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>동일한 점착성 말단</strong></td>
+                        <td>선택한 두 효소가 같은 점착성 말단 서열을 만듭니다.</td>
+                        <td>모듈은 설계를 <strong>비방향성</strong>으로 표시합니다. 삽입편 방향이 강제되지 않으며 벡터 자가 연결 위험이 증가합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>양쪽 말단이 평활임</strong></td>
+                        <td>선택한 어느 효소도 점착성 말단을 만들지 않습니다.</td>
+                        <td>모듈은 평활 말단 클로닝이 비방향성이고 일반적으로 연결 효율이 낮으며 배경 콜로니가 더 생기기 쉬움을 경고합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>한쪽은 평활 말단, 한쪽은 점착성 말단</strong></td>
+                        <td>선택한 효소 하나가 평활 말단을 만들고 다른 하나가 점착성 말단을 만듭니다.</td>
+                        <td>모듈은 여전히 설계를 보고하지만 이 효소 조합을 표준 제한효소 클로닝에 일반적으로 <strong>권장되지 않음</strong>으로 표시합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>매우 짧은 삽입편</strong></td>
+                        <td>삽입편 길이가 <strong>50 bp</strong>보다 짧습니다.</td>
+                        <td>매우 짧은 삽입편에서는 연결, 콜로니 선별 및 서열 검증이 더 어려울 수 있음을 사용자에게 알리는 경고가 추가됩니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>높은 벡터 자가 연결 위험</strong></td>
+                        <td>동일한 점착성 말단, 평활–평활 클로닝 또는 유사 단일 백본 위상에 의해 트리거됩니다.</td>
+                        <td>모듈은 배경 콜로니를 줄이기 위해 <strong>벡터 탈인산화</strong> 및/또는 다른 효소 조합 선택을 명시적으로 권장합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>설계 검토 후 방향 불일치</strong></td>
+                        <td>조립된 출력이 의도한 상위 가닥 삽입편 방향과 일치하지 않습니다.</td>
+                        <td>권장되는 교정 조치는 예측된 조립을 수동으로 편집하는 것이 아니라 <strong>삽입편 서열을 역상보</strong>한 뒤 설계를 다시 실행하는 것입니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>조립 도식은 개념도임</strong></td>
+                        <td>조립 미리보기가 있는 성공적인 모든 제한효소 클로닝 설계.</td>
+                        <td>조립 이미지는 길이가 정확한 플라스미드 지도가 아니라 개념적 도식입니다. 사용자는 정확한 해석을 위해 조립된 서열, 점착성 말단 표 및 절편 정보에 의존해야 합니다.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <p><strong>실용적 해석:</strong> 이 모듈의 경고가 항상 설계가 불가능함을 의미하지는 않습니다. 일부 경고는 현재 효소 쌍이 클로닝 위상을 이상적인 방향성 점착성 말단 워크플로에서 대체 또는 저효율 시나리오로 바꾼다는 것을 나타낼 뿐입니다. 따라서 사용자는 RE 결과를 <strong>백본 절편 선택기</strong>, <strong>점착성 말단 표</strong> 및 <strong>조립된 플라스미드 미리보기</strong>와 함께 해석해야 합니다.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

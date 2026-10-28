@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contrôle qualité des amorces - PrimerWeaver V1.0.6</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #333;
+            background: #f9fafb;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e40af;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2563eb;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            font-size: 1.5em;
+        }
+        h3 {
+            color: #3b82f6;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            font-size: 1.2em;
+        }
+        h4 {
+            color: #60a5fa;
+            margin-top: 1.2em;
+            margin-bottom: 0.6em;
+        }
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 1em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        strong {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c2410c;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1em 0;
+            width: fit-content;
+        }
+        .code-examples {
+            display: flex;
+            gap: 2em;
+            margin: 1em 0;
+        }
+        .code-example-group {
+            flex: 1;
+            min-width: 0;
+        }
+        .code-example-group h4 {
+            margin-top: 0;
+            margin-bottom: 0.5em;
+        }
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .abstract {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+        .abstract p {
+            margin: 0;
+            font-style: italic;
+        }
+        .highlight {
+            background: #fef3c7;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        .section {
+            margin-bottom: 2.5em;
+        }
+        .warning-box {
+            background: #fff7ed;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .reference {
+            font-size: 0.9em;
+            margin-left: 20px;
+            margin-bottom: 0.5em;
+        }
+        .version-info {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+            margin-top: 3em;
+            padding-top: 2em;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Contrôle qualité des amorces</h1>
+        
+        <div class="abstract">
+            <p>Le contrôle qualité des amorces répond à plusieurs situations pratiques rencontrées dans les procédures courantes de biologie moléculaire. Il peut servir à valider, avant de commander de nouveaux oligonucléotides, des séquences d’amorces provenant de publications, de bases de données ou d’expériences antérieures, ainsi qu’à évaluer la compatibilité de paires d’amorces existantes. Le module facilite également le dépannage en identifiant les caractéristiques des amorces susceptibles d’entraîner un échec de la PCR, ce qui permet de comprendre pourquoi certaines amorces donnent de mauvais résultats. En outre, le contrôle qualité des amorces permet de comparer plusieurs amorces candidates afin d’aider à l’optimisation et constitue une ressource pédagogique pour comprendre les principes fondamentaux de conception des amorces et les paramètres thermodynamiques qui influencent les performances de la PCR.</p>
+        </div>
+
+        <div class="section">
+            <h2>Guide de démarrage rapide</h2>
+            
+            <ol>
+                <li>Téléversez ou collez vos séquences d’amorces dans les champs de saisie correspondants, puis ajustez les concentrations de Na⁺, de Mg²⁺ et d’amorces ainsi que la Tm cible si nécessaire. Pour connaître en détail les exigences de format et le réglage des paramètres, consultez le guide détaillé ci-dessous ou l’icône d’aide du module de contrôle qualité.
+                
+                <div style="text-align: center; margin: 2em 0;">
+                    <img
+                        src="contents/pictures/QC_demo.png"
+                        alt="Démonstration du contrôle qualité des amorces"
+                        style="max-width: 90%; height: auto; border-radius: 8px;"
+                    >
+                </div>
+                </li>
+                
+                                
+                <li>Cliquez sur le bouton « Run QC » pour effectuer l’évaluation de la qualité. Les résultats s’afficheront dans la section de sortie et présenteront les paramètres thermodynamiques, la formation de structures secondaires et la compatibilité des paires d’amorces.
+
+                </li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>Principe du contrôle qualité des amorces</h2>
+            
+            <p>Le contrôle qualité des amorces est une composante essentielle de la conception et du dépannage des expériences de PCR. Les amorces de haute qualité se lient spécifiquement aux cibles prévues, s’hybrident efficacement dans les conditions de réaction et présentent une faible tendance à former des structures secondaires indésirables ou des dimères d’amorces. Ce module évalue les amorces selon plusieurs dimensions au moyen d’une modélisation thermodynamique des plus proches voisins, d’une prédiction systématique des structures secondaires et d’un système intégré de score de fiabilité.</p>
+            
+            <h3>Principaux critères d’évaluation</h3>
+            <ul>
+                <li><strong>Propriétés thermodynamiques :</strong> la température de fusion (Tm), la teneur en GC et la stabilité de l’extrémité 3′ sont calculées à partir de paramètres thermodynamiques unifiés des plus proches voisins, avec des corrections salines explicites pour les ions Na⁺ et Mg²⁺.</li>
+                <li><strong>Formation de structures secondaires :</strong> le module identifie et évalue les structures en épingle à cheveux au sein de chaque amorce et la formation de dimères entre les paires d’amorces, en calculant l’énergie libre de Gibbs (ΔG) afin d’estimer leur stabilité et leur probabilité d’apparition.</li>
+                <li><strong>Compatibilité de la paire d’amorces :</strong> les amorces sens et antisens sont évaluées quant à la formation d’hétérodimères, à la concordance des températures de fusion et à l’efficacité globale d’amplification au moyen d’un score de fiabilité complet combinant plusieurs indicateurs de qualité.</li>
+                <li><strong>Indicateurs de qualité des séquences :</strong> les répétitions homopolymériques, la force d’appariement des bases à l’extrémité 3′ et la prise en charge des bases dégénérées IUPAC sont évaluées afin d’identifier les sources potentielles d’amplification non spécifique ou de baisse de spécificité.</li>
+            </ul>
+
+        </div>
+
+        <div class="section">
+            <h2>Format d’entrée</h2>
+            
+            <h3>Formats de séquence pris en charge</h3>
+            <p>Ce module accepte <strong>les formats multi-FASTA et texte brut</strong>. Les fichiers téléversés de plus de <strong>1 MB</strong> sont bloqués par le contrôle d’importation commun <strong>MW-22</strong>. Même en dessous de cette limite stricte, l’interface utilisateur peut devenir instable lors du traitement d’entrées très volumineuses ; nous recommandons donc de limiter chaque analyse à <strong>500 séquences au maximum</strong>. Le système prend en charge <strong>les bases canoniques de l’ADN (A, T, G, C) ainsi que les bases dégénérées IUPAC (R, Y, S, W, K, M, B, D, H, V, N)</strong>. Ces bases sont intégrées aux calculs d’appariement complémentaire et de thermodynamique. Les caractères non conformes à l’IUPAC sont supprimés lors de la normalisation après confirmation de l’utilisateur. Les amorces contenant des bases dégénérées sont signalées par un astérisque (*) dans les résultats.</p>
+
+		<div style="text-align: center; margin: 2em 0;">
+                    <img
+                        src="contents/pictures/qc_input_format.png"
+                        alt="Format d’entrée du contrôle qualité des amorces"
+                        style="max-width: 60%; height: auto; border-radius: 8px;"
+                    >
+                </div>
+
+
+            
+            <h3>Reconnaissance des paires d’amorces</h3>
+            <p>L’outil reconnaît et apparie automatiquement les amorces selon des conventions de nommage souples. Si l’appariement est ambigu, le rapport indique les amorces non appariées sans effectuer de contrôle des hétérodimères entre amorces. Les modèles de nommage pris en charge comprennent :</p>
+            <ul>
+                <li><code>Target1-F / Target1-R</code> (avec tiret)</li>
+                <li><code>Target1_F / Target1_R</code> (avec trait de soulignement)</li>
+                <li><code>Target1F / Target1R</code> (sans séparateur)</li>
+                <li><code>Target1-Forward / Target1-Reverse</code> (mots complets)</li>
+                <li><code>Target1_Forward / Target1_Reverse</code> (mots complets avec trait de soulignement)</li>
+                <li><code>Target1-fwd / Target1-rev</code> (abrégé)</li>
+                <li><code>Target1_FWD / Target1_REV</code> (abrégé en majuscules)</li>
+            </ul>
+
+        </div>
+
+        <div class="section">
+            <h2>Paramètres du contrôle qualité</h2>
+            
+            <p>Avant de lancer l’analyse de contrôle qualité, vérifiez et ajustez les paramètres suivants pour qu’ils correspondent aux conditions de votre réaction de PCR.</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Paramètre</th>
+                        <th>Valeur par défaut</th>
+                        <th>Plage</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Concentration en Na⁺ (mM)</strong></td>
+                        <td>50</td>
+                        <td>0–200</td>
+                        <td>Concentration en cations monovalents utilisée pour le calcul de la Tm corrigé en fonction des sels. Plage habituelle : 10-200 mM.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Concentration en Mg²⁺ (mM)</strong></td>
+                        <td>2.0</td>
+                        <td>0–10</td>
+                        <td>Concentration en cations divalents utilisée pour le calcul de la Tm. Réglez-la sur 0 si la réaction ne contient pas de Mg²⁺. Plage habituelle : 0.5-5 mM.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Concentration des amorces (nM)</strong></td>
+                        <td>500</td>
+                        <td>50–2000</td>
+                        <td>Concentration effective des amorces retenue pour le calcul in silico de la Tm. Plage habituelle : 25-1000 nM.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tm cible (°C)</strong></td>
+                        <td>60</td>
+                        <td>40–75</td>
+                        <td>Température de fusion cible utilisée pour l’évaluation. Les valeurs de Tm des amorces évaluées sont comparées à cette référence afin d’estimer la compatibilité d’hybridation. Plage habituelle : 50-65°C.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+        <div class="section">
+            <h2>Résultats et sortie</h2>
+            
+            <p>Après l’exécution de l’analyse de contrôle qualité, le module produit des résultats détaillés évaluant les propriétés de chaque amorce, la compatibilité des paires d’amorces et la fiabilité globale.</p>
+
+            <p>Pour chaque amorce, l’outil affiche un tableau complet d’indicateurs comprenant :</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Indicateur</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Amorce</strong></td>
+                        <td>Nom ou étiquette de l’amorce (marqué d’un * si des bases dégénérées sont présentes)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Longueur</strong></td>
+                        <td>Longueur de l’amorce en nucléotides</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GC%</strong></td>
+                        <td>Pourcentage de GC (généralement optimal entre 40 et 60 %)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tm (Δ)</strong></td>
+                        <td>Température de fusion calculée et écart (ΔTm) par rapport à la Tm cible</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Clamp 3′</strong></td>
+                        <td>Identité de la paire de bases terminale (G/C préférable, A/T acceptable)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Homopolymère</strong></td>
+                        <td>État de détection des répétitions homopolymériques (OK ou Élevé)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Épingle à cheveux</strong></td>
+                        <td>Classification de la structure secondaire en épingle à cheveux (Aucune, Faible, Modérée, Forte)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ΔG(3′ 5bp)</strong></td>
+                        <td>Énergie libre de Gibbs de la fenêtre de 5 bases à l’extrémité 3′ (indique la stabilité)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Autodimère</strong></td>
+                        <td>Classification et stabilité de la formation d’autodimères</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Hétérodimère</strong></td>
+                        <td>Formation d’hétérodimères entre les amorces d’une paire (pour les amorces appariées)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            
+            <h3>Score de fiabilité</h3>
+            <p>Un score composite (0–100) est calculé en combinant plusieurs indicateurs de qualité :</p>
+            <ul>
+                <li>Scores de qualité de chaque amorce (pondération de 45 % pour chacune des amorces sens et antisens)</li>
+                <li>Évaluation de la formation d’hétérodimères (pénalité ou bonus)</li>
+                <li>Évaluation de la concordance des températures de fusion (pénalité si ΔTm &gt; 5°C)</li>
+            </ul>
+            
+            <h4>Classification du score</h4>
+            <ul>
+                <li><strong>Excellent (≥85) :</strong> paire d’amorces de haute qualité, prête à être utilisée en PCR</li>
+                <li><strong>Acceptable (65–84) :</strong> bonne qualité avec des réserves mineures, généralement adaptée à la PCR</li>
+                <li><strong>Risqué (&lt;65) :</strong> problèmes importants détectés ; vérification et optimisation recommandées avant utilisation</li>
+            </ul>
+            
+            <h3>Structures secondaires prédites</h3>
+            <p>Lorsque des dimères ou des épingles à cheveux sont détectés, l’outil fournit un alignement visuel de la structure, la valeur de ΔG calculée, le niveau de classification (Aucune, Faible, Modérée, Forte) et des avertissements concernant les interactions à l’extrémité 3′ susceptibles de nuire aux performances de la PCR.</p>
+            
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/qc_2nd_structure.png"
+                    alt="Structures secondaires et visualisation des dimères dans le contrôle qualité des amorces"
+                    style="max-width: 70%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+        </div>
+
+        <div class="section">
+            <h2>Méthodes de calcul et algorithmes</h2>
+            
+            <h3>Paramètres du modèle thermodynamique des plus proches voisins</h3>
+        <p>L’outil utilise les paramètres unifiés des plus proches voisins (NN) de SantaLucia (1998) et d’Allawi & SantaLucia (1997), avec une correction d’initiation. Pour les séquences contenant des bases dégénérées IUPAC, le moteur de contrôle qualité développe chaque base en ses bases concrètes possibles et applique une hypothèse prudente fondée sur le cas le plus défavorable : à chaque étape dinucléotidique, il choisit la combinaison qui produit l’interaction la plus stable (ΔG le plus faible à 37 °C). Cette méthode évite de sous-estimer la force de liaison.</p>
+        <table>
+                <thead>
+                    <tr>
+                        <th>Plus proches voisins</th>
+                        <th>ΔH° (kcal/mol)</th>
+                        <th>ΔS° (cal/mol·K)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>AA/TT</td>
+                        <td>-7.9</td>
+                        <td>-22.2</td>
+                    </tr>
+                    <tr>
+                        <td>AT/TA</td>
+                        <td>-7.2</td>
+                        <td>-20.4 / -21.3</td>
+                    </tr>
+                    <tr>
+                        <td>CA/TG</td>
+                        <td>-8.5</td>
+                        <td>-22.7</td>
+                    </tr>
+                    <tr>
+                        <td>GT/AC</td>
+                        <td>-8.4</td>
+                        <td>-22.4</td>
+                    </tr>
+                    <tr>
+                        <td>CT/AG</td>
+                        <td>-7.8</td>
+                        <td>-21.0</td>
+                    </tr>
+                    <tr>
+                        <td>GA/TC</td>
+                        <td>-8.2</td>
+                        <td>-22.2</td>
+                    </tr>
+                    <tr>
+                        <td>CG/GC</td>
+                        <td>-10.6 / -9.8</td>
+                        <td>-27.2 / -24.4</td>
+                    </tr>
+                    <tr>
+                        <td>GG/CC</td>
+                        <td>-8.0</td>
+                        <td>-19.9</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3>Calcul de la température de fusion (Tm)</h3>
+            <p>Met en œuvre le modèle thermodynamique unifié des plus proches voisins, avec une prise en charge explicite des effets des cations monovalents (Na⁺) et divalents (Mg²⁺). Les températures de fusion des amorces sont en outre ajustées en fonction de la concentration en oligonucléotides selon la formulation ci-dessous.</p>
+            
+            <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin: 1em 0; text-align: center; font-family: 'Times New Roman', serif; font-size: 1.1em;">
+                <p style="margin: 0;">T<sub>m</sub> = ΔH° / (ΔS° + R × ln(C<sub>T</sub>/4)) - 273.15 + 16.6 × log[Na<sup>+</sup><sub>eq</sub>]</p>
+                <p style="font-size: 0.85em; color: #666; margin-top: 0.5em; margin-bottom: 0;">où Na<sup>+</sup><sub>eq</sub> inclut l’effet de la concentration en Mg<sup>2+</sup>.</p>
+            </div>
+
+            <h3>Analyse de la teneur en GC</h3>
+            <p>Prend en charge les codes de bases dégénérées IUPAC, calcule le pourcentage de GC selon la formule ci-dessous et identifie les amorces dont la teneur en GC est sous-optimale (une valeur de 40 à 60 % est généralement recommandée).</p>
+            
+            <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin: 1em 0; text-align: center; font-family: 'Times New Roman', serif; font-size: 1.1em;">
+                <p style="margin: 0;">%GC = [Count(G) + Count(C)] / Total Length × 100</p>
+            </div>
+
+
+            <h3>Analyse des structures secondaires</h3>
+
+            <h4>Détection des autodimères</h4>
+            <ul>
+                <li>Recherche exhaustive des formations potentielles d’autodimères</li>
+                <li>Calcul de l’énergie libre de Gibbs (ΔG) des structures dimériques</li>
+                <li>Classification des dimères :
+                    <ul>
+                        <li><strong>Aucun</strong> : aucune formation significative de dimère (ΔG &gt; -3 kcal/mol)</li>
+                        <li><strong>Faible</strong> : stabilité modérée (-5 &lt; ΔG ≤ -3 kcal/mol)</li>
+                        <li><strong>Modéré</strong> : stabilité importante (-7 &lt; ΔG ≤ -5 kcal/mol)</li>
+                        <li><strong>Fort</strong> : stabilité élevée (ΔG ≤ -7 kcal/mol)</li>
+                    </ul>
+                </li>
+                <li>Attention particulière portée aux interactions à l’extrémité 3', qui sont particulièrement problématiques pour la PCR</li>
+            </ul>
+
+            <h4>Détection des épingles à cheveux</h4>
+            <ul>
+                <li>Identification des structures potentielles en épingle à cheveux présentant des boucles de 3 à 9 nucléotides</li>
+                <li>Intégration des pénalités entropiques de boucle fondées sur les paramètres de SantaLucia (2004)</li>
+                <li>Calcul de ΔG pour la formation d’épingles à cheveux, en tenant compte :
+                    <ul>
+                        <li>de l’appariement des bases dans la région de la tige</li>
+                        <li>de la taille et de l’entropie de la boucle</li>
+                        <li>des mésappariements terminaux</li>
+                    </ul>
+                </li>
+                <li>Classification des épingles à cheveux selon les mêmes seuils énergétiques que les dimères</li>
+            </ul>
+
+            <h4>Analyse des hétérodimères</h4>
+            <ul>
+                <li>Évaluation de la formation potentielle de dimères entre les amorces sens et antisens</li>
+                <li>Essentielle à la validation des paires d’amorces</li>
+                <li>Affichage d’un alignement visuel des structures dimériques lorsqu’elles sont détectées</li>
+                <li>Avertissement concernant les interactions à l’extrémité 3' susceptibles de produire des artéfacts de dimères d’amorces</li>
+            </ul>
+
+            <h4>Algorithme de recherche des dimères</h4>
+            <ol>
+                <li><strong>Approche par fenêtre glissante</strong>
+                    <ul>
+                        <li>Examine tous les alignements possibles entre les séquences d’amorces</li>
+                        <li>Prend en compte les orientations directe et complémentaire inverse</li>
+                        <li>Teste les alignements comportant des espaces et des surplombs</li>
+                    </ul>
+                </li>
+                <li><strong>Calcul de l’énergie :</strong>
+                    <ul>
+                        <li>Somme les valeurs de ΔH° et ΔS° des plus proches voisins dans les régions appariées</li>
+                        <li>Applique une correction saline</li>
+                        <li>Prend en compte les mésappariements terminaux et les renflements</li>
+                    </ul>
+                </li>
+                <li><strong>Détection des interactions à l’extrémité 3' :</strong>
+                    <ul>
+                        <li>Signalement spécifique lorsque les interactions dimériques impliquent l’extrémité 3'</li>
+                        <li>Élément essentiel pour la PCR, puisque l’élongation commence à l’extrémité 3'</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <h3>Algorithme de détection des épingles à cheveux</h3>
+            <ol>
+		<li><strong>Identification de la tige :</strong>
+                    <ul>
+                        <li>Recherche de régions complémentaires au sein de l’amorce</li>
+                        <li>Longueur minimale de la tige : 3 paires de bases</li>
+                        <li>Autorise les boucles internes et les renflements</li>
+                    </ul>
+                </li> 
+		<li><strong>Pénalité entropique de la boucle :</strong>
+                    <ul>
+                        <li>Applique des pénalités entropiques dépendant de la taille :
+                            <ul>
+                                <li>Boucle de 3 nt : +5.7 kcal/mol</li>
+                                <li>Boucle de 4 nt : +5.6 kcal/mol</li>
+                                <li>Boucle de 5 nt : +4.9 kcal/mol</li>
+                                <li>Boucle de 6 nt : +4.4 kcal/mol</li>
+                                <li>Boucles de 7-9 nt : +4.5-4.6 kcal/mol</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li><strong>Seuil énergétique :</strong>
+                    <ul>
+                        <li>Les épingles à cheveux avec ΔG ≤ -3 kcal/mol sont considérées comme significatives</li>
+                        <li>Les épingles à cheveux plus stables (ΔG ≤ -7 kcal/mol) sont signalées comme critiques</li>
+                    </ul>
+                </li> 
+              
+            </ol>
+
+            </ul>
+ 	 
+
+        <h3>Indicateurs de qualité supplémentaires</h3>
+
+        <h4>Stabilité de l’extrémité 3' (clamp 3')</h4>
+        <ul>
+            <li>Évalue la stabilité de la paire de bases terminale en 3'</li>
+            <li>Un clamp G/C, plus fort, est préférable à un clamp A/T</li>
+            <li>Élément essentiel à l’efficacité de la PCR, puisque l’élongation débute à l’extrémité 3'</li>
+        </ul>
+
+        <h4>Détection des homopolymères</h4>
+        <ul>
+            <li>Identifie les répétitions de bases identiques (seuil par défaut : 4 bases consécutives)</li>
+            <li>Les longs homopolymères peuvent provoquer des glissements et une amplification non spécifique</li>
+        </ul>
+
+        <h4>Prise en charge des bases dégénérées IUPAC</h4>
+        <ul>
+            <li>Prise en charge complète des bases d’ADN ambiguës</li>
+            <li>Les calculs de Tm et de ΔG utilisent la variante la plus stable, correspondant au cas le plus défavorable</li>
+            <li>Signalement clair dans les résultats par un astérisque (*)</li>
+        </ul>
+
+        <h3>Calcul du score de fiabilité</h3>
+        <p>Calcule un score composite à partir de différents indicateurs de qualité des amorces, avec un score initial de 100 :</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Règle</th>
+                    <th>Pénalité</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>GC% hors de la plage 40–60 %</td><td>−10</td></tr>
+                <tr><td>Longueur hors de la plage 18–30 bp</td><td>−8</td></tr>
+                <tr><td>Absence de clamp GC en 3′</td><td>−5</td></tr>
+                <tr><td>Homopolymère (≥4)</td><td>−8</td></tr>
+                <tr><td>ΔG(3′ 5bp) ≤ −9</td><td>−10</td></tr>
+                <tr><td>Autodimère = BAD (fort/très fort)</td><td>−25</td></tr>
+                <tr><td>Autodimère = WARN (modéré)</td><td>−10</td></tr>
+                <tr><td>Épingle à cheveux = BAD</td><td>−12</td></tr>
+                <tr><td>Épingle à cheveux = WARN</td><td>−6</td></tr>
+            </tbody>
+        </table>
+
+        <h4>Score de la paire (0–100)</h4>
+        <p>Si les deux amorces sont présentes, le score de la paire est calculé comme suit :</p>
+        <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin: 1em 0; text-align: center; font-family: 'Times New Roman', serif; font-size: 1.1em;">
+            <p style="margin: 0;">Score<sub>pair</sub> = 0.45 &times; Score<sub>F</sub> + 0.45 &times; Score<sub>R</sub> + pp</p>
+        </div>
+        <p>où <code>pp</code> dépend de la classification de l’hétérodimère :</p>
+        <ul>
+            <li>Hétérodimère OK : +10</li>
+            <li>Hétérodimère WARN : −10</li>
+            <li>Hétérodimère BAD : −25</li>
+        </ul>
+        <p>Si ΔTm &gt; 5 °C, alors <code>pp -= 10</code>. Le score final est limité à l’intervalle [0, 100].</p>
+        </div>
+
+        <div class="section">
+            <h2>Avertissements et cas limites</h2>
+            <p>Le module de contrôle qualité des amorces utilise son propre système d’avertissement préalable pour valider les listes d’amorces, la logique d’appariement, la normalisation des séquences et les plages des paramètres thermodynamiques avant le début de l’analyse. Il présente également plusieurs cas limites d’interprétation qui influencent la lecture des indicateurs de contrôle qualité par paire.</p>
+
+            <h3>Avertissements généraux</h3>
+            <p>Ces avertissements sont principalement générés avant le début du contrôle qualité et signalent généralement des problèmes liés à la qualité des entrées, à la qualité de l’appariement ou aux limites du modèle. Dans la plupart des cas, l’utilisateur peut poursuivre, mais la signification du score final ou des indicateurs par paire peut changer.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Catégorie</th>
+                        <th>Condition de déclenchement</th>
+                        <th>Comportement actuel du module de contrôle qualité des amorces</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Invite bloquante liée aux entrées</strong></td>
+                        <td>Ni la liste des amorces sens ni celle des amorces antisens ne contient de séquence exploitable.</td>
+                        <td>Le module s’arrête immédiatement et demande à l’utilisateur de fournir des amorces avant de pouvoir exécuter le contrôle qualité.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-01 / MW-02</strong><br>Un seul côté exploitable</td>
+                        <td>Après l’analyse syntaxique et le nettoyage, seules les amorces sens ou seules les amorces antisens restent analysables.</td>
+                        <td>Le module poursuit uniquement le contrôle qualité des amorces individuelles ; les indicateurs au niveau de la paire, tels que l’hétérodimère et la fiabilité de la paire, ne sont pas disponibles.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-03</strong><br>Nombre d’amorces discordant</td>
+                        <td>Le nombre d’entrées sens et antisens diffère.</td>
+                        <td>Le module tente d’abord un appariement fondé sur les noms, puis utilise à défaut un appariement fondé sur les indices ; certaines lignes peuvent donc n’être évaluées que comme des entrées d’amorces partielles ou non appariées.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-04</strong><br>Aucune séquence valide après normalisation</td>
+                        <td>Le texte des amorces est présent, mais aucune amorce IUPAC valide ne subsiste après normalisation.</td>
+                        <td>L’utilisateur peut tout de même poursuivre, mais la sortie du contrôle qualité sera vide ou non informative.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-05</strong><br>Caractères non IUPAC supprimés</td>
+                        <td>Une ou plusieurs séquences d’amorces contiennent des caractères non pris en charge.</td>
+                        <td>Le module poursuit uniquement avec les séquences normalisées et avertit que la séquence effectivement utilisée pour le calcul thermodynamique peut différer du texte collé à l’origine.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-06</strong><br>Bases dégénérées détectées</td>
+                        <td>Une ou plusieurs amorces contiennent des bases IUPAC ambiguës.</td>
+                        <td>Les valeurs thermodynamiques sont estimées de manière prudente à partir de l’interprétation la plus stable ; les valeurs de Tm et de ΔG indiquées doivent donc être considérées comme des approximations.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-07</strong><br>Noms d’amorces en double</td>
+                        <td>Des étiquettes d’amorces sont répétées dans les listes soumises.</td>
+                        <td>Le module continue de fonctionner, mais l’appariement et les étiquettes de sortie peuvent devenir ambigus.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-08</strong><br>Orientation ou méthode de nommage suspecte</td>
+                        <td>Les étiquettes suggèrent la présence d’une amorce antisens dans le champ sens, d’une amorce sens dans le champ antisens, ou le mélange de méthodes de nommage incompatibles.</td>
+                        <td>Le module avertit que l’appariement automatique risque de ne pas correspondre à l’intention biologique de l’utilisateur.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-09</strong><br>Grand ensemble d’amorces</td>
+                        <td>Le nombre total d’amorces dépasse <strong>500</strong>.</td>
+                        <td>Le module avertit que les calculs effectués dans le navigateur peuvent ralentir ou ne plus répondre.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-10 à MW-15</strong><br>Avertissements relatifs aux plages des paramètres</td>
+                        <td>Na<sup>+</sup>, Mg<sup>2+</sup>, la concentration des amorces ou la Tm cible se situe en dehors des plages thermodynamiques recommandées ou validées.</td>
+                        <td>Le module peut tout de même poursuivre, mais l’interprétation de la Tm, de ΔG et du score devient moins fiable dans ces conditions.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-16</strong><br>Structures extrêmement stables ou Tm cible extrême</td>
+                        <td>La Tm cible demandée est très élevée ou une ou plusieurs amorces forment des structures auto-complémentaires très stables.</td>
+                        <td>Le module avertit que le résultat calculé peut devenir très sensible aux paramètres et difficile à interpréter expérimentalement.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-17</strong><br>Grande dispersion des longueurs d’amorces</td>
+                        <td>Les longueurs des amorces varient fortement dans l’ensemble soumis.</td>
+                        <td>Le module avertit que la comparabilité entre amorces et la cohérence de la notation peuvent diminuer pour les collections d’amorces très hétérogènes.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-19</strong><br>Grande taille totale des séquences</td>
+                        <td>La longueur totale des séquences d’amorces normalisées est très importante.</td>
+                        <td>Le module avertit que le contrôle qualité et le rendu dans le navigateur peuvent ralentir.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-21</strong><br>Les résultats au niveau des paires se réduisent en grande partie au contrôle qualité des amorces individuelles</td>
+                        <td>Trop peu de paires sens/antisens exploitables peuvent être constituées par rapport aux listes d’amorces soumises.</td>
+                        <td>Le module avertit que la plupart des résultats seront interprétés comme un contrôle qualité des amorces individuelles plutôt que comme un véritable contrôle qualité par paire.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-22</strong><br>Le téléversement dépasse la limite d’importation</td>
+                        <td>Un fichier d’amorces téléversé dépasse <strong>1 MB</strong>.</td>
+                        <td>L’importation est bloquée avant le chargement des séquences et l’utilisateur doit choisir un fichier plus petit.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Avertissements de conception</h3>
+            <p>Ces cas limites concernent spécifiquement l’interprétation du contrôle qualité, la constitution des paires et les heuristiques thermodynamiques internes utilisées par le module.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cas</th>
+                        <th>Condition de déclenchement</th>
+                        <th>Comportement actuel du module de contrôle qualité des amorces</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Le format multi-FASTA est une entrée attendue, et non une erreur</strong></td>
+                        <td>Les utilisateurs fournissent de nombreuses amorces au format FASTA.</td>
+                        <td>Contrairement aux modules à séquence unique, le contrôle qualité des amorces est conçu pour accepter les listes d’amorces au format multi-FASTA ; <strong>MW-20 n’est donc pas utilisé ici</strong>.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Appariement fondé sur les noms avec recours aux indices</strong></td>
+                        <td>Les étiquettes des amorces ne peuvent pas être appariées clairement selon la convention de nommage.</td>
+                        <td>Le module tente d’abord d’apparier les amorces selon le nom et l’orientation de la cible déduits, puis utilise à défaut un appariement fondé sur les indices pour les entrées non résolues.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Les lignes d’amorces individuelles affichent moins d’informations par paire</strong></td>
+                        <td>Un membre d’une paire d’amorces est absent ou inexploitable.</td>
+                        <td>Les indicateurs d’hétérodimère et de paire sont indiqués comme indisponibles au lieu d’être déduits de données incomplètes.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Les amorces dégénérées sont signalées, mais restent notées</strong></td>
+                        <td>Les amorces contiennent des codes d’ambiguïté IUPAC valides.</td>
+                        <td>Le tableau de résultats signale ces amorces et les évalue selon des hypothèses thermodynamiques prudentes au lieu de les rejeter d’emblée.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Les modèles d’épingles à cheveux et de dimères sont heuristiques</strong></td>
+                        <td>Des structures secondaires sont détectées dans des plages énergétiques limites.</td>
+                        <td>Le module indique les structures prédites les plus pertinentes, mais le comportement expérimental peut différer, car les pénalités de boucle, les renflements et les effets des sels sont estimés par calcul.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>La récupération des préréglages revient aux valeurs par défaut du système</strong></td>
+                        <td>Les préréglages de contrôle qualité enregistrés sont mal formés, incomplets ou indisponibles dans le stockage local.</td>
+                        <td>Le module rétablit les paramètres internes par défaut au lieu de conserver des valeurs de préréglage non valides.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <p><strong>Interprétation pratique :</strong> les avertissements du contrôle qualité des amorces ne signifient pas toujours que les amorces soumises sont inutilisables. De nombreux avertissements concernent la normalisation des séquences, un appariement ambigu ou la distinction entre le contrôle qualité au niveau de la paire et celui limité aux amorces individuelles. Les résultats doivent donc être interprétés conjointement avec l’état de l’appariement, le résultat relatif aux hétérodimères et le résumé du score final.</p>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>限制性内切酶克隆 - PrimerWeaver V1.0.6</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #333;
+            background: #f9fafb;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e40af;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2563eb;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            font-size: 1.5em;
+        }
+        h3 {
+            color: #3b82f6;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            font-size: 1.2em;
+        }
+        h4 {
+            color: #60a5fa;
+            margin-top: 1.2em;
+            margin-bottom: 0.6em;
+        }
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 1em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        strong {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c2410c;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .abstract {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+        .abstract p {
+            margin: 0;
+            font-style: italic;
+        }
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .section {
+            margin-bottom: 2.5em;
+        }
+        .version-info {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+            margin-top: 3em;
+            padding-top: 2em;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>限制性内切酶克隆引物设计器</h1>
+        
+        <div class="abstract">
+            <p>限制性内切酶克隆模块用于设计采用限制性内切酶的定向克隆引物。该工具可自动创建在 DNA 片段两端添加限制性酶切位点的引物，从而将片段以受控方向插入经酶切的载体。这种经典克隆方法仍广泛用于简单构建体，并为质粒构建提供可靠、经济的途径。</p>
+        </div>
+
+        <div class="section">
+            <h2>快速入门指南</h2>
+            <ol>
+                <li>将目的载体和插入片段序列上传或粘贴到相应输入框中。选择所需限制性内切酶组合，核验自动检测到的载体骨架，并在必要时调整设计参数。</li>
+	   <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/re_demo.png"
+                    style="max-width: 90%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+                <li>单击“设计引物”以生成带有附加限制性酶切位点的引物。检查引物序列（酶切位点已突出显示）、Tm 值和质控指标。下载组装后的 FASTA 文件，以确认插入片段方向与预期设计一致。如果方向不正确，请将插入片段序列反向互补后重新生成引物。</li>
+
+
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>限制性内切酶克隆原理</h2>
+            
+            <p>限制性内切酶克隆使用<strong>II 型限制性内切酶</strong>在插入片段和载体上产生兼容的<strong>黏性末端或平末端</strong>，随后由 <strong>T4 DNA ligase</strong> 将 DNA 末端共价连接。一般而言，<strong>黏性末端连接的效率显著高于平末端连接</strong>，因为黏性突出端可在连接前促进正确退火，而平末端连接仅依赖末端的随机碰撞，因此效率较低。</p>
+            <p>单酶切使用一种限制性内切酶同时切割插入片段和载体。该策略简单，但允许插入片段以任一方向连接，并增加载体自连风险，在平末端克隆中尤为明显。在单酶切中，可应用<strong>载体去磷酸化</strong>以减少自连并提高克隆效率。</p>
+	    <p><strong>双酶切</strong>使用两种不同的限制性内切酶，在插入片段和载体的两端产生<strong>不兼容末端</strong>。该方法可强制<strong>定向克隆</strong>，降低载体自连造成的背景，并通常获得更高的克隆效率。因此，带黏性末端的双酶切是大多数限制性克隆应用的首选策略。</p>
+        </div>
+
+        <div class="section">
+            <h2>输入格式</h2>
+            <p>载体和插入片段输入均接受 <strong>FASTA</strong>、<strong>纯 DNA 文本</strong>或标准 <strong>GenBank</strong> 文件（<code>.gb</code>、<code>.gbk</code>、<code>.gbff</code>、<code>.genbank</code>），并需包含 <code>LOCUS</code> 和 <code>ORIGIN</code> 区块。<strong>LOCUS</strong> 中的短名称用作序列标题。每个输入框仅允许<strong>一条序列</strong>；若检测到多个 FASTA 标题，将<strong>仅使用第一条序列</strong>。如果上传不含 <code>&gt;</code> 标题的纯序列，则使用<strong>文件名</strong>（不含扩展名）作为名称。专有二进制格式（例如 SnapGene <code>.dna</code>）必须先导出为 GenBank 或 FASTA。来自 FASTA 或 GenBank 的片段名称在适用时用于引物命名。</p>
+            <p>PrimerWeaver 目前支持约 <strong>100 种内置 II 型限制性内切酶</strong>。提供载体序列后，系统会<strong>自动识别载体特征</strong>，并显示所有<strong>单切限制性酶切位点</strong>的位置。载体图谱可旋转，以便观察目标克隆区域。</p>
+
+	<div style="text-align: center; margin: 2em 0;">
+  		<img
+    			src="contents/pictures/re_input.png"
+   			alt="限制性内切酶克隆模块输入"
+    			style="max-width: 60%; height: auto; border-radius: 8px;"
+  		 >
+	   </div>
+
+
+
+        <div class="section">
+            <h2>设计参数</h2>
+		<p>请从下拉列表中选择首选限制性内切酶，或按酶名称搜索。选定<strong>两种限制性内切酶</strong>后，系统会自动将<strong>最长酶切片段</strong>识别为目的载体骨架。如果最长片段并非预期载体骨架，您可以手动选择合适片段。请在继续前检查引物设计参数，并在必要时修改。</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>参数</th>
+                        <th>默认值</th>
+                        <th>范围</th>
+                        <th>说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>限制性内切酶 1</strong></td>
+                        <td>None</td>
+                        <td>任意受支持的酶</td>
+                        <td>添加到插入片段 5' 端的限制性酶切位点。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>限制性内切酶 2</strong></td>
+                        <td>None</td>
+                        <td>任意受支持的酶</td>
+                        <td>添加到插入片段 3' 端的限制性酶切位点。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>目标 Tm（°C）</strong></td>
+                        <td>55</td>
+                        <td>40–75</td>
+                        <td>模板结合区（不含限制性酶切位点）的目标熔解温度。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>引物浓度（nM）</strong></td>
+                        <td>500</td>
+                        <td>50–2000</td>
+                        <td>计算机模拟 Tm 计算所采用的有效引物浓度。常用范围：25-1000 nM。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Na⁺ 浓度（mM）</strong></td>
+                        <td>50</td>
+                        <td>0–200</td>
+                        <td>用于经盐校正的 Tm 计算的单价阳离子浓度。常用范围：10-200 mM。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mg²⁺ 浓度（mM）</strong></td>
+                        <td>2.0</td>
+                        <td>0–10</td>
+                        <td>用于 Tm 计算的二价阳离子浓度。如果反应中不含 Mg²⁺，请设为 0。常用范围：0.5-5 mM。</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>结果与输出</h2>
+            <p>引物设计完成后，限制性克隆模块会生成一套完整结果，以便进行实验验证和下游克隆。</p>
+
+            <h3>引物表</h3>
+            <p>设计好的引物对以结构化表格报告，包括引物序列（5′→3′）、长度、GC 含量和熔解温度（Tm）。Tm 值分别显示<strong>退火核心区</strong>和<strong>全长引物</strong>，便于评估扩增兼容性。引物质量指标（包括同聚物连续序列、发夹结构、自身二聚体和交叉二聚体形成）会被评估并标记，以突出可能影响 PCR 性能的潜在风险。添加到引物中的<strong>限制性内切酶识别位点</strong>在引物序列中以<strong>粗体突出显示</strong>，保护碱基则以斜体显示。</p>
+	
+	   <div style="text-align: center; margin: 2em 0;">
+  		<img
+    			src="contents/pictures/RE_primer_table.png"
+			alt="限制性内切酶克隆引物表"
+    			style="max-width: 60%; height: auto; border-radius: 8px;"
+  		 >
+	   </div>
+
+            <h3>组装示意图与黏性末端表</h3>
+	    <p>系统会生成<strong>组装质粒示意图</strong>，以说明克隆流程，包括载体线性化、插入片段引入和最终质粒组装。该图提供片段方向和接头结构的概念性概览。对于使用黏性末端的限制性克隆策略，会提供<strong>接头水平黏性末端表</strong>。该表汇总每个连接接头处的左右黏性末端（5′→3′），便于用户一眼确认末端兼容性和定向克隆设计。</p>
+
+	   <div style="text-align: center; margin: 2em 0;">
+  		<img
+    			src="contents/pictures/RE_assembly_tabel.png"
+			alt="限制性内切酶克隆组装输出"
+    			style="max-width: 60%; height: auto; border-radius: 8px;"
+  		 >
+	   </div>
+
+            <h3>模拟琼脂糖凝胶电泳</h3>
+	    <p>PrimerWeaver 会生成<strong>模拟琼脂糖凝胶图像</strong>，以预测关键克隆步骤的实验结果。凝胶包括：</p>
+            <ul>
+                <li>可选 DNA 分子量标准（默认：NEB 1 kb Plus DNA Ladder）</li>
+                <li>未酶切载体</li>
+                <li>限制性酶切后的载体</li>
+                <li>PCR 扩增的插入片段</li>
+                <li>组装质粒</li>
+                <li>组装质粒的诊断性限制性酶切</li>
+            </ul>
+	    <p>预测条带大小会标注在凝胶旁，便于用户将预期片段大小与实验结果比较，并快速识别潜在克隆问题。</p>
+
+	   <div style="text-align: center; margin: 2em 0;">
+  		<img
+    			src="contents/pictures/RE_gel.png"
+			alt="限制性内切酶克隆模拟凝胶输出"
+    			style="max-width: 60%; height: auto; border-radius: 8px;"
+  		 >
+	   </div>
+
+        </div>
+
+        <div class="section">
+            <h2>引物设计算法</h2>
+            
+            <h3>引物结构</h3>
+            <p>每条引物由三个功能区组成：</p>
+            <ul>
+                <li><strong>退火核心（3′）：</strong>驱动 PCR 退火的模板互补区（通常为 18–30 bp）</li>
+                <li><strong>限制性酶切位点：</strong>附加的酶识别序列，用于酶切/连接（通常为 6–8 bp）</li>
+                <li><strong>保护碱基（5′ 侧翼）：</strong>位于限制性酶切位点上游的短碱基，用于提高酶切效率（通常为 2–6 nt；取决于酶）</li>
+            </ul>
+
+            <h3>设计流程</h3>
+            <p>PrimerWeaver 中的限制性克隆设计分为三个相互关联的步骤：<strong>插入片段引物构建</strong>、<strong>载体酶切解释</strong>以及<strong>考虑连接的组装重建</strong>。这些步骤概述如下。</p>
+
+            <h3>插入片段引物构建</h3>
+            <p>模块首先规范化插入片段序列，并直接在插入片段末端设计<strong>模板结合核心</strong>。正向核心选自插入片段 5′ 端，反向核心选自 3′ 端，为插入片段末端的反向互补。核心长度会迭代扫描，直到达到目标 Tm 或找到最佳可用末端引物。在可用时优先选择 3′ 以 GC 结尾的引物。</p>
+            <p>插入片段结合核心确定后，全长引物按如下方式组装：</p>
+            <p><strong>5′ 保护夹 + 限制性酶切位点 + 退火核心 3′</strong></p>
+            <p>保护夹生成为一段短的非自身互补 5′ 序列，旨在提高酶切效率，所选酶识别位点则附加在夹与退火核心之间。因此，热力学计算针对<strong>插入片段结合核心</strong>进行，而不是针对完整的 5′ 克隆尾部。</p>
+
+            <h3>载体酶切与骨架选择</h3>
+            <p>载体被视为<strong>环状分子</strong>。对每种所选限制性内切酶，模块会识别所有识别位点，将其转换为实际切割位置，并枚举环状骨架上产生的所有酶切片段。最长片段用作默认骨架候选，但如果产生多个片段，用户也可从骨架选择器中手动选择另一片段。</p>
+            <p>随后根据保留骨架片段两端的酶身份解释酶切拓扑。这决定克隆表现为定向双酶切、伪单酶切，还是真正的非定向连接情形。</p>
+
+            <h3>连接与组装序列重建</h3>
+            <p>选定骨架片段后，模块会重建组装质粒，而不仅仅报告引物序列。片段边缘残留的部分识别位点会在适当时从保留骨架中修剪，插入片段则根据骨架左右两端的酶身份相对于骨架定向。在定向双酶克隆中，插入片段可保持原样或经反向互补，使引物携带的酶切位点与实际骨架拓扑对齐。</p>
+            <p>最终组装序列随后按如下方式重建：</p>
+            <p><strong>修剪后的骨架 + 右端限制性酶切位点 + 定向插入片段 + 左端限制性酶切位点</strong></p>
+            <p>同一解释还用于填充接头黏性末端表、组装质粒摘要以及模拟诊断酶切输出。</p>
+
+            <h3>算法中的边界情况逻辑</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>算法边界情况</th>
+                        <th>限制性克隆模块的当前处理方式</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>两种酶都不切割载体</strong></td>
+                        <td>模块完全无法定义酶切骨架。它不会虚构克隆拓扑，而是返回明确的 N/A 类结果，并报告所选酶在载体中没有可用位点。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>仅一种酶切割载体</strong></td>
+                        <td>设计会自动回退到<strong>单酶模式</strong>，在插入片段两端使用该切割酶。这可保留可克隆的设计，但由此得到的连接是非定向的，载体自连风险更高。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>载体中存在多个位点</strong></td>
+                        <td>模块会计算所有酶切片段，并将最长片段用作默认保留骨架。如果该片段两端由同一酶产生，即使名义上是双酶切设置，骨架也会被当作<strong>伪单酶</strong>骨架处理。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>插入片段含有所选限制性酶切位点</strong></td>
+                        <td>引物设计本身仍可生成，但模块会明确标记扩增后的插入片段也可能被所选酶组合切割，从而改变实际克隆解释。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>黏性末端兼容性改变连接解释</strong></td>
+                        <td>如果两端均为平末端，或两种酶产生相同黏性末端，组装会被解释为非定向连接。如果一端为平末端、另一端为黏性末端，模块仍会报告设计，但将其视为不利的克隆拓扑。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>插入片段方向取决于骨架末端酶身份</strong></td>
+                        <td>组装序列不是简单地将插入片段粘贴到载体之后。模块会比较骨架左右末端酶与正向和反向引物的酶标签，并在必要时对插入片段进行反向互补，以保持内部连接拓扑一致。</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>警告与边界情况</h2>
+            <p>限制性克隆模块在共享可视化层可用时，使用共享的 <strong>MW（Message Warning）</strong> 系统进行预检验证和确认对话框。如果 MW 层不可用，模块会回退到标准浏览器警告/确认对话框。实际上，本模块的警告分为两组：继承自共享验证层的<strong>一般警告</strong>，以及特定于限制性克隆逻辑的<strong>设计相关警告</strong>。</p>
+
+            <h3>一般警告</h3>
+            <p>这些警告在设计开始前生成，主要表示潜在的输入质量或参数质量问题。其中大多数允许用户单击<strong>取消</strong>以修改输入，或单击<strong>确定</strong>以使用当前设置继续。</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>类别</th>
+                        <th>触发条件</th>
+                        <th>RE 模块的当前处理方式</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>阻断性输入提示</strong></td>
+                        <td>无插入片段序列、无载体序列、规范化后的插入片段/载体序列为空，或缺少酶选择。</td>
+                        <td>设计立即停止，并显示提示，说明继续前必须提供哪些内容。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-04</strong><br>规范化后无有效序列</td>
+                        <td>因不再剩余有效 IUPAC DNA 符号，规范化后所有字符均被移除。</td>
+                        <td>用户可取消以修改输入或继续，但由此得到的设计将为空或缺乏信息价值。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-05</strong><br>已移除非 IUPAC 字符</td>
+                        <td>序列含有不支持的字符，尤其是出现在与引物相关的 3′ 区域附近时。</td>
+                        <td>模块仅使用规范化序列继续；并警告这可能改变设计行为。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-06</strong><br>检测到简并碱基</td>
+                        <td>载体或插入片段含有 IUPAC 简并符号。</td>
+                        <td>热力学数值根据最稳定变体进行保守估算，因此报告的 Tm 和 ΔG 值可能是最坏情况下的近似值。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-10 至 MW-13</strong><br>参数范围警告</td>
+                        <td>Na<sup>+</sup>、Mg<sup>2+</sup>、引物浓度或目标 Tm 超出建议设计范围。</td>
+                        <td>用户可以继续，但 Tm 预测和引物优化的可靠性可能降低。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-14</strong><br>高盐组合</td>
+                        <td>同时提供高 Na<sup>+</sup> 和高 Mg<sup>2+</sup>。</td>
+                        <td>模块会警告模型可能高估双链稳定性。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-15</strong><br>超出经验证的热力学范围</td>
+                        <td>参数值超出热力学模型的验证范围。</td>
+                        <td>用户仍可继续，但由此得到的 Tm 值可能不再具有物理意义。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-19</strong><br>输入总量较大</td>
+                        <td>载体加插入片段的总输入非常大（&gt; 1 MB）。</td>
+                        <td>模块会警告浏览器端执行可能变慢。这是与 RE 最相关的实际性能警告；一般的“条目过多”警告通常不会触发，因为 RE 每次处理一个载体和一个插入片段设计。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-20</strong><br>同一输入框中有多个 FASTA 标题</td>
+                        <td>载体或插入片段文本框包含不止一条 FASTA 记录。</td>
+                        <td>共享 MW 对话框会警告每个输入框仅允许一条序列。如果用户继续，该输入框会在设计继续前被截取为<strong>第一条 FASTA 记录</strong>。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-22</strong><br>上传文件超过导入限制</td>
+                        <td>上传的载体或插入片段文件大于 <strong>1 MB</strong>。</td>
+                        <td>导入会在加载序列前被阻止，用户必须选择较小的文件。</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>设计相关警告</h3>
+            <p>这些警告来自限制性克隆算法本身。部分以确认式 MW 对话框显示，因为它们会改变所选酶对的解释；另一些则直接附加到结果面板，以便仍可在上下文中审查设计。</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>情况</th>
+                        <th>触发条件</th>
+                        <th>RE 模块的当前处理方式</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>仅使用第一个插入片段</strong></td>
+                        <td>界面中存在不止一行插入片段。</td>
+                        <td>当前 RE 设计流程会收集所有非空插入片段行，但仅将<strong>第一个非空插入片段</strong>用于引物设计、组装预测和凝胶模拟。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>所选两种酶均不存在于载体中</strong></td>
+                        <td>载体中未找到任一所选酶的识别位点。</td>
+                        <td>模块会打开确认 MW 对话框。如果用户继续，输出面板显示 <strong>N/A</strong>，不生成组装质粒，组装图反映无切割情况。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>载体中仅找到一个酶切位点</strong></td>
+                        <td>所选两种酶中恰好一种切割载体。</td>
+                        <td>模块提供<strong>单酶回退</strong>，在两端复用该切割酶。这允许继续设计，但克隆变为非定向，自连风险增加。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>载体上有多个切割位点</strong></td>
+                        <td>所选一种或两种酶在载体上切割不止一个位置。</td>
+                        <td>模块自动选择<strong>最长酶切片段</strong>作为候选骨架，并警告用户核验所选片段是否与预期实验骨架一致。可使用骨架下拉菜单覆盖自动选择。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>伪单酶切骨架</strong></td>
+                        <td>即使输入了两种酶，最长片段两端仍由<strong>同一酶</strong>侧翼。</td>
+                        <td>模块会警告所选骨架实际上表现为单酶切，因此克隆是非定向的，载体背景可能增加。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>所选酶切位点存在于插入片段内部</strong></td>
+                        <td>插入片段已含有一种或两种所选限制性酶切位点。</td>
+                        <td>警告会附加到黏性末端或接头输出，因为插入片段可能在克隆流程中被意外切割。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>相同黏性末端</strong></td>
+                        <td>所选两种酶产生相同的黏性末端序列。</td>
+                        <td>模块将设计标记为<strong>非定向</strong>；不强制插入片段方向，载体自连风险增加。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>两端均为平末端</strong></td>
+                        <td>所选酶均不产生黏性末端。</td>
+                        <td>模块会警告平末端克隆是非定向的，连接效率通常较低，也更容易出现背景菌落。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>一端平末端、一端黏性末端</strong></td>
+                        <td>一种所选酶产生平末端，另一种产生黏性末端。</td>
+                        <td>模块仍会报告设计，但将该酶组合标记为一般<strong>不推荐</strong>用于标准限制性克隆。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>插入片段非常短</strong></td>
+                        <td>插入片段长度短于 <strong>50 bp</strong>。</td>
+                        <td>会添加警告，提醒用户对于极短插入片段，连接、菌落筛选和序列验证可能更困难。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>载体自连风险高</strong></td>
+                        <td>由相同黏性末端、平–平克隆或伪单酶骨架拓扑触发。</td>
+                        <td>模块明确建议进行<strong>载体去磷酸化</strong>和/或选择不同酶组合，以减少背景菌落。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>设计审查后方向不匹配</strong></td>
+                        <td>组装输出与预期的正义链插入片段方向不一致。</td>
+                        <td>建议的纠正措施是<strong>将插入片段序列反向互补</strong>并重新运行设计，而不是手动编辑预测的组装结果。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>组装图为示意图</strong></td>
+                        <td>任何带有组装预览的成功限制性克隆设计。</td>
+                        <td>组装图像是概念性示意图，而不是长度精确的质粒图谱；用户应依赖组装序列、黏性末端表和片段信息来进行精确解释。</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <p><strong>实际解读：</strong>本模块中的警告并不总是意味着设计不可能。部分警告只是表明当前酶对将克隆拓扑从理想的定向黏性末端流程变为回退或较低效率的情形。因此，用户应将 RE 结果与<strong>骨架片段选择器</strong>、<strong>黏性末端表</strong>和<strong>组装质粒预览</strong>一并解读。</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

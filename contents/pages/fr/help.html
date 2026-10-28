@@ -1,0 +1,468 @@
+<section class="card" style="padding:22px 28px">
+
+<svg width="0" height="0" style="position:absolute">
+    <defs>
+    <symbol id="icon-format" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline>
+    </symbol>
+    <symbol id="icon-fail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line>
+    </symbol>
+    <symbol id="icon-pool" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line>
+    </symbol>
+    <symbol id="icon-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+    </symbol>
+    <symbol id="icon-cite" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+    </symbol>
+    <symbol id="icon-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>
+    </symbol>
+    <symbol id="icon-scissors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle>
+    <line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line>
+    <line x1="8.12" y1="8.12" x2="12" y2="12"></line>
+    </symbol>
+    <symbol id="icon-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+    <polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline>
+    </symbol>
+    <symbol id="icon-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line>
+    <line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line>
+    <line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line>
+    </symbol>
+    <symbol id="icon-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 .57 1.92v.5a2 2 0 0 1-1.73 1l-.25.43a2 2 0 0 1 0 2l.25.43a2 2 0 0 1 1.73 1v.5a2 2 0 0 1-.57 1.92l-.15.1a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-.57-1.92v-.5a2 2 0 0 1 1.73-1l.25-.43a2 2 0 0 1 0 2l-.25-.43a2 2 0 0 1-1.73-1v-.5a2 2 0 0 1 .57-1.92l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+    <circle cx="12" cy="12" r="3"></circle>
+    </symbol>
+    <symbol id="icon-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+    </symbol>
+    <symbol id="icon-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line>
+    </symbol>
+    <symbol id="icon-dna" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 14.899A7 7 0 1 1 15 9.101"></path><path d="M9 9.101A7 7 0 1 1 20 14.899"></path><line x1="4" y1="14.9" x2="9" y2="9.1"></line><line x1="15" y1="14.9" x2="20" y2="9.1"></line><line x1="12" y1="6" x2="12" y2="7"></line><line x1="12" y1="17" x2="12" y2="18"></line><line x1="7" y1="12" x2="8" y2="12"></line><line x1="16" y1="12" x2="17" y2="12"></line>
+    </symbol>
+    <symbol id="icon-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line>
+    </symbol>
+    <symbol id="icon-award" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 17 17 23 15.79 13.88"></polyline>
+    </symbol>
+    </defs>
+</svg>
+
+<h2 style="margin-bottom: 24px;">Aide et FAQ</h2>
+
+<h3 class="faq-section-heading">Prise en main</h3>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-user"></use></svg>
+    <details class="faq-content" open>
+    <summary>Faut-il se connecter ou payer&nbsp;?</summary>
+    <div>
+        <p>Non. PrimerWeaver est <strong>gratuit pour les usages universitaires comme commerciaux</strong>. Le code source est publié sous licence MIT. Aucune connexion ni aucun cookie ne sont requis, conformément aux directives de NAR Web Server.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-lock"></use></svg>
+    <details class="faq-content">
+    <summary>Mes données de séquence sont-elles téléversées ou enregistrées sur votre serveur&nbsp;?</summary>
+    <div>
+        <p><strong>Non.</strong> Tous les calculs, de la conception des amorces au contrôle qualité <i>in silico</i>, sont réalisés <strong>entièrement dans votre navigateur local</strong> (côté client). Vos séquences ne sont jamais téléversées, transmises ni stockées sur notre serveur. Vos données restent ainsi totalement privées et sécurisées.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-format"></use></svg>
+    <details class="faq-content">
+    <summary>Quels formats de séquence sont acceptés&nbsp;?</summary>
+    <div>
+        <p>PrimerWeaver accepte les séquences d’ADN standard au format <strong>FASTA</strong> ou <strong>texte brut</strong>. Après autorisation de l’utilisateur, les chiffres, les espaces et les caractères de nucléotides ou d’acides aminés non conformes au code IUPAC sont automatiquement supprimés.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-cite"></use></svg>
+    <details class="faq-content">
+    <summary>Comment citer le serveur&nbsp;?</summary>
+    <div>
+        <p>Si vous utilisez PrimerWeaver dans vos recherches, veuillez citer la publication suivante&nbsp;:</p>
+        <p class="reference">Jin, Z., Kim, Y. E., Ignea, C., 2026. PrimerWeaver: An integrated web server for primer design in molecular biology workflows. <em>Nucleic Acids Research</em>, 54, gkag399. <a href="https://doi.org/10.1093/nar/gkag399" target="_blank" rel="noopener noreferrer">https://doi.org/10.1093/nar/gkag399</a></p>
+    </div>
+    </details>
+</div>
+
+<h3 class="faq-section-heading">Paramètres de conception et précision</h3>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-settings"></use></svg>
+    <details class="faq-content">
+    <summary>Que signifient les paramètres de contrainte (Tm, %GC, épingle à cheveux, dimère)&nbsp;?</summary>
+    <div>
+        <p><strong>Température de fusion (Tm)&nbsp;:</strong> température à laquelle 50&nbsp;% du duplex amorce-cible est dénaturé. PrimerWeaver utilise la méthode des plus proches voisins pour calculer précisément la Tm. Une Tm plus élevée favorise la spécificité, tandis qu’une Tm plus faible réduit l’amplification non spécifique. En pratique, les amorces sont généralement conçues avec une Tm comprise entre 55 et 65&nbsp;°C. Pour une paire d’amorces, un ΔTm inférieur à 5&nbsp;°C est généralement recommandé afin d’assurer une hybridation homogène.</p>
+        <p><strong>Teneur en GC (%)&nbsp;:</strong> pourcentage de bases guanine et cytosine dans l’amorce. La plage habituelle est de 40 à 60&nbsp;%. Une teneur plus élevée augmente la Tm, mais aussi le risque de structures secondaires.</p>
+        <p><strong>ΔG maximal des épingles à cheveux&nbsp;:</strong> énergie libre de Gibbs des structures secondaires intramoléculaires potentielles (épingles à cheveux) dans l’amorce. Des valeurs plus négatives indiquent des structures plus stables et une probabilité accrue d’auto-hybridation. Seuil habituel&nbsp;: −3&nbsp;kcal/mol.</p>
+        <p><strong>ΔG maximal des dimères&nbsp;:</strong> énergie libre de Gibbs des structures secondaires bimoléculaires potentielles (dimères) entre deux amorces. Des valeurs plus négatives indiquent une liaison amorce-amorce plus forte. Seuil habituel&nbsp;: −6&nbsp;kcal/mol pour les homodimères et −8&nbsp;kcal/mol pour les hétérodimères.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-settings"></use></svg>
+    <details class="faq-content">
+    <summary>Comment PrimerWeaver garantit-il la précision des calculs thermodynamiques&nbsp;?</summary>
+    <div>
+        <p>PrimerWeaver emploie des modèles thermodynamiques des plus proches voisins couramment utilisés pour calculer la Tm et les structures secondaires&nbsp;:</p>
+        <ul>
+        <li><strong>Calcul de la Tm&nbsp;:</strong> utilisation de la méthode des plus proches voisins (SantaLucia, 1998), avec des valeurs de ΔH° et ΔS° déterminées empiriquement pour les doublets de dinucléotides d’ADN. La Tm est calculée comme suit&nbsp;: Tm = (ΔH° − T°) / ΔS°.</li>
+        <li><strong>Structure secondaire&nbsp;:</strong> estimation de l’énergie libre de Gibbs (ΔG) fondée sur l’appariement des bases de Watson-Crick et les interactions d’empilement. Les valeurs de ΔG des épingles à cheveux et des dimères prédisent la stabilité des structures secondaires (plus la valeur est négative, plus la structure est stable).</li>
+        <li><strong>Comparaison entre outils&nbsp;:</strong> la Tm et le ΔG sont calculés à partir de paramètres publiés des plus proches voisins. Les comparaisons avec d’autres plateformes (voir la FAQ sur les différences de Tm) illustrent les variations liées à la mise en œuvre et ne constituent pas une revendication de précision supérieure.</li>
+        </ul>
+        <p><strong>Réserve&nbsp;:</strong> les valeurs calculées de Tm et de ΔG servent de repères pour la conception des amorces. Le comportement réel d’hybridation dépend du tampon, de la polymérase et des conditions expérimentales&nbsp;; lorsque les performances sont déterminantes, validez-les dans votre propre PCR.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-info"></use></svg>
+    <details class="faq-content">
+    <summary>Pourquoi la Tm diffère-t-elle de celle calculée par SnapGene, Benchling, Multiple Primer Analyzer ou d’autres outils&nbsp;?</summary>
+    <div>
+        <p><strong>Nous n’affirmons pas que PrimerWeaver est plus précis que les autres plateformes.</strong> De nombreux outils répandus reposent sur le même cadre thermodynamique des plus proches voisins, mais peuvent indiquer des Tm différentes en raison de différences de mise en œuvre et de paramètres par défaut (par exemple, concentrations en sels monovalents et divalents ou concentration des amorces).</p>
+        <p>L’évaluation comparative présentée dans notre publication (fig.&nbsp;2 et tableau supplémentaire&nbsp;S1), notamment avec SnapGene, Benchling et Multiple Primer Analyzer, vise à montrer cette <strong>variation entre plateformes</strong>, et non à classer les outils. Dans PrimerWeaver, ces paramètres sont réglables par l’utilisateur afin d’adapter les estimations aux conditions de PCR.</p>
+        <p><strong>Conseil pratique&nbsp;:</strong> considérez la Tm calculée comme un repère pour la conception des amorces, et non comme une «&nbsp;vérité de référence&nbsp;» unique définie expérimentalement. Lorsque les performances sont déterminantes, validez les conditions d’hybridation dans votre propre essai.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-pool"></use></svg>
+    <details class="faq-content">
+    <summary>Pourquoi la répartition en groupes pour la PCR multiplexe diffère-t-elle de celle d’outils tels que PrimerPooler&nbsp;?</summary>
+    <div>
+        <p><strong>Nous n’affirmons pas que PrimerWeaver est plus précis que PrimerPooler.</strong> Les deux outils répondent à des besoins différents&nbsp;:</p>
+        <ul>
+        <li><strong>PCR multiplexe de PrimerWeaver&nbsp;:</strong> <strong>conception d’amorces</strong> automatisée avec répartition tenant compte de leur compatibilité. Le nombre de groupes est déterminé par les contraintes thermodynamiques et, en mode conception, par les contraintes de taille et de hors-cible&nbsp;; il n’est pas fixé manuellement par l’utilisateur.</li>
+        <li><strong>PrimerPooler&nbsp;:</strong> répartit un ensemble d’amorces <strong>existant</strong> en groupes. Vous pouvez préciser le nombre de groupes souhaité, ce qui est utile lorsque les séquences sont fixes et qu’un nombre donné de tubes est requis.</li>
+        </ul>
+        <p>Dans notre publication, les amorces d’évaluation ont été conçues par PrimerWeaver. PrimerPooler ne conçoit pas d’amorces et a reçu ces séquences en entrée. Les comparaisons avec le nombre de groupes «&nbsp;computer suggested&nbsp;» proposé par défaut par PrimerPooler illustrent ce réglage par défaut, et non les limites de l’outil lorsqu’un nombre de groupes est précisé.</p>
+        <p><strong>Conseil pratique&nbsp;:</strong> utilisez PrimerWeaver pour une conception intégrée et des suggestions de répartition. Si vous disposez déjà d’amorces et souhaitez un <strong>nombre de groupes défini par l’utilisateur</strong>, envisagez PrimerPooler. En <strong>mode CQ</strong>, PrimerWeaver répartit les amorces existantes principalement selon leurs propriétés thermodynamiques, sans règles de taille ni de hors-cible.</p>
+    </div>
+    </details>
+</div>
+
+<h3 class="faq-section-heading">Méthodes expérimentales</h3>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-layers"></use></svg>
+    <details class="faq-content">
+    <summary>Quelles sont les différences entre le clonage par restriction et l’assemblage Golden Gate&nbsp;?</summary>
+    <div>
+        <p><strong>Clonage par restriction&nbsp;:</strong> utilise des enzymes de restriction classiques de type&nbsp;II (p. ex. EcoRI, BamHI) pour couper l’ADN au niveau de sites de reconnaissance précis. Les amorces ajoutent des sites d’enzymes de restriction à l’insert afin qu’il puisse être coupé et ligaturé dans un vecteur digéré de manière similaire. Il est vivement recommandé d’ajouter des bases protectrices de part et d’autre des sites de restriction afin d’assurer une digestion efficace du produit de PCR. Le site de reconnaissance de l’enzyme de restriction est conservé à la jonction vecteur-insert après ligature.</p>
+        <p><strong>Golden Gate (type IIS)&nbsp;:</strong> utilise des enzymes de type&nbsp;IIS (p. ex. BsaI) qui coupent l’ADN en dehors de leur site de reconnaissance, ce qui permet l’assemblage directionnel et sans cicatrice de plusieurs fragments en une seule réaction. L’enzyme reconnaît les séquences flanquantes et génère des extrémités cohésives permettant aux fragments de s’assembler spontanément dans le bon ordre sans religature.</p>
+        <p><strong>Recommandation&nbsp;:</strong> Golden Gate est plus rapide et plus souple pour l’assemblage de plusieurs fragments, tandis que le clonage par restriction est une méthode plus traditionnelle et bien établie pour l’insertion d’un seul fragment.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-scissors"></use></svg>
+    <details class="faq-content">
+    <summary>En quoi l’assemblage Gibson diffère-t-il des autres méthodes de clonage&nbsp;?</summary>
+    <div>
+        <p><strong>L’assemblage Gibson</strong> est une méthode d’assemblage isotherme <i>in vitro</i> qui combine&nbsp;:</p>
+        <ul>
+        <li><strong>Exonucléase&nbsp;:</strong> crée de courtes extrémités simple brin (généralement de 15 à 30&nbsp;pb) aux extrémités des fragments.</li>
+        <li><strong>ADN polymérase&nbsp;:</strong> comble les lacunes créées par l’activité exonucléase.</li>
+        <li><strong>ADN ligase&nbsp;:</strong> scelle les brèches pour former une molécule d’ADN continue.</li>
+        </ul>
+        <p>Les trois réactions se déroulent simultanément à 50&nbsp;°C dans un seul tube, ce qui rend la méthode rapide et efficace. PrimerWeaver conçoit des amorces qui ajoutent des extrémités homologues (25&nbsp;pb par défaut) à chaque fragment. Les fragments s’apparient ensuite grâce à leurs chevauchements et s’assemblent dans l’ordre, sans vecteur prédécoupé ni étape intermédiaire de ligature.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-play"></use></svg>
+    <details class="faq-content">
+    <summary>Qu’est-ce que la PCR par chevauchement (OE-PCR) et comment l’utiliser&nbsp;?</summary>
+    <div>
+        <p><strong>La PCR par chevauchement (ou PCR par extension de chevauchement, OE-PCR)</strong> permet d’assembler plusieurs fragments d’ADN ou d’introduire des mutations précises sans utiliser de vecteurs intermédiaires. Elle emploie des amorces chevauchantes pour créer des extrémités compatibles entre les fragments.</p>
+        <p><strong>Protocole de base&nbsp;:</strong></p>
+        <ol style="margin: 0;">
+        <li>Étape&nbsp;1&nbsp;: amplifier séparément chaque fragment avec des amorces externes et des amorces internes comportant des régions 3′ chevauchantes (la zone de chevauchement).</li>
+        <li>Étape&nbsp;2&nbsp;: mélanger tous les produits de PCR&nbsp;; les régions simple brin chevauchantes s’hybrident entre elles, puis une polymérase prolonge la séquence à travers le chevauchement pour former des produits fusionnés de pleine longueur.</li>
+        <li>Étape&nbsp;3&nbsp;: ajouter les amorces externes et réamplifier le produit de pleine longueur afin d’augmenter le rendement.</li>
+        </ol>
+        <p>Cette méthode convient particulièrement à la mutagenèse (introduction de modifications aux jonctions entre fragments) ou à la création de séquences de liaison personnalisées entre des domaines.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-pool"></use></svg>
+    <details class="faq-content">
+    <summary>Comment fonctionne la répartition en groupes pour la PCR multiplexe&nbsp;?</summary>
+    <div>
+        <p>Le module multiplexe conçoit d’abord les amorces optimales pour toutes les cibles. Il analyse ensuite les conflits potentiels entre amorces et les répartit en groupes afin de réduire les interférences&nbsp;:</p>
+        <p><strong>Trois types de conflits sont pris en compte&nbsp;:</strong></p>
+        <ul>
+        <li><strong>Conflits de dimères croisés&nbsp;:</strong> de fortes interactions thermodynamiques entre amorces (ΔG ≤ −6&nbsp;kcal/mol) peuvent entraîner la formation de dimères d’amorces, consommer les amorces et provoquer l’échec de l’amplification. Les amorces présentant des scores de dimérisation élevés sont placées dans des groupes distincts.</li>
+        <li><strong>Conflits de taille des produits&nbsp;:</strong> des produits de PCR de tailles très proches (écart inférieur à la tolérance de taille) peuvent être impossibles à distinguer par électrophorèse sur gel. Les amorces produisant des fragments de tailles similaires sont placées dans des groupes distincts afin de permettre leur résolution sur le gel.</li>
+        <li><strong>Conflits d’amplification hors cible&nbsp;:</strong> plusieurs paires d’amorces susceptibles d’amplifier la même séquence hors cible produisent des bandes superposées sur le gel, ce qui complique l’identification des produits attendus. Ces amorces sont affectées à des groupes distincts.</li>
+        </ul>
+        <p>PrimerWeaver utilise un algorithme de coloration de graphe pour affecter automatiquement les amorces au <strong>nombre minimal de groupes compatibles</strong>, afin d’assurer une PCR multiplexe efficace tout en évitant ces conflits.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-settings"></use></svg>
+    <details class="faq-content">
+    <summary>Comment concevoir des amorces pour une mutagenèse dirigée&nbsp;?</summary>
+    <div>
+        <p>Le module <strong>Mutagenèse</strong> de PrimerWeaver conçoit des amorces destinées à introduire des mutations ciblées au moyen d’une stratégie de PCR par extension de chevauchement (OE-PCR).</p>
+        <p><strong>Approche de conception&nbsp;:</strong> saisissez la séquence de type sauvage et indiquez la mutation souhaitée (p. ex. V55A&nbsp;: remplacement de la valine en position&nbsp;55 par une alanine). L’outil conçoit deux paires d’amorces encadrant le site de mutation. Chaque paire produit un fragment de PCR qui contient la mutation souhaitée dans la zone de chevauchement. Les extrémités 3′ des amorces, qui portent la mutation, sont conçues pour être complémentaires.</p>
+        <p><strong>Principales étapes expérimentales&nbsp;:</strong></p>
+        <ul>
+        <li><strong>Étape&nbsp;1&nbsp;:</strong> amplifier deux fragments distincts à partir de la matrice à l’aide des paires d’amorces conçues. Chaque fragment contient une partie de la mutation.</li>
+        <li><strong>Étape&nbsp;2 (extension de chevauchement)&nbsp;:</strong> mélanger les deux produits de PCR&nbsp;; les régions simple brin chevauchantes portant la mutation s’hybrident, puis une polymérase prolonge la séquence à travers le chevauchement afin de créer le produit mutant de pleine longueur.</li>
+        <li><strong>Étape&nbsp;3&nbsp;:</strong> si nécessaire, réamplifier le produit de pleine longueur à l’aide des amorces externes afin d’augmenter le rendement.</li>
+        <li><strong>Vérification&nbsp;:</strong> confirmer la mutation par séquençage avant d’utiliser la construction finale.</li>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-layers"></use></svg>
+    <details class="faq-content">
+    <summary>Comment concevoir des amorces pour l’assemblage de plusieurs fragments (USER, Golden Gate ou Gibson)&nbsp;?</summary>
+    <div>
+        <p><strong>Préparation des données d’entrée&nbsp;:</strong> fournissez tous les fragments d’ADN à assembler (p. ex. promoteur, CDS, terminateur, squelette). Vous pouvez les téléverser ou les coller au format FASTA.</p>
+                </ul>
+        <p><strong>Pour le clonage USER&nbsp;:</strong></p>
+        <ul>
+        <li>Le clonage USER (Uracil-Specific Excision Reagent) emploie des amorces contenant de l’uracile pour créer des jonctions sans cicatrice entre des fragments d’ADN.</li>
+        <li>Indiquez la longueur du chevauchement (généralement de 7 à 15&nbsp;pb).</li>
+        <li>PrimerWeaver conçoit des amorces comportant des substitutions par l’uracile à des positions précises des zones de chevauchement.</li>
+        <li>Après la PCR, un traitement avec le mélange enzymatique USER clive l’ADN aux positions contenant de l’uracile et génère des extrémités simple brin complémentaires.</li>
+        <li>Les fragments sont mélangés, puis les extrémités complémentaires s’hybrident pour former des assemblages sans cicatrice, généralement réparés après la transformation.</li>
+        </ul>
+
+	<p><strong>Pour Golden Gate&nbsp;:</strong></p>
+        <ul>
+        <li>Sélectionnez votre enzyme de type&nbsp;IIS (p. ex. BsaI, BsmBI).</li>
+        <li>PrimerWeaver conçoit des amorces dotées d’extrémités cohésives compatibles de part et d’autre de chaque fragment.</li>
+        <li>Après la PCR, préparez la réaction d’assemblage Golden Gate avec l’enzyme choisie&nbsp;; les fragments s’assembleront dans le bon ordre en une seule réaction.</li>
+        </ul>
+        <p><strong>Pour l’assemblage Gibson&nbsp;:</strong></p>
+        <ul>
+	<li>Facultatif&nbsp;: choisissez la séquence de liaison entre les inserts.</li>
+        <li>Indiquez la longueur du chevauchement (généralement de 20 à 30&nbsp;pb).</li>
+        <li>PrimerWeaver ajoute des séquences homologues aux extrémités des fragments&nbsp;; les fragments se chevauchent et sont assemblés par le mélange réactionnel Gibson en une seule réaction à 50&nbsp;°C.</li>
+
+        <p><strong>Conseil&nbsp;:</strong> concevez simultanément les amorces de tous les fragments afin d’assurer leur compatibilité et des proportions d’assemblage optimales.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-list"></use></svg>
+    <details class="faq-content">
+    <summary>Comment exporter et utiliser les résultats&nbsp;?</summary>
+    <div>
+        <p>PrimerWeaver propose plusieurs options d’exportation pour vos amorces et vos séquences assemblées&nbsp;:</p>
+        <ul>
+        <li><strong>Fichier d’amorces (format FASTA)&nbsp;:</strong> téléchargez-le sous le nom <code>primers.txt</code>. Il contient toutes les séquences d’amorces conçues au format FASTA standard, à raison d’une amorce par entrée. Il est prêt à être utilisé pour commander les amorces auprès d’une entreprise de synthèse ou pour effectuer des recherches BLAST dans des bases de données génomiques.</li>
+        <li><strong>Séquence assemblée&nbsp;:</strong> téléchargez au format FASTA la séquence d’ADN assemblée finale pour les méthodes telles que Golden Gate, Gibson, USER ou OE-PCR. Elle comprend tous les fragments assemblés dans le bon ordre avec des jonctions compatibles.</li>
+        </ul>
+        <p><strong>Conseils d’utilisation&nbsp;:</strong></p>
+        <ul>
+        <li>Copiez directement les séquences d’amorces du fichier FASTA vers votre formulaire de commande.</li>
+        <li>Avant de commencer les expériences, vérifiez la séquence assemblée en la comparant à vos spécifications de conception.</li>
+        <li>Conservez les deux fichiers pour assurer la traçabilité et la reproductibilité de votre conception.</li>
+        <li>Utilisez BLAST pour vérifier la spécificité des amorces par rapport au génome cible ou à la séquence de référence.</li>
+        </ul>
+    </div>
+    </details>
+</div>
+
+<h3 class="faq-section-heading">Contrôle qualité et validation</h3>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-list"></use></svg>
+    <details class="faq-content">
+    <summary>Comment interpréter les mesures de CQ dans le rapport de contrôle qualité des amorces&nbsp;?</summary>
+    <div>
+        <p>Le module <strong>CQ des amorces</strong> effectue une analyse <i>in silico</i> de vos paires d’amorces afin de prédire les problèmes potentiels&nbsp;:</p>
+        <ul>
+        <li><strong>Spécificité (type BLAST)&nbsp;:</strong> PrimerWeaver recherche dans la séquence de référence fournie (matrice) afin de vérifier que les amorces s’hybrident principalement à la cible prévue. Une spécificité élevée réduit l’amplification hors cible.</li>
+        <li><strong>Formation d’épingles à cheveux&nbsp;:</strong> prédit les structures secondaires intramoléculaires. Si elles sont trop stables, les amorces risquent de ne pas être correctement prolongées pendant la PCR.</li>
+        <li><strong>Formation d’homodimères&nbsp;:</strong> détermine si des amorces identiques peuvent s’hybrider entre elles, ce qui risque de les séquestrer et de réduire l’efficacité de la PCR.</li>
+        <li><strong>Formation d’hétérodimères&nbsp;:</strong> évalue la réactivité croisée entre les amorces sens et antisens&nbsp;; des dimères stables peuvent réduire le rendement de la PCR.</li>
+        <li><strong>Pince GC (extrémité 3′)&nbsp;:</strong> idéalement, les amorces se terminent par G ou C à l’extrémité 3′, ce qui peut améliorer la stabilité amorce-matrice et l’efficacité de l’élongation. PrimerWeaver signale les amorces se terminant par A ou T, car elles peuvent être moins efficaces dans certaines conditions de PCR.</li>
+        <li><strong>Séries homopolymériques&nbsp;:</strong> les séries d’au moins quatre bases identiques (p. ex. «&nbsp;AAAA&nbsp;») sont signalées, car elles réduisent la spécificité et peuvent favoriser les amorçages erronés ou le glissement pendant l’amplification.</li>
+        </ul>
+        <p><strong>Interprétation&nbsp;:</strong> examinez attentivement les avertissements, en particulier lors de la conception dans des régions répétitives ou de faible complexité.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-pool"></use></svg>
+    <details class="faq-content">
+    <summary>Comment vérifier expérimentalement que les amorces conçues fonctionneront&nbsp;?</summary>
+    <div>
+        <p>Avant de les commander, suivez ces bonnes pratiques&nbsp;:</p>
+        <ul>
+        <li><strong>CQ <i>in silico</i>&nbsp;:</strong> utilisez le module de CQ de PrimerWeaver pour rechercher les épingles à cheveux, les dimères et les hybridations hors cible. Examinez tous les avertissements.</li>
+        <li><strong>Vérification par BLAST&nbsp;:</strong> copiez les séquences de vos amorces sens et antisens dans NCBI BLAST et vérifiez qu’elles correspondent à la cible avec une spécificité élevée (valeur E &lt; 0,01).</li>
+        <li><strong>Écart de Tm&nbsp;:</strong> vérifiez que les Tm des amorces sens et antisens diffèrent de moins de 3 à 5&nbsp;°C afin d’obtenir une amplification PCR équilibrée.</li>
+        <li><strong>Vérification en multiplexe&nbsp;:</strong> pour les conceptions multiplexes, exécutez l’analyse des dimères de PrimerWeaver et respectez la répartition en groupes proposée.</li>
+        <li><strong>Optimisation expérimentale&nbsp;:</strong> après réception des amorces, réalisez une PCR en gradient (hybridation de 58 à 62&nbsp;°C) afin de déterminer la température optimale, puis ajustez-la si nécessaire.</li>
+        </ul>
+        <p><strong>Conseil&nbsp;:</strong> si les amorces échouent, consultez le rapport de CQ, vérifiez la qualité de la matrice et envisagez une nouvelle conception avec des contraintes assouplies.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-fail"></use></svg>
+    <details class="faq-content">
+    <summary>La conception de mes amorces a échoué. Quelles en sont les causes fréquentes&nbsp;?</summary>
+    <div>
+        <p>La conception peut échouer pour plusieurs raisons, généralement liées à vos contraintes&nbsp;:</p>
+        <ul>
+        <li><strong>Aucune amorce valide trouvée&nbsp;:</strong> l’outil n’a pas trouvé de paire d’amorces respectant toutes les contraintes (p. ex. Tm, %GC, taille du produit). Essayez d’élargir la plage de Tm.</li>
+        <li><strong>Régions de faible complexité&nbsp;:</strong> il est impossible de concevoir des amorces dans des régions de très faible complexité (p. ex. «&nbsp;AAAAAAAAAA&nbsp;»). Envisagez de modifier la région cible ou de supprimer les bases ambiguës.</li>
+        <li><strong>Score de dimérisation élevé&nbsp;:</strong> en mode multiplexe, une amorce qui forme inévitablement des dimères de forte affinité avec toutes les autres peut être exclue. Essayez de réduire le nombre de cibles ou d’augmenter le seuil de dimérisation.</li>
+        <li><strong>Problèmes liés à la matrice&nbsp;:</strong> vérifiez que la séquence matrice est correcte et suffisamment longue pour encadrer la région cible (généralement ±50&nbsp;pb).</li>
+        </ul>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-scissors"></use></svg>
+    <details class="faq-content">
+    <summary>Puis-je reconcevoir les amorces si le premier jeu échoue&nbsp;?</summary>
+    <div>
+        <p>Oui. Si les amorces conçues ne fonctionnent pas expérimentalement&nbsp;:</p>
+        <ol>
+        <li><strong>Examinez le rapport de CQ&nbsp;:</strong> recherchez les prédictions d’épingles à cheveux, de dimères ou d’hybridations hors cible.</li>
+        <li><strong>Assouplissez les contraintes&nbsp;:</strong> essayez d’élargir la plage de Tm (p. ex. 55–65&nbsp;°C plutôt que 62–65&nbsp;°C).</li>
+        <li><strong>Vérifiez l’ADN matrice&nbsp;:</strong> assurez-vous que la matrice de PCR est pure et à une concentration appropriée (généralement 100 à 1&nbsp;000&nbsp;ng pour l’ADN génomique et 1 à 20&nbsp;ng pour l’ADN plasmidique dans une réaction standard de 50&nbsp;µl).</li>
+        <li><strong>Vérifiez les réactifs&nbsp;:</strong> confirmez l’activité de la polymérase, la fraîcheur des dNTP et les conditions de conservation des amorces.</li>
+        <li><strong>Optimisez les conditions de PCR&nbsp;:</strong> testez plusieurs températures d’hybridation (PCR en gradient) et durées d’élongation.</li>
+        <li><strong>Reconcevez avec PrimerWeaver&nbsp;:</strong> conservez les mêmes contraintes ou adaptez-les au mode d’échec. PrimerWeaver propose généralement plusieurs paires d’amorces&nbsp;; si le premier choix échoue, les autres peuvent réussir.</li>
+        </ol>
+        <p><strong>Consignez vos résultats&nbsp;:</strong> notez le jeu d’amorces et les conditions qui ont fonctionné afin de faciliter les conceptions ultérieures.</p>
+    </div>
+    </details>
+</div>
+
+<h3 class="faq-section-heading">Détails techniques et assistance</h3>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-format"></use></svg>
+    <details class="faq-content">
+    <summary>Quels formats et quelles tailles de séquence de référence PrimerWeaver prend-il en charge&nbsp;?</summary>
+    <div>
+        <p>PrimerWeaver est optimisé pour les méthodes courantes de biologie moléculaire et prend en charge&nbsp;:</p>
+        <ul>
+        <li><strong>Formats de séquence&nbsp;:</strong> FASTA (une ou plusieurs séquences) et ADN en texte brut (majuscules ou minuscules, espaces ignorés).</li>
+        <li><strong>Plage de tailles habituelle&nbsp;:</strong> de 100&nbsp;pb à plusieurs centaines de kilobases (principalement limitée par les performances du navigateur&nbsp;; la limite actuelle des fichiers est de 1&nbsp;Mo).</li>
+        <li><strong>Séquences protéiques&nbsp;:</strong> non prises en charge directement. Convertissez-les en ADN (l’optimisation de l’usage des codons n’est pas intégrée, mais peut être effectuée manuellement).</li>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-info"></use></svg>
+    <details class="faq-content">
+    <summary>Quels sont les besoins informatiques et les navigateurs compatibles&nbsp;?</summary>
+    <div>
+        <p><strong>Compatibilité des navigateurs&nbsp;:</strong> PrimerWeaver fonctionne dans tout navigateur moderne où JavaScript est activé&nbsp;:</p>
+        <ul>
+        <li>Chrome 60+ (recommandé pour de meilleures performances)</li>
+        <li>Firefox 55+</li>
+        <li>Safari 12+</li>
+        <li>Edge 79+</li>
+        </ul>
+        
+        <p><strong>Conseils pour améliorer les performances&nbsp;:</strong></p>
+        <ul>
+        <li>Les calculs sollicitent principalement le processeur&nbsp;; les machines anciennes et les appareils mobiles peuvent être plus lents pour les conceptions volumineuses (&gt;100 fragments).</li>
+        <li>Fermez les autres onglets ou applications afin de libérer des ressources processeur.</li>
+        <li>Utilisez la version la plus récente du navigateur pour bénéficier d’une optimisation maximale.</li>
+        </ul>
+        <p><strong>Résolution des problèmes de lenteur&nbsp;:</strong> si la conception prend plus de 30&nbsp;secondes, simplifiez les données d’entrée (moins de fragments, séquences plus courtes), puis réessayez.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-settings"></use></svg>
+    <details class="faq-content">
+    <summary>Comment signaler un bogue ou demander une fonctionnalité&nbsp;?</summary>
+    <div>
+        <p>Vos commentaires sont les bienvenus. Pour signaler un problème ou proposer une amélioration&nbsp;:</p>
+        <ol>
+        <li><strong>Utilisez le formulaire de contact&nbsp;:</strong> accédez à la page <strong>À propos</strong> et remplissez le formulaire «&nbsp;Nous contacter&nbsp;» en décrivant le problème ou la fonctionnalité souhaitée.</li>
+        <li><strong>Problèmes GitHub&nbsp;:</strong> consultez le <a href="https://github.com/ZimoJin/PrimerWeaver" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline;">dépôt GitHub de PrimerWeaver</a> et ouvrez un ticket (un compte GitHub gratuit est requis).</li>
+        <li><strong>Courriel direct&nbsp;:</strong> communiquez avec les auteurs correspondants indiqués dans les coordonnées de la page «&nbsp;À propos&nbsp;».</li>
+        </ol>
+        <p><strong>Informations utiles à fournir&nbsp;:</strong></p>
+        <ul>
+        <li>Les étapes exactes permettant de reproduire le problème, le cas échéant.</li>
+        <li>Le comportement attendu et le comportement observé.</li>
+        <li>Le type et la version du navigateur (consultez Paramètres → À propos dans votre navigateur).</li>
+        <li>Des exemples de séquences ou de paramètres, si cela est pertinent.</li>
+        </ul>
+        <p><strong>Délai de réponse&nbsp;:</strong> nous nous efforçons de répondre aux problèmes critiques dans un délai de 2 à 3&nbsp;jours ouvrables.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-user"></use></svg>
+    <details class="faq-content">
+    <summary>Existe-t-il un traitement par lots ou une API pour la conception d’amorces à haut débit&nbsp;?</summary>
+    <div>
+        <p>À l’heure actuelle, PrimerWeaver est un outil à instance unique exécuté dans le navigateur, optimisé pour des processus de conception immédiats et interactifs. Il ne comporte <strong>ni traitement par lots ni API REST intégrés</strong>.</p>
+        <p><strong>Solution de remplacement pour plusieurs conceptions&nbsp;:</strong></p>
+        <ul>
+        <li>Ouvrez plusieurs onglets du navigateur et concevez les amorces en parallèle (les calculs côté navigateur se prêtent bien à cette méthode).</li>
+        <li>Exportez les résultats au format CSV ou JSON, puis regroupez-les dans une feuille de calcul principale.</li>
+        <li>Pour les projets à très grande échelle, communiquez avec les auteurs afin d’envisager des options de développement sur mesure.</li>
+        </ul>
+        <p><strong>Évolution possible&nbsp;:</strong> l’architecture JavaScript modulaire permet une éventuelle intégration d’API ou un déploiement côté serveur. Communiquez avec nous si vous avez des besoins particuliers en matière de haut débit.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-award"></use></svg>
+    <details class="faq-content">
+    <summary>Comment PrimerWeaver est-il maintenu et restera-t-il accessible&nbsp;?</summary>
+    <div>
+        <p><strong>Financement et soutien&nbsp;:</strong> PrimerWeaver est maintenu par le laboratoire Ignea de l’Université McGill, qui assure un soutien scientifique et technique continu.</p>
+        <p><strong>Mises à jour et maintenance&nbsp;:</strong></p>
+        <ul>
+        <li>Les corrections de bogues sont déployées rapidement.</li>
+        <li>Des améliorations fonctionnelles sont publiées périodiquement (généralement tous les six mois).</li>
+        <li>La compatibilité avec les navigateurs est maintenue à mesure que les normes évoluent.</li>
+        </ul>
+        <p><strong>Science ouverte&nbsp;:</strong> le code source est disponible sur GitHub, ce qui permet les contributions de la communauté et garantit que l’outil ne dépend pas d’une seule institution. Si, pour quelque raison que ce soit, le service hébergé devenait indisponible, le code pourrait être dupliqué et auto-hébergé.</p>
+    </div>
+    </details>
+</div>
+</section>

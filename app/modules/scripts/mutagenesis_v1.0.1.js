@@ -8,7 +8,12 @@ import * as Core from './core_v1.0.1.js';
 import { CODON_USAGE, getCodonEntries } from './codon_v1.0.1.js';
 import * as VIZ from './bio_visuals_v1.0.1.js';
 
-
+const t = (key, params, fallback) => (
+  window.PW_I18N ? window.PW_I18N.t(key, params, fallback) : (fallback || key)
+);
+const applyI18n = (root) => {
+  if (window.PW_I18N && root) window.PW_I18N.apply(root);
+};
 
 // mutagenesis_core.js (v3)
 // OE-PCR style site-directed mutagenesis:
@@ -1821,7 +1826,7 @@ function showCDSDetectionModal(candidates) {
   }
   
   // Build modal content
-  let html = '<h3>Detected ORF Candidates</h3>';
+  let html = '<h3>' + t('mut.detectedOrfs', null, 'Detected ORF Candidates') + '</h3>';
   html += '<p style="font-size:0.9rem; color:#666;">Found multiple ORFs. Select the one to use:</p>';
   html += '<div style="max-height: 300px; overflow-y: auto; border: 1px solid #ccc; border-radius: 4px;">';
   
@@ -2636,7 +2641,7 @@ function getCrossDimerLabel(seqA, seqB, tmTarget) {
  */
 function downloadMutantFASTA() {
   if (!currentMutantSequence) {
-    alert('Mutant sequence is not available. Please design primers first.');
+    alert(t('mut.mutantUnavailable', null, 'Mutant sequence is not available. Please design primers first.'));
     return;
   }
   
@@ -2683,13 +2688,13 @@ function downloadPrimersFASTA() {
 
   if (currentDNAMode) {
     if (!currentDNAPrimers || currentDNAPrimers.length === 0) {
-      alert('No primers available for DNA mode. Please design primers first.');
+      alert(t('mut.noPrimersDna', null, 'No primers available for DNA mode. Please design primers first.'));
       return;
     }
     primersToDownload = currentDNAPrimers;
   } else {
     if (!currentResults || currentResults.length === 0) {
-      alert('No primers available for CDS mode. Please design primers first.');
+      alert(t('mut.noPrimersCds', null, 'No primers available for CDS mode. Please design primers first.'));
       return;
     }
     primersToDownload = currentResults;
@@ -2725,7 +2730,7 @@ function downloadPrimersFASTA() {
   }
 
   if (!fastaContent) {
-    alert('No primer sequences available.');
+    alert(t('ui.noPrimerSeqs', null, 'No primer sequences available.'));
     return;
   }
 
@@ -3010,7 +3015,7 @@ async function onDesignClick() {
   console.log('Host code:', hostCode);
 
   if (!rawTemplate || !cleanDNA(rawTemplate)) {
-    alert('Please paste a DNA template sequence.');
+    alert(t('mut.pleasePasteTemplate', null, 'Please paste a DNA template sequence.'));
     return;
   }
 
@@ -3047,7 +3052,7 @@ async function onDesignClick() {
     // No ORF detected/selected - use raw template as-is
     const template = cleanDNA(rawTemplate);
     if (template.length < 30) {
-      alert('Sequence too short. Please enter a valid CDS sequence.');
+      alert(t('mut.seqTooShort', null, 'Sequence too short. Please enter a valid CDS sequence.'));
       return;
     }
           performDesign(template, hostCode, rawTemplate);
@@ -3061,7 +3066,7 @@ function performDesign(template, hostCode, rawTemplate) {
   const mutations = parseMutations();
   console.log('Parsed mutations:', mutations);
   if (mutations.length === 0) {
-    alert('Please define at least one amino-acid edit (position + operation).');
+    alert(t('mut.defineAaEdit', null, 'Please define at least one amino-acid edit (position + operation).'));
     return;
   }
 
@@ -3661,7 +3666,7 @@ async function onDesignClickDNAMode() {
   let template = cleanDNA(rawTemplate);
 
   if (!template) {
-    alert('Please paste a DNA template sequence.');
+    alert(t('mut.pleasePasteTemplate', null, 'Please paste a DNA template sequence.'));
     return;
   }
 
@@ -3678,7 +3683,7 @@ async function onDesignClickDNAMode() {
   console.log('onDesignClickDNAMode: edits content:', JSON.stringify(edits, null, 2));
   
   if (edits.length === 0) {
-    alert('Please define at least one DNA edit.');
+    alert(t('mut.defineDnaEdit', null, 'Please define at least one DNA edit.'));
     return;
   }
 
@@ -3845,7 +3850,7 @@ function renderDNAEditResults(results, origSeq, finalSeq, edits, rawTemplate = n
   summaryDiv.innerHTML = summaryHtml;
 
   // Design primers for each edit
-  outTable.innerHTML = '<h3 style="margin-top:12px; color:#27ae60;">Primer Design for DNA Edits</h3>';
+  outTable.innerHTML = '<h3 style="margin-top:12px; color:#27ae60;">' + t('mut.primerDesignDnaEdits', null, 'Primer Design for DNA Edits') + '</h3>';
   
   // Get primer parameters
   const outerTm = parseFloat($('outer-tm').value) || 60;
@@ -4213,8 +4218,8 @@ async function initMutagenesisParameterPresets(container) {
     const { setupAssemblyParameterPresets } = await import('./assembly_parameter_presets_v1.0.1.js');
     return setupAssemblyParameterPresets(moduleRoot, {
       scope: 'mutagenesis-primer-params',
-      label: 'mutagenesis primer design parameters',
-      placeholder: 'e.g. Standard mutagenesis',
+      label: t('mut.presetLabel', null, 'mutagenesis primer design parameters'),
+      placeholder: t('mut.presetPlaceholder', null, 'e.g. Standard mutagenesis'),
       presetRootSelector: '.primer-params-header',
       selectSelector: '#mutagenesis-preset-select',
       saveSelector: '#mutagenesis-preset-save',
@@ -4393,7 +4398,7 @@ export function initMutagenesisModule(container) {
         }
       };
       reader.onerror = function() {
-        alert('Failed to read file, please try again.');
+        alert(t('ui.failedReadFile', null, 'Failed to read file, please try again.'));
       };
       reader.readAsText(file, 'UTF-8');
       
@@ -4427,7 +4432,7 @@ export function initMutagenesisModule(container) {
         const base = new URL('modules/contents/demo/', window.location.href).toString();
         const resp = await fetch(base + 'Insert_1.txt');
         if (!resp.ok) {
-          alert('Failed to load demo sequence.');
+          alert(t('ui.failedDemo', null, 'Failed to load demo sequence.'));
           return;
         }
         const text = await resp.text();
@@ -4436,7 +4441,7 @@ export function initMutagenesisModule(container) {
         templateTextarea.dispatchEvent(new Event('input', { bubbles: true }));
       } catch (e) {
         console.error('Demo load error:', e);
-        alert('Failed to load demo sequence.');
+        alert(t('ui.failedDemo', null, 'Failed to load demo sequence.'));
       }
     });
   }
@@ -4453,7 +4458,7 @@ export function initMutagenesisModule(container) {
         const base = new URL('modules/contents/demo/', window.location.href).toString();
         const resp = await fetch(base + 'Insert_1.txt');
         if (!resp.ok) {
-          alert('Failed to load demo sequence.');
+          alert(t('ui.failedDemo', null, 'Failed to load demo sequence.'));
           return;
         }
         const text = await resp.text();
@@ -4502,7 +4507,7 @@ export function initMutagenesisModule(container) {
         }
       } catch (e) {
         console.error('Demo Set load error:', e);
-        alert('Failed to load demo sequence.');
+        alert(t('ui.failedDemo', null, 'Failed to load demo sequence.'));
       }
     });
   }

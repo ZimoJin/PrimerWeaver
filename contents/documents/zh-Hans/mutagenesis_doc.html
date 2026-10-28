@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>定点突变 - PrimerWeaver V1.0.6</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #333;
+            background: #f9fafb;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e40af;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2563eb;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            font-size: 1.5em;
+        }
+        h3 {
+            color: #3b82f6;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            font-size: 1.2em;
+        }
+        h4 {
+            color: #60a5fa;
+            margin-top: 1.2em;
+            margin-bottom: 0.6em;
+        }
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 1em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        strong {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c2410c;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .abstract {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+        .abstract p {
+            margin: 0;
+            font-style: italic;
+        }
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .section {
+            margin-bottom: 2.5em;
+        }
+        .version-info {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+            margin-top: 3em;
+            padding-top: 2em;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>定点突变</h1>
+        
+        <div class="abstract">
+            <p>定点突变模块通过重叠 PCR 引物设计，可在 DNA 模板中精确引入点突变、插入和缺失。该工具支持两种互补的突变策略：编码序列中的蛋白水平突变（自动检测 ORF，并根据宿主生物偏好进行密码子优化），以及对任意基因组区域的 DNA 水平序列编辑。模块会自动设计引物对，通过两步连续 PCR 反应高效组装突变构建体。</p>
+        </div>
+
+        <div class="section">
+            <h2>快速入门指南</h2>
+            
+            <ol>
+                <li>将含待突变区域的靶 DNA 序列以 FASTA 或纯文本格式上传或粘贴到输入框中。选择 CDS 蛋白突变或 DNA 序列编辑模式。在 CDS 蛋白突变模式下，系统会自动在全部六个读框中检测开放读框（ORF），并默认选择最长 ORF 作为输入；您也可以手动指定所需 ORF。突变可在 CDS 模式中定义为氨基酸替换、插入或缺失，或在 DNA 模式中定义为 DNA 水平的替换、插入或缺失。最后，在继续前根据需要调整设计参数。
+
+                <div style="text-align: center; margin: 2em 0;">
+                    <img
+                        src="contents/pictures/mutagenesis_demo.png"
+                        alt="定点突变演示"
+                        style="max-width: 90%; height: auto; border-radius: 8px;"
+                    >
+                </div>
+                </li>
+                
+                <li>单击“设计引物”以生成诱变引物组。检查设计的引物、质量指标和预测的突变序列。下载 FASTA 格式结果以进行实验验证。
+                
+
+                </li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>定点突变原理</h2>
+            
+            <p>定点突变是一种分子生物学技术，可向质粒或基因组 DNA 模板中精确引入既定突变。本模块采用的重叠 PCR 策略利用诱变引物引入所需改变，并与侧翼野生型序列重叠，从而通过两轮 PCR 组装出完整突变构建体，无需限制性内切酶或连接反应。</p>
+            
+
+            
+            <h3>关键设计原则</h3>
+            
+            <p>基于 OE-PCR 的定点突变采用<strong>四引物策略</strong>，由两条外侧引物和两条诱变引物组成，各自承担不同的热力学和结构作用，以最大限度地提高突变效率：</p>
+            <ul>
+                <li><strong>外侧引物（F1、R2）：</strong>定义最终构建体 5′ 和 3′ 边界的野生型侧翼引物。F1 结合于突变位点上游，R2 结合于下游，从而扩增全长突变产物。这些引物可选择携带末端序列（例如限制性酶切位点或亲和标签），用于下游克隆。</li>
+                <li><strong>诱变引物（Fmut、Rmut）：</strong>在其<strong>3′ 延伸端</strong>引入所需突变的引物，DNA 聚合酶由此起始合成。每条诱变引物都含有野生型侧翼序列以确保特异性结合，并且两条引物在涵盖突变的中心重叠区互为反向互补。该重叠使链延伸和全长突变构建体组装成为可能。</li>
+                <li><strong>两阶段热力学优化：</strong><strong>核心区</strong>（含突变的区段）被优化至目标熔解温度（通常为 55–60 °C），以驱动突变片段的初始 PCR 扩增。<strong>重叠区</strong>（Fmut 与 Rmut 之间的反向互补重叠）用于在延伸 PCR 中支持稳定的引物–引物退火，此时突变 PCR 产物互为引物，从而组装全长构建体。</li>
+            </ul>
+            
+        </div>
+
+        <div class="section">
+            <h2>输入格式</h2>
+		<p>本模块接受<strong>FASTA 或纯文本格式的 DNA 序列</strong>。每个输入框仅支持一条序列；若检测到多个 FASTA 标题，将仅使用第一条序列。支持两种操作模式：<strong>CDS（蛋白突变）</strong>和<strong>DNA（核苷酸编辑）</strong>。 </p>
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/mutagenesis_input.png"
+                    alt="定点突变输入"
+                    style="max-width: 60%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+           <h3>突变定义规则</h3>
+		<p>选定输入序列和突变模式后，突变将按以下坐标和操作规则进行解释。 </p>
+<p>
+突变位置为<strong>从 1 开始</strong>的坐标，并相对于
+<strong>所选参考序列</strong>进行解释：
+</p>
+<ul>
+  <li><strong>CDS（蛋白突变）模式：</strong>位置对应于所选翻译 ORF。</li>
+  <li><strong>DNA 序列编辑模式：</strong>位置对应于输入 DNA 序列。</li>
+</ul>
+
+<p>在 CDS 模式中，使用标准单字母符号 <strong><code>*</code></strong> 作为新氨基酸以引入终止密码子（例如 <code>W55*</code>）。单独输入时也接受别名 <code>STOP</code> 和 <code>TER</code>。</p>
+
+<p>两种模式均支持以下操作：</p>
+<ul>
+  <li><strong>替换 / 置换：</strong>
+      将从 <em>Start</em> 到 <em>End</em> 的序列（或氨基酸）
+      替换为所提供的新序列。</li>
+
+  <li><strong>插入：</strong>
+      将新序列插入<strong>指定 Start 位置之后</strong>
+      （End 位置可留空）。</li>
+
+  <li><strong>缺失：</strong>
+      删除从 <em>Start</em> 到 <em>End</em> 的序列（或氨基酸）。</li>
+</ul>
+
+<p>
+如果提供可选的<strong>5′ 重叠序列</strong>，它们会附加到引物上
+用于下游组装，并且<strong>不影响突变坐标或
+热力学计算</strong>。
+</p>
+
+            
+
+
+        </div>
+
+        <div class="section">
+            <h2>设计参数</h2>
+            
+            <p>开始诱变引物设计前，请检查并调整以下参数，使其与您的 PCR 条件和突变要求相符。</p>
+            
+            <table>
+    <thead>
+        <tr>
+            <th>参数</th>
+            <th>默认值</th>
+            <th>范围</th>
+            <th>说明</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>核心引物 Tm（°C）</strong></td>
+            <td>55</td>
+            <td>40–75</td>
+            <td>
+                诱变引物（Fmut 和 Rmut）<strong>模板结合区</strong>的目标熔解温度。
+             </td>
+        </tr>
+        <tr>
+            <td><strong>重叠引物 Tm（°C）</strong></td>
+            <td>55</td>
+            <td>40–75</td>
+            <td>
+                Fmut 与 Rmut 共享、且两条引物互为反向互补的
+                <strong>重叠区</strong>目标熔解温度。
+            </td>
+        </tr>
+        <tr>
+            <td><strong>引物浓度（nM）</strong></td>
+            <td>500</td>
+            <td>50–2000</td>
+            <td>
+                计算机模拟 Tm 计算所采用的有效引物浓度。常用范围：25-1000 nM。
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Na⁺ 浓度（mM）</strong></td>
+            <td>50</td>
+            <td>0–200</td>
+            <td>
+                用于经盐校正的 Tm 计算的单价阳离子浓度。常用范围：10-200 mM。
+
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Mg²⁺ 浓度（mM）</strong></td>
+            <td>2.0</td>
+            <td>0–10</td>
+            <td>
+                用于 Tm 计算的二价阳离子浓度。如果反应中不含 Mg²⁺，请设为 0。常用范围：0.5-5 mM。
+
+            </td>
+        </tr>
+        <tr>
+            <td><strong>正向末端序列</strong></td>
+            <td>—</td>
+            <td>可选</td>
+            <td>
+                附加到外侧正向引物（F1）5′ 端的自定义 DNA 序列。
+                该区域不纳入 Tm 计算，可用于引入
+                限制性酶切位点、亲和标签或其他功能元件。
+            </td>
+        </tr>
+        <tr>
+            <td><strong>反向末端序列</strong></td>
+            <td>—</td>
+            <td>可选</td>
+            <td>
+                附加到外侧反向引物（R2）5′ 端的自定义 DNA 序列，
+                以反向互补形式提供。该区域不纳入 Tm 计算。
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+            
+            <div class="info-box">
+                <strong>关于宿主生物选择的说明（CDS 模式）：</strong>
+                <p style="margin: 8px 0 0 0;">进行蛋白水平突变时，所选宿主生物决定将氨基酸序列翻译为 DNA 时所使用的密码子偏好。这可确保设计的引物使用对该宿主自然偏倚的密码子，从而提高翻译效率并降低稀有密码子相关表达问题的风险。</p>
+            </div>
+
+        </div>
+
+        <div class="section">
+            <h2>结果与输出</h2>
+            
+            <p>引物设计完成后，定点突变模块会生成一套完整结果，用于实验验证和下游克隆。模块显示预测的全长突变构建体，展示纳入全部编辑后的完整序列。原始突变位点会突出显示以便查看，序列以 FASTA 格式提供，便于下载并对照目标进行验证。</p>
+            
+            <p>模块生成四条引物序列：F1（5′ 野生型侧翼引物）、Fmut（含核心区的 5′ 诱变引物）、Rmut（含核心区的 3′ 诱变引物）和 R2（3′ 野生型侧翼引物）。对每条引物，表格显示完整序列（5′→3′）、长度、GC 含量和熔解温度。Tm 值分别报告核心（含突变）区和任何重叠区，以便评估引物结合特异性和扩增兼容性。质量控制指标（包括同聚物连续序列、发夹结构以及自身二聚体/交叉二聚体形成）会被评估并标记，以识别潜在风险。</p>
+            
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/mutagenesis_output.png"
+                    alt="定点突变引物设计输出"
+                    style="max-width: 70%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+
+
+
+            
+        </div>
+
+        <div class="section">
+            <h2>引物设计算法</h2>
+                        
+            <h3>ORF 检测与选择</h3>
+            <p>模块会自动在全部六个读框（正向三个，反向链三个）中扫描输入序列，以识别潜在编码序列。对每个读框，ORF 被识别为以 ATG（起始密码子）开始、以 TAA、TAG 或 TGA（终止密码子）结束的序列。所有检测到的 ORF 按长度排序，并预选最长 ORF。如果目标编码序列与检测到的最长读框不同，用户可从排序列表中手动选择其他 ORF。</p>
+
+            <h3>四引物设计策略</h3>
+            <p>指定突变后，模块按重叠 PCR 策略构建四条引物：</p>
+            <ul>
+		<li><strong>F1（正向侧翼）：</strong>结合于诱变区域上游（5′）的野生型引物。F1 定义最终 PCR 产物的 5′ 边界，并针对外侧 PCR 扩增进行优化。可选的 5′ 末端序列（例如限制性酶切位点或标签）可附加，且不纳入热力学计算。</li>
+                
+                <li><strong>Rmut（反向诱变）：</strong>设计为以核心引物区结合于突变位点紧邻上游（5′）的诱变引物。Rmut 在其 5′ 区（重叠区）中包含部分编辑后序列。 </li>
+
+                <li><strong>Fmut（正向诱变）：</strong>设计为以核心引物区结合于突变位点紧邻下游（3′）的诱变引物。Fmut 在其 5′ 区（重叠区）中包含部分编辑后序列。</li>
+
+                <li><strong>R2（反向侧翼）：</strong>结合于诱变区域下游（3′）的野生型引物。R2 定义最终 PCR 产物的 3′ 边界，并可携带可选的 5′ 末端序列（经反向互补），这些序列不参与 Tm 计算。</li>
+            </ul>
+
+            <h3>末端近端编辑的回退策略</h3>
+            <p>默认的四引物 OE-PCR 策略假设突变位点两侧都有足够的野生型序列，以支持两条外侧引物和两条诱变引物。当所请求的编辑<strong>过于靠近模板任一末端</strong>时，该假设不再成立，因为一侧已无法提供足够长的 PCR 片段以进行稳定扩增。</p>
+            <p>为处理这种情况，模块会评估编辑位点 5′ 和 3′ 两侧的可用序列长度。如果一侧低于内部最小片段长度要求（约 <strong>39 nt</strong>），设计会自动切换为<strong>单片段 PCR 回退</strong>，而不是强制采用标准四引物布局。在该回退模式下，算法将诱变引物保持在编辑区域中心，并仅在仍有足够模板上下文的一侧复用与末端兼容的侧翼引物。</p>
+            <p>因此，靠近模板起始处的编辑可能产生以 <strong>Fmut + R2</strong> 为主的设计，而靠近末端的编辑则可能依赖 <strong>F1 + Rmut</strong>。在极端情况下，如果必须从末端受限的片段直接扩增编辑本身，最终输出实际上可能收缩为单一诱变引物对。这种回退行为是有意为之，反映的是序列末端附近引物放置的物理限制，而不是设计失败。</p>
+
+           
+
+        </div>
+        <div class="section">
+            <h2>警告与边界情况</h2>
+            <p>定点突变模块将共享的 <strong>MW（Message Warning）</strong> 层与突变专用设计回退相结合。部分警告仅为预检，另一些则说明当突变靠近模板末端或序列解释出现歧义时，算法如何改变策略。</p>
+
+            <h3>一般警告</h3>
+            <p>这些警告主要反映设计前或设计过程中检测到的输入质量或参数质量问题。许多情况下用户可以继续，但由此得到的热力学解释可靠性会降低。</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>类别</th>
+                        <th>触发条件</th>
+                        <th>定点突变模块的当前处理方式</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>阻断性输入提示</strong></td>
+                        <td>缺少模板序列、未定义突变/编辑，或所选模式的前提条件无效。</td>
+                        <td>设计立即停止，并要求用户完成所需输入后才能继续有效的突变设计。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-04</strong><br>规范化后无有效序列</td>
+                        <td>规范化后因不再剩余有效 IUPAC DNA 符号，模板变为空。</td>
+                        <td>用户仍可继续，但由此得到的突变输出将没有意义。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-05</strong><br>已移除非 IUPAC 字符</td>
+                        <td>模板输入中存在不支持的字符。</td>
+                        <td>模块仅使用规范化序列继续，并警告有效设计模板可能与最初粘贴的文本不同。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-06</strong><br>检测到简并碱基</td>
+                        <td>模板含有歧义 IUPAC 碱基。</td>
+                        <td>热力学数值按保守方式估算，因此显示的 Tm 和 ΔG 应视为近似值。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-09</strong><br>大批量编辑</td>
+                        <td>在<strong>DNA 编辑模式</strong>下，编辑行数变得非常大。</td>
+                        <td>共享警告层会报告，对于大批量编辑，浏览器端处理可能变慢或失去响应。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-10 至 MW-15</strong><br>参数范围警告</td>
+                        <td>Na<sup>+</sup>、Mg<sup>2+</sup>、引物浓度或目标<strong>核心引物 Tm</strong> 超出建议或经验证的热力学范围。</td>
+                        <td>模块仍可继续，但热力学预测和引物优化的可靠性会降低。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-19</strong><br>模板输入较大</td>
+                        <td>模板输入总量超过共享的大输入阈值。该预检同时适用于<strong>CDS 模式</strong>和<strong>DNA 编辑模式</strong>。</td>
+                        <td>模块会警告浏览器中的设计和渲染可能变慢，但用户仍可继续。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-20</strong><br>同一输入框中有多个 FASTA 标题</td>
+                        <td>在<strong>CDS 模式</strong>或<strong>DNA 编辑模式</strong>下，模板文本框包含不止一条 FASTA 记录。</td>
+                        <td>共享 MW 对话框会警告每个输入框仅允许一条序列。如果用户继续，模板会在设计继续前被截取为<strong>第一条 FASTA 记录</strong>。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-22</strong><br>上传文件超过导入限制</td>
+                        <td>上传的模板文件大于 <strong>1 MB</strong>。</td>
+                        <td>这是导入阶段的硬性阻断 MW：文件会在加载序列前被拒绝，必须替换为更小的上传文件。</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>设计相关警告</h3>
+            <p>这些边界情况特定于突变算法，尤其涉及 CDS 与 DNA 编辑模式的区别、末端近端突变以及可选末端重叠的使用。</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>情况</th>
+                        <th>触发条件</th>
+                        <th>定点突变模块的当前处理方式</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>靠近模板一端的突变</strong></td>
+                        <td>编辑位点过于靠近 5′ 或 3′ 末端，无法留下通常的侧翼片段长度（内部一侧最小约 <strong>39 nt</strong>）。</td>
+                        <td>模块会自动从默认的四引物重叠 PCR 设计回退到<strong>单片段 PCR</strong> 策略，因此输出可能只包含一对主要诱变引物，而不是完整的四引物组。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>可选末端重叠长度警告</strong></td>
+                        <td>用户提供的正向或反向末端重叠序列超出建议的 <strong>15–40 bp</strong> 范围。</td>
+                        <td>模块会发出突变专用 MW 提示，但仍允许继续设计，并警告过短的重叠可能降低下游组装效率，而过长的重叠可能增加脱靶配对。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>未能可靠检测到 CDS</strong></td>
+                        <td>在 CDS 模式下未自动找到 ORF。</td>
+                        <td>如果清理后的模板足够长，模块会回退使用完整规范化序列作为 CDS 输入；如果过短，设计会停止并要求提供有效的 CDS 模板。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>按顺序应用多次编辑</strong></td>
+                        <td>提供了多行突变/编辑。</td>
+                        <td>编辑会<strong>按顺序</strong>应用，后续每一步设计都使用已被前一步修改的模板。用户输入的位置仍锚定于原始输入/ORF，并映射到每个中间模板；重叠的编辑会因歧义而被拒绝。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CDS 模式的密码子选择行为</strong></td>
+                        <td>蛋白水平替换或插入需要反向翻译为 DNA。</td>
+                        <td>模块使用所选宿主生物的密码子偏好；带有明确选定密码子的单个氨基酸会直接使用该密码子，而多氨基酸编辑则按所选宿主的偏好密码子展开。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>重叠/核心构建不足</strong></td>
+                        <td>局部序列上下文不允许在所请求编辑周围形成有效重叠区或足够的核心引物长度。</td>
+                        <td>模块会以设计错误停止，而不是静默生成弱引物组，必须修改突变定义或序列上下文。</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <p><strong>实际解读：</strong>定点突变中的警告并不一定意味着设计失败。如果编辑过于靠近模板一端，模块可能有意从默认的四引物 OE-PCR 布局回退到单片段 PCR 策略，因此看到少于四条引物可能是预期结果而非错误。最终解读因此应考虑所选模式、突变顺序、可选末端重叠，以及报告结果反映的是默认四引物设计还是末端近端回退策略。</p>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

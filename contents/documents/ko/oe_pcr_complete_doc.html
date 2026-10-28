@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오버랩 연장 PCR - PrimerWeaver V1.0.6</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #333;
+            background: #f9fafb;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e40af;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2563eb;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            font-size: 1.5em;
+        }
+        h3 {
+            color: #3b82f6;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            font-size: 1.2em;
+        }
+        h4 {
+            color: #60a5fa;
+            margin-top: 1.2em;
+            margin-bottom: 0.6em;
+        }
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 1em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        strong {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c2410c;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .abstract {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+        .abstract p {
+            margin: 0;
+            font-style: italic;
+        }
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .section {
+            margin-bottom: 2.5em;
+        }
+        .version-info {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+            margin-top: 3em;
+            padding-top: 2em;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>오버랩 연장 PCR</h1>
+        
+        <div class="abstract">
+            <p>오버랩 PCR(또는 오버랩 연장 PCR, OE-PCR) 모듈은 상보적 오버랩 서열을 포함하는 프라이머를 합리적으로 설계하여 여러 DNA 절편을 흉터 없이 조립할 수 있게 합니다. 이 도구는 각 절편에 대한 프라이머 쌍을 자동으로 설계하고, 절편 사이에 사용자가 지정한 링커 서열(DNA 또는 아미노산)을 포함하며, 효율적인 조립을 위해 오버랩 길이와 용융 온도를 최적화합니다. 이 방법은 융합 단백질 구축, 모듈형 유전 요소 연결, 제한효소 부위가 필요 없는 키메라 서열 제작에 특히 적합합니다.</p>
+        </div>
+
+        <div class="section">
+            <h2>빠른 시작 가이드</h2>
+            
+            <ol>
+                <li>원하는 조립 순서로 FASTA 또는 일반 텍스트 형식의 DNA 절편을 2개 이상 추가합니다. 절편 이름은 FASTA 헤더에서 자동으로 추출되어 식별이 쉽습니다. 선택적으로 절편 사이 링커 서열(DNA 또는 아미노산)을 지정하고, 설계 매개변수(핵심 Tm, 오버랩 Tm, 염 농도)를 조정하며, 말단 프라이머에 선택적 5′ 서열(예: 제한효소 부위 또는 친화성 태그)을 추가할 수 있습니다.</li>
+                
+                <div style="text-align: center; margin: 2em 0;">
+                    <img
+                        src="contents/pictures/oe_PCR_demo.png"
+                        alt="OE-PCR 절편 입력 인터페이스"
+                        style="max-width: 90%; height: auto; border-radius: 8px;"
+                    >
+                </div>
+                
+                
+                
+                <li>"프라이머 설계"를 클릭하여 최적화된 오버랩 영역을 가진 프라이머 쌍을 자동으로 설계합니다. 프라이머 서열, 용융 온도, 품질 지표 및 예측된 조립 서열을 검토합니다. 결과는 FASTA 형식으로 다운로드할 수 있습니다.</li>
+                
+
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>오버랩 PCR 원리</h2>
+            
+            <p>오버랩 PCR은 상보적 오버랩 영역을 포함하는 프라이머 설계를 통해 여러 DNA 절편을 흉터 없이 조립하는 강력한 분자생물학 기법입니다. 오버랩 PCR에서는 여러 회의 PCR이 수행됩니다. 초기 회차에서 오버랩 프라이머 서열로 개별 절편을 증폭하고, 이어서 조립 PCR에서 오버랩하는 절편이 어닐링되어 DNA 중합효소에 의해 연장됨으로써 접합부에 간격이나 추가 서열이 없는 연속 산물이 만들어집니다.</p>
+
+                        
+            <h3>주요 설계 원리</h3>
+            
+            
+            <p>오버랩 PCR 프라이머 설계는 절편 증폭과 오버랩 연장의 서로 다른 요구를 반영하는 <strong>2단계 열역학적 전략</strong>을 따릅니다.</p>
+            <ul>
+                <li><strong>핵심 영역(주형 결합):</strong> 주형 상보 영역은 사용자가 정의한 <strong>핵심 Tm</strong>(일반적으로 55–65 °C)에 도달하도록 최적화되어, 첫 번째 PCR 단계에서 개별 절편의 견고하고 특이적인 증폭을 보장합니다.</li>
+                <li><strong>오버랩 영역(연장 주도):</strong> 오버랩 영역은 연장 PCR 동안 인접 PCR 산물 사이의 안정적인 어닐링을 지원하도록 설계되며, 이때 오버랩하는 절편이 서로에 대한 프라이머로 작용합니다. 이 영역의 열역학적 안정성은 오버랩 연장 효율과 전장 산물 형성을 직접 결정합니다.</li>
+            </ul>
+            <p>이 두 영역을 독립적으로 최적화함으로써 모듈은 개별 절편의 신뢰성 있는 증폭을 가능하게 하면서 오버랩 연장 단계의 효율과 특이성을 극대화합니다.</p>
+
+        </div>
+
+        <div class="section">
+            <h2>입력 형식</h2>
+            
+            <p>이 모듈은 <strong>FASTA 또는 일반 텍스트 형식의 DNA 서열</strong>을 받습니다. 여러 절편을 순서대로 추가할 수 있으며, 사용자가 지정한 순서로 조립됩니다. 입력 필드당 <strong>하나의 서열</strong>만 허용되며, 여러 FASTA 헤더가 감지되면 <strong>첫 번째 서열만</strong> 사용됩니다. </p>
+            
+            <p>선택적 <strong>사용자 지정 오버랩 서열</strong>을 첫 번째 정방향 프라이머와 마지막 역방향 프라이머의 5′ 말단에 추가할 수 있습니다. 선택적 <strong>링커 서열</strong>을 절편 사이에 삽입할 수 있으며, 예를 들어 아미노산(단백질 링커, 친화성 태그) 또는 뉴클레오타이드 서열(제한효소 부위, 유연한 스페이서 등)을 사용할 수 있습니다. </p>
+
+                <div style="text-align: center; margin: 2em 0;">
+                    <img
+                        src="contents/pictures/oe_PCR_input.png"
+                        alt="OE-PCR 입력 서열"
+                        style="max-width: 60%; height: auto; border-radius: 8px;"
+                    >
+                </div>
+ <h3>절편 관리</h3>
+            <ul>
+                <li><strong>절편 추가/제거:</strong> 다중 절편 조립을 위해 여러 DNA 서열을 추가합니다(2–10개 절편 권장; 더 큰 조립은 복잡도가 증가함)</li>
+                <li><strong>절편 순서 변경:</strong> 인터페이스 컨트롤로 조립 순서를 조정합니다. 순서가 최종 구축물의 구조를 결정합니다</li>
+                <li><strong>절편 이름:</strong> FASTA 헤더에서 자동 추출되어 프라이머를 명확히 식별하며, 출력 보고서에 사용됩니다</li>
+                <li><strong>역상보:</strong> 원하는 방향과 조립 방향에 맞추기 위해 개별 절편을 전환할 수 있습니다</li>
+            </ul>
+        </div>
+
+
+        <div class="section">
+            <h2>설계 매개변수</h2>
+            
+            <p>프라이머 설계를 시작하기 전에 다음 매개변수를 PCR 조건 및 조립 요구사항에 맞게 검토하고 조정하십시오.</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>매개변수</th>
+                        <th>기본값</th>
+                        <th>범위</th>
+                        <th>설명</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>핵심 프라이머 Tm(°C)</strong></td>
+                        <td>55</td>
+                        <td>40–75</td>
+                        <td>프라이머의 핵심(주형 결합) 영역에 대한 목표 용융 온도입니다. </td>
+                    </tr>
+                    <tr>
+                        <td><strong>오버랩 영역 Tm(°C)</strong></td>
+                        <td>55</td>
+                        <td>40–75</td>
+                        <td>절편 간 어닐링을 위해 설계된 오버랩 영역의 목표 용융 온도입니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>프라이머 농도(nM)</strong></td>
+                        <td>500</td>
+                        <td>50–2000</td>
+                        <td>in silico Tm 계산에 가정되는 유효 프라이머 농도입니다. 일반적인 범위: 25-1000 nM.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Na⁺ 농도(mM)</strong></td>
+                        <td>50</td>
+                        <td>0–200</td>
+                        <td>염 보정 Tm 계산에 사용되는 1가 양이온 농도입니다. 일반적인 범위: 10-200 mM.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mg²⁺ 농도(mM)</strong></td>
+                        <td>2.0</td>
+                        <td>0–10</td>
+                        <td>Tm 계산에 사용되는 2가 양이온 농도입니다. 반응에 Mg²⁺가 없으면 0으로 설정합니다. 일반적인 범위: 0.5-5 mM.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>정방향 말단 서열</strong></td>
+                        <td>—</td>
+                        <td>선택</td>
+                        <td>F1 프라이머(첫 절편 정방향)의 5′ 말단에 추가되는 사용자 지정 DNA 서열입니다. Tm 계산에서 제외됩니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>역방향 말단 서열</strong></td>
+                        <td>—</td>
+                        <td>선택</td>
+                        <td>RN 프라이머(마지막 절편 역방향, 역상보)의 5′ 말단에 추가되는 사용자 지정 DNA 서열입니다. Tm 계산에서 제외됩니다.</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            
+        </div>
+
+        <div class="section">
+            <h2>결과 및 출력</h2>
+            
+            <p>프라이머 설계 후 오버랩 PCR 모듈은 실험적 검증과 후속 클로닝을 돕기 위한 포괄적인 결과 집합을 생성합니다. </p>
+            
+            <h3>프라이머 표</h3>
+            <p>설계된 프라이머 쌍은 완전한 프라이머 서열 정보(5′→3′), 길이, GC 함량 및 용융 온도(Tm)가 포함된 구조화된 표로 제시됩니다. Tm 값은 어닐링 핵심 영역과 오버랩 영역에 대해 모두 표시되어 증폭 적합성을 평가할 수 있습니다. 동종중합체 연속 서열, 헤어핀 구조, 자기 이합체 및 교차 이합체 형성을 포함한 프라이머 품질 지표가 평가되고 표시되어 PCR 성능에 영향을 줄 수 있는 잠재적 위험을 강조합니다. 오버랩 영역은 프라이머 서열 내에서 굵게 강조되어 쉽게 확인할 수 있습니다. <p>
+          
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/oe_PCR_output_results.png"
+                    alt="OE-PCR 프라이머 설계 표 결과"
+                    style="max-width: 70%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+            <h3>조립된 서열</h3>
+            <p>모듈은 모든 절편이 연결된 완전한 연결 서열을 보여 주는 예측된 최종 조립 구축물을 생성합니다. 프라이머 결합 영역은 시각화를 위해 강조됩니다. 서열 검증 및 후속 분석을 위해 FASTA 형식으로 다운로드하십시오</p>
+            
+        </div>
+
+        <div class="section">
+            <h2>프라이머 설계 알고리즘</h2>
+            
+            <h3>프라이머 구조</h3>
+		<p>각 오버랩 PCR 프라이머는 두 기능 영역으로 구성됩니다.</p>
+		<ul>
+  			<li><strong>어닐링 핵심(3′):</strong> 어닐링과 증폭을 주도하는 주형 상보 영역입니다(일반적으로 18–30 bp).</li>
+  			<li><strong>오버랩 영역(5′):</strong> 인접 절편에 상보적인 서열로, 프라이머를 통해 도입되며 오버랩 PCR 동안 절편–절편 어닐링 및 연장에 사용됩니다(일반적으로 18–30 bp). </li>
+		</ul>
+         
+            <h3>설계 과정</h3>
+            <p>오버랩 PCR 프라이머 설계 시 시스템은 먼저 사용자가 정의한 순서에 따라 모든 입력 절편을 연결하고 지정된 <strong>링커 서열</strong>을 포함하여 <strong>조립된 표적 서열</strong>을 구축합니다. 이어서 이 조립 서열에서 인접 절편 사이의 접합부가 식별되며, <strong>오버랩 영역은 독립적인 절편 서열이 아니라 최종 구축물에 대한 위치 좌표로 정의</strong>됩니다. 이러한 오버랩 영역은 링커 길이와 접합부 맥락에 따라 링커 서열을 부분적으로 또는 완전히 걸칠 수 있으므로 <strong>잘리거나 폐기되지 않습니다</strong>.</p>
+	     <p>접합부 위치와 오버랩 경계가 고정되면 시스템은 접합부 상류 또는 하류의 해당 원래 절편 서열을 스캔하여 각 프라이머의 <strong>어닐링 핵심(주형 결합 영역)</strong>을 설계합니다. 핵심 길이는 목표 용융 온도에 도달하고 QC 제약을 충족하도록 반복적으로 조정됩니다. 마지막으로 전장 OE-PCR 프라이머는 최적화된 어닐링 핵심과 할당된 오버랩 영역을 <strong>위치적으로 연결</strong>하여 구성되며, 각 프라이머가 올바른 접합부 맥락을 도입하면서 오버랩 연장 동안 조립된 표적 서열을 충실히 재구성하도록 합니다.<p>
+
+            <h3>알고리즘의 예외 사례 논리</h3>
+            <p>여러 예외 사례는 사용자 대면 경고로만 처리되지 않고 프라이머 설계 알고리즘 내부에서 직접 처리됩니다. 가장 중요한 분기는 아래에 요약되어 있습니다.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>알고리즘 예외 사례</th>
+                        <th>오버랩 PCR 모듈의 현재 동작</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>유효 절편이 두 개 미만</strong></td>
+                        <td>프라이머 구성 전에 워크플로가 중지됩니다. 빈 행은 먼저 무시되며, <strong>비어 있지 않은 절편이 두 개 이상</strong> 남아 있을 때만 설계가 진행됩니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>인접 절편 사이의 긴 링커</strong></td>
+                        <td>링커가 충분히 길면 알고리즘은 오버랩을 <strong>링커 자체 내부</strong>에서 우선적으로 검색합니다. 보고되는 오버랩 Tm은 전체 프라이머 꼬리보다는 주로 링커-오버랩 구간에 의해 결정됩니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>짧은 링커 또는 링커 없음</strong></td>
+                        <td>링커가 짧거나 없으면 오버랩 영역은 링커 서열과 양쪽 이웃 절편의 측면 서열을 결합하여 구축되므로, 접합부 오버랩이 단일 출처 영역에 속하지 않고 절편-링커-절편 맥락에 걸칠 수 있습니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>선호하는 접합부 설정에서 이상적인 오버랩을 찾지 못함</strong></td>
+                        <td>알고리즘은 즉시 실패하지 않습니다. 대체 오버랩 길이와 국소 접합부 배치를 계속 탐색한 뒤, 포기하기 전에 Tm 근접도와 길이 페널티를 기준으로 <strong>점수가 가장 좋은 가용 오버랩</strong>으로 대체합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>핵심 설계를 위한 절편 말단이 매우 짧음</strong></td>
+                        <td>핵심 설계 단계는 일반적으로 목표 Tm을 향해 프라이머 결합 길이를 반복적으로 스캔합니다. 절편 말단 근처의 서열 맥락이 제한되면 모듈은 이상적인 Tm 목표를 완전히 맞추지 못하더라도 사용 가능한 최상의 말단 서열을 사용하도록 대체합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>연결 프라이머 조립이 링커 부류에 따라 달라짐</strong></td>
+                        <td><strong>R1</strong>과 <strong>F2</strong>의 내부 구성은 링커 길이에 따라 달라집니다. 긴 링커에서는 오버랩 꼬리가 링커 위주이며, 짧거나 빈 링커에서는 꼬리가 링커와 이웃 절편 서열에 나뉘어 배치됩니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>구축물 말단의 선택적 말단 서열</strong></td>
+                        <td>사용자가 제공한 정방향 및 역방향 말단 서열은 핵심/오버랩 설계 후에 추가되며 열역학적 최적화에서 제외됩니다. 역방향 말단 서열은 최종 역방향 프라이머에 역상보 호환 방향으로 포함됩니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>아미노산 링커 입력</strong></td>
+                        <td>링커가 아미노산으로 제공되면 모듈은 먼저 아미노산 문자열을 정리한 다음, 오버랩 설계를 시작하기 전에 선택한 코돈표를 따라 DNA로 변환합니다. 이후 오버랩 알고리즘은 항상 아미노산 기호가 아닌 DNA 서열에서 작동합니다.</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+    </div>
+        <div class="section">
+            <h2>경고 및 예외 사례</h2>
+            <p>오버랩 PCR 모듈은 서열 정규화와 매개변수 사전 점검에 공유 <strong>MW(Message Warning)</strong> 계층을 사용하며, 절편 수, 링커 변환 또는 말단 오버랩 선택이 사용자 주의가 필요할 때 OE-PCR 고유의 예외 사례도 제시합니다.</p>
+
+            <h3>일반 경고</h3>
+            <p>이러한 경고는 대부분 최종 프라이머 세트가 생성되기 전에 발생하며 서열 입력 또는 매개변수 선택의 문제를 나타냅니다. 대부분의 경우 사용자는 입력을 수정하거나 정규화된 값으로 계속 진행할 수 있습니다.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>범주</th>
+                        <th>발생 조건</th>
+                        <th>오버랩 PCR 모듈의 현재 동작</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>차단 입력 알림</strong></td>
+                        <td>유효한 절편이 제공되지 않았거나, 빈 행을 무시한 후 <strong>비어 있지 않은 절편이 두 개 미만</strong>으로 남습니다.</td>
+                        <td>설계가 즉시 중지되며, 조립에 충분한 절편 서열을 제공하도록 사용자에게 요청합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-04</strong><br>정규화 후 유효한 서열 없음</td>
+                        <td>FASTA 헤더 제거 및 비-IUPAC 정리 후 절편이 비어 있게 됩니다.</td>
+                        <td>사용자는 계속 진행할 수 있지만, 해당 절편은 더 이상 의미 있는 프라이머 설계를 지원할 수 없습니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-05</strong><br>비-IUPAC 문자 제거됨</td>
+                        <td>절편 입력에 지원되지 않는 문자가 있습니다.</td>
+                        <td>모듈은 정규화된 DNA만으로 진행하며, 유효 주형이 원래 붙여넣은 텍스트와 다를 수 있음을 경고합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-06</strong><br>축퇴 염기 검출됨</td>
+                        <td>하나 이상의 절편에 모호성 IUPAC 염기가 포함되어 있습니다.</td>
+                        <td>열역학적 값은 가장 안정한 변이에서 보수적으로 추정되므로, 표시된 Tm 및 ΔG 값은 근사값으로 간주해야 합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-10~MW-15</strong><br>매개변수 범위 경고</td>
+                        <td>Na<sup>+</sup>, Mg<sup>2+</sup>, 프라이머 농도 또는 <strong>핵심 프라이머 Tm</strong>이 권장되거나 검증된 범위를 벗어납니다.</td>
+                        <td>모듈은 계속 진행할 수 있지만 해당 조건에서는 열역학적 예측의 신뢰도가 낮아집니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-19</strong><br>총 입력 크기가 큼</td>
+                        <td>절편 전체의 총 서열 입력이 공유 브라우저 측 경고 임계값을 초과합니다.</td>
+                        <td>공유 경고 계층은 매우 큰 총 입력 크기에서 계산이 느려질 수 있음을 보고하지만, 사용자는 계속 진행할 수 있습니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-20</strong><br>한 필드에 여러 FASTA 헤더</td>
+                        <td>절편 텍스트 영역에 FASTA 레코드가 둘 이상 포함되어 있습니다.</td>
+                        <td>공유 MW 대화상자가 필드당 하나의 서열만 허용됨을 경고합니다. 사용자가 계속 진행하면 설계를 이어가기 전에 필드가 <strong>첫 번째 FASTA 레코드</strong>로 잘립니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-22</strong><br>파일 업로드가 가져오기 제한을 초과함</td>
+                        <td>업로드한 절편 파일이 <strong>1 MB</strong>보다 큽니다.</td>
+                        <td>서열을 불러오기 전에 가져오기가 차단되며, 사용자는 더 작은 파일을 선택해야 합니다.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>설계 경고</h3>
+            <p>이러한 예외 사례는 절편 연결, 링커 변환 및 말단 오버랩 처리와 같은 OE-PCR 고유의 설계 논리에서 발생합니다.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>사례</th>
+                        <th>발생 조건</th>
+                        <th>오버랩 PCR 모듈의 현재 동작</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>말단 오버랩 길이 경고</strong></td>
+                        <td>사용자가 제공한 <strong>정방향 말단 서열</strong> 또는 <strong>역방향 말단 서열</strong>이 권장 <strong>15–30 bp</strong> 범위를 벗어납니다.</td>
+                        <td>모듈은 OE 전용 MW 알림을 표시하면서도 설계를 계속 진행하며, 매우 짧은 오버랩은 조립 효율을 낮출 수 있고 더 긴 오버랩은 원치 않는 재조합을 증가시킬 수 있음을 경고합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>AA 링커에 지원되지 않는 기호가 포함됨</strong></td>
+                        <td>아미노산 링커에 유효한 아미노산 기호가 아닌 문자가 포함되어 있습니다.</td>
+                        <td>모듈은 무시된 문자를 보고하고 링커를 정리할 것을 제안한 뒤, 정리된 아미노산 서열로 설계를 다시 시도합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>AA 링커 변환 실패</strong></td>
+                        <td>아미노산 링커를 선택한 숙주 코돈표로 DNA로 번역할 수 없습니다.</td>
+                        <td>설계가 중지되고 수정을 위해 링커 변환 오류가 보고됩니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>링커 길이에 따른 오버랩 전략</strong></td>
+                        <td>이웃 절편 사이의 접합부 링커 길이가 크게 다릅니다.</td>
+                        <td>링커가 길면 오버랩은 링커 서열 내에서 우선 설계되고, 링커가 짧거나 없으면 오버랩이 링커와 측면 절편 서열에 걸쳐집니다. 이로 인해 보고되는 오버랩 Tm에 기여하는 염기가 달라질 수 있습니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>매우 짧은 절편 말단</strong></td>
+                        <td>접합부 근처의 주형 서열이 일반적인 반복 핵심 스캔을 지원하기에 너무 짧습니다.</td>
+                        <td>모듈은 사용 가능한 말단 서열을 핵심 영역으로 사용하도록 대체하므로, 최적화 자유도가 줄어들고 평소보다 짧은 어닐링 핵심이 생성될 수 있습니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>QC 표시는 결과 수준 주석임</strong></td>
+                        <td>프라이머 생성 후 헤어핀, 이합체, 동종중합체 또는 관련 프라이머 QC 문제가 검출됩니다.</td>
+                        <td>이러한 문제는 독립 MW 대화상자가 아니라 결과 표에 인라인으로 나타나므로, 최종 해석은 QC 배지와 조립된 서열 및 오버랩 배치를 함께 고려해야 합니다.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <p><strong>실용적 해석:</strong> 오버랩 PCR에서 경고는 반드시 프라이머 설계가 실패했음을 의미하지 않습니다. 많은 경고는 입력 정규화 또는 설계 휴리스틱을 반영합니다. <strong>오버랩 영역 Tm</strong>은 접합부 설계에 영향을 주지만, 공유 MW 범위 검사는 <strong>핵심 프라이머 Tm</strong> 필드를 대상으로 합니다. 따라서 결과는 프라이머 QC 표, 조립된 서열, 각 접합부의 실제 절편/링커 맥락과 함께 해석해야 합니다.</p>
+            </div>
+        </div>
+</body>
+</html>

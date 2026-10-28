@@ -1,0 +1,468 @@
+<section class="card" style="padding:22px 28px">
+
+<svg width="0" height="0" style="position:absolute">
+    <defs>
+    <symbol id="icon-format" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline>
+    </symbol>
+    <symbol id="icon-fail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line>
+    </symbol>
+    <symbol id="icon-pool" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line>
+    </symbol>
+    <symbol id="icon-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+    </symbol>
+    <symbol id="icon-cite" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+    </symbol>
+    <symbol id="icon-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>
+    </symbol>
+    <symbol id="icon-scissors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle>
+    <line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line>
+    <line x1="8.12" y1="8.12" x2="12" y2="12"></line>
+    </symbol>
+    <symbol id="icon-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+    <polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline>
+    </symbol>
+    <symbol id="icon-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line>
+    <line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line>
+    <line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line>
+    </symbol>
+    <symbol id="icon-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 .57 1.92v.5a2 2 0 0 1-1.73 1l-.25.43a2 2 0 0 1 0 2l.25.43a2 2 0 0 1 1.73 1v.5a2 2 0 0 1-.57 1.92l-.15.1a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-.57-1.92v-.5a2 2 0 0 1 1.73-1l.25-.43a2 2 0 0 1 0 2l-.25-.43a2 2 0 0 1-1.73-1v-.5a2 2 0 0 1 .57-1.92l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+    <circle cx="12" cy="12" r="3"></circle>
+    </symbol>
+    <symbol id="icon-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+    </symbol>
+    <symbol id="icon-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line>
+    </symbol>
+    <symbol id="icon-dna" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 14.899A7 7 0 1 1 15 9.101"></path><path d="M9 9.101A7 7 0 1 1 20 14.899"></path><line x1="4" y1="14.9" x2="9" y2="9.1"></line><line x1="15" y1="14.9" x2="20" y2="9.1"></line><line x1="12" y1="6" x2="12" y2="7"></line><line x1="12" y1="17" x2="12" y2="18"></line><line x1="7" y1="12" x2="8" y2="12"></line><line x1="16" y1="12" x2="17" y2="12"></line>
+    </symbol>
+    <symbol id="icon-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line>
+    </symbol>
+    <symbol id="icon-award" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 17 17 23 15.79 13.88"></polyline>
+    </symbol>
+    </defs>
+</svg>
+
+<h2 style="margin-bottom: 24px;">도움말 및 자주 묻는 질문</h2>
+
+<h3 class="faq-section-heading">시작하기</h3>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-user"></use></svg>
+    <details class="faq-content" open>
+    <summary>로그인이나 비용이 필요한가요?</summary>
+    <div>
+        <p>아니요. PrimerWeaver는 <strong>학술 및 상업적 용도 모두 무료</strong>입니다. 소스 코드는 MIT License로 공개되어 있습니다. NAR Web Server 지침에 따라 로그인이나 쿠키가 필요하지 않습니다.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-lock"></use></svg>
+    <details class="faq-content">
+    <summary>내 서열 데이터가 서버에 업로드되거나 저장되나요?</summary>
+    <div>
+        <p><strong>아니요.</strong> 프라이머 설계부터 <i>in-silico</i> 품질 관리까지 모든 계산은 <strong>사용자의 로컬 브라우저에서 100%</strong> 수행됩니다(클라이언트 측 처리). 사용자의 서열은 서버에 업로드, 전송 또는 저장되지 않습니다. 따라서 데이터의 완전한 개인정보 보호와 보안이 보장됩니다.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-format"></use></svg>
+    <details class="faq-content">
+    <summary>어떤 서열 형식을 사용할 수 있나요?</summary>
+    <div>
+        <p>PrimerWeaver는 표준 DNA 서열을 <strong>FASTA</strong> 또는 <strong>일반 텍스트</strong> 형식으로 입력받습니다. 숫자, 공백 또는 IUPAC 핵산/아미노산 기호가 아닌 문자는 사용자의 허용 후 자동으로 제거됩니다.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-cite"></use></svg>
+    <details class="faq-content">
+    <summary>이 서버는 어떻게 인용하나요?</summary>
+    <div>
+        <p>연구에 PrimerWeaver를 사용한 경우 다음 논문을 인용해 주십시오.</p>
+        <p class="reference">Jin, Z., Kim, Y. E., Ignea, C., 2026. PrimerWeaver: An integrated web server for primer design in molecular biology workflows. <em>Nucleic Acids Research</em>, 54, gkag399. <a href="https://doi.org/10.1093/nar/gkag399" target="_blank" rel="noopener noreferrer">https://doi.org/10.1093/nar/gkag399</a></p>
+    </div>
+    </details>
+</div>
+
+<h3 class="faq-section-heading">설계 매개변수 및 정확도</h3>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-settings"></use></svg>
+    <details class="faq-content">
+    <summary>제약 매개변수(Tm, GC%, 헤어핀, 이합체)는 무엇을 의미하나요?</summary>
+    <div>
+        <p><strong>융해 온도(Tm):</strong> 프라이머-표적 이중가닥의 50%가 변성되는 온도입니다. PrimerWeaver는 정확한 Tm 계산을 위해 최근접 이웃법을 사용합니다. Tm이 높으면 특이성이 향상되고, 낮으면 비특이적 증폭이 줄어듭니다. 실제로 프라이머는 일반적으로 약 55–65 °C의 Tm으로 설계합니다. 프라이머 쌍은 일관된 결합을 위해 ΔTm이 5 °C 미만이 되도록 하는 것이 일반적으로 권장됩니다.</p>
+        <p><strong>GC 함량(%):</strong> 프라이머에서 구아닌과 사이토신 염기가 차지하는 비율입니다. 일반적인 범위는 40–60%입니다. GC 함량이 높으면 Tm이 증가하지만 이차 구조가 형성될 위험도 커집니다.</p>
+        <p><strong>최대 헤어핀 ΔG:</strong> 프라이머 내에서 형성될 수 있는 분자 내 이차 구조(헤어핀)의 Gibbs 자유 에너지입니다. 값이 더 음수일수록 헤어핀이 더 안정하고 자가 결합 가능성이 높습니다. 일반적인 임계값은 −3 kcal/mol입니다.</p>
+        <p><strong>최대 이합체 ΔG:</strong> 두 프라이머 사이에 형성될 수 있는 이분자 이차 구조(이합체)의 Gibbs 자유 에너지입니다. 값이 더 음수일수록 프라이머 간 결합이 더 강합니다. 일반적인 임계값은 동종이합체의 경우 −6 kcal/mol, 이종이합체의 경우 −8 kcal/mol입니다.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-settings"></use></svg>
+    <details class="faq-content">
+    <summary>PrimerWeaver는 열역학 계산의 정확도를 어떻게 확보하나요?</summary>
+    <div>
+        <p>PrimerWeaver는 Tm과 이차 구조 계산에 업계 표준인 최근접 이웃 열역학 모델을 사용합니다.</p>
+        <ul>
+        <li><strong>Tm 계산:</strong> DNA 이뉴클레오타이드 단계에 대해 실험적으로 구한 ΔH° 및 ΔS° 값을 사용하는 최근접 이웃법(SantaLucia, 1998)을 적용합니다. Tm은 Tm = (ΔH° − T°) / ΔS°로 계산합니다.</li>
+        <li><strong>이차 구조:</strong> Watson–Crick 염기쌍 형성과 스태킹 상호작용을 바탕으로 Gibbs 자유 에너지(ΔG)를 추정합니다. 헤어핀 및 이합체의 ΔG 값은 이차 구조의 안정성을 예측하며, 값이 더 음수일수록 더 안정합니다.</li>
+        <li><strong>도구 간 비교:</strong> Tm과 ΔG는 발표된 최근접 이웃 매개변수를 사용하여 계산합니다. 다른 플랫폼과의 비교(Tm 차이에 관한 FAQ 참조)는 구현 방식에 따른 차이를 보여 주기 위한 것이며, 더 높은 정확도를 주장하는 것이 아닙니다.</li>
+        </ul>
+        <p><strong>주의:</strong> 계산된 Tm과 ΔG는 프라이머 설계를 위한 지침입니다. 실제 결합 거동은 완충액, 중합효소 및 분석 조건에 따라 달라지므로, 성능이 중요한 경우 자체 PCR 실험에서 검증하십시오.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-info"></use></svg>
+    <details class="faq-content">
+    <summary>Tm이 SnapGene, Benchling, Multiple Primer Analyzer 또는 다른 도구의 결과와 다른 이유는 무엇인가요?</summary>
+    <div>
+        <p><strong>PrimerWeaver가 다른 플랫폼보다 더 정확하다고 주장하지 않습니다.</strong> 널리 사용되는 여러 도구가 동일한 최근접 이웃 열역학 체계를 기반으로 하지만, 구현 방식과 기본 설정(예: 1가/2가 염 농도, 프라이머 농도)이 달라 서로 다른 Tm 값을 제시할 수 있습니다.</p>
+        <p>SnapGene, Benchling 및 Multiple Primer Analyzer와의 비교를 포함한 논문의 벤치마킹(그림&nbsp;2, 보충표&nbsp;S1)은 도구의 순위를 매기기 위한 것이 아니라 이러한 <strong>플랫폼 간 차이</strong>를 보여 주기 위한 것입니다. PrimerWeaver에서는 이러한 매개변수를 사용자가 조절하여 추정값을 자신의 PCR 조건에 맞출 수 있습니다.</p>
+        <p><strong>실용적 요점:</strong> 계산된 Tm은 실험적으로 단일하게 정의된 “절대적 기준값”이 아니라 프라이머 설계 지침으로 사용하십시오. 성능이 중요한 경우 자체 분석에서 결합 조건을 검증하십시오.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-pool"></use></svg>
+    <details class="faq-content">
+    <summary>다중 PCR 풀링이 PrimerPooler 같은 도구와 다른 이유는 무엇인가요?</summary>
+    <div>
+        <p><strong>PrimerWeaver가 PrimerPooler보다 더 정확하다고 주장하지 않습니다.</strong> 두 도구는 서로 다른 작업을 수행합니다.</p>
+        <ul>
+        <li><strong>PrimerWeaver 다중 PCR:</strong> 자동화된 <strong>프라이머 설계</strong>와 호환성을 고려한 풀링을 함께 수행합니다. 풀 수는 사용자가 수동으로 지정하는 것이 아니라 열역학적 제약 조건 및 설계 모드의 경우 크기/비표적 제약 조건에 따라 결정됩니다.</li>
+        <li><strong>PrimerPooler:</strong> <strong>기존</strong> 프라이머 세트를 여러 풀로 분할합니다. 원하는 풀 수를 지정할 수 있으므로 서열이 고정되어 있고 목표 튜브 수를 맞춰야 할 때 유용합니다.</li>
+        </ul>
+        <p>논문의 벤치마크 프라이머는 PrimerWeaver가 설계했으며, 프라이머를 설계하지 않는 PrimerPooler에는 해당 서열을 입력했습니다. PrimerPooler의 기본 “컴퓨터 제안” 풀 수와 비교한 결과는 이 기본 설정을 보여 줄 뿐, 풀 수를 지정했을 때 도구가 달성할 수 있는 한계를 나타내는 것은 아닙니다.</p>
+        <p><strong>실용적 요점:</strong> 통합 설계와 풀 추천에는 PrimerWeaver를 사용하십시오. 기존 프라이머가 있고 <strong>사용자 지정 풀 수</strong>가 필요하다면 PrimerPooler를 고려하십시오. <strong>QC 모드</strong>에서 PrimerWeaver는 주로 열역학을 기준으로 기존 프라이머를 풀링하며, 크기/비표적 규칙은 적용하지 않습니다.</p>
+    </div>
+    </details>
+</div>
+
+<h3 class="faq-section-heading">워크플로 방법</h3>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-layers"></use></svg>
+    <details class="faq-content">
+    <summary>제한효소 클로닝과 Golden Gate의 차이점은 무엇인가요?</summary>
+    <div>
+        <p><strong>제한효소 클로닝:</strong> 전통적인 II형 제한효소(예: EcoRI, BamHI)를 사용하여 특정 인식 부위에서 DNA를 절단합니다. 프라이머로 삽입 DNA에 제한효소 부위를 추가하면, 동일하게 절단된 벡터에 삽입 DNA를 절단하여 연결할 수 있습니다. PCR 산물을 직접 효율적으로 절단하려면 제한효소 부위 양쪽에 보호 염기를 추가하는 것이 강력히 권장됩니다. 연결 후에도 제한효소 인식 부위는 벡터-삽입 DNA 접합부에 남습니다.</p>
+        <p><strong>Golden Gate(Type IIS):</strong> 인식 부위 바깥쪽의 DNA를 절단하는 Type IIS 효소(예: BsaI)를 사용하여 단일 반응에서 여러 절편을 이음매 없이 방향성 있게 조립합니다. 효소가 인접한 “돌출 말단”을 인식하고 절단하므로, 절편은 재연결 없이 올바른 순서로 자가 조립될 수 있습니다.</p>
+        <p><strong>권장 사항:</strong> Golden Gate는 여러 절편을 조립할 때 더 빠르고 유연하며, 제한효소 클로닝은 단일 절편 삽입에 사용되는 보다 전통적이고 확립된 방법입니다.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-scissors"></use></svg>
+    <details class="faq-content">
+    <summary>Gibson Assembly는 다른 클로닝 방법과 어떻게 다른가요?</summary>
+    <div>
+        <p><strong>Gibson Assembly</strong>는 다음 효소 작용을 결합한 등온 <i>in vitro</i> 조립법입니다.</p>
+        <ul>
+        <li><strong>엑소뉴클레아제:</strong> 절편 말단에 짧은 단일가닥 돌출부(일반적으로 15–30 bp)를 생성합니다.</li>
+        <li><strong>DNA 중합효소:</strong> 엑소뉴클레아제 활성으로 생성된 틈을 채웁니다.</li>
+        <li><strong>DNA 연결효소:</strong> 절단부를 연결하여 연속적인 DNA를 형성합니다.</li>
+        </ul>
+        <p>세 반응이 모두 단일 튜브에서 50°C로 동시에 진행되므로 빠르고 효율적입니다. PrimerWeaver는 각 절편에 상동성 돌출부(기본값 25 bp)를 추가하는 프라이머를 설계합니다. 이후 절편들은 중첩 영역을 통해 서로를 “찾아” 미리 절단한 벡터나 중간 연결 단계 없이 순서대로 조립됩니다.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-play"></use></svg>
+    <details class="faq-content">
+    <summary>중첩 PCR(OE-PCR)이란 무엇이며 어떻게 사용하나요?</summary>
+    <div>
+        <p><strong>중첩 PCR(중첩 연장 PCR, OE-PCR)</strong>은 중간 벡터를 사용하지 않고 여러 DNA 절편을 조립하거나 특정 돌연변이를 도입하는 방법입니다. 중첩 프라이머를 사용하여 절편 사이에 서로 호환되는 돌출부를 생성합니다.</p>
+        <p><strong>기본 워크플로:</strong></p>
+        <ol style="margin: 0;">
+        <li>1차: 외부 프라이머와 중첩되는 3' 영역(중첩 영역)을 가진 내부 프라이머를 사용하여 각 절편을 별도로 증폭합니다.</li>
+        <li>2차: 모든 PCR 산물을 혼합합니다. 중첩되는 단일가닥 영역이 서로 결합하고 중합효소가 중첩 영역을 연장하여 전장 융합 산물을 생성합니다.</li>
+        <li>3차: 외부 프라이머를 추가하여 전장 산물을 다시 증폭하고 수율을 높입니다.</li>
+        </ol>
+        <p>이 방법은 돌연변이 유발(절편 접합부에 변이 도입)이나 도메인 사이에 사용자 지정 링커를 생성할 때 적합합니다.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-pool"></use></svg>
+    <details class="faq-content">
+    <summary>다중 PCR 풀링은 어떻게 작동하나요?</summary>
+    <div>
+        <p>다중 PCR 모듈은 먼저 모든 표적에 대해 최적의 프라이머를 설계합니다. 그런 다음 프라이머 사이에 발생할 수 있는 충돌을 분석하고, 간섭을 최소화하도록 프라이머를 여러 풀로 분할합니다.</p>
+        <p><strong>다음 세 가지 충돌 유형을 고려합니다.</strong></p>
+        <ul>
+        <li><strong>교차 이합체 충돌:</strong> 프라이머 간 강한 열역학적 상호작용(ΔG ≤ −6 kcal/mol)은 프라이머 이합체를 형성하여 프라이머를 소모하고 증폭 실패를 일으킬 수 있습니다. 이합체 점수가 높은 프라이머는 서로 다른 풀에 배치됩니다.</li>
+        <li><strong>산물 크기 충돌:</strong> 크기가 매우 비슷한 PCR 산물(차이 &lt; 크기 허용오차)은 겔 전기영동에서 구분되지 않을 수 있습니다. 비슷한 크기의 산물을 생성하는 프라이머는 겔에서 구분될 수 있도록 서로 다른 풀에 배치됩니다.</li>
+        <li><strong>비표적 증폭 충돌:</strong> 동일한 비표적 서열을 증폭할 수 있는 여러 프라이머 쌍은 겔 전기영동에서 겹치는 밴드를 생성하여 올바른 산물을 식별하기 어렵게 만듭니다. 이러한 프라이머는 서로 다른 풀에 배정됩니다.</li>
+        </ul>
+        <p>PrimerWeaver는 그래프 색칠 알고리즘을 사용하여 프라이머를 <strong>호환 가능한 최소 개수의 풀</strong>에 자동으로 배정함으로써 이러한 충돌을 방지하면서 효율적인 다중화를 구현합니다.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-settings"></use></svg>
+    <details class="faq-content">
+    <summary>부위 특이적 돌연변이 유발용 프라이머는 어떻게 설계하나요?</summary>
+    <div>
+        <p>PrimerWeaver의 <strong>돌연변이 유발</strong> 모듈은 중첩 연장 PCR(OE-PCR) 전략을 사용하여 부위 특이적 돌연변이를 도입하는 프라이머를 설계합니다.</p>
+        <p><strong>설계 방법:</strong> 야생형 서열을 입력하고 원하는 돌연변이(예: V55A: 55번 위치의 발린을 알라닌으로 변경)를 지정합니다. 도구는 돌연변이 부위 양쪽에 위치하는 두 프라이머 쌍을 설계합니다. 각 쌍은 중첩 영역에 원하는 돌연변이를 포함하는 PCR 절편을 생성합니다. 돌연변이를 포함하는 프라이머의 3' 말단은 서로 상보적이도록 설계됩니다.</p>
+        <p><strong>주요 실험 단계:</strong></p>
+        <ul>
+        <li><strong>1차:</strong> 설계된 프라이머 쌍을 사용하여 주형으로부터 두 절편을 별도로 증폭합니다. 각 절편에는 돌연변이의 일부가 포함됩니다.</li>
+        <li><strong>2차(중첩 연장):</strong> 두 PCR 산물을 혼합합니다. 돌연변이를 포함하는 중첩 단일가닥 영역이 서로 결합하고 중합효소가 중첩 영역을 연장하여 전장 돌연변이 산물을 생성합니다.</li>
+        <li><strong>3차:</strong> 필요한 경우 외부 프라이머로 전장 산물을 다시 증폭하여 수율을 높입니다.</li>
+        <li><strong>검증:</strong> 최종 구축물을 사용하기 전에 시퀀싱으로 돌연변이를 확인합니다.</li>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-layers"></use></svg>
+    <details class="faq-content">
+    <summary>다중 절편 조립(USER, Golden Gate 또는 Gibson)용 프라이머는 어떻게 설계하나요?</summary>
+    <div>
+        <p><strong>입력 준비:</strong> 조립하려는 모든 DNA 절편(예: 프로모터, CDS, 종결자, 백본)을 입력합니다. FASTA 형식으로 업로드하거나 붙여넣을 수 있습니다.</p>
+                </ul>
+        <p><strong>USER 클로닝:</strong></p>
+        <ul>
+        <li>USER(Uracil-Specific Excision Reagent) 클로닝은 우라실 함유 프라이머를 사용하여 DNA 절편 사이에 이음매 없는 접합부를 생성합니다.</li>
+        <li>중첩 길이(일반적으로 7–15 bp)를 지정합니다.</li>
+        <li>PrimerWeaver는 중첩 영역의 특정 위치가 우라실로 치환된 프라이머를 설계합니다.</li>
+        <li>PCR 후 USER 효소 혼합물로 처리하면 우라실 위치에서 DNA가 절단되어 상보적인 단일가닥 돌출부가 생성됩니다.</li>
+        <li>절편을 혼합하면 상보적인 돌출부가 결합하여 이음매 없는 조립체를 형성하며, 일반적으로 형질전환 후 복구됩니다.</li>
+        </ul>
+
+	<p><strong>Golden Gate:</strong></p>
+        <ul>
+        <li>Type IIS 효소(예: BsaI, BsmBI)를 선택합니다.</li>
+        <li>PrimerWeaver는 각 절편 양쪽에 서로 호환되는 돌출부가 포함된 프라이머를 설계합니다.</li>
+        <li>PCR 후 선택한 효소로 Golden Gate 조립 반응을 수행하면 절편이 단일 반응에서 올바른 순서로 조립됩니다.</li>
+        </ul>
+        <p><strong>Gibson Assembly:</strong></p>
+        <ul>
+	<li>선택 사항: 삽입 DNA 사이의 링커를 선택합니다.</li>
+        <li>중첩 길이(일반적으로 20–30 bp)를 지정합니다.</li>
+        <li>PrimerWeaver는 절편 말단에 상동성 서열을 추가합니다. 절편은 서로 중첩되며, 50°C의 단일 반응에서 Gibson 반응 마스터 믹스로 조립됩니다.</li>
+
+        <p><strong>유용한 정보:</strong> 호환성과 최적의 조립 비율을 확보하려면 모든 절편의 프라이머를 함께 설계하십시오.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-list"></use></svg>
+    <details class="faq-content">
+    <summary>결과를 내보내고 사용하려면 어떻게 하나요?</summary>
+    <div>
+        <p>PrimerWeaver는 프라이머 설계와 조립 서열을 내보내는 기능을 제공합니다.</p>
+        <ul>
+        <li><strong>프라이머 파일(FASTA 형식):</strong> <code>primers.txt</code>로 다운로드합니다. 설계된 모든 프라이머 서열이 표준 FASTA 형식으로 한 항목당 하나씩 포함됩니다. 합성 업체에 주문하거나 유전체 데이터베이스에 대해 BLAST 검색을 수행하는 데 바로 사용할 수 있습니다.</li>
+        <li><strong>조립 서열:</strong> Golden Gate, Gibson, USER 또는 OE-PCR과 같은 조립 워크플로에서 최종 조립된 DNA 서열을 FASTA 형식으로 다운로드합니다. 호환되는 접합부를 통해 올바른 순서로 조립된 모든 절편이 포함됩니다.</li>
+        </ul>
+        <p><strong>사용 팁:</strong></p>
+        <ul>
+        <li>FASTA 파일에서 프라이머 서열을 복사하여 프라이머 주문 양식에 직접 붙여넣습니다.</li>
+        <li>실험을 진행하기 전에 조립 서열을 설계 사양과 비교하여 확인합니다.</li>
+        <li>설계 기록과 재현성을 위해 두 파일을 모두 보관합니다.</li>
+        <li>BLAST를 사용하여 표적 유전체 또는 참조 서열에 대한 프라이머 특이성을 확인합니다.</li>
+        </ul>
+    </div>
+    </details>
+</div>
+
+<h3 class="faq-section-heading">품질 관리 및 검증</h3>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-list"></use></svg>
+    <details class="faq-content">
+    <summary>Primer QC 보고서의 품질 관리 지표는 어떻게 해석해야 하나요?</summary>
+    <div>
+        <p><strong>Primer QC</strong> 모듈은 프라이머 쌍에 대한 <i>in-silico</i> 분석을 수행하여 잠재적인 문제를 예측합니다.</p>
+        <ul>
+        <li><strong>특이성(BLAST 유사):</strong> PrimerWeaver는 제공된 참조 서열(주형)을 검색하여 프라이머가 주로 의도한 표적에 결합하는지 확인합니다. 특이성이 높으면 비표적 증폭이 줄어듭니다.</li>
+        <li><strong>헤어핀 형성:</strong> 분자 내 이차 구조를 예측합니다. 구조가 지나치게 안정하면 PCR 중 프라이머가 제대로 연장되지 않을 수 있습니다.</li>
+        <li><strong>동종이합체 형성:</strong> 동일한 프라이머끼리 결합하여 프라이머를 격리하고 PCR 효율을 낮출 가능성을 평가합니다.</li>
+        <li><strong>이종이합체 형성:</strong> 정방향 프라이머와 역방향 프라이머 사이의 교차 반응성을 확인합니다. 강한 이합체는 PCR 수율을 낮출 수 있습니다.</li>
+        <li><strong>GC 클램프(3' 말단):</strong> 프라이머는 이상적으로 3′ 말단이 G 또는 C로 끝나며, 이는 프라이머-주형 안정성과 연장 효율을 높일 수 있습니다. PrimerWeaver는 A 또는 T로 끝나는 프라이머가 일부 PCR 조건에서 효율이 낮을 수 있으므로 이를 표시합니다.</li>
+        <li><strong>동일 염기 연속 서열:</strong> 같은 염기가 4개 이상 연속되는 구간(예: 'AAAA')은 특이성을 낮추고 증폭 중 오결합이나 미끄러짐을 촉진할 수 있으므로 표시됩니다.</li>
+        </ul>
+        <p><strong>해석:</strong> 특히 반복 서열이나 복잡도가 낮은 영역에서 설계하는 경우 경고를 주의 깊게 검토하십시오.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-pool"></use></svg>
+    <details class="faq-content">
+    <summary>설계한 프라이머가 실험에서 작동할지 어떻게 검증하나요?</summary>
+    <div>
+        <p>주문하기 전에 다음 모범 사례를 따르십시오.</p>
+        <ul>
+        <li><strong><i>In-silico</i> 품질 관리:</strong> PrimerWeaver의 QC 모듈을 사용하여 헤어핀, 이합체 및 비표적 결합을 확인합니다. 모든 경고를 검토하십시오.</li>
+        <li><strong>BLAST 확인:</strong> 정방향 및 역방향 프라이머 서열을 NCBI BLAST에 복사하고 높은 특이성으로 표적에 일치하는지 확인합니다(e-value &lt; 0.01).</li>
+        <li><strong>Tm 차이:</strong> 균형 잡힌 PCR 증폭을 위해 정방향 및 역방향 프라이머의 Tm 값 차이가 3–5°C 이내인지 확인합니다.</li>
+        <li><strong>다중성 확인:</strong> 다중 설계에서는 PrimerWeaver의 이합체 분석을 실행하고 제안된 풀 배정을 따릅니다.</li>
+        <li><strong>실험 최적화:</strong> 주문 후 경사 PCR(결합 온도 58–62°C)로 최적 온도를 확인하고 필요에 따라 조정합니다.</li>
+        </ul>
+        <p><strong>팁:</strong> 프라이머가 작동하지 않으면 QC 보고서를 검토하고 주형 품질을 확인한 후 제약 조건을 완화하여 다시 설계하는 것을 고려하십시오.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-fail"></use></svg>
+    <details class="faq-content">
+    <summary>프라이머 설계에 실패했습니다. 일반적인 원인은 무엇인가요?</summary>
+    <div>
+        <p>설계 실패에는 여러 원인이 있으며, 대개 설정한 제약 조건과 관련이 있습니다.</p>
+        <ul>
+        <li><strong>유효한 프라이머 없음:</strong> 도구가 모든 제약 조건(예: Tm, GC%, 산물 크기)을 충족하는 프라이머 쌍을 찾지 못했습니다. Tm 범위를 넓혀 보십시오.</li>
+        <li><strong>복잡도가 낮은 영역:</strong> 복잡도가 매우 낮은 영역(예: 'AAAAAAAAAA')에서는 프라이머를 설계할 수 없습니다. 표적 영역을 조정하거나 모호한 염기를 제거해 보십시오.</li>
+        <li><strong>높은 이합체 점수:</strong> 다중 모드에서 특정 프라이머가 다른 모든 프라이머와 불가피하게 결합력이 높은 이합체를 형성하면 해당 프라이머가 제외될 수 있습니다. 표적 수를 줄이거나 이합체 임계값을 높여 보십시오.</li>
+        <li><strong>주형 문제:</strong> 주형 서열이 정확하고 표적 영역 양쪽에 충분한 길이(일반적으로 ±50 bp)가 있는지 확인하십시오.</li>
+        </ul>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-scissors"></use></svg>
+    <details class="faq-content">
+    <summary>첫 번째 프라이머 세트가 실패하면 다시 설계할 수 있나요?</summary>
+    <div>
+        <p>예. 설계한 프라이머가 실험에서 작동하지 않으면 다음을 수행하십시오.</p>
+        <ol>
+        <li><strong>QC 보고서 검토:</strong> 헤어핀, 이합체 또는 비표적 결합 예측을 확인합니다.</li>
+        <li><strong>제약 조건 완화:</strong> Tm 범위를 넓혀 보십시오(예: 62–65°C 대신 55–65°C).</li>
+        <li><strong>주형 DNA 확인:</strong> PCR 주형이 순수하고 적절한 농도인지 확인합니다(표준 50ul 반응에서 일반적으로 유전체 DNA는 100–1000 ng, 플라스미드는 1–20 ng).</li>
+        <li><strong>시약 확인:</strong> 중합효소 활성, dNTP의 신선도 및 프라이머 보관 조건을 확인합니다.</li>
+        <li><strong>PCR 조건 최적화:</strong> 여러 결합 온도(경사 PCR)와 연장 시간을 시험합니다.</li>
+        <li><strong>PrimerWeaver로 재설계:</strong> 동일한 제약 조건을 사용하거나 실패 양상에 따라 조정합니다. PrimerWeaver는 일반적으로 여러 프라이머 쌍을 반환하므로 첫 번째 선택이 실패해도 대안 프라이머는 성공할 수 있습니다.</li>
+        </ol>
+        <p><strong>기록 유지:</strong> 어떤 프라이머 세트와 조건이 효과적이었는지 기록하면 향후 설계에 도움이 됩니다.</p>
+    </div>
+    </details>
+</div>
+
+<h3 class="faq-section-heading">기술 세부 정보 및 지원</h3>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-format"></use></svg>
+    <details class="faq-content">
+    <summary>PrimerWeaver는 어떤 참조 서열 형식과 크기를 지원하나요?</summary>
+    <div>
+        <p>PrimerWeaver는 일반적인 분자생물학 워크플로에 최적화되어 있으며 다음을 지원합니다.</p>
+        <ul>
+        <li><strong>서열 형식:</strong> FASTA(다중 또는 단일), 일반 DNA 텍스트(대소문자 모두 허용, 공백 무시).</li>
+        <li><strong>일반적인 크기 범위:</strong> 100 bp부터 수백 kb까지 지원합니다. 주로 브라우저 성능의 제한을 받으며 현재 파일 크기 제한은 1MB입니다.</li>
+        <li><strong>단백질 서열:</strong> 직접 지원하지 않습니다. DNA로 번역하여 입력하십시오(코돈 사용 최적화 기능은 내장되어 있지 않지만 수동으로 최적화할 수 있습니다).</li>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-info"></use></svg>
+    <details class="faq-content">
+    <summary>컴퓨팅 요구 사항과 브라우저 호환성은 어떻게 되나요?</summary>
+    <div>
+        <p><strong>브라우저 호환성:</strong> PrimerWeaver는 JavaScript가 활성화된 모든 최신 브라우저에서 실행됩니다.</p>
+        <ul>
+        <li>Chrome 60 이상(최상의 성능을 위해 권장)</li>
+        <li>Firefox 55 이상</li>
+        <li>Safari 12 이상</li>
+        <li>Edge 79 이상</li>
+        </ul>
+        
+        <p><strong>성능 향상 팁:</strong></p>
+        <ul>
+        <li>계산은 CPU 성능에 좌우됩니다. 구형 컴퓨터나 모바일 기기에서는 대규모 설계(&gt;100개 절편)에 더 오래 걸릴 수 있습니다.</li>
+        <li>CPU 자원을 확보하려면 다른 탭이나 애플리케이션을 닫으십시오.</li>
+        <li>최상의 최적화 성능을 위해 최신 브라우저 버전을 사용하십시오.</li>
+        </ul>
+        <p><strong>느린 성능 문제 해결:</strong> 설계에 30초 넘게 걸리면 입력을 단순화(절편 수 감소, 서열 길이 축소)한 후 다시 시도하십시오.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-settings"></use></svg>
+    <details class="faq-content">
+    <summary>버그를 신고하거나 기능을 요청하려면 어떻게 하나요?</summary>
+    <div>
+        <p>여러분의 의견을 환영합니다. 문제를 신고하거나 개선 사항을 제안하려면 다음 방법을 이용하십시오.</p>
+        <ol>
+        <li><strong>문의 양식 사용:</strong> <strong>소개</strong> 페이지로 이동하여 문의 양식에 문제나 기능 요청에 관한 세부 정보를 입력합니다.</li>
+        <li><strong>GitHub Issues:</strong> <a href="https://github.com/ZimoJin/PrimerWeaver" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline;">PrimerWeaver GitHub 저장소</a>를 방문하여 이슈를 등록합니다(무료 GitHub 계정 필요).</li>
+        <li><strong>이메일:</strong> 소개 페이지의 연락처에 기재된 교신저자에게 문의합니다.</li>
+        </ol>
+        <p><strong>포함하면 유용한 정보:</strong></p>
+        <ul>
+        <li>문제를 재현하는 정확한 단계(해당하는 경우).</li>
+        <li>예상한 동작과 실제로 관찰된 동작.</li>
+        <li>브라우저 종류와 버전(브라우저의 설정 → 정보에서 확인).</li>
+        <li>관련된 경우 예시 서열 또는 매개변수.</li>
+        </ul>
+        <p><strong>응답 시간:</strong> 중대한 문제에는 영업일 기준 2–3일 이내에 답변하는 것을 목표로 합니다.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-user"></use></svg>
+    <details class="faq-content">
+    <summary>고처리량 프라이머 설계를 위한 일괄 처리 기능이나 API가 있나요?</summary>
+    <div>
+        <p>현재 PrimerWeaver는 즉각적인 대화형 설계 워크플로에 최적화된 단일 인스턴스 브라우저 기반 도구입니다. 현재 <strong>내장된 일괄 처리 기능이나 REST API는 없습니다.</strong></p>
+        <p><strong>여러 설계를 처리하는 대안:</strong></p>
+        <ul>
+        <li>여러 브라우저 탭을 열어 프라이머를 병렬로 설계합니다(브라우저 측 계산은 병렬 처리에 적합합니다).</li>
+        <li>결과를 CSV/JSON으로 내보낸 후 하나의 통합 스프레드시트로 취합합니다.</li>
+        <li>매우 큰 규모의 프로젝트는 맞춤형 개발 가능성을 논의하기 위해 저자에게 문의하십시오.</li>
+        </ul>
+        <p><strong>향후 고려 사항:</strong> 모듈식 JavaScript 아키텍처를 사용하므로 향후 API 통합이나 백엔드 배포가 가능합니다. 고처리량과 관련된 구체적인 요구 사항이 있으면 문의해 주십시오.</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-award"></use></svg>
+    <details class="faq-content">
+    <summary>PrimerWeaver는 어떻게 유지 관리되며 앞으로도 계속 사용할 수 있나요?</summary>
+    <div>
+        <p><strong>연구비 및 지원:</strong> PrimerWeaver는 McGill University의 Ignea Lab에서 지속적인 연구 및 기술 지원과 함께 유지 관리합니다.</p>
+        <p><strong>업데이트 및 유지 관리:</strong></p>
+        <ul>
+        <li>버그 수정은 신속하게 배포됩니다.</li>
+        <li>기능 개선은 정기적으로 출시됩니다(일반적으로 6개월마다).</li>
+        <li>표준의 변화에 맞추어 브라우저 호환성을 유지합니다.</li>
+        </ul>
+        <p><strong>오픈 사이언스:</strong> 소스 코드는 GitHub에서 제공되므로 커뮤니티가 기여할 수 있으며, 도구가 단일 기관에 종속되지 않습니다. 어떤 이유로든 호스팅 서비스가 중단되는 경우 코드를 포크하여 자체 호스팅할 수 있습니다.</p>
+    </div>
+    </details>
+</div>
+</section>

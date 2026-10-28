@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>부위 지정 돌연변이 유도 - PrimerWeaver V1.0.6</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #333;
+            background: #f9fafb;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e40af;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2563eb;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            font-size: 1.5em;
+        }
+        h3 {
+            color: #3b82f6;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            font-size: 1.2em;
+        }
+        h4 {
+            color: #60a5fa;
+            margin-top: 1.2em;
+            margin-bottom: 0.6em;
+        }
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 1em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        strong {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c2410c;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .abstract {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+        .abstract p {
+            margin: 0;
+            font-style: italic;
+        }
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .section {
+            margin-bottom: 2.5em;
+        }
+        .version-info {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+            margin-top: 3em;
+            padding-top: 2em;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>부위 지정 돌연변이 유도</h1>
+        
+        <div class="abstract">
+            <p>부위 지정 돌연변이 유도 모듈은 오버랩 PCR 프라이머 설계를 사용하여 DNA 주형에 점돌연변이, 삽입 및 결실을 정밀하게 도입할 수 있게 합니다. 이 도구는 두 가지 상호 보완적인 돌연변이 유도 방식을 지원합니다. 코딩 서열에서의 단백질 수준 돌연변이 유도(자동 ORF 검출 및 숙주 생물 선호도에 따른 코돈 최적화)와 임의의 유전체 영역에 대한 DNA 수준 서열 편집입니다. 모듈은 두 차례의 연속 PCR 반응을 통해 돌연변이 구축물을 효율적으로 조립할 수 있는 프라이머 쌍을 자동으로 설계합니다.</p>
+        </div>
+
+        <div class="section">
+            <h2>빠른 시작 가이드</h2>
+            
+            <ol>
+                <li>돌연변이시킬 영역이 포함된 표적 DNA 서열을 FASTA 또는 일반 텍스트 형식으로 입력 필드에 업로드하거나 붙여넣습니다. CDS 단백질 돌연변이 또는 DNA 서열 편집 모드를 선택합니다. CDS 단백질 돌연변이 모드에서는 시스템이 여섯 개 읽기 틀 전체에서 열린 읽기 틀(ORF)을 자동으로 검출하고 가장 긴 ORF를 기본 입력으로 선택합니다. 원하는 ORF를 수동으로 지정할 수도 있습니다. 돌연변이는 CDS 모드에서 아미노산 치환, 삽입 또는 결실로, DNA 모드에서는 DNA 수준 치환, 삽입 또는 결실로 정의할 수 있습니다. 마지막으로 진행하기 전에 필요에 따라 설계 매개변수를 조정합니다.
+
+                <div style="text-align: center; margin: 2em 0;">
+                    <img
+                        src="contents/pictures/mutagenesis_demo.png"
+                        alt="돌연변이 유도 데모"
+                        style="max-width: 90%; height: auto; border-radius: 8px;"
+                    >
+                </div>
+                </li>
+                
+                <li>"프라이머 설계"를 클릭하여 돌연변이 유발 프라이머 세트를 생성합니다. 설계된 프라이머, 품질 지표 및 예측된 돌연변이 서열을 검토합니다. 실험적 검증을 위해 결과를 FASTA 형식으로 다운로드합니다.
+                
+
+                </li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>부위 지정 돌연변이 유도 원리</h2>
+            
+            <p>부위 지정 돌연변이 유도는 플라스미드 또는 유전체 DNA 주형에 정의된 돌연변이를 정밀하게 도입하는 분자생물학 기법입니다. 이 모듈이 사용하는 오버랩 PCR 전략은 원하는 변화를 포함하고 측면 야생형 서열과 오버랩하는 돌연변이 유발 프라이머를 활용하여, 제한효소나 연결 반응 없이 두 회의 PCR로 완전히 돌연변이된 구축물을 조립할 수 있게 합니다.</p>
+            
+
+            
+            <h3>주요 설계 원리</h3>
+            
+            <p>OE-PCR에 의한 부위 지정 돌연변이 유도는 두 개의 외부 프라이머와 두 개의 돌연변이 유발 프라이머로 구성된 <strong>4프라이머 전략</strong>을 따르며, 각 프라이머는 돌연변이 유도 효율을 극대화하기 위해 서로 다른 열역학적·구조적 역할을 수행합니다.</p>
+            <ul>
+                <li><strong>외부 프라이머(F1, R2):</strong> 최종 구축물의 5′ 및 3′ 경계를 정의하는 야생형 플랭킹 프라이머입니다. F1은 돌연변이 부위 상류에 결합하고 R2는 하류에 결합하여 전장 돌연변이 산물의 증폭을 가능하게 합니다. 이들 프라이머는 후속 클로닝을 위해 말단 서열(예: 제한효소 부위 또는 친화성 태그)을 선택적으로 포함할 수 있습니다.</li>
+                <li><strong>돌연변이 유발 프라이머(Fmut, Rmut):</strong> DNA 중합효소가 합성을 시작하는 <strong>3′ 연장 말단</strong>에서 원하는 돌연변이를 도입하는 프라이머입니다. 각 돌연변이 유발 프라이머는 특이적 결합을 보장하는 야생형 측면 서열을 포함하며, 두 프라이머는 돌연변이를 포괄하는 중심 오버랩 영역에서 서로 역상보가 되도록 설계됩니다. 이 오버랩은 가닥 연장과 전장 돌연변이 구축물의 조립을 가능하게 합니다.</li>
+                <li><strong>2단계 열역학적 최적화:</strong> <strong>핵심 영역</strong>(돌연변이를 포함하는 구간)은 돌연변이 절편의 초기 PCR 증폭을 주도하도록 목표 용융 온도(일반적으로 55–60 °C)에 도달하게 최적화됩니다. <strong>오버랩 영역</strong>(Fmut와 Rmut 사이의 역상보 오버랩)은 연장 PCR 동안 안정적인 프라이머–프라이머 어닐링을 지원하도록 설계되며, 이때 돌연변이 PCR 산물이 서로에 대한 프라이머로 작용하여 전장 구축물을 조립합니다.</li>
+            </ul>
+            
+        </div>
+
+        <div class="section">
+            <h2>입력 형식</h2>
+		<p>이 모듈은 <strong>FASTA 또는 일반 텍스트 형식의 DNA 서열</strong>을 받습니다. 각 입력 필드는 하나의 서열만 지원하며, 여러 FASTA 헤더가 감지되면 첫 번째 서열만 사용됩니다. 두 가지 작동 모드가 지원됩니다. <strong>CDS(단백질 돌연변이 유도)</strong>와 <strong>DNA(뉴클레오타이드 편집)</strong>입니다. </p>
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/mutagenesis_input.png"
+                    alt="돌연변이 유도 입력"
+                    style="max-width: 60%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+           <h3>돌연변이 정의 규칙</h3>
+		<p>입력 서열과 돌연변이 모드가 선택되면 돌연변이는 다음 좌표 및 연산 규칙에 따라 해석됩니다. </p>
+<p>
+돌연변이 위치는 <strong>1부터 시작하는</strong> 좌표이며
+<strong>선택된 참조 서열</strong>을 기준으로 해석됩니다.
+</p>
+<ul>
+  <li><strong>CDS(단백질 돌연변이) 모드:</strong> 위치는 선택된 번역 ORF를 가리킵니다.</li>
+  <li><strong>DNA 서열 편집 모드:</strong> 위치는 입력 DNA 서열을 가리킵니다.</li>
+</ul>
+
+<p>CDS 모드에서는 표준 한 글자 기호 <strong><code>*</code></strong>를 새 아미노산으로 사용하여 종결 코돈을 도입합니다(예: <code>W55*</code>). 단독으로 입력하면 <code>STOP</code> 및 <code>TER</code> 별칭도 허용됩니다.</p>
+
+<p>두 모드 모두에서 다음 연산이 지원됩니다.</p>
+<ul>
+  <li><strong>치환 / 교체:</strong>
+      <em>Start</em>부터 <em>End</em>까지의 서열(또는 아미노산)을
+      제공된 새 서열로 교체합니다.</li>
+
+  <li><strong>삽입:</strong>
+      새 서열을 <strong>지정된 Start 위치 뒤에</strong> 삽입합니다
+      (End 위치는 비워 둘 수 있습니다).</li>
+
+  <li><strong>결실:</strong>
+      <em>Start</em>부터 <em>End</em>에 걸친 서열(또는 아미노산)을 제거합니다.</li>
+</ul>
+
+<p>
+선택적 <strong>5′ 오버랩 서열</strong>이 제공되면 후속 조립을 위해 프라이머에
+추가되며 <strong>돌연변이 좌표나
+열역학 계산에는 영향을 주지 않습니다</strong>.
+</p>
+
+            
+
+
+        </div>
+
+        <div class="section">
+            <h2>설계 매개변수</h2>
+            
+            <p>돌연변이 유발 프라이머 설계를 시작하기 전에 다음 매개변수를 PCR 조건 및 돌연변이 유도 요구사항에 맞게 검토하고 조정하십시오.</p>
+            
+            <table>
+    <thead>
+        <tr>
+            <th>매개변수</th>
+            <th>기본값</th>
+            <th>범위</th>
+            <th>설명</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>핵심 프라이머 Tm(°C)</strong></td>
+            <td>55</td>
+            <td>40–75</td>
+            <td>
+                돌연변이 유발 프라이머(Fmut 및 Rmut)의 <strong>주형 결합 영역</strong>에 대한 목표 용융 온도입니다.
+             </td>
+        </tr>
+        <tr>
+            <td><strong>오버랩 프라이머 Tm(°C)</strong></td>
+            <td>55</td>
+            <td>40–75</td>
+            <td>
+                Fmut와 Rmut가 역상보인
+                <strong>오버랩 영역</strong>의 목표 용융 온도입니다.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>프라이머 농도(nM)</strong></td>
+            <td>500</td>
+            <td>50–2000</td>
+            <td>
+                in silico Tm 계산에 가정되는 유효 프라이머 농도입니다. 일반적인 범위: 25-1000 nM.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Na⁺ 농도(mM)</strong></td>
+            <td>50</td>
+            <td>0–200</td>
+            <td>
+                염 보정 Tm 계산에 사용되는 1가 양이온 농도입니다. 일반적인 범위: 10-200 mM.
+
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Mg²⁺ 농도(mM)</strong></td>
+            <td>2.0</td>
+            <td>0–10</td>
+            <td>
+                Tm 계산에 사용되는 2가 양이온 농도입니다. 반응에 Mg²⁺가 없으면 0으로 설정합니다. 일반적인 범위: 0.5-5 mM.
+
+            </td>
+        </tr>
+        <tr>
+            <td><strong>정방향 말단 서열</strong></td>
+            <td>—</td>
+            <td>선택</td>
+            <td>
+                외부 정방향 프라이머(F1)의 5′ 말단에 추가되는 사용자 지정 DNA 서열입니다.
+                이 영역은 Tm 계산에서 제외되며 제한효소 부위, 친화성 태그 또는
+                기타 기능 요소를 도입하는 데 사용할 수 있습니다.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>역방향 말단 서열</strong></td>
+            <td>—</td>
+            <td>선택</td>
+            <td>
+                외부 역방향 프라이머(R2)의 5′ 말단에 추가되는 사용자 지정 DNA 서열로,
+                역상보로 제공됩니다. 이 영역은 Tm 계산에서 제외됩니다.
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+            
+            <div class="info-box">
+                <strong>숙주 생물 선택에 관한 참고(CDS 모드):</strong>
+                <p style="margin: 8px 0 0 0;">단백질 수준 돌연변이 유도를 수행할 때 선택한 숙주 생물은 아미노산 서열을 DNA로 번역할 때 사용되는 코돈 선호도를 결정합니다. 이를 통해 설계된 프라이머가 표적 숙주에 자연스럽게 편향된 코돈을 사용하게 되어 번역 효율이 향상되고 희귀 코돈 관련 발현 문제의 위험이 줄어듭니다.</p>
+            </div>
+
+        </div>
+
+        <div class="section">
+            <h2>결과 및 출력</h2>
+            
+            <p>프라이머 설계 후 부위 지정 돌연변이 유도 모듈은 실험적 검증과 후속 클로닝을 위한 포괄적인 결과 집합을 생성합니다. 모듈은 모든 편집이 반영된 완전한 서열을 보여 주는 예측된 전장 돌연변이 구축물을 표시합니다. 원래 돌연변이 부위는 쉽게 확인할 수 있도록 강조되며, 서열은 원하는 표적과 대조하여 검증할 수 있도록 FASTA 형식으로 제공됩니다.</p>
+            
+            <p>모듈은 네 개의 프라이머 서열을 생성합니다. F1(5′ 야생형 플랭킹 프라이머), Fmut(핵심 영역이 있는 5′ 돌연변이 유발 프라이머), Rmut(핵심 영역이 있는 3′ 돌연변이 유발 프라이머), R2(3′ 야생형 플랭킹 프라이머)입니다. 각 프라이머에 대해 표는 완전한 서열(5′→3′), 길이, GC 함량 및 용융 온도를 표시합니다. Tm 값은 핵심(돌연변이 포함) 영역과 오버랩 영역에 대해 별도로 보고되어 프라이머 결합 특이성과 증폭 적합성을 평가할 수 있습니다. 동종중합체 연속 서열, 헤어핀 구조, 자기 이합체/교차 이합체 형성을 포함한 품질 관리 지표가 평가되고 표시되어 잠재적 위험을 식별합니다.</p>
+            
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/mutagenesis_output.png"
+                    alt="돌연변이 유도 프라이머 설계 출력"
+                    style="max-width: 70%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+
+
+
+            
+        </div>
+
+        <div class="section">
+            <h2>프라이머 설계 알고리즘</h2>
+                        
+            <h3>ORF 검출 및 선택</h3>
+            <p>모듈은 잠재적 코딩 서열을 식별하기 위해 입력 서열을 여섯 개 읽기 틀(정방향 세 개와 역방향 가닥 세 개) 모두에서 자동으로 스캔합니다. 각 틀에서 ORF는 ATG(개시 코돈)로 시작하고 TAA, TAG 또는 TGA(종결 코돈)로 끝나는 서열로 식별됩니다. 검출된 모든 ORF는 길이로 순위가 매겨지며 가장 긴 ORF가 미리 선택됩니다. 의도한 코딩 서열이 검출된 가장 긴 틀과 다를 경우 사용자는 순위 목록에서 대체 ORF를 수동으로 선택할 수 있습니다.</p>
+
+            <h3>4프라이머 설계 전략</h3>
+            <p>돌연변이 지정 후 모듈은 오버랩 PCR 전략에 따라 네 개의 프라이머를 구성합니다.</p>
+            <ul>
+		<li><strong>F1(정방향 플랭킹):</strong> 돌연변이 유발 영역 상류(5′)에 결합하는 야생형 프라이머입니다. F1은 최종 PCR 산물의 5′ 경계를 정의하며 외부 PCR 증폭에 최적화됩니다. 선택적 5′ 말단 서열(예: 제한효소 부위 또는 태그)을 추가할 수 있으며 열역학 계산에서 제외됩니다.</li>
+                
+                <li><strong>Rmut(역방향 돌연변이 유발):</strong> 핵심 프라이머 영역으로 돌연변이 부위 바로 상류(5′)에 결합하도록 설계된 돌연변이 유발 프라이머입니다. Rmut는 5′ 영역(오버랩 영역)에 편집된 서열의 일부를 포함합니다. </li>
+
+                <li><strong>Fmut(정방향 돌연변이 유발):</strong> 핵심 프라이머 영역으로 돌연변이 부위 바로 하류(3′)에 결합하도록 설계된 돌연변이 유발 프라이머입니다. Fmut는 5′ 영역(오버랩 영역)에 편집된 서열의 일부를 포함합니다.</li>
+
+                <li><strong>R2(역방향 플랭킹):</strong> 돌연변이 유발 영역 하류(3′)에 결합하는 야생형 프라이머입니다. R2는 최종 PCR 산물의 3′ 경계를 정의하며, Tm 계산에 참여하지 않는 선택적 5′ 말단 서열(역상보)을 포함할 수 있습니다.</li>
+            </ul>
+
+            <h3>말단 근접 편집을 위한 대체 방식</h3>
+            <p>기본 4프라이머 OE-PCR 전략은 돌연변이 부위가 양쪽에서 두 개의 외부 프라이머와 두 개의 돌연변이 유발 프라이머를 지지할 만큼 충분한 야생형 서열로 둘러싸여 있다고 가정합니다. 요청된 편집이 <strong>주형의 어느 한쪽 말단에 너무 가까우면</strong> 한쪽이 안정적인 증폭에 충분한 길이의 PCR 절편을 더 이상 제공할 수 없으므로 이 가정이 무너집니다.</p>
+            <p>이 상황을 처리하기 위해 모듈은 편집의 5′ 및 3′ 쪽에서 사용 가능한 서열 길이를 평가합니다. 한쪽이 내부 최소 절편 길이 요구사항(약 <strong>39 nt</strong>) 아래로 떨어지면 설계는 표준 4프라이머 배치를 강제하는 대신 <strong>단일 절편 PCR 대체 방식</strong>으로 자동 전환됩니다. 이 대체 모드에서 알고리즘은 편집된 영역에 중심을 둔 돌연변이 유발 프라이머를 유지하고, 충분한 주형 맥락이 남아 있는 쪽에서만 말단 호환 플랭킹 프라이머를 재사용합니다.</p>
+            <p>그 결과 주형 시작 근처의 편집은 <strong>Fmut + R2</strong>가 주도하는 설계를 만들 수 있고, 끝 근처의 편집은 <strong>F1 + Rmut</strong>에 의존할 수 있습니다. 편집 자체를 말단이 제약된 절편에서 직접 증폭해야 하는 극단적인 경우에는 최종 출력이 사실상 단일 돌연변이 유발 프라이머 쌍으로 축소될 수 있습니다. 이 대체 동작은 의도된 것이며, 실패한 설계 시도가 아니라 서열 말단 근처에서 프라이머를 배치하는 물리적 한계를 반영합니다.</p>
+
+           
+
+        </div>
+        <div class="section">
+            <h2>경고 및 예외 사례</h2>
+            <p>부위 지정 돌연변이 유도 모듈은 공유 <strong>MW(Message Warning)</strong> 계층과 돌연변이 유도 고유의 설계 대체 방식을 결합합니다. 일부 경고는 순수 사전 점검이며, 다른 경고는 돌연변이가 주형 말단에 가깝거나 서열 해석이 모호해질 때 알고리즘이 전략을 어떻게 바꾸는지 설명합니다.</p>
+
+            <h3>일반 경고</h3>
+            <p>이러한 경고는 주로 설계 전이나 도중에 검출되는 입력 품질 또는 매개변수 품질 문제를 반영합니다. 많은 경우 사용자는 계속 진행할 수 있지만 그 결과로 나오는 열역학적 해석의 신뢰도는 낮아집니다.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>범주</th>
+                        <th>발생 조건</th>
+                        <th>돌연변이 유도 모듈의 현재 동작</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>차단 입력 알림</strong></td>
+                        <td>주형 서열 누락, 돌연변이/편집 정의 없음, 또는 선택한 모드에 대한 유효하지 않은 전제 조건.</td>
+                        <td>설계가 즉시 중지되며, 유효한 돌연변이 유도 설계가 진행되기 전에 필요한 입력을 완료하도록 사용자에게 요청합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-04</strong><br>정규화 후 유효한 서열 없음</td>
+                        <td>유효한 IUPAC DNA 기호가 남아 있지 않아 정규화 후 주형이 비어 있게 됩니다.</td>
+                        <td>사용자는 계속 진행할 수 있지만 그 결과로 나오는 돌연변이 유도 출력은 의미가 없습니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-05</strong><br>비-IUPAC 문자 제거됨</td>
+                        <td>주형 입력에 지원되지 않는 문자가 있습니다.</td>
+                        <td>모듈은 정규화된 서열만으로 진행하며, 유효 설계 주형이 원래 붙여넣은 텍스트와 다를 수 있음을 경고합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-06</strong><br>축퇴 염기 검출됨</td>
+                        <td>주형에 모호성 IUPAC 염기가 포함되어 있습니다.</td>
+                        <td>열역학적 값은 보수적으로 추정되므로 표시된 Tm 및 ΔG는 근사값으로 간주해야 합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-09</strong><br>대규모 편집 배치</td>
+                        <td><strong>DNA 편집 모드</strong>에서 편집 행 수가 매우 많아집니다.</td>
+                        <td>공유 경고 계층은 대규모 편집 배치에서 브라우저 측 처리가 느려지거나 응답하지 않을 수 있음을 보고합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-10~MW-15</strong><br>매개변수 범위 경고</td>
+                        <td>Na<sup>+</sup>, Mg<sup>2+</sup>, 프라이머 농도 또는 목표 <strong>핵심 프라이머 Tm</strong>이 권장되거나 검증된 열역학적 범위를 벗어납니다.</td>
+                        <td>모듈은 계속 진행할 수 있지만 열역학적 예측과 프라이머 최적화의 신뢰도가 낮아집니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-19</strong><br>대규모 주형 입력</td>
+                        <td>총 주형 입력 크기가 공유 대규모 입력 임계값을 초과합니다. 이 사전 점검은 <strong>CDS 모드</strong>와 <strong>DNA 편집 모드</strong> 모두에 적용됩니다.</td>
+                        <td>모듈은 브라우저에서 설계와 렌더링이 느려질 수 있음을 경고하지만 사용자는 계속 진행할 수 있습니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-20</strong><br>한 필드에 여러 FASTA 헤더</td>
+                        <td><strong>CDS 모드</strong> 또는 <strong>DNA 편집 모드</strong>에서 주형 텍스트 영역에 FASTA 레코드가 둘 이상 포함되어 있습니다.</td>
+                        <td>공유 MW 대화상자가 필드당 하나의 서열만 허용됨을 경고합니다. 사용자가 계속 진행하면 설계를 이어가기 전에 주형이 <strong>첫 번째 FASTA 레코드</strong>로 잘립니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-22</strong><br>파일 업로드가 가져오기 제한을 초과함</td>
+                        <td>업로드한 주형 파일이 <strong>1 MB</strong>보다 큽니다.</td>
+                        <td>가져오기 단계의 강한 차단 MW입니다. 파일이 서열 로딩 전에 거부되며 더 작은 업로드로 교체해야 합니다.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>설계 경고</h3>
+            <p>이러한 예외 사례는 돌연변이 유도 알고리즘에 고유하며, 특히 CDS와 DNA 편집 모드의 구분, 말단 근접 돌연변이, 선택적 말단 오버랩 사용과 관련이 있습니다.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>사례</th>
+                        <th>발생 조건</th>
+                        <th>돌연변이 유도 모듈의 현재 동작</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>주형 한쪽 말단 근처의 돌연변이</strong></td>
+                        <td>편집 부위가 5′ 또는 3′ 말단에 너무 가까워 일반적인 플랭킹 절편 길이를 남기지 못합니다(내부적으로 한쪽 최소 약 <strong>39 nt</strong>).</td>
+                        <td>모듈은 기본 4프라이머 오버랩 PCR 설계에서 <strong>단일 절편 PCR</strong> 전략으로 자동 대체하므로, 출력에는 전체 4프라이머 세트가 아니라 하나의 주요 돌연변이 유발 프라이머 쌍만 포함될 수 있습니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>선택적 말단 오버랩 길이 경고</strong></td>
+                        <td>사용자가 제공한 정방향 또는 역방향 말단 오버랩 서열이 권장 <strong>15–40 bp</strong> 범위를 벗어납니다.</td>
+                        <td>모듈은 돌연변이 유도 전용 MW 알림을 표시하면서도 설계를 계속 진행하며, 매우 짧은 오버랩은 후속 조립 효율을 낮출 수 있고 매우 긴 오버랩은 비표적 짝짓기를 증가시킬 수 있음을 경고합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>신뢰성 있게 검출된 CDS가 없음</strong></td>
+                        <td>CDS 모드에서 ORF가 자동으로 발견되지 않습니다.</td>
+                        <td>정리된 주형이 충분히 길면 모듈은 정규화된 전체 서열을 CDS 입력으로 사용하도록 대체하고, 너무 짧으면 설계가 중지되고 유효한 CDS 주형을 요청합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>순차적 다중 편집 적용</strong></td>
+                        <td>여러 돌연변이/편집 행이 제공됩니다.</td>
+                        <td>편집은 <strong>순서대로</strong> 적용되며, 이후 각 설계 단계는 이전 단계에서 이미 수정된 주형을 사용합니다. 사용자가 입력한 위치는 원래 입력/ORF에 고정되어 각 중간 주형에 매핑되며, 겹치는 편집은 모호한 것으로 거부됩니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CDS 모드 코돈 선택 동작</strong></td>
+                        <td>단백질 수준 치환 또는 삽입은 DNA로의 역번역이 필요합니다.</td>
+                        <td>모듈은 선택한 숙주 생물의 코돈 선호도를 사용합니다. 명시적으로 선택한 코돈이 있는 단일 아미노산은 해당 코돈을 직접 사용하고, 다중 아미노산 편집은 선택한 숙주의 선호 코돈 선택에 따라 확장됩니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>불충분한 오버랩/핵심 구성</strong></td>
+                        <td>국소 서열 맥락이 요청된 편집 주변에서 유효한 오버랩 영역 또는 충분한 핵심 프라이머 길이를 허용하지 않습니다.</td>
+                        <td>모듈은 약한 프라이머 세트를 조용히 생성하는 대신 설계 오류로 중지되며, 돌연변이 정의 또는 서열 맥락을 수정해야 합니다.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <p><strong>실용적 해석:</strong> 돌연변이 유도의 경고가 반드시 설계 실패를 의미하지는 않습니다. 편집이 주형의 한쪽 말단에 너무 가까우면 모듈이 기본 4프라이머 OE-PCR 배치에서 단일 절편 PCR 전략으로 의도적으로 대체할 수 있으므로, 프라이머가 네 개보다 적게 보이는 것은 오류가 아니라 예상된 결과일 수 있습니다. 따라서 최종 해석은 선택한 모드, 돌연변이 순서, 선택적 말단 오버랩, 보고된 결과가 기본 4프라이머 설계인지 말단 근접 대체 전략인지를 함께 고려해야 합니다.</p>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

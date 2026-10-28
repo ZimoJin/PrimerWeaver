@@ -10,6 +10,13 @@ import * as Core from './core_v1.0.1.js';
 import * as VIZ from './bio_visuals_v1.0.1.js';
 import { setupAssemblyParameterPresets } from './assembly_parameter_presets_v1.0.1.js';
 
+const t = (key, params, fallback) => (
+  window.PW_I18N ? window.PW_I18N.t(key, params, fallback) : (fallback || key)
+);
+const applyI18n = (root) => {
+  if (window.PW_I18N && root) window.PW_I18N.apply(root);
+};
+
 let USER_ROOT = document;
 
 function scopedById(id) {
@@ -1651,7 +1658,7 @@ function updateVectorPreview() {
   const statsDiv = $('vector-map-stats');
   
   if (!vectorText) {
-    if (statsDiv) statsDiv.textContent = 'Paste vector above';
+    if (statsDiv) statsDiv.textContent = t('ui.pasteVectorAbove', null, 'Paste vector above');
     const canvas = $('vector-map-canvas');
     if (canvas) {
       const ctx = canvas.getContext('2d');
@@ -1663,11 +1670,11 @@ function updateVectorPreview() {
   try {
     const records = parseFASTA(vectorText);
     if (records.length === 0) {
-      if (statsDiv) statsDiv.textContent = 'Unable to parse vector sequence';
+      if (statsDiv) statsDiv.textContent = t('ui.unableParseVector', null, 'Unable to parse vector sequence');
       return;
     }
     if (records.length > 1 && statsDiv) {
-      statsDiv.textContent = 'Multiple sequences found, using first one';
+      statsDiv.textContent = t('ui.multipleSeqFirst', null, 'Multiple sequences found, using first one');
     }
     
     const vector = records[0];
@@ -1698,7 +1705,7 @@ function updateVectorPreview() {
     }
     
   } catch (error) {
-    if (statsDiv) statsDiv.textContent = 'Error parsing vector';
+    if (statsDiv) statsDiv.textContent = t('ui.errorParsingVector', null, 'Error parsing vector');
   }
 }
 
@@ -1760,7 +1767,7 @@ function displayResults(results) {
   const primersCell = document.createElement('div');
   primersCell.id = 'cell-primers';
   primersCell.className = 'box';
-  primersCell.innerHTML = '<h3>Primer sets</h3>';
+  primersCell.innerHTML = ('<h3>' + t('ui.primerSets', null, 'Primer sets') + '</h3>');
   primersCell.innerHTML += renderPrimerSets(results, naConc, mgConc, primerConc, tmTarget);
   resultsContent.appendChild(primersCell);
   
@@ -1822,7 +1829,7 @@ function displayResults(results) {
   gelCell.id = 'cell-gel';
   gelCell.className = 'box';
   gelCell.innerHTML = `
-    <h3>Simulated Gel</h3>
+    <h3>${t('ui.simulatedGel', null, 'Simulated Gel')}</h3>
     <div style="margin-top:5px; margin-bottom:10px;">
       <label class="aside" style="display:inline-block; margin-right:5px;">Marker:</label>
       <select id="ggx-ladder" style="width:auto; font-size:12px;">
@@ -2324,7 +2331,7 @@ function initVectorUpload() {
     const textarea = $('vector-seq');
     if (!textarea) return;
     if (!textarea.value.trim()) {
-      showWarning('Vector sequence is empty.');
+      showWarning(t('ui.vectorEmpty', null, 'Vector sequence is empty.'));
       return;
     }
     applyRCToTextarea(textarea);
@@ -2342,7 +2349,7 @@ function initVectorUpload() {
         const base = new URL('modules/contents/demo/', window.location.href).toString();
         const resp = await fetch(base + 'pESC-His.txt');
         if (!resp.ok) {
-          alert('Failed to load demo sequence.');
+          alert(t('ui.failedDemo', null, 'Failed to load demo sequence.'));
           return;
         }
         const text = await resp.text();
@@ -2350,7 +2357,7 @@ function initVectorUpload() {
         updateVectorPreview();
       } catch (e) {
         console.error('Vector demo load error:', e);
-        alert('Failed to load demo sequence.');
+        alert(t('ui.failedDemo', null, 'Failed to load demo sequence.'));
       }
     });
   }
@@ -2391,7 +2398,7 @@ function initUserDemoSetButton() {
       ]);
 
       if (!vectorResp.ok || !insertResp.ok) {
-        showWarning('Failed to load demo sequences.');
+        showWarning(t('ui.failedDemoPlural', null, 'Failed to load demo sequences.'));
         return;
       }
 
@@ -2426,7 +2433,7 @@ function initUserDemoSetButton() {
       }
     } catch (e) {
       console.error('USER Demo Set load error:', e);
-      showWarning('Failed to load demo sequences.');
+      showWarning(t('ui.failedDemoPlural', null, 'Failed to load demo sequences.'));
     } finally {
       demoSetBtn.disabled = false;
       demoSetBtn.textContent = prevText;
@@ -2447,7 +2454,7 @@ function initInsertUpload() {
       const currentRows = container.querySelectorAll('.insert-row');
       
       if (currentRows.length >= 3) {
-        showWarning('Maximum 3 inserts allowed.');
+        showWarning(t('ui.maxInsertsAllowed', {n: 3}, 'Maximum {n} inserts allowed.'));
         return;
       }
       
@@ -2456,26 +2463,27 @@ function initInsertUpload() {
       newRow.className = 'insert-row';
       newRow.setAttribute('data-index', insertCount - 1);
       newRow.innerHTML = `
-        <div class="insert-label">Insert #${insertCount}:</div>
+        <div class="insert-label">${t('ui.insertNColon', {n: insertCount}, 'Insert #{n}:')}</div>
         <div class="insert-body">
           <textarea class="insert-seq" placeholder=">insert${insertCount}&#10;ATGCGTAGCTA..."></textarea>
           <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 6px;">
             <div class="row end" style="gap: 6px;">
               <input type="file" class="insert-file" accept=".fa,.fasta,.fas,.txt,.gb,.gbk,.gbff,.genbank" style="display: none;">
-              <button class="btn demo xs insert-flip-btn" type="button">Reverse complement</button>
-              <button class="btn demo xs insert-demo-btn" type="button">Demo</button>
-              <button class="ghost btn xs insert-upload-btn" type="button">Upload</button>
+              <button class="btn demo xs insert-flip-btn" type="button" data-i18n="ui.reverseComplement">Reverse complement</button>
+              <button class="btn demo xs insert-demo-btn" type="button" data-i18n="ui.demo">Demo</button>
+              <button class="ghost btn xs insert-upload-btn" type="button" data-i18n="ui.upload">Upload</button>
             </div>
           </div>
         </div>
         <div></div>
         <div class="insert-controls" style="width: 100%;">
-          <button class="ghost btn sm insert-move-up-btn" type="button" title="Move up" style="width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">▲</button>
-          <button class="ghost btn sm insert-move-down-btn" type="button" title="Move down" style="width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">▼</button>
-          <button class="ghost btn sm remove-insert-btn" type="button" title="Delete" style="display: none; width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">✕</button>
+          <button class="ghost btn sm insert-move-up-btn" type="button" title="${t('ui.moveUp', null, 'Move up')}" data-i18n-title="ui.moveUp" style="width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">▲</button>
+          <button class="ghost btn sm insert-move-down-btn" type="button" title="${t('ui.moveDown', null, 'Move down')}" data-i18n-title="ui.moveDown" style="width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">▼</button>
+          <button class="ghost btn sm remove-insert-btn" type="button" title="${t('ui.delete', null, 'Delete')}" data-i18n-title="ui.delete" style="display: none; width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">✕</button>
         </div>
       `;
       container.appendChild(newRow);
+        applyI18n(newRow);
       setupInsertRowListeners(newRow);
       updateInsertControls();
       updateAddInsertButton();
@@ -2550,7 +2558,7 @@ function setupInsertRowListeners(row) {
       
       // Limit to 3 inserts
       if (insertNum > 3) {
-        alert('Demo only provides 3 inserts.');
+        alert(t('ui.demoOnlyInserts', {n: 3}, 'Demo only provides {n} inserts.'));
         return;
       }
       
@@ -2558,14 +2566,14 @@ function setupInsertRowListeners(row) {
         const base = new URL('modules/contents/demo/', window.location.href).toString();
         const resp = await fetch(base + `Insert_${insertNum}.txt`);
         if (!resp.ok) {
-          alert('Failed to load demo sequence.');
+          alert(t('ui.failedDemo', null, 'Failed to load demo sequence.'));
           return;
         }
         const text = await resp.text();
         textarea.value = text;
       } catch (e) {
         console.error('Insert demo load error:', e);
-        alert('Failed to load demo sequence.');
+        alert(t('ui.failedDemo', null, 'Failed to load demo sequence.'));
       }
     });
   }
@@ -2621,7 +2629,7 @@ function updateInsertNumbers() {
   const rows = container.querySelectorAll('.insert-row');
   rows.forEach((row, idx) => {
     const label = row.querySelector('.insert-label');
-    if (label) label.textContent = `Insert #${idx + 1}:`;
+    if (label) label.textContent = t('ui.insertNColon', {n: idx + 1}, 'Insert #{n}:');
     row.setAttribute('data-index', idx);
   });
   insertCount = rows.length;
@@ -2722,7 +2730,7 @@ function updatePCRFragments(pcrForward, pcrReverse) {
   
   if (!vectorText || !pcrForward || !pcrReverse) {
     if (backboneSelectU) {
-      backboneSelectU.innerHTML = '<option value="">Please enter vector sequence and PCR primers first</option>';
+      backboneSelectU.innerHTML = '<option value="">' + t('user.enterVectorAndPrimers', null, 'Please enter vector sequence and PCR primers first') + '</option>';
     }
     if (pcrFragmentsInfo) pcrFragmentsInfo.style.display = 'none';
     window.currentPCRFragments = null;
@@ -2733,7 +2741,7 @@ function updatePCRFragments(pcrForward, pcrReverse) {
     const vectorSeq = cleanDNA(vectorText);
     if (!vectorSeq) {
       if (backboneSelectU) {
-        backboneSelectU.innerHTML = '<option value="">Invalid vector sequence</option>';
+        backboneSelectU.innerHTML = '<option value="">' + t('user.invalidVector', null, 'Invalid vector sequence') + '</option>';
       }
       if (pcrFragmentsInfo) pcrFragmentsInfo.style.display = 'none';
       window.currentPCRFragments = null;
@@ -2745,7 +2753,7 @@ function updatePCRFragments(pcrForward, pcrReverse) {
     
     if (!pcrFInfo || !pcrRInfo) {
       if (backboneSelectU) {
-        backboneSelectU.innerHTML = '<option value="">Primer format error</option>';
+        backboneSelectU.innerHTML = '<option value="">' + t('user.primerFormatError', null, 'Primer format error') + '</option>';
       }
       if (pcrFragmentsInfo) pcrFragmentsInfo.style.display = 'none';
       window.currentPCRFragments = null;
@@ -2786,7 +2794,7 @@ function updatePCRFragments(pcrForward, pcrReverse) {
     
     if (!fHits.length || !rHits.length) {
       if (backboneSelectU) {
-        backboneSelectU.innerHTML = '<option value="">Primers not found in sequence</option>';
+        backboneSelectU.innerHTML = '<option value="">' + t('user.primersNotFound', null, 'Primers not found in sequence') + '</option>';
       }
       if (pcrFragmentsInfo) pcrFragmentsInfo.style.display = 'none';
       window.currentPCRFragments = null;
@@ -2816,7 +2824,7 @@ function updatePCRFragments(pcrForward, pcrReverse) {
     
     if (!bestFHit || !bestRHit) {
       if (backboneSelectU) {
-        backboneSelectU.innerHTML = '<option value="">No valid PCR product found</option>';
+        backboneSelectU.innerHTML = '<option value="">' + t('user.noValidPcr', null, 'No valid PCR product found') + '</option>';
       }
       if (pcrFragmentsSummary) pcrFragmentsSummary.textContent = '';
       window.currentPCRFragments = null;
@@ -2892,7 +2900,7 @@ function updatePCRFragments(pcrForward, pcrReverse) {
     console.error('Error updating PCR products:', error);
     const backboneSelectU = $('backbone-select-u');
     if (backboneSelectU) {
-      backboneSelectU.innerHTML = '<option value="">Update failed</option>';
+      backboneSelectU.innerHTML = '<option value="">' + t('user.updateFailed', null, 'Update failed') + '</option>';
     }
     if (pcrFragmentsInfo) pcrFragmentsInfo.style.display = 'none';
     window.currentPCRFragments = null;
@@ -2957,7 +2965,7 @@ function initDesignButton() {
       const insertSeq = getCombinedInsertSeq();
       
       if (!vectorSeq || !insertSeq) {
-        showWarning('Please enter vector and at least one insert sequence');
+        showWarning(t('user.enterVectorAndInsert', null, 'Please enter vector and at least one insert sequence'));
         return;
       }
       
@@ -2965,7 +2973,7 @@ function initDesignButton() {
       const pcrReverse = $('pcr-reverse').value.trim();
       
       if (!pcrForward || !pcrReverse) {
-        showWarning('Please enter PCR forward and reverse primers for vector linearization');
+        showWarning(t('user.enterPcrLinearize', null, 'Please enter PCR forward and reverse primers for vector linearization'));
         return;
       }
       
@@ -3015,8 +3023,8 @@ function initDesignButton() {
               if (modal) {
                 const confirmBtn = modal.querySelector('#mw-confirm-btn');
                 const cancelBtn = modal.querySelector('#mw-cancel-btn');
-                if (confirmBtn) confirmBtn.textContent = 'Return';
-                if (cancelBtn) cancelBtn.textContent = 'Cancel';
+                if (confirmBtn) confirmBtn.textContent = t('user.return', null, 'Return');
+                if (cancelBtn) cancelBtn.textContent = t('ui.cancel', null, 'Cancel');
               }
             } else {
               showWarning(msg);
@@ -3047,7 +3055,7 @@ function initDesignButton() {
                   const results = designUSERPrimersWithU(vectorSeq, insertSeq, pcrForward, pcrReverse, opts, selectedFragmentIdx);
                   displayResults(results);
                 } else {
-                  showWarning('Cannot proceed: primers must both contain U or both not contain U');
+                  showWarning(t('user.bothUOrNeither', null, 'Cannot proceed: primers must both contain U or both not contain U'));
                 }
               } catch (error) {
                 console.error('Design failed:', error);
@@ -3112,7 +3120,7 @@ function initDesignButton() {
                 const results = designUSERPrimersWithU(vectorSeq, insertSeq, pcrForward, pcrReverse, opts, selectedFragmentIdx);
                 displayResults(results);
               } else {
-                showWarning('Cannot proceed: primers must both contain U or both not contain U');
+                showWarning(t('user.bothUOrNeither', null, 'Cannot proceed: primers must both contain U or both not contain U'));
               }
             } catch (error) {
               console.error('Design failed:', error);
@@ -3176,7 +3184,7 @@ function initDownloadButton() {
 
 function downloadPrimersTXT() {
   if (!currentResults) {
-    showWarning('No primers available. Please design primers first.');
+    showWarning(t('ui.noPrimers', null, 'No primers available. Please design primers first.'));
     return;
   }
   
@@ -3241,7 +3249,7 @@ function downloadPrimersTXT() {
   }
   
   if (!fasta) {
-    showWarning('No primer sequences available.');
+    showWarning(t('ui.noPrimerSeqs', null, 'No primer sequences available.'));
     return;
   }
   
@@ -3258,7 +3266,7 @@ function downloadPrimersTXT() {
 
 function downloadAssembledFASTA() {
   if (!window.currentAssembledSeq) {
-    showWarning('Assembled plasmid sequence is not available. Please design primers first.');
+    showWarning(t('ui.assembledUnavailable', null, 'Assembled plasmid sequence is not available. Please design primers first.'));
     return;
   }
   
@@ -3441,8 +3449,8 @@ function initUSERModule(container) {
 
   setupAssemblyParameterPresets(USER_ROOT, {
     scope: 'user-assembly',
-    label: 'USER cloning settings',
-    placeholder: 'e.g. Standard USER cloning',
+    label: t('user.presetLabel', null, 'USER cloning settings'),
+    placeholder: t('user.presetPlaceholder', null, 'e.g. Standard USER cloning'),
     fields: [
       { key: 'pcrForward', selector: '#pcr-forward', defaultValue: '' },
       { key: 'pcrReverse', selector: '#pcr-reverse', defaultValue: '' },

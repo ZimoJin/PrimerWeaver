@@ -1,58 +1,58 @@
 <section class="pane" id="gibson-pane">
   <div class="grid cols-2" id="top-grid">
     <div id="left-panel">
-      <label style="display:flex;align-items:center;gap:8px;"><strong>Vector sequence (FASTA)</strong>
-        <span class="help-icon" tabindex="0" aria-label="Help: Vector sequence">
+      <label style="display:flex;align-items:center;gap:8px;"><strong data-i18n="ui.vectorSequence">Vector sequence (FASTA)</strong>
+        <span class="help-icon" tabindex="0" aria-label="Help: Vector sequence" data-i18n-aria-label="ui.helpVector">
           <span>?</span>
-          <span class="help-tooltip">
+          <span class="help-tooltip" data-i18n-html="ui.vectorHelpHtml">
             <strong style="display:block;margin-bottom:6px;">Vector sequence input</strong>
-            <strong>Formats:</strong> FASTA (optional <code>&gt;</code>), plain DNA, or GenBank (<code>.gb</code>, <code>.gbk</code>, <code>.gbff</code>, <code>.genbank</code>) with <code>LOCUS</code> and <code>ORIGIN</code>. The <strong>LOCUS</strong> name is used as the short sequence name. <strong>Upload</strong> without a header uses the <strong>file name</strong> (no extension) as <code>&gt;</code>name. SnapGene <code>.dna</code> is binary—export as GenBank or FASTA first. Whitespace ignored.
+            <strong>Formats:</strong> FASTA (optional <code>&gt;</code>), plain DNA, or GenBank (<code>.gb</code>, <code>.gbk</code>, <code>.gbff</code>, <code>.genbank</code>) with <code>LOCUS</code> and <code>ORIGIN</code>. The <strong>LOCUS</strong> name is used as the short sequence name. <strong data-i18n="ui.upload">Upload</strong> without a header uses the <strong>file name</strong> (no extension) as <code>&gt;</code>name. SnapGene <code>.dna</code> is binary—export as GenBank or FASTA first. Whitespace ignored.
           </span>
         </span>
       </label>
       <textarea id="vector-seq" placeholder="pESC-His&#10;GAGCAGACAA..."></textarea>
       <div class="row end" id="left-upload-row">
         <input type="file" id="vector-file" accept=".fa,.fasta,.fas,.txt,.gb,.gbk,.gbff,.genbank" style="display:none">
-        <button class="btn demo" id="vector-flip-btn" type="button">Reverse complement</button>
-        <button class="btn demo" id="btn-vector-demo" type="button">Demo</button>
-        <button class="ghost btn" id="vector-upload-btn" type="button">Upload</button>
+        <button class="btn demo" id="vector-flip-btn" type="button" data-i18n="ui.reverseComplement">Reverse complement</button>
+        <button class="btn demo" id="btn-vector-demo" type="button" data-i18n="ui.demo">Demo</button>
+        <button class="ghost btn" id="vector-upload-btn" type="button" data-i18n="ui.upload">Upload</button>
       </div>
     </div>
     <div id="right-panel">
       <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom: 8px;">
         <label style="display:flex;align-items:center;gap:8px; margin:0">
-          <strong>Insert sequence (FASTA)</strong>
-          <span class="help-icon" tabindex="0" aria-label="Help: Insert sequence">
+          <strong data-i18n="ui.insertSequence">Insert sequence (FASTA)</strong>
+          <span class="help-icon" tabindex="0" aria-label="Help: Insert sequence" data-i18n-aria-label="ui.helpInsert">
             <span>?</span>
-            <span class="help-tooltip">
+            <span class="help-tooltip" data-i18n-html="gibson.insertHelpHtml">
               <strong style="display:block;margin-bottom:6px;">Insert sequences</strong>
               Same formats as vector (FASTA, plain DNA, GenBank <code>.gb</code>/<code>.gbk</code>/<code>.gbff</code>/<code>.genbank</code>; file name as header when missing). Add inserts in order. The tool designs Gibson overlaps and primers; optional codon optimization for amino-acid linkers uses the selected host organism.
             </span>
           </span>
         </label>
-        <div style="display:flex; gap:8px; align-items:center; flex-shrink:0;">
-          <button class="demo btn" id="demo-set-btn" type="button">Demo Set</button>
-          <button class="ghost btn" id="global-reset" type="button">Reset</button>
+        <div class="module-primary-actions">
+          <button class="demo btn" id="demo-set-btn" type="button" data-i18n="ui.demoSet">Demo Set</button>
+          <button class="ghost btn" id="global-reset" type="button" data-i18n="ui.reset">Reset</button>
         </div>
       </div>
       <div class="row" id="gibson-host-row" style="justify-content:space-between;margin-bottom:6px;gap:6px;align-items:center">
         <div class="row" style="gap:6px;align-items:center">
-          <label for="host-organism" class="aside" style="white-space: nowrap; margin: 0;">Host organism:</label>
+          <label for="host-organism" class="aside" style="white-space: nowrap; margin: 0;" data-i18n="ui.hostOrganism">Host organism:</label>
           <select id="host-organism" style="width:auto;min-width:180px"></select>
         </div>
         <div class="row" style="gap:6px;align-items:center">
-          <button class="ghost btn" id="flip-order-btn" type="button" title="Reverse the order of inserts without changing sequences">Flip order</button>
-          <button class="ghost btn" id="add-insert-btn" type="button">+ Add insert</button>
+          <button class="ghost btn" id="flip-order-btn" type="button" title="Reverse the order of inserts without changing sequences" data-i18n-title="ui.flipOrderTitle" data-i18n="ui.flipOrder">Flip order</button>
+          <button class="ghost btn" id="add-insert-btn" type="button" data-i18n="ui.addInsert">+ Add insert</button>
         </div>
       </div>
       <div id="inserts-container">
         <div class="insert-row" data-index="0">
-          <div class="insert-label">Insert #1:</div>
+          <div class="insert-label" data-i18n="ui.insertOneColon">Insert #1:</div>
           <div class="insert-body">
             <textarea class="insert-seq" placeholder=">yeGFP&#10;ATGTCTAAAG..."></textarea>
             <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 6px;">
               <div class="row" style="gap: 4px;">
-                <input type="text" class="insert-linker" placeholder="Linker and tag (optional)" list="linker-suggestions-0" style="flex: 1; font-family: monospace; font-size: 0.85rem;" autocomplete="off">
+                <input type="text" class="insert-linker" placeholder="Linker and tag (optional)" data-i18n-placeholder="ui.linkerOptional" list="linker-suggestions-0" style="flex: 1; font-family: monospace; font-size: 0.85rem;" autocomplete="off">
                 <datalist id="linker-suggestions-0">
                   <option value="GS">GS</option>
               	  <option value="GSGS">2x(GS)</option>
@@ -80,17 +80,17 @@
               </div>
               <div class="row end" style="gap: 6px;">
                 <input type="file" class="insert-file" accept=".fa,.fasta,.fas,.txt,.gb,.gbk,.gbff,.genbank" style="display: none;">
-                <button class="btn demo xs insert-flip-btn" type="button">Reverse complement</button>
-                <button class="btn demo xs insert-demo-btn" type="button">Demo</button>
-                <button class="ghost btn xs insert-upload-btn" type="button">Upload</button>
+                <button class="btn demo xs insert-flip-btn" type="button" data-i18n="ui.reverseComplement">Reverse complement</button>
+                <button class="btn demo xs insert-demo-btn" type="button" data-i18n="ui.demo">Demo</button>
+                <button class="ghost btn xs insert-upload-btn" type="button" data-i18n="ui.upload">Upload</button>
               </div>
             </div>
           </div>
           <div></div>
           <div class="insert-controls" style="width: 100%;">
-            <button class="ghost btn sm insert-move-up-btn" type="button" title="Move up" style="width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">▲</button>
-            <button class="ghost btn sm insert-move-down-btn" type="button" title="Move down" style="width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">▼</button>
-            <button class="ghost btn sm remove-insert-btn" type="button" title="Delete" style="display: none; width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">✕</button>
+            <button class="ghost btn sm insert-move-up-btn" type="button" title="Move up" data-i18n-title="ui.moveUp" style="width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">▲</button>
+            <button class="ghost btn sm insert-move-down-btn" type="button" title="Move down" data-i18n-title="ui.moveDown" style="width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">▼</button>
+            <button class="ghost btn sm remove-insert-btn" type="button" title="Delete" data-i18n-title="ui.delete" style="display: none; width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">✕</button>
           </div>
         </div>
       </div>
@@ -101,11 +101,11 @@
     <div class="box" id="vector-preview-box">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
         <div>
-          <h3 style="margin:0;">Vector map preview</h3>
-          <div class="aside">Auto-draws circular plasmid map from vector sequence</div>
+          <h3 style="margin:0;" data-i18n="ui.vectorMapPreview">Vector map preview</h3>
+          <div class="aside" data-i18n="ui.vectorMapAside">Auto-draws circular plasmid map from vector sequence</div>
         </div>
         <div style="display:flex;gap:6px;align-items:center;">
-          <span class="aside">Rotate</span>
+          <span class="aside" data-i18n="ui.rotate">Rotate</span>
           <input type="range" id="vector-map-rotation" min="0" max="360" value="0" step="1" style="width:130px;">
           <span id="vector-map-rot-label" class="aside">0°</span>
         </div>
@@ -113,18 +113,18 @@
       <div style="display:flex;justify-content:center;">
         <canvas id="vector-map-canvas" width="520" height="320" class="asm-figure"></canvas>
       </div>
-      <div id="vector-map-stats" class="aside" style="margin-top:4px;text-align:center">Paste vector sequence above to update preview.</div>
+      <div id="vector-map-stats" class="aside" style="margin-top:4px;text-align:center" data-i18n="ui.pasteVectorPreview">Paste vector sequence above to update preview.</div>
     </div>
 
     <div class="box" id="settings-box">
-      <h3>Assembly settings</h3>
+      <h3 data-i18n="ui.assemblySettings">Assembly settings</h3>
       <div class="assembly-preset-toolbar">
         <div class="assembly-preset-main">
           <label class="aside" for="assembly-preset-select" style="display:flex;align-items:center;gap:6px;">
-            <span>Parameter preset</span>
+            <span data-i18n="ui.preset">Parameter preset</span>
             <span class="help-icon">
               <span>?</span>
-              <span class="help-tooltip">
+              <span class="help-tooltip" data-i18n-html="ui.presetHelpAssembly">
                 Save commonly used assembly settings in this browser. Select a preset to reuse it, or set one as the startup default for next time.
               </span>
             </span>
@@ -132,22 +132,22 @@
           <select id="assembly-preset-select" class="assembly-preset-select"></select>
         </div>
         <div class="assembly-preset-actions">
-          <button class="btn demo assembly-preset-save" type="button">Save as New</button>
-          <button class="btn demo assembly-preset-update" type="button">Update</button>
-          <button class="btn ghost assembly-preset-delete" type="button">Delete</button>
-          <button class="btn assembly-preset-set-default" type="button">Set as Startup Default</button>
+          <button class="btn demo assembly-preset-save" type="button" data-i18n="ui.saveNew">Save as New</button>
+          <button class="btn demo assembly-preset-update" type="button" data-i18n="ui.update">Update</button>
+          <button class="btn ghost assembly-preset-delete" type="button" data-i18n="ui.delete">Delete</button>
+          <button class="btn assembly-preset-set-default" type="button" data-i18n="ui.setDefault">Set as Startup Default</button>
         </div>
       </div>
       <div style="margin-top:8px">
-        <label class="aside">Vector linearization mode</label>
+        <label class="aside" data-i18n="ui.linearizationMode">Vector linearization mode</label>
         <div class="radio-group" style="margin-top:4px">
           <label>
             <input type="radio" name="linearization-mode" value="enzyme" checked>
-            <span>Restriction enzyme linearization</span>
+            <span data-i18n="ui.enzymeLinearization">Restriction enzyme linearization</span>
           </label>
           <label>
             <input type="radio" name="linearization-mode" value="pcr">
-            <span>PCR linearization</span>
+            <span data-i18n="ui.pcrLinearization">PCR linearization</span>
           </label>
         </div>
       </div>
@@ -157,18 +157,18 @@
       <div id="enzyme-block" style="margin-top:8px">
         <div class="grid cols-3" style="gap:12px">
           <div>
-            <label for="enzyme1" class="aside">Restriction enzyme 1:</label>
-            <input type="text" id="enzyme1" list="enzyme-list" placeholder="please choose a enzyme">
+            <label for="enzyme1" class="aside" data-i18n="ui.enzyme1">Restriction enzyme 1:</label>
+            <input type="text" id="enzyme1" list="enzyme-list" placeholder="please choose a enzyme" data-i18n-placeholder="ui.pleaseChooseEnzyme">
           </div>
           <div>
-            <label for="enzyme2" class="aside">Restriction enzyme 2:</label>
-            <input type="text" id="enzyme2" list="enzyme-list" placeholder="please choose a enzyme">
+            <label for="enzyme2" class="aside" data-i18n="ui.enzyme2">Restriction enzyme 2:</label>
+            <input type="text" id="enzyme2" list="enzyme-list" placeholder="please choose a enzyme" data-i18n-placeholder="ui.pleaseChooseEnzyme">
           </div>
           <div>
-            <label for="keep-sites" class="aside">Keep recognition sites?</label>
+            <label for="keep-sites" class="aside" data-i18n="ui.keepSites">Keep recognition sites?</label>
             <select id="keep-sites">
-              <option value="yes">Yes (default)</option>
-              <option value="no">No (delete sites)</option>
+              <option value="yes" data-i18n="ui.yesDefault">Yes (default)</option>
+              <option value="no" data-i18n="ui.noDeleteSites">No (delete sites)</option>
             </select>
           </div>
         </div>
@@ -177,20 +177,20 @@
       <div id="pcr-block" style="display: none; margin-top:8px">
         <div class="grid cols-2" style="gap:12px">
           <div>
-            <label for="pcr-forward" class="aside">Vector PCR forward primer (5′→3′):</label>
+            <label for="pcr-forward" class="aside" data-i18n="ui.pcrForward">Vector PCR forward primer (5′→3′):</label>
             <input type="text" id="pcr-forward" placeholder="e.g., ATG..." class="mono">
           </div>
           <div>
-            <label for="pcr-reverse" class="aside">Vector PCR reverse primer (5′→3′):</label>
+            <label for="pcr-reverse" class="aside" data-i18n="ui.pcrReverse">Vector PCR reverse primer (5′→3′):</label>
             <input type="text" id="pcr-reverse" placeholder="e.g., TCA..." class="mono">
           </div>
         </div>
       </div>
 
       <div id="fragments-info" style="margin-top:8px">
-        <label for="backbone-select" class="aside">Vector backbone fragment</label>
+        <label for="backbone-select" class="aside" data-i18n="ui.vectorBackbone">Vector backbone fragment</label>
         <select id="backbone-select" style="margin-top:6px">
-          <option value="">No fragments available</option>
+          <option value="" data-i18n="ui.noFragments">No fragments available</option>
         </select>
         <span id="fragments-summary" class="aside" style="margin-left:8px;"></span>
       </div>
@@ -198,42 +198,42 @@
       <!-- Parameters row -->
       <div class="grid cols-3" style="margin-top:10px; gap: 12px;">
         <div>
-          <label for="target-tm" class="aside">Target Tm (°C)</label>
+          <label for="target-tm" class="aside" data-i18n="ui.targetTm">Target Tm (°C)</label>
           <input type="number" id="target-tm" value="55" min="55" max="65" step="0.5">
         </div>
         <div>
-          <label for="delta-tm" class="aside">ΔTm (°C)</label>
+          <label for="delta-tm" class="aside" data-i18n="ui.deltaTm">ΔTm (°C)</label>
           <input type="number" id="delta-tm" value="2.5" min="0" max="10" step="0.1">
         </div>
         <div>
-          <label for="overlap-len" class="aside">Overlap (bp)</label>
+          <label for="overlap-len" class="aside" data-i18n="ui.overlapBp">Overlap (bp)</label>
           <input type="number" id="overlap-len" value="25" min="20" max="30" step="1">
         </div>
         <div style="margin-top: 10px;">
-          <label for="primer-conc" class="aside">Primer conc. (nM)</label>
+          <label for="primer-conc" class="aside" data-i18n="ui.primerConc">Primer conc. (nM)</label>
           <input type="number" id="primer-conc" value="500" min="100" max="2000" step="50">
         </div>
         <div style="margin-top: 10px;">
-          <label for="na-conc" class="aside">Na⁺ (mM)</label>
+          <label for="na-conc" class="aside" data-i18n="ui.sodium">Na⁺ (mM)</label>
           <input type="number" id="na-conc" value="50" min="0" max="200" step="10">
         </div>
         <div style="margin-top: 10px;">
-          <label for="mg-conc" class="aside">Mg²⁺ (mM)</label>
+          <label for="mg-conc" class="aside" data-i18n="ui.magnesium">Mg²⁺ (mM)</label>
           <input type="number" id="mg-conc" value="2.0" min="0" max="10" step="0.5">
         </div>
       </div>
       <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
         <div class="row" style="gap:8px;flex-wrap:nowrap">
-          <button class="btn" id="design-btn">Design Gibson Primers</button>
+          <button class="btn" id="design-btn" data-i18n="gibson.design">Design Gibson Primers</button>
           <select id="download-type" class="ghost btn" style="min-width:140px;width:auto">
-            <option value="primers">primer.txt</option>
-            <option value="fasta">assembled.fasta</option>
+            <option value="primers" data-i18n="ui.primerTxt">primer.txt</option>
+            <option value="fasta" data-i18n="ui.assembledFasta">assembled.fasta</option>
           </select>
-          <button class="ghost btn" id="download-btn">Download</button>
+          <button class="ghost btn" id="download-btn" data-i18n="ui.download">Download</button>
         </div>
       </div>
       <div class="row" style="margin-top:auto;justify-content:flex-end">
-        <button class="ghost btn" id="clear-btn">Clear</button>
+        <button class="ghost btn" id="clear-btn" data-i18n="ui.clear">Clear</button>
       </div>
     </div>
   </div>
@@ -249,13 +249,13 @@
   <div class="warning-modal-content">
     <div class="warning-modal-header">
       <span class="warning-icon">⚠️</span>
-      <h3>Warning</h3>
+      <h3 data-i18n="ui.warning">Warning</h3>
     </div>
     <div class="warning-modal-body">
       <p id="warning-message"></p>
     </div>
     <div class="warning-modal-footer">
-      <button class="btn" id="warning-ok-btn">OK</button>
+      <button class="btn" id="warning-ok-btn" data-i18n="ui.ok">OK</button>
     </div>
   </div>
 </div>

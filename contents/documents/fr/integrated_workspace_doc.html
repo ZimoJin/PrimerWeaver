@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Espace de travail de clonage intégré - PrimerWeaver V1.0.6</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #333;
+            background: #f9fafb;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e40af;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2563eb;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            font-size: 1.5em;
+        }
+        h3 {
+            color: #3b82f6;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            font-size: 1.2em;
+        }
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 1em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        strong {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c2410c;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .abstract {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+        .abstract p {
+            margin: 0;
+            font-style: italic;
+        }
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background: #fff7ed;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .section {
+            margin-bottom: 2.5em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Espace de travail de clonage intégré</h1>
+
+        <div class="abstract">
+            <p>L’espace de travail de clonage intégré fournit une interface unifiée pour quatre flux de clonage dans PrimerWeaver : clonage par restriction, assemblage Golden Gate, assemblage Gibson et clonage USER. Au lieu de ressaisir les séquences de vecteur et d’insert dans chaque module, l’espace de travail conserve une couche de séquences partagée en haut de page et affiche en dessous la méthode sélectionnée, avec ses paramètres de conception et ses sorties propres.</p>
+        </div>
+
+        <div class="section">
+            <h2>À quoi sert cet espace de travail</h2>
+            <p>Ce document décrit uniquement la <strong>couche d’intégration propre à l’espace de travail</strong> : entrées partagées, changement de méthode, synchronisation, persistance, et comportement de réinitialisation ou de démonstration au niveau de l’espace de travail. Il ne reprend <strong>pas</strong> la logique de conception complète de chaque méthode de clonage.</p>
+
+            <div class="info-box">
+                <strong>Documentation propre à chaque méthode :</strong>
+                <ul style="margin: 8px 0 0 20px;">
+                    <li><a href="#/docs#d-re">Clonage par restriction</a></li>
+                    <li><a href="#/docs#d-gg">Assemblage Golden Gate</a></li>
+                    <li><a href="#/docs#d-gb">Assemblage Gibson</a></li>
+                    <li><a href="#/docs#d-user">Clonage USER</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Guide de démarrage rapide</h2>
+            <ol>
+                <li>Collez ou téléversez la <strong>séquence du vecteur</strong> et la <strong>séquence de l’insert</strong> partagées dans la zone de saisie supérieure. Ces champs acceptent FASTA, le texte brut et les fichiers texte GenBank standard (<code>.gb</code>, <code>.gbk</code>, <code>.gbff</code>, <code>.genbank</code>), comme les modules de clonage sous-jacents.</li>
+                <li>Sélectionnez une méthode de clonage dans le menu déroulant <strong>Méthode de clonage</strong>. L’espace de travail affiche alors l’interface propre à cette méthode sous les champs partagés.</li>
+                <li>Ajustez les paramètres de conception, les préréglages et les options avancées propres à la méthode dans la zone du module affiché, puis lancez la conception comme d’habitude.</li>
+                <li>Utilisez <strong>Jeu de démonstration</strong> uniquement après avoir sélectionné une méthode ; l’espace de travail chargera le contenu de démonstration de cette méthode dans la zone partagée et dans le volet de méthode synchronisé.</li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>Architecture de l’espace de travail</h2>
+            <p>L’espace de travail est un <strong>adaptateur d’enveloppe partagée</strong> plutôt qu’un cinquième algorithme de clonage. Il conserve une région commune de saisie des séquences et monte dynamiquement le module de clonage sélectionné en dessous. Un seul volet de méthode est actif à la fois, ce qui évite les conflits DOM entre modules qui utilisent des identifiants d’éléments qui se recouvrent ou des hypothèses d’interface locales.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Couche</th>
+                        <th>Rôle dans l’espace de travail</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Champs partagés du haut</strong></td>
+                        <td>Conservent l’état commun des séquences de vecteur et d’insert utilisé par les méthodes de clonage.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Sélecteur de méthode</strong></td>
+                        <td>Choisit le module de clonage affiché et synchronisé sous les champs partagés.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Volet de méthode</strong></td>
+                        <td>Affiche l’interface native du clonage par restriction, Golden Gate, Gibson ou USER, tout en masquant les champs de premier niveau déjà fournis par l’enveloppe de l’espace de travail.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Couche de synchronisation</strong></td>
+                        <td>Maintient l’alignement de l’état vecteur/insert partagé entre l’enveloppe de l’espace de travail et le volet de méthode actuellement actif.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Entrées partagées et synchronisation</h2>
+            <p>Les zones <strong>Séquence du vecteur</strong> et <strong>Séquence de l’insert</strong> du haut sont les champs d’entrée canoniques de l’espace de travail. Lorsqu’une méthode est sélectionnée, l’espace de travail copie ces valeurs dans le DOM propre à la méthode et maintient le volet actif synchronisé lorsque l’utilisateur modifie le contenu.</p>
+            <p>Les utilisateurs peuvent ainsi comparer différentes stratégies de clonage sans recoller manuellement les mêmes séquences de vecteur et d’insert pour chaque module. Si la méthode active modifie les champs d’entrée synchronisés, les champs partagés de l’espace de travail sont également mis à jour, de sorte que le changement de méthode reste cohérent.</p>
+
+            <div class="warning-box">
+                <p><strong>Interprétation pratique :</strong> l’espace de travail vise à réduire la resaisie des séquences partagées, mais il n’aplatit pas toutes les hypothèses propres à chaque méthode en un algorithme universel. L’interprétation finale doit toujours s’appuyer sur la méthode de clonage sélectionnée et sur ses propres réglages en aval, avertissements et résultats.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Comportement lors du changement de méthode</h2>
+            <p>Changer de méthode de clonage ne vide <strong>pas</strong> par défaut le brouillon partagé du vecteur et de l’insert. L’espace de travail conserve ces séquences d’une méthode à l’autre afin de comparer les méthodes sur la même idée de construction.</p>
+            <p>Si la méthode nouvellement sélectionnée prend en charge moins d’inserts que l’interprétation précédente du panneau d’inserts partagé, l’espace de travail affiche une confirmation avant de tronquer l’ensemble d’inserts effectif. Cela évite la perte silencieuse de lignes d’inserts lors du passage d’une méthode d’assemblage plus permissive à une méthode plus restrictive.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Comportement de commutation</th>
+                        <th>Implémentation actuelle</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Conservation du brouillon partagé</strong></td>
+                        <td>Les brouillons de vecteur et d’insert sont conservés lors des changements de méthode au sein d’une même session.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Vérification d’écart de capacité d’inserts</strong></td>
+                        <td>L’espace de travail avertit avant de supprimer des inserts lors du passage à une méthode de capacité d’inserts plus faible.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Points d’accroche de rafraîchissement propres à la méthode</strong></td>
+                        <td>Les volets de méthode actifs peuvent demander des redessins, par exemple un rafraîchissement de la carte du vecteur après synchronisation.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Jeu de démonstration et réinitialisation</h2>
+            <p>Le bouton <strong>Jeu de démonstration</strong> au niveau de l’espace de travail tient compte de la méthode. Une méthode de clonage doit d’abord être sélectionnée ; sinon l’espace de travail affiche un avertissement au lieu de deviner quelle démonstration de module charger.</p>
+            <p>Le bouton <strong>Réinitialiser</strong> au niveau de l’espace de travail est plus radical qu’une réinitialisation locale de méthode. Il efface le brouillon partagé de l’espace de travail et actualise la page afin que l’état de l’enveloppe et le volet de méthode actif reviennent à un état propre.</p>
+        </div>
+
+        <div class="section">
+            <h2>Notes propres à l’espace de travail</h2>
+            <ul>
+                <li>La zone de saisie supérieure partagée est volontairement simplifiée en <strong>Vecteur</strong> plus <strong>Insert</strong> ; les réglages d’enzymes, de chevauchement, d’amorces et de paramètres propres à la méthode restent dans le volet de méthode en dessous.</li>
+                <li>Les préréglages de paramètres affichés dans le volet de méthode inférieur restent <strong>propres à chaque méthode</strong>. L’espace de travail unifie la navigation et la saisie des séquences partagées, mais ne fusionne pas les préréglages de clonage en un format global unique.</li>
+                <li>Le comportement de la carte du vecteur, les avertissements et l’interprétation des résultats restent de la responsabilité du module de clonage sélectionné.</li>
+                <li>L’espace de travail se comprend mieux comme une couche de comparaison et d’orchestration construite au-dessus des quatre outils de clonage, et non comme un substitut à leur documentation au niveau de la méthode.</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

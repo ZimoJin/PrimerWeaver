@@ -259,12 +259,12 @@
 <section class="pane" style="position: relative; overflow: visible;">
   <div style="position: relative; overflow: visible;">
       <div style="display: flex; align-items: center; justify-content: flex-start; gap: 12px; margin: 0 0 12px 0; position: relative; overflow: visible; flex-wrap: wrap;">
-        <h3 style="font-size: 1.1rem; margin: 0;">Input Sequences</h3>
+        <h3 style="font-size: 1.1rem; margin: 0;" data-i18n="ui.inputSequences">Input Sequences</h3>
         <div style="display: flex; gap: 16px; align-items: center; flex-shrink: 0;">
           <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
             <input type="radio" name="input-mode" id="mode-design" value="design" checked style="width: auto; margin: 0;">
             <span style="display: flex; align-items: center; gap: 6px;">
-              <strong>De Novo Design Mode</strong>
+              <strong data-i18n="multiplex.deNovo">De Novo Design Mode</strong>
               <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
                 <span style="display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.7rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
                 <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 420px; padding: 14px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.6; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
@@ -283,7 +283,7 @@ GCTAGCTAGCT...</pre>
           <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
             <input type="radio" name="input-mode" id="mode-qc" value="qc" style="width: auto; margin: 0;">
             <span style="display: flex; align-items: center; gap: 6px;">
-              <strong>QC Mode</strong>
+              <strong data-i18n="multiplex.qcMode">QC Mode</strong>
               <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
                 <span style="display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.7rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
                 <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 460px; padding: 14px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.6; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
@@ -304,9 +304,9 @@ GCTAGCTAGCT...</pre>
             </span>
           </label>
         </div>
-        <div style="display:flex; gap:8px; align-items:center; margin-left:auto; flex-shrink: 0;">
-          <button class="demo btn" id="demo-set-btn" type="button">Demo Set</button>
-          <button class="ghost btn" id="global-reset" type="button">Reset</button>
+        <div class="module-primary-actions" style="margin-left:auto;">
+          <button class="demo btn" id="demo-set-btn" type="button" data-i18n="ui.demoSet">Demo Set</button>
+          <button class="ghost btn" id="global-reset" type="button" data-i18n="ui.reset">Reset</button>
         </div>
       </div>
 
@@ -316,14 +316,14 @@ GCTAGCTAGCT...</pre>
         </div>
         <div class="row" style="margin-top:6px; align-items: center;">
           <div id="sequences-preview" style="display: none; align-items: center; gap: 8px; margin-right: auto;">
-            <button id="toggle-sequences-btn" class="btn btn-secondary" style="padding: 4px 12px; font-size: 0.8rem;">Show Details</button>
+            <button id="toggle-sequences-btn" class="btn btn-secondary" style="padding: 4px 12px; font-size: 0.8rem;" data-i18n="ui.showDetails">Show Details</button>
             <strong id="sequences-count" style="font-size: 0.85rem;">Loaded Sequences: 0</strong>
           </div>
           <div class="row end" style="gap: 8px; align-items: center; margin-left: auto;">
             <input type="file" id="fasta-upload" accept=".fasta,.fa,.fas,.txt,.gb,.gbk,.gbff,.genbank" style="display: none;">
-            <button type="button" class="btn demo" id="target-reverse-complement-btn">Reverse complement</button>
-            <button class="btn demo" id="target-demo-btn" type="button">Demo</button>
-            <button class="ghost btn" id="upload-btn" type="button">Upload</button>
+            <button type="button" class="btn demo" id="target-reverse-complement-btn" data-i18n="ui.reverseComplement">Reverse complement</button>
+            <button class="btn demo" id="target-demo-btn" type="button" data-i18n="ui.demo">Demo</button>
+            <button class="ghost btn" id="upload-btn" type="button" data-i18n="ui.upload">Upload</button>
           </div>
         </div>
         <div id="sequences-list-container" style="display: none; margin-top: 12px;">
@@ -339,14 +339,14 @@ GCTAGCTAGCT...</pre>
         </div>
         <div class="row" style="margin-top:6px; align-items: center;">
           <div id="primers-preview" style="display: none; align-items: center; gap: 8px; margin-right: auto;">
-            <button id="toggle-primers-btn" class="btn btn-secondary" style="padding: 4px 12px; font-size: 0.8rem;">Show Details</button>
+            <button id="toggle-primers-btn" class="btn btn-secondary" style="padding: 4px 12px; font-size: 0.8rem;" data-i18n="ui.showDetails">Show Details</button>
             <strong id="primers-count" style="font-size: 0.85rem;">Loaded Primer Pairs: 0</strong>
           </div>
           <div class="row end" style="gap: 8px; align-items: center; margin-left: auto;">
             <input type="file" id="primer-upload" accept=".fasta,.fa,.fas,.txt" style="display: none;">
-            <button type="button" class="btn demo" id="primer-reverse-complement-btn">Reverse complement</button>
-            <button class="btn demo" id="primer-demo-btn" type="button">Demo</button>
-            <button class="ghost btn" id="upload-primer-btn" type="button">Upload</button>
+            <button type="button" class="btn demo" id="primer-reverse-complement-btn" data-i18n="ui.reverseComplement">Reverse complement</button>
+            <button class="btn demo" id="primer-demo-btn" type="button" data-i18n="ui.demo">Demo</button>
+            <button class="ghost btn" id="upload-primer-btn" type="button" data-i18n="ui.upload">Upload</button>
           </div>
         </div>
         <div id="primers-list-container" style="display: none; margin-top: 12px;">
@@ -359,15 +359,15 @@ GCTAGCTAGCT...</pre>
 
   <div>
     <div class="primer-params-header">
-      <h2>Primer Design Parameters</h2>
+      <h2 data-i18n="ui.primerParams">Primer Design Parameters</h2>
       <div class="assembly-preset-toolbar assembly-preset-toolbar--inline">
         <div class="assembly-preset-group">
           <div class="assembly-preset-main" style="position:relative;overflow:visible;">
             <label class="aside" for="assembly-preset-select" style="display:flex;align-items:center;gap:6px;">
-              <span>Parameter preset</span>
+              <span data-i18n="ui.preset">Parameter preset</span>
               <span class="help-icon">
                 <span>?</span>
-                <span class="help-tooltip">
+                <span class="help-tooltip" data-i18n-html="ui.presetHelpPrimer">
                   Save commonly used primer design settings in this browser. Select a preset to reuse it, or set one as the startup default for next time.
                 </span>
               </span>
@@ -375,10 +375,10 @@ GCTAGCTAGCT...</pre>
             <select id="assembly-preset-select" class="assembly-preset-select"></select>
           </div>
           <div class="assembly-preset-actions">
-            <button class="btn demo assembly-preset-save" type="button">Save as New</button>
-            <button class="btn demo assembly-preset-update" type="button">Update</button>
-            <button class="btn ghost assembly-preset-delete" type="button">Delete</button>
-            <button class="btn assembly-preset-set-default" type="button">Set as Startup Default</button>
+            <button class="btn demo assembly-preset-save" type="button" data-i18n="ui.saveNew">Save as New</button>
+            <button class="btn demo assembly-preset-update" type="button" data-i18n="ui.update">Update</button>
+            <button class="btn ghost assembly-preset-delete" type="button" data-i18n="ui.delete">Delete</button>
+            <button class="btn assembly-preset-set-default" type="button" data-i18n="ui.setDefault">Set as Startup Default</button>
           </div>
         </div>
       </div>
@@ -386,12 +386,12 @@ GCTAGCTAGCT...</pre>
       <div class="param-grid">
         <div>
           <label for="target-tm" class="aside" style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible;">
-            <span>Target Tm (°C)</span>
+            <span data-i18n="ui.targetTm">Target Tm (°C)</span>
             <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
               <span style="display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.7rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
-              <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 280px; padding: 12px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.5; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
+              <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 280px; padding: 12px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.5; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;"><div data-i18n-html="multiplex.targetTmHelp">
                 <p style="margin: 0;">Target melting temperature for primer design. Primers will be designed to have Tm close to this value. Typical range: 50-65°C.</p>
-                <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
+                </div><span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
               </span>
             </span>
           </label>
@@ -399,12 +399,12 @@ GCTAGCTAGCT...</pre>
         </div>
         <div>
           <label for="tm-tolerance" class="aside" style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible;">
-            <span>ΔTm (°C)</span>
+            <span data-i18n="ui.deltaTm">ΔTm (°C)</span>
             <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
               <span style="display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.7rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
-              <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 280px; padding: 12px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.5; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
+              <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 280px; padding: 12px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.5; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;"><div data-i18n-html="multiplex.deltaTmHelp">
                 <p style="margin: 0;">Maximum allowed difference between primer Tm and Target Tm. This controls how close each primer's melting temperature should be to the Target Tm. Larger values allow more flexibility but may result in less optimal primers.</p>
-                <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
+                </div><span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
               </span>
             </span>
           </label>
@@ -412,12 +412,12 @@ GCTAGCTAGCT...</pre>
         </div>
         <div>
           <label for="primer-conc" class="aside" style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible;">
-            <span>Primer conc. (nM)</span>
+            <span data-i18n="ui.primerConc">Primer conc. (nM)</span>
             <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
               <span style="display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.7rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
-              <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 280px; padding: 12px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.5; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
+              <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 280px; padding: 12px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.5; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;"><div data-i18n-html="ui.primerConcHelp">
                 <p style="margin: 0;">Effective primer concentration assumed for in silico Tm calculation. Typical range: 25-1000 nM.</p>
-                <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
+                </div><span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
               </span>
             </span>
           </label>
@@ -425,12 +425,12 @@ GCTAGCTAGCT...</pre>
         </div>
         <div>
           <label for="na-conc" class="aside" style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible;">
-            <span>Na<sup>+</sup> Conc. (mM)</span>
+            <span data-i18n="multiplex.naConc">Na<sup>+</sup> Conc. (mM)</span>
             <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
               <span style="display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.7rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
-              <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 280px; padding: 12px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.5; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
+              <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 280px; padding: 12px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.5; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;"><div data-i18n-html="ui.sodiumHelp">
                 <p style="margin: 0;">Monovalent cation concentration used for salt-corrected Tm calculation. Typical range: 10-200 mM.</p>
-                <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
+                </div><span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
               </span>
             </span>
           </label>
@@ -438,7 +438,7 @@ GCTAGCTAGCT...</pre>
         </div>
         <div>
           <label for="mg-conc" class="aside" style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible;">
-            <span>Mg<sup>2+</sup> Conc. (mM)</span>
+            <span data-i18n="multiplex.mgConc">Mg<sup>2+</sup> Conc. (mM)</span>
             <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
               <span style="display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.7rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
               <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 280px; padding: 12px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.5; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
@@ -451,10 +451,10 @@ GCTAGCTAGCT...</pre>
         </div>
         <div>
           <label for="size-tolerance" class="aside" style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible;">
-            <span>Size Tolerance (bp)</span>
+            <span data-i18n="multiplex.sizeTolerance">Size Tolerance (bp)</span>
             <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
               <span style="display: inline-block; width: 18px; height: 18px; line-height: 18px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.8rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
-              <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); right: 0; width: 340px; padding: 14px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.6; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
+              <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); right: 0; width: 340px; padding: 14px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.6; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;"><div data-i18n-html="multiplex.sizeHelpHtml">
                 <strong style="display: block; margin-bottom: 10px; font-size: 0.9rem;">Product Size Tolerance:</strong>
                 <ul style="margin: 8px 0 0 20px; padding: 0; list-style: disc;">
                   <li style="margin-bottom: 6px;"><strong>0:</strong> Disable size-based pooling (for cases without gel electrophoresis, e.g., qPCR, sequencing)</li>
@@ -464,7 +464,7 @@ GCTAGCTAGCT...</pre>
                 </ul>
                 <p style="margin: 10px 0 0 0; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.2);"><strong>Note 1:</strong> Pooling is primarily based on thermodynamic parameters (cross-dimer conflicts), size tolerance is only used as auxiliary criteria.</p>
                 <p style="margin: 10px 0 0 0; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.2);"><strong>Note 2:</strong> In QC mode, no PCR product length information is available, size-based pooling is automatically disabled. PCR products cannot be distinguished based on size on gel electrophoresis.</p>
-                <span style="position: absolute; top: -6px; right: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
+                </div><span style="position: absolute; top: -6px; right: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
               </span>
             </span>
           </label>
@@ -472,13 +472,13 @@ GCTAGCTAGCT...</pre>
         </div>
         <div class="overlap-input">
           <label for="overlap-seq-fwd" class="aside" style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible;">
-            <span>Forward Overlap (optional)</span>
+            <span data-i18n="multiplex.fwdOverlap">Forward Overlap (optional)</span>
             <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
               <span style="display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.7rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
-              <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 320px; padding: 12px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.5; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
+              <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 320px; padding: 12px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.5; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;"><div data-i18n-html="multiplex.fwdOverlapHelpHtml">
                 <p style="margin: 0 0 8px 0;">Optional sequence to append to the 5' end of forward primers. Useful for cloning (e.g., Gibson Assembly, Golden Gate). Leave empty if not needed.</p>
                 <p style="margin: 0; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.2);"><strong>Note:</strong> The overlap sequence does not participate in Tm calculation. Tm is calculated based on the core primer sequence only, as the overlap portion remains unbound during initial PCR cycles.</p>
-                <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
+                </div><span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
               </span>
             </span>
           </label>
@@ -486,13 +486,13 @@ GCTAGCTAGCT...</pre>
         </div>
         <div class="overlap-input reverse-overlap">
           <label for="overlap-seq-rev" class="aside" style="display: flex; align-items: center; gap: 6px; position: relative; overflow: visible;">
-            <span>Reverse Overlap (optional)</span>
+            <span data-i18n="multiplex.revOverlap">Reverse Overlap (optional)</span>
             <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
               <span style="display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.7rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
-              <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 320px; padding: 12px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.5; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
+              <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 320px; padding: 12px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.5; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 999999 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;"><div data-i18n-html="multiplex.revOverlapHelpHtml">
                 <p style="margin: 0 0 8px 0;">Optional sequence to append to the 5' end of reverse primers. Useful for cloning (e.g., Gibson Assembly, Golden Gate). Leave empty if not needed.</p>
                 <p style="margin: 0; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.2);"><strong>Note:</strong> The overlap sequence does not participate in Tm calculation. Tm is calculated based on the core primer sequence only, as the overlap portion remains unbound during initial PCR cycles.</p>
-                <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
+                </div><span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
               </span>
             </span>
           </label>
@@ -500,13 +500,13 @@ GCTAGCTAGCT...</pre>
         </div>
       </div>
       <div style="display: flex; gap: 8px; margin-top: 20px; justify-content: space-between;">
-        <button class="btn btn-primary" id="design-btn">Design Primers</button>
-        <button class="btn btn-secondary" id="clear-btn" style="background: #ef4444; color: white; border: none;">Clear</button>
+        <button class="btn btn-primary" id="design-btn" data-i18n="ui.designPrimers">Design Primers</button>
+        <button class="btn btn-secondary" id="clear-btn" style="background: #ef4444; color: white; border: none;" data-i18n="ui.clear">Clear</button>
       </div>
     </div>
 
   <div id="results">
-    <h2>Design Results</h2>
+    <h2 data-i18n="ui.designResults">Design Results</h2>
     <div id="results-content"></div>
   </div>
 </section>
@@ -517,13 +517,13 @@ GCTAGCTAGCT...</pre>
     <div class="warning-modal-content">
       <div class="warning-modal-header">
         <span class="warning-icon">⚠️</span>
-        <h3>Warning</h3>
+        <h3 data-i18n="ui.warning">Warning</h3>
       </div>
       <div class="warning-modal-body">
         <p id="warning-message"></p>
       </div>
       <div class="warning-modal-footer">
-        <button class="btn btn-primary" id="warning-ok-btn">OK</button>
+        <button class="btn btn-primary" id="warning-ok-btn" data-i18n="ui.ok">OK</button>
       </div>
     </div>
   </div>

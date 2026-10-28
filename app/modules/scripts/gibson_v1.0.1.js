@@ -6,6 +6,13 @@ import * as VIZ from './bio_visuals_v1.0.1.js';
 import { CODON_USAGE, getCodonEntries } from './codon_v1.0.1.js';
 import { setupAssemblyParameterPresets } from './assembly_parameter_presets_v1.0.1.js';
 
+const t = (key, params, fallback) => (
+  window.PW_I18N ? window.PW_I18N.t(key, params, fallback) : (fallback || key)
+);
+const applyI18n = (root) => {
+  if (window.PW_I18N && root) window.PW_I18N.apply(root);
+};
+
 let GIBSON_ROOT = document;
 
 function scopedById(id) {
@@ -293,7 +300,7 @@ function initVectorUpload() {
         const base = new URL('modules/contents/demo/', window.location.href).toString();
         const resp = await fetch(base + 'pESC-His.txt');
         if (!resp.ok) {
-          alert('Failed to load demo sequence.');
+          alert(t('ui.failedDemo', null, 'Failed to load demo sequence.'));
           return;
         }
         const text = await resp.text();
@@ -302,7 +309,7 @@ function initVectorUpload() {
         updateFragmentsInfo();
       } catch (e) {
         console.error('Vector demo load error:', e);
-        alert('Failed to load demo sequence.');
+        alert(t('ui.failedDemo', null, 'Failed to load demo sequence.'));
       }
     });
   }
@@ -312,7 +319,7 @@ function initVectorUpload() {
     const textarea = $('vector-seq');
     const input = textarea.value.trim();
     if (!input) {
-      showWarning('Vector sequence is empty.');
+      showWarning(t('ui.vectorEmpty', null, 'Vector sequence is empty.'));
       return;
     }
     
@@ -322,7 +329,7 @@ function initVectorUpload() {
       // Not FASTA format, treat as raw sequence
       const cleaned = Core.normalizeSeq(input);
       if (!cleaned) {
-        showWarning('Vector sequence is empty.');
+        showWarning(t('ui.vectorEmpty', null, 'Vector sequence is empty.'));
         return;
       }
       textarea.value = Core.reverseComplementSeq(cleaned);
@@ -332,7 +339,7 @@ function initVectorUpload() {
       const header = record.header || '';
       const seq = Core.normalizeSeq(record.seq);
       if (!seq) {
-        showWarning('Vector sequence is empty.');
+        showWarning(t('ui.vectorEmpty', null, 'Vector sequence is empty.'));
         return;
       }
       const rcSeq = Core.reverseComplementSeq(seq);
@@ -409,7 +416,7 @@ function updateVectorPreview() {
   const statsDiv = $('vector-map-stats');
   
   if (!vectorText) {
-    if (statsDiv) statsDiv.textContent = 'Paste vector above';
+    if (statsDiv) statsDiv.textContent = t('ui.pasteVectorAbove', null, 'Paste vector above');
     const canvas = $('vector-map-canvas');
     if (canvas) {
       const ctx = canvas.getContext('2d');
@@ -421,11 +428,11 @@ function updateVectorPreview() {
   try {
     const records = parseFASTA(vectorText);
     if (records.length === 0) {
-      if (statsDiv) statsDiv.textContent = 'Unable to parse vector sequence';
+      if (statsDiv) statsDiv.textContent = t('ui.unableParseVector', null, 'Unable to parse vector sequence');
       return;
     }
     if (records.length > 1 && statsDiv) {
-      statsDiv.textContent = 'Multiple sequences found, using first one';
+      statsDiv.textContent = t('ui.multipleSeqFirst', null, 'Multiple sequences found, using first one');
     }
     
     const vector = records[0];
@@ -488,7 +495,7 @@ function updateVectorPreview() {
     }
     
   } catch (error) {
-    if (statsDiv) statsDiv.textContent = 'Error parsing vector';
+    if (statsDiv) statsDiv.textContent = t('ui.errorParsingVector', null, 'Error parsing vector');
   }
 }
 
@@ -503,7 +510,7 @@ function initAddInsert() {
     const currentRows = container.querySelectorAll('.insert-row');
     
     if (currentRows.length >= 6) {
-      showWarning('Maximum 6 inserts allowed.');
+      showWarning(t('ui.maxInsertsAllowed', {n: 6}, 'Maximum {n} inserts allowed.'));
       return;
     }
     
@@ -512,12 +519,12 @@ function initAddInsert() {
     newRow.className = 'insert-row';
     newRow.setAttribute('data-index', insertCount - 1);
     newRow.innerHTML = `
-      <div class="insert-label">Insert #${insertCount}:</div>
+      <div class="insert-label">${t('ui.insertNColon', {n: insertCount}, 'Insert #{n}:')}</div>
       <div class="insert-body">
         <textarea class="insert-seq" placeholder=">insert${insertCount}&#10;ATGCGTAGCTA..."></textarea>
         <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 6px;">
           <div style="display: flex; gap: 4px; align-items: center;">
-            <input type="text" class="insert-linker" placeholder="Linker and tag (optional)" list="linker-suggestions-${insertCount - 1}" style="flex: 1; font-family: monospace; font-size: 0.85rem;" autocomplete="off">
+            <input type="text" class="insert-linker" placeholder="${t('ui.linkerOptional', null, 'Linker and tag (optional)')}" data-i18n-placeholder="ui.linkerOptional" list="linker-suggestions-${insertCount - 1}" style="flex: 1; font-family: monospace; font-size: 0.85rem;" autocomplete="off">
             <datalist id="linker-suggestions-${insertCount - 1}">
               <option value="GS">GS</option>
               <option value="GSGS">2x(GS)</option>
@@ -545,20 +552,21 @@ function initAddInsert() {
           </div>
           <div style="display: flex; justify-content: flex-end; gap: 6px; flex-wrap: wrap;">
             <input type="file" class="insert-file" accept=".fa,.fasta,.fas,.txt,.gb,.gbk,.gbff,.genbank" style="display: none;">
-            <button class="btn demo xs insert-flip-btn" type="button">Reverse complement</button>
-            <button class="btn demo xs insert-demo-btn" type="button">Demo</button>
-            <button class="ghost btn xs insert-upload-btn" type="button">Upload</button>
+            <button class="btn demo xs insert-flip-btn" type="button" data-i18n="ui.reverseComplement">Reverse complement</button>
+            <button class="btn demo xs insert-demo-btn" type="button" data-i18n="ui.demo">Demo</button>
+            <button class="ghost btn xs insert-upload-btn" type="button" data-i18n="ui.upload">Upload</button>
           </div>
         </div>
       </div>
       <div></div>
       <div class="insert-controls" style="width: 100%;">
-        <button class="ghost btn sm insert-move-up-btn" type="button" title="Move up" style="width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">▲</button>
-        <button class="ghost btn sm insert-move-down-btn" type="button" title="Move down" style="width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">▼</button>
-        <button class="ghost btn sm remove-insert-btn" type="button" title="Delete" style="display: none; width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">✕</button>
+        <button class="ghost btn sm insert-move-up-btn" type="button" title="${t('ui.moveUp', null, 'Move up')}" data-i18n-title="ui.moveUp" style="width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">▲</button>
+        <button class="ghost btn sm insert-move-down-btn" type="button" title="${t('ui.moveDown', null, 'Move down')}" data-i18n-title="ui.moveDown" style="width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">▼</button>
+        <button class="ghost btn sm remove-insert-btn" type="button" title="${t('ui.delete', null, 'Delete')}" data-i18n-title="ui.delete" style="display: none; width: 100%; min-width: 32px; padding: 5px 8px; text-align: center;">✕</button>
       </div>
     `;
     container.appendChild(newRow);
+    applyI18n(newRow);
     setupInsertRowListeners(newRow);
     updateInsertControls();
     updateAddInsertButton();
@@ -632,7 +640,7 @@ function setupInsertRowListeners(row) {
       
       // Limit to 6 inserts
       if (insertNum > 6) {
-        alert('Demo only provides 6 inserts.');
+        alert(t('ui.demoOnlyInserts', {n: 6}, 'Demo only provides {n} inserts.'));
         return;
       }
       
@@ -640,14 +648,14 @@ function setupInsertRowListeners(row) {
         const base = new URL('modules/contents/demo/', window.location.href).toString();
         const resp = await fetch(base + `Insert_${insertNum}.txt`);
         if (!resp.ok) {
-          alert('Failed to load demo sequence.');
+          alert(t('ui.failedDemo', null, 'Failed to load demo sequence.'));
           return;
         }
         const text = await resp.text();
         textarea.value = text;
       } catch (e) {
         console.error('Insert demo load error:', e);
-        alert('Failed to load demo sequence.');
+        alert(t('ui.failedDemo', null, 'Failed to load demo sequence.'));
       }
     });
   }
@@ -659,7 +667,7 @@ function setupInsertRowListeners(row) {
       const textarea = row.querySelector('.insert-seq');
       const input = textarea.value.trim();
       if (!input) {
-        showWarning('Insert sequence is empty.');
+        showWarning(t('ui.insertEmpty', null, 'Insert sequence is empty.'));
         return;
       }
       
@@ -669,7 +677,7 @@ function setupInsertRowListeners(row) {
         // Not FASTA format, treat as raw sequence
         const cleaned = Core.normalizeSeq(input);
         if (!cleaned) {
-          showWarning('Insert sequence is empty.');
+          showWarning(t('ui.insertEmpty', null, 'Insert sequence is empty.'));
           return;
         }
         textarea.value = Core.reverseComplementSeq(cleaned);
@@ -679,7 +687,7 @@ function setupInsertRowListeners(row) {
         const header = record.header || '';
         const seq = Core.normalizeSeq(record.seq);
         if (!seq) {
-          showWarning('Insert sequence is empty.');
+          showWarning(t('ui.insertEmpty', null, 'Insert sequence is empty.'));
           return;
         }
         const rcSeq = Core.reverseComplementSeq(seq);
@@ -843,7 +851,7 @@ function updateInsertNumbers() {
   const rows = document.querySelectorAll('.insert-row');
   rows.forEach((row, idx) => {
     const label = row.querySelector('.insert-label');
-    label.textContent = `Insert #${idx + 1}:`;
+    label.textContent = t('ui.insertNColon', {n: idx + 1}, 'Insert #{n}:');
     row.setAttribute('data-index', idx);
   });
   insertCount = rows.length;
@@ -1127,7 +1135,7 @@ function initDesignButton() {
         }
       const vectorRecords = parseFASTA(vectorText);
       if (vectorRecords.length === 0) {
-        throw new Error('Unable to parse vector sequence');
+        throw new Error(t('ui.unableParseVector', null, 'Unable to parse vector sequence'));
       }
       if (vectorRecords.length > 1) {
         throw new Error('Vector sequence should contain only one sequence');
@@ -2138,7 +2146,7 @@ function renderResults(results, vector, inserts) {
   const primersCell = document.createElement('div');
   primersCell.id = 'cell-primers';
   primersCell.className = 'box';
-  primersCell.innerHTML = '<h3>Primer sets</h3>';
+  primersCell.innerHTML = ('<h3>' + t('ui.primerSets', null, 'Primer sets') + '</h3>');
   primersCell.innerHTML += renderPrimerSets(results.primers, naConc, mgConc, primerConc, tmTarget);
   resultsContent.appendChild(primersCell);
 
@@ -2187,7 +2195,7 @@ function renderResults(results, vector, inserts) {
   gelCell.id = 'cell-gel';
   gelCell.className = 'box';
   gelCell.innerHTML = `
-    <h3>Simulated Gel</h3>
+    <h3>${t('ui.simulatedGel', null, 'Simulated Gel')}</h3>
     <div style="margin-top:5px; margin-bottom:10px;">
       <label class="aside" style="display:inline-block; margin-right:5px;">Marker:</label>
       <select id="ggx-ladder" style="width:auto; font-size:12px;">
@@ -2779,7 +2787,7 @@ function initDownloadButton() {
 
 function downloadPrimersTXT() {
   if (!window.currentPrimers || !Array.isArray(window.currentPrimers) || window.currentPrimers.length === 0) {
-    showWarning('No primers available. Please design primers first.');
+    showWarning(t('ui.noPrimers', null, 'No primers available. Please design primers first.'));
     return;
   }
   
@@ -2822,7 +2830,7 @@ function downloadPrimersTXT() {
 
 function downloadAssembledFASTA() {
   if (!window.currentAssembledSeq) {
-    showWarning('Assembled plasmid sequence is not available. Please design primers first.');
+    showWarning(t('ui.assembledUnavailable', null, 'Assembled plasmid sequence is not available. Please design primers first.'));
     return;
   }
   
@@ -3003,8 +3011,8 @@ function initGibsonModule(container) {
 
   setupAssemblyParameterPresets(GIBSON_ROOT, {
     scope: 'gibson-assembly',
-    label: 'Gibson assembly settings',
-    placeholder: 'e.g. Standard Gibson',
+    label: t('gibson.presetLabel', null, 'Gibson assembly settings'),
+    placeholder: t('gibson.presetPlaceholder', null, 'e.g. Standard Gibson'),
     fields: [
       { key: 'linearizationMode', type: 'radio', name: 'linearization-mode', defaultValue: 'enzyme' },
       { key: 'enzyme1', selector: '#enzyme1', defaultValue: '' },

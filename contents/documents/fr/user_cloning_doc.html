@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clonage enzymatique USER - PrimerWeaver V1.0.6</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #333;
+            background: #f9fafb;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e40af;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2563eb;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            font-size: 1.5em;
+        }
+        h3 {
+            color: #3b82f6;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            font-size: 1.2em;
+        }
+        h4 {
+            color: #60a5fa;
+            margin-top: 1.2em;
+            margin-bottom: 0.6em;
+        }
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 1em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        strong {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c2410c;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .abstract {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+        .abstract p {
+            margin: 0;
+            font-style: italic;
+        }
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .section {
+            margin-bottom: 2.5em;
+        }
+        .version-info {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+            margin-top: 3em;
+            padding-top: 2em;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Concepteur d’amorces pour le clonage enzymatique USER</h1>
+        
+        <div class="abstract">
+            <p>Le module de clonage USER permet de concevoir des amorces pour l’assemblage directionnel d’ADN à l’aide du système enzymatique USER (Uracil-Specific Excision Reagent). Cet outil automatise l’incorporation de bases uracile à des positions définies dans les amorces ; ces bases sont reconnues et clivées par l’enzyme USER à température ambiante afin de générer des extrémités cohésives compatibles. Le clonage USER combine la simplicité et le contrôle directionnel du clonage par enzyme de restriction avec la flexibilité et l’efficacité des méthodes d’assemblage sans cicatrice, et constitue une alternative rapide, en un seul tube, pour le clonage multi-fragments ou vecteur–insert.</p>
+        </div>
+
+        <div class="section">
+            <h2>Guide de démarrage rapide</h2>
+            <ol>
+		<li>Téléversez ou collez les séquences du vecteur de destination et des inserts (maximum de 3 fragments) au format FASTA ou en texte brut dans les champs correspondants, dans l’ordre d’assemblage souhaité. Fournissez les amorces PCR de linéarisation du vecteur ; les amorces contenant de l’uracile sont détectées automatiquement pour les conceptions compatibles USER. Vérifiez le squelette vectoriel détecté automatiquement et ajustez les paramètres de conception si nécessaire.</li>
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/USER_demo.png"
+                    style="max-width: 90%; height: auto; border-radius: 8px;"
+                >
+            </div>
+                <li>Cliquez sur « Design Primers » pour générer des amorces intégrant des séquences de surplomb. Examinez le tableau des amorces, le tableau des chevauchements et le schéma d’assemblage prédit. Téléchargez le fichier FASTA assemblé afin de vérifier que l’orientation de l’insert correspond à la conception prévue. Si l’orientation est incorrecte, inversez le complément de la séquence d’insert et régénérez les amorces.</li>
+
+
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>Principe du clonage enzymatique USER</h2>
+            
+            <p>Le clonage USER (Uracil-Specific Excision Reagent) est une méthode d’assemblage directionnel d’ADN qui exploite le <strong>retrait site-spécifique des résidus uracile (U)</strong> incorporés dans les amorces. Les bases uracile introduites à des positions définies sont excisées par l’<strong>uracile-ADN glycosylase (UDG)</strong>, ce qui génère des sites abasiques ensuite clivés par l’<strong>endonucléase VIII</strong>, produisant des <strong>surplombs simple brin</strong> complémentaires aux extrémités des fragments. Ces surplombs permettent un appariement précis et directionnel entre fragments d’ADN, tandis que la réparation des brèches et le scellement des brins sont généralement achevés par la <strong>machinerie de réparation de l’ADN de la cellule hôte</strong> après transformation, sans ligation in vitro.</p>
+
+            
+
+            <h3>Principe de conception des chevauchements</h3>
+            <p>Le succès du clonage USER dépend de la conception de chevauchements courts, spécifiques de chaque jonction, qui deviennent exposés après le traitement USER des extensions d’amorces contenant de l’uracile. À chaque jonction de fragments, une paire appariée de surplombs complémentaires est requise afin d’assurer un assemblage directionnel et une réparation sans cicatrice après transformation.</p>
+            <ul>
+                <li><strong>Surplombs complémentaires :</strong> pour chaque jonction, les amorces sont conçues de sorte que le traitement USER expose des surplombs simple brin complémentaires aux extrémités des fragments adjacents. Seuls les surplombs correctement appariés peuvent s’hybrider, ce qui impose l’ordre et l’orientation prévus des fragments.</li>
+                <li><strong>Longueur optimale des surplombs :</strong> les surplombs USER mesurent généralement <strong>7–15</strong> nucléotides, ce qui offre une spécificité et une stabilité d’hybridation suffisantes pour l’assemblage directionnel. Dans les conceptions multi-fragments, les surplombs doivent être uniques à chaque jonction afin d’éviter les hybridations croisées et les mauvais assemblages.</li>
+                <li><strong>Jonctions sans cicatrice :</strong> comme les surplombs sont retirés lors du traitement USER et qu’aucun site de restriction n’est conservé, les fragments assemblés sont joints sans séquence supplémentaire. La réparation des brèches et le scellement des brins sont achevés in vivo, ce qui produit des jonctions sans cicatrice.</li>
+                
+            </ul>
+
+           
+        </div>
+
+        <div class="section">
+            <h2>Format d’entrée</h2>
+            <p>Les champs vecteur et insert acceptent les fichiers <strong>FASTA</strong>, le <strong>texte ADN brut</strong> ou les fichiers <strong>GenBank</strong> standard (<code>.gb</code>, <code>.gbk</code>, <code>.gbff</code>, <code>.genbank</code>) contenant des blocs <code>LOCUS</code> et <code>ORIGIN</code>. Le nom court du champ <strong>LOCUS</strong> est utilisé comme titre de séquence. Une <strong>seule séquence</strong> est autorisée par champ ; si plusieurs en-têtes FASTA sont détectés, <strong>seule la première séquence</strong> est utilisée. Si vous téléversez une séquence brute sans en-tête <code>&gt;</code>, le <strong>nom de fichier</strong> (sans extension) sert de nom. Les formats binaires propriétaires (p. ex. SnapGene <code>.dna</code>) doivent d’abord être exportés en GenBank ou FASTA. Les noms de fragments issus de FASTA ou de GenBank sont utilisés, le cas échéant, pour nommer les amorces.</p> 
+	     <p>Une fois une séquence vectorielle fournie, le système <strong>identifie automatiquement les caractéristiques du vecteur</strong>. La carte du vecteur peut être tournée afin de faciliter la visualisation de la région de clonage ciblée.</p>
+
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/USER_input.png"
+                    alt="Saisie du module USER"
+                    style="max-width: 60%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+            <h3>Gestion des fragments</h3>
+            <ul>
+                <li><strong>Ajouter/retirer des fragments :</strong> ajoutez plusieurs séquences d’ADN pour un assemblage multi-fragments (2–10 fragments recommandés ; les assemblages plus grands deviennent plus complexes)</li>
+                <li><strong>Réordonner les fragments :</strong> ajustez l’ordre d’assemblage à l’aide des commandes de l’interface ; l’ordre détermine l’architecture du construit final</li>
+                <li><strong>Noms des fragments :</strong> extraits automatiquement des en-têtes FASTA pour une identification claire des amorces ; utilisés dans les rapports de sortie</li>
+                <li><strong>Complément inverse :</strong> inversez le complément de fragments individuels si nécessaire afin de correspondre à l’orientation et au sens d’assemblage souhaités</li>
+            </ul>
+
+
+
+        <div class="section">
+            <h2>Paramètres de conception</h2>
+            
+            <p>Veuillez fournir les paires d’amorces utilisées pour la linéarisation du vecteur. Le système détermine automatiquement si de l’uracile est présent dans les amorces vectorielles fournies. Si aucun uracile n’est détecté, le système peut reconcevoir les amorces vectorielles en y incorporant de l’uracile aux jonctions spécifiées, après confirmation de l’utilisateur. Si de l’uracile est déjà présent, le système utilise directement les surplombs fournis par l’utilisateur pour la conception des amorces.</p>
+	     <p>Une fois les paires d’amorces vectorielles fournies, le système identifie automatiquement le fragment résultant le plus long comme squelette vectoriel de destination par défaut. Si ce fragment ne correspond pas au squelette prévu, vous pouvez sélectionner manuellement le fragment approprié. Avant de poursuivre, veuillez examiner les paramètres de conception des amorces et les ajuster si nécessaire.</p>
+            
+            <!-- USER cloning parameter table (same layout as your Gibson table: Category | Parameter | Default | Range | Description) -->
+<table class="param-table">
+  <thead>
+    <tr>
+      <th>Catégorie</th>
+      <th>Paramètre</th>
+      <th>Valeur par défaut</th>
+      <th>Plage</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <!-- =========================
+         Vector Linearization
+         ========================= -->
+    <tr>
+      <td class="cat" rowspan="4">Linéarisation du vecteur</td>
+      <td><strong>Mode de linéarisation</strong></td>
+      <td>PCR</td>
+      <td>PCR</td>
+      <td>Méthode utilisée pour linéariser le vecteur de destination en vue du clonage USER. Le clonage USER utilise une linéarisation du vecteur par PCR, avec des jonctions définies par les amorces.</td>
+    </tr>
+
+    <tr>
+      <td><strong>Amorces PCR du vecteur (5′→3′)</strong></td>
+      <td>—</td>
+      <td>Séquence d’ADN</td>
+      <td>Amorces sens et antisens utilisées pour linéariser le squelette du vecteur par PCR. Les amorces peuvent contenir de l’uracile (U) ou des bases standard.</td>
+    </tr>
+
+    <tr>
+      <td><strong>Détection de l’uracile</strong></td>
+      <td>Auto</td>
+      <td>Auto</td>
+      <td>Le système détecte automatiquement la présence d’uracile (U) dans les amorces vectorielles fournies et s’en sert pour inférer les jonctions compatibles USER.</td>
+    </tr>
+
+    <tr>
+      <td><strong>Fragment du squelette vectoriel</strong></td>
+      <td>Fragment le plus long</td>
+      <td>Tout fragment PCR</td>
+      <td>Squelette du vecteur de destination sélectionné parmi les produits PCR. Le fragment amplifié le plus long est sélectionné par défaut et peut être ajusté manuellement.</td>
+    </tr>
+
+    <!-- =========================
+         Primer & Overlap Design
+         ========================= -->
+    <tr>
+      <td class="cat" rowspan="6">Conception des amorces et des chevauchements</td>
+      <td><strong>Longueur de chevauchement (bp)</strong></td>
+      <td>9</td>
+      <td>6–15</td>
+      <td>Longueur du chevauchement complémentaire exposé après le traitement USER. </td>
+    </tr>
+
+    <tr>
+      <td><strong>Tm cible du cœur (°C)</strong></td>
+      <td>55</td>
+      <td>45–70</td>
+      <td>Température de fusion cible de la région cœur de liaison au gabarit (hybridation). Les régions d’uracile et de chevauchement sont exclues du calcul de Tm.</td>
+    </tr>
+
+    <tr>
+      <td><strong>ΔTm (°C)</strong></td>
+      <td>2.5</td>
+      <td>0–5</td>
+      <td>Différence maximale de température de fusion autorisée entre les cœurs d’hybridation des amorces sens et antisens.</td>
+    </tr>
+
+    <tr>
+      <td><strong>Concentration d’amorce (nM)</strong></td>
+      <td>500</td>
+      <td>50–2000</td>
+      <td>Concentration effective d’amorce supposée pour le calcul in silico de Tm. Plage habituelle : 25-1000 nM.</td>
+    </tr>
+
+    <tr>
+      <td><strong>Concentration de Na<sup>+</sup> (mM)</strong></td>
+      <td>50</td>
+      <td>0–200</td>
+      <td>Concentration en cations monovalents utilisée pour le calcul de Tm corrigé selon le sel. Plage habituelle : 10-200 mM.
+</td>
+    </tr>
+
+    <tr>
+      <td><strong>Concentration de Mg<sup>2+</sup> (mM)</strong></td>
+      <td>2.0</td>
+      <td>0–10</td>
+      <td>Concentration en cations divalents utilisée pour le calcul de Tm. Indiquez 0 en l’absence de Mg²⁺. Plage habituelle : 0.5-5 mM.</td>
+    </tr>
+  </tbody>
+</table>
+
+        </div>
+
+        <div class="section">
+            <h2>Résultats et sorties</h2>
+            
+	    <p>Après la conception des amorces, le module de clonage USER génère un ensemble complet de résultats afin de faciliter la validation expérimentale et le clonage en aval.</p>
+
+
+            <h3>Tableau des amorces</h3>
+	    <p>Les paires d’amorces conçues sont présentées dans un tableau structuré indiquant les séquences d’amorces complètes (5′→3′), la longueur, la teneur en GC et les températures de fusion (Tm). Les valeurs de Tm sont affichées à la fois pour la <strong>région cœur d’hybridation</strong> et pour l’<strong>amorce de pleine longueur</strong>, ce qui permet d’évaluer la compatibilité d’amplification. Les indicateurs de qualité des amorces, notamment les séries homopolymériques, les structures en épingle à cheveux, les auto-dimères et les dimères croisés, sont évalués et signalés afin de mettre en évidence les risques potentiels pour la PCR. Les <strong>régions de chevauchement sont mises en gras</strong> dans les séquences d’amorces pour en faciliter la visualisation.</p>
+
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/USER_primer_tabel.png"
+                    alt="Tableau des amorces du clonage USER"
+                    style="max-width: 60%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+            <h3>Schéma d’assemblage et tableau des surplombs</h3>
+	    <p>Un <strong>schéma de plasmide assemblé</strong> est généré afin d’illustrer le flux de clonage, y compris la linéarisation du vecteur, l’incorporation des inserts et l’assemblage plasmidique final. Ce diagramme fournit une vue conceptuelle de l’orientation des fragments et de la structure des jonctions. Un <strong>tableau des chevauchements</strong> affiche la séquence de chevauchement à chaque jonction, confirmant que les fragments adjacents possèdent une région homologue complémentaire. Ce tableau offre une vérification visuelle rapide que l’architecture d’assemblage est correcte et qu’aucun conflit ni mésappariement de surplomb n’est présent.</p>
+            <div class="warning-box">
+                <p><strong>Remarque :</strong> le schéma d’assemblage est uniquement conceptuel et n’est pas à l’échelle. L’interprétation exacte doit s’appuyer sur la séquence assemblée et sur les informations de chevauchement aux jonctions.</p>
+            </div>
+
+
+	   <div style="text-align: center; margin: 2em 0;">
+  		<img
+    			src="contents/pictures/USER_assembly_tabel.png"
+                    	alt="Tableau d’assemblage du clonage USER"
+    			style="max-width: 60%; height: auto; border-radius: 8px;"
+  		 >
+	   </div>
+
+
+            <h3>Électrophorèse sur gel d’agarose simulée</h3>
+            <p>PrimerWeaver génère une <strong>image de gel d’agarose simulée</strong> afin de prédire les résultats expérimentaux des étapes clés du clonage. Le gel comprend :</p>
+
+            <ul>
+                <li>Un marqueur d’ADN sélectionnable (par défaut : NEB 1 kb Plus DNA Ladder)</li>
+                <li>Le vecteur non digéré</li>
+                <li>Le vecteur linéarisé par PCR</li>
+		<li>Les fragments amplifiés par PCR (une piste par fragment, indiquant la taille attendue y compris le chevauchement)</li>
+                <li>Le produit de clonage USER (montrant le construit assemblé)</li>
+            </ul>
+            <p>Les tailles de bandes prédites sont annotées, ce qui permet une comparaison rapide avec les résultats expérimentaux et une identification rapide des problèmes de digestion ou d’assemblage.</p>
+
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/USER_gel.png"
+                    alt="Gel d’agarose simulé illustrant le flux USER"
+                    style="max-width: 60%; height: auto; border-radius: 8px;"
+                >
+            </div>
+        </div>
+
+
+        <div class="section">
+            <h2>Algorithme de conception des amorces</h2>
+	    
+	    <h3>Structure des amorces</h3>
+            <p>Chaque amorce de clonage USER comporte trois régions fonctionnelles :</p>
+            <ul>
+                <li><strong>Cœur d’hybridation (3′) :</strong> région complémentaire du gabarit qui pilote l’hybridation PCR (typiquement 18–30 bp)</li>
+		<li><strong>Marqueur uracile :</strong> un seul <strong>U</strong> placé à la position de clivage définie utilisée par la chimie USER.</li>
+		<li><strong>Région de chevauchement (5′) :</strong> séquence spécifique de la jonction qui devient l’extrémité cohésive exposée après le traitement USER (généralement dans la plage de chevauchement définie par l’utilisateur). </li>
+            </ul>
+
+            <h3>Processus de conception</h3>
+            <p>Le flux USER formel dans PrimerWeaver suppose que les deux amorces de linéarisation du vecteur sont déjà fournies sous forme d’<strong>amorces USER contenant U</strong>. Dans cette hypothèse, l’algorithme se comprend le mieux comme un processus en quatre étapes : reconstruire le vecteur linéarisé par PCR, dériver les jonctions USER côté vecteur à partir des amorces fournies, découvrir les jonctions internes compatibles USER entre inserts, puis construire les amorces d’insert finales autour de ces queues USER fixes.</p>
+
+            <h3>Étape 1. Reconstruire le produit vectoriel linéarisé par PCR à partir des amorces USER</h3>
+            <p>Le module analyse d’abord chaque amorce vectorielle au niveau du <strong>U terminal</strong>. La séquence située avant ce U est traitée comme le segment définissant le chevauchement USER, et la séquence située après ce U comme le cœur 3′ servant à recaler l’amorce sur le vecteur. À l’aide de ces régions cœur post-U, le code reconstruit le produit vectoriel linéarisé par PCR. Si le recalage direct échoue, il tente encore une interprétation en complément inverse / amorces permutées avant d’abandonner. Le produit PCR retenu devient le squelette vectoriel utilisé pour tous les calculs de jonctions USER en aval.</p>
+
+            <h3>Étape 2. Définir les frontières USER côté vecteur</h3>
+            <p>Une fois le produit PCR fixé, les jonctions USER côté vecteur sont dérivées directement des amorces vectorielles fournies par l’utilisateur, plutôt qu’inventées de toutes pièces. En pratique, la séquence située avant le U terminal de chaque amorce vectorielle définit la logique d’extrémité cohésive prévue aux frontières du vecteur, et les queues d’amorces côté insert sont générées pour correspondre à ces frontières USER après clivage. Les amorces vectorielles fournies ne sont donc pas de simples entrées de validation ; elles constituent des contraintes de frontière actives sur la géométrie finale du clonage.</p>
+
+            <h3>Étape 3. Rechercher aux jonctions internes insert–insert des motifs de chevauchement compatibles USER</h3>
+            <p>Pour chaque jonction interne entre inserts adjacents, PrimerWeaver recherche dans l’assemblage des inserts, près de cette jonction, un motif compatible USER de la forme <strong>A + N{4-13} + T</strong>. Les motifs candidats sont classés selon leur positionnement sur la jonction prévue, la proximité de leur longueur de chevauchement avec le réglage demandé, et la proximité de la Tm de chevauchement avec le comportement cible. Une fois un motif convenable sélectionné, le <strong>T</strong> de position de clivage terminal est converti en <strong>U</strong> dans la queue d’amorce conçue, de sorte que le traitement USER expose l’extrémité cohésive prévue.</p>
+
+            <h3>Étape 4. Concevoir les cœurs de liaison au gabarit et construire les amorces USER complètes</h3>
+            <p>Après fixation de chaque queue USER, le module s’étend à partir de la jonction pour concevoir la région cœur de liaison 3′. La longueur du cœur est balayée dans une fenêtre bornée et notée selon l’écart entre la Tm calculée, corrigée selon le sel, et la Tm cible ; l’algorithme choisit ainsi le <strong>cœur workable le plus proche</strong> plutôt que simplement le plus court dépassant un seuil. Les amorces finales sont ensuite assemblées sous la forme <strong>queue USER 5′ (y compris le marqueur de clivage U) + cœur de liaison au gabarit 3′</strong>. Les amorces vectorielles sont en grande partie conservées telles que fournies, tandis que les amorces d’insert sont générées de sorte que le traitement USER produise les extrémités compatibles prévues sur l’ensemble de l’assemblage.</p>
+            <h3>Logique des cas limites dans l’algorithme</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cas limite algorithmique</th>
+                        <th>Comportement actuel du module USER</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Les deux amorces vectorielles doivent définir une géométrie USER valide</strong></td>
+                        <td>L’algorithme USER formel suppose que les amorces de linéarisation du vecteur définissent déjà les frontières USER. Si cette géométrie n’est pas présente, la conception est traitée comme hors du flux USER principal, et non comme un cas normal équivalent.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Une seule amorce contient de l’uracile</strong></td>
+                        <td>Une paire d’amorces vectorielles mixte U / non-U est considérée comme algorithmiquement incohérente. Le module avertit l’utilisateur plutôt que de prétendre qu’il s’agit d’une définition stricte et propre des frontières USER.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Le format d’amorce USER n’est pas canonique</strong></td>
+                        <td>Les amorces en mode USER strict sont censées suivre l’architecture validée <strong>5′ A N{4-13} U core 3′</strong>. Les amorces hors de ce schéma ne sont pas interprétées comme des amorces USER normales.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Le recalage des amorces de linéarisation du vecteur est ambigu</strong></td>
+                        <td>Si la région cœur de liaison 3′ des amorces vectorielles ne peut pas être appariée directement, le module tente des interprétations en complément inverse et en amorces permutées avant d’abandonner la conception.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Aucun motif de jonction canonique compatible USER n’est trouvé</strong></td>
+                        <td>Lorsqu’une recherche de jonction ne trouve pas de motif <strong>A + N{4-13} + T</strong> convenable, le module recourt à une stratégie de chevauchement/U introduite manuellement, au lieu d’inventer silencieusement un motif USER canonique.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>La conception du cœur est un plus proche voisin, non un arrêt au seuil</strong></td>
+                        <td>La région cœur de liaison est sélectionnée par un balayage borné minimisant l’erreur de Tm par rapport aux réglages cibles. S’il n’existe pas de cœur idéal, le meilleur disponible est néanmoins renvoyé, plutôt que d’imposer un passage net d’un seuil.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Avertissements et cas limites</h2>
+            <p>Le module de clonage USER combine des contrôles partagés <strong>MW (Message Warning)</strong> avec une validation spécifique USER autour des amorces contenant de l’uracile, de la découverte des chevauchements, et du comportement lorsque les motifs de jonction canoniques compatibles USER ne peuvent pas être trouvés.</p>
+
+            <h3>Avertissements généraux</h3>
+            <p>Ces avertissements surviennent surtout avant la génération de la conception finale et reflètent des problèmes de qualité des séquences ou des paramètres.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Catégorie</th>
+                        <th>Déclencheur</th>
+                        <th>Comportement actuel du module USER</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Invites d’entrée bloquantes</strong></td>
+                        <td>Vecteur manquant, inserts manquants, ou amorces PCR de linéarisation du vecteur manquantes.</td>
+                        <td>La conception s’arrête immédiatement et l’utilisateur est invité à compléter les saisies requises avant de continuer.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-04</strong><br>Aucune séquence valide après normalisation</td>
+                        <td>La séquence du vecteur ou d’un insert devient vide après normalisation.</td>
+                        <td>L’utilisateur peut néanmoins continuer, mais l’entrée de conception concernée ne permettra plus une sortie pertinente.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-05</strong><br>Caractères non IUPAC retirés</td>
+                        <td>Des caractères non pris en charge sont présents dans la séquence du vecteur ou d’un insert.</td>
+                        <td>Le module continue en n’utilisant que les séquences normalisées et avertit que le gabarit de conception effectif peut différer du texte d’origine.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-06</strong><br>Bases dégénérées détectées</td>
+                        <td>Le vecteur ou un insert contient des bases IUPAC ambiguës.</td>
+                        <td>Les valeurs thermodynamiques sont estimées de manière conservative à partir de la variante la plus stable ; les valeurs de Tm et de ΔG peuvent donc représenter des approximations de cas défavorable.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-10 à MW-15</strong><br>Avertissements de plage de paramètres</td>
+                        <td>Na<sup>+</sup>, Mg<sup>2+</sup>, la concentration d’amorce ou la Tm cible sort de la plage thermodynamique recommandée ou validée.</td>
+                        <td>Le module peut néanmoins poursuivre, mais l’interprétation thermodynamique devient moins fiable.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-19</strong><br>Taille totale d’entrée importante</td>
+                        <td>La taille totale vecteur plus inserts devient suffisamment grande pour solliciter le calcul côté navigateur.</td>
+                        <td>La couche d’avertissement partagée signale que la conception et le rendu côté navigateur peuvent ralentir pour des tailles d’entrée très importantes.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-20</strong><br>Plusieurs en-têtes FASTA dans un même champ</td>
+                        <td>Une zone de texte vecteur ou insert contient plus d’un enregistrement FASTA.</td>
+                        <td>Une boîte de dialogue MW partagée avertit qu’une seule séquence est autorisée par champ. Si l’utilisateur continue, le champ est réduit au <strong>premier enregistrement FASTA</strong> avant de poursuivre la conception.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-22</strong><br>Le fichier téléversé dépasse la limite d’importation</td>
+                        <td>Un fichier vecteur ou insert téléversé est plus grand que <strong>1 MB</strong>.</td>
+                        <td>L’importation est bloquée avant le chargement de la séquence, et l’utilisateur doit choisir un fichier plus petit.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Avertissements de conception</h3>
+            <p>Ces cas limites sont propres à la logique du clonage USER, en particulier au traitement des amorces contenant de l’uracile et à la découverte des surplombs au niveau des jonctions.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cas</th>
+                        <th>Déclencheur</th>
+                        <th>Comportement actuel du module USER</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Plafond du nombre d’inserts</strong></td>
+                        <td>Plus de trois lignes d’insert sont ajoutées.</td>
+                        <td>L’interface avertit que le clonage USER prend actuellement en charge un maximum de <strong>trois inserts</strong>.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>L’aperçu du vecteur n’utilise que la première séquence</strong></td>
+                        <td>Plusieurs enregistrements vectoriels sont présents avant le recadrage de prévol.</td>
+                        <td>L’aperçu de la carte du vecteur signale que plusieurs séquences ont été trouvées et utilise le <strong>premier enregistrement</strong> pour la visualisation.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Le mode USER strict exige que les deux amorces contiennent U</strong></td>
+                        <td>Les deux amorces sont censées être compatibles USER, mais l’une ou les deux violent le format requis contenant U.</td>
+                        <td>Le module signale une erreur de format d’amorce USER et demande à l’utilisateur de revenir à l’édition des amorces.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Une amorce contient U et l’autre non</strong></td>
+                        <td>Une seule des deux amorces PCR contient une base uracile.</td>
+                        <td>Le module affiche un avertissement de confirmation expliquant que les deux amorces doivent soit contenir U, soit toutes deux l’omettre. Poursuivre dans cet état mixte n’est pas pris en charge proprement et conduit généralement à une correction.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Contrainte de format des amorces U</strong></td>
+                        <td>Les amorces contenant U ne satisfont pas la règle attendue <strong>5′ A N{4-13} U core 3′</strong>.</td>
+                        <td>La conception est interrompue par un avertissement de format USER dédié afin que l’utilisateur puisse réécrire les amorces avant de poursuivre.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cœur d’amorce PCR introuvable dans le vecteur</strong></td>
+                        <td>La partie cœur de liaison 3′ des amorces de linéarisation USER ne peut pas être appariée sur la séquence du vecteur.</td>
+                        <td>Le module tente d’abord un repli complément inverse / amorces permutées, et ne lève une erreur que si aucun recalage valide ne peut être trouvé.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Aucun produit PCR valide trouvé</strong></td>
+                        <td>Le placement des amorces est insuffisant pour reconstruire un produit vectoriel linéarisé par PCR valide.</td>
+                        <td>La conception est abandonnée et l’utilisateur est invité à vérifier les séquences d’amorces.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Aucun motif de jonction USER canonique trouvé</strong></td>
+                        <td>Aucun motif <strong>5′AN(4-13)T3′</strong> convenable ne peut être trouvé autour d’une jonction USER souhaitée.</td>
+                        <td>L’algorithme recourt à une séquence de chevauchement par défaut avec un U supplémentaire introduit manuellement, et avertit explicitement que cela peut créer un <strong>risque de décalage de cadre</strong>.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Sortie d’avertissement de chevauchement au niveau des résultats</strong></td>
+                        <td>La découverte des jonctions réussit, mais une ou plusieurs étapes de recherche de chevauchement signalent des avertissements.</td>
+                        <td>Ces avertissements sont affichés à la fois dans la zone du tableau des chevauchements et dans la boîte d’avertissements unifiée, afin que l’utilisateur puisse examiner l’amorce ou la jonction concernée.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Le schéma d’assemblage est conceptuel</strong></td>
+                        <td>Toute conception de clonage USER réussie.</td>
+                        <td>L’image d’assemblage est conceptuelle plutôt qu’à l’échelle ; l’interprétation exacte doit s’appuyer sur la séquence assemblée et sur les informations de chevauchement / jonction USER.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <p><strong>Interprétation pratique :</strong> les avertissements du clonage USER ne signifient pas toujours que la conception est inutilisable. Nombre d’entre eux reflètent des attentes de format d’amorces ou des jonctions USER non canoniques plutôt qu’un échec complet. Les résultats doivent donc être interprétés conjointement avec le tableau des chevauchements, la liste d’avertissements et la séquence assemblée finale.</p>
+            </div>
+        </div>
+
+
+
+    </div>
+</body>
+</html>

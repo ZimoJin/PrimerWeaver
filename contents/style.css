@@ -149,6 +149,12 @@ a:not(.btn):not(.cta):hover {
     grid-template-columns: 1fr;
     /* Mobile-first: single column */
     gap: 24px;
+    min-width: 0;
+}
+
+.info-layout > * {
+    min-width: 0;
+    max-width: 100%;
 }
 
 .info-sidebar {
@@ -200,6 +206,59 @@ a:not(.btn):not(.cta):hover {
 /* Docs page: slightly tighter top spacing in the content card */
 #docBody.info-content {
     padding-top: 16px;
+}
+
+/* Keep long titles, abstracts, and screenshots inside the mobile card. */
+#docBody {
+    overflow-x: auto;
+    max-width: 100%;
+}
+
+#docBody .doc-scope,
+#docBody .doc-scope .container {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-wrap: break-word;
+}
+
+#docBody .doc-scope h1,
+#docBody .doc-scope h2,
+#docBody .doc-scope h3,
+#docBody .doc-scope p,
+#docBody .doc-scope li {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    white-space: normal;
+}
+
+#docBody .doc-scope img,
+#docBody .doc-scope svg,
+#docBody .doc-scope video,
+#docBody .doc-scope canvas {
+    max-width: 100%;
+    height: auto;
+    min-width: 0;
+}
+
+#docBody .doc-scope table,
+#docBody .doc-scope pre {
+    max-width: 100%;
+}
+
+@media (max-width: 768px) {
+    #docBody.info-content {
+        padding: 16px 14px;
+    }
+
+    #docBody .doc-scope h1 {
+        font-size: 1.45rem;
+        line-height: 1.25;
+    }
+
+    #docBody .doc-scope p {
+        text-align: left;
+    }
 }
 
 /* --- Docs mobile dropdown nav (mobile-only) --- */
@@ -662,6 +721,68 @@ header {
     align-items: center;
     margin-left: auto;
     align-self: center;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.language-picker {
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;
+}
+
+.language-picker select {
+    width: auto;
+    min-width: 92px;
+    padding: 5px 26px 5px 9px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--card);
+    color: var(--ink);
+    font: inherit;
+    cursor: pointer;
+}
+
+.translation-notice {
+    margin: 0 0 16px;
+    padding: 10px 12px;
+    border: 1px solid #f59e0b;
+    border-radius: 8px;
+    background: #fffbeb;
+    color: #92400e;
+}
+
+@media (prefers-color-scheme: dark) {
+    .translation-notice {
+        background: #1c1200;
+        color: #fde68a;
+    }
+}
+
+:lang(ko) body,
+:lang(ko) button,
+:lang(ko) input,
+:lang(ko) select,
+:lang(ko) textarea {
+    font-family: system-ui, "Segoe UI", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+}
+
+:lang(zh) body,
+:lang(zh) button,
+:lang(zh) input,
+:lang(zh) select,
+:lang(zh) textarea {
+    font-family: system-ui, "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
 }
 
 .menu>a,
@@ -1238,7 +1359,7 @@ header {
     color: var(--muted);
     margin-top: 0;
     margin-bottom: 8px;
-    max-width: 450px;
+    max-width: 560px;
     margin-left: auto;
     margin-right: auto;
 }
@@ -1427,6 +1548,15 @@ header {
         background: rgba(255, 255, 255, 0);
         border-radius: 10px;
         font-weight: 500;
+    }
+
+    .menu .language-picker,
+    .menu .language-picker select {
+        width: 100%;
+    }
+
+    .menu .language-picker {
+        padding: 8px 14px;
     }
 
     header .menu .dropdown-toggle {
@@ -1643,6 +1773,13 @@ header {
     opacity: 0.6;
 }
 
+.welcome-language-picker {
+    position: absolute;
+    bottom: calc(var(--footer-offset, 48px) + 12px);
+    left: 20px;
+    z-index: 1002;
+}
+
 /* Ensure welcome screen content stays below header on small screens */
 #welcome-screen .app-container {
     position: relative;
@@ -1724,15 +1861,22 @@ header {
     }
 }
 
-/* Ensure content stays below header on all screens */
+/* Keep welcome content below the header without flattening
+   the language picker or version label above the footer. */
 @media (max-width: 768px) {
-    #welcome-screen,
-    #welcome-screen * {
-        z-index: auto !important;
+    #welcome-screen .app-container,
+    #welcome-screen .tab-content,
+    #welcome-screen .content-panel {
+        z-index: auto;
     }
-    
+
     #welcome-screen {
-        z-index: 999 !important;
+        z-index: 999;
+    }
+
+    .welcome-language-picker,
+    .welcome-corner-text {
+        z-index: 1002;
     }
 }
 
@@ -1746,7 +1890,7 @@ header {
 }
 
 .update-page .update-entry {
-    border-top: 1px solid var(--border, #e2e8f0);
+    border-top: 1px solid var(--line);
     padding-top: 20px;
 }
 .update-page .update-version {
@@ -2024,10 +2168,11 @@ header {
 .app-shell-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     padding: 8px 16px; /* A bit more padding */
     border-bottom: 1px solid var(--line);
     flex-shrink: 0; /* Prevents the header from shrinking */
+    gap: 8px;
 }
 
 .app-header-buttons {
@@ -2167,7 +2312,7 @@ header {
     padding: 8px 16px; /* Restore simple padding */
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     gap: 16px;
     min-height: 50px; 
 }
@@ -2178,8 +2323,14 @@ header {
   color: var(--brand-ink);
   font-weight: 600;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
+  min-width: 0;
+  flex: 1 1 auto;
+  line-height: 1.25;
+}
+
+.app-shell-title > span {
   min-width: 0;
 }
 
@@ -2233,20 +2384,33 @@ header {
         height: 18px;
     }
     
-    /* Adjust app shell header for mobile */
+    /* Stack the module title and actions so long translations cannot overlap */
     .app-shell-header {
         padding: 8px 12px;
         gap: 8px;
+        flex-direction: column;
+        align-items: stretch;
     }
     
     .app-shell-title {
         font-size: 16px;
         min-width: 0;
-        flex: 1;
+        flex: none;
+        width: 100%;
+        line-height: 1.25;
     }
     
     .app-header-buttons {
         gap: 6px;
+        flex-shrink: 0;
+        width: 100%;
+        margin-left: 0;
+        justify-content: flex-end;
+    }
+
+    .help-tooltip {
+        max-width: calc(100vw - 32px) !important;
+        width: auto !important;
     }
 
 }

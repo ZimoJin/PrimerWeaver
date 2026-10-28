@@ -2,22 +2,30 @@
 // We will assign them after the page loads.
 let view, welcomeScreen, appHeader, appFooter;
 
+const pwT = (key, params, fallback) => (
+    window.PW_I18N ? window.PW_I18N.t(key, params, fallback) : (fallback || key)
+);
+const currentLocale = () => (
+    window.PW_I18N ? window.PW_I18N.getLocale() : 'en'
+);
+
 // Docs navigation labels (used for sidebar + mobile dropdown label sync)
 const docsList = [
-    { id: '#d-intro', label: 'Introduction' },
-    { id: '#d-qc', label: 'Primer QC' },
-    { id: '#d-mp', label: 'Multiplex PCR' },
-    { id: '#d-opcr', label: 'Overlap PCR' },
-    { id: '#d-muta', label: 'Mutagenesis' },
-    { id: '#d-workspace', label: 'Integrated Cloning Workspace' },
-    { id: '#d-re', label: 'Restriction Cloning' },
-    { id: '#d-gg', label: 'Golden Gate' },
-    { id: '#d-gb', label: 'Gibson Assembly' },
-    { id: '#d-user', label: 'USER Cloning' },
+    { id: '#d-intro', key: 'docs.introduction', label: 'Introduction' },
+    { id: '#d-qc', key: 'docs.qc', label: 'Primer QC' },
+    { id: '#d-mp', key: 'docs.multiplex', label: 'Multiplex PCR' },
+    { id: '#d-opcr', key: 'docs.overlap', label: 'Overlap PCR' },
+    { id: '#d-muta', key: 'docs.mutagenesis', label: 'Mutagenesis' },
+    { id: '#d-workspace', key: 'docs.workspace', label: 'Integrated Cloning Workspace' },
+    { id: '#d-re', key: 'docs.restriction', label: 'Restriction Cloning' },
+    { id: '#d-gg', key: 'docs.goldenGate', label: 'Golden Gate' },
+    { id: '#d-gb', key: 'docs.gibson', label: 'Gibson Assembly' },
+    { id: '#d-user', key: 'docs.user', label: 'USER Cloning' },
 ];
 
 function getDocLabel(id) {
-    return docsList.find(d => d.id === id)?.label || 'Documents';
+    const item = docsList.find(d => d.id === id);
+    return item ? pwT(item.key, null, item.label) : pwT('docs.title', null, 'Documents');
 }
 
 /** Official PrimerWeaver publication (NAR Web Server issue). */
@@ -100,7 +108,17 @@ function initWelcomeScreen() {
     }
 }
 
+function closeMobileMenu() {
+    const menuBtn = document.getElementById('menuBtn');
+    const menu = document.querySelector('.menu');
+    const backdrop = document.getElementById('backdrop');
+    if (menu) menu.classList.remove('is-open');
+    if (backdrop) backdrop.classList.remove('is-open');
+    if (menuBtn) menuBtn.setAttribute('aria-expanded', 'false');
+}
+
 function navigate() {
+    closeMobileMenu();
     let hash = location.hash.substring(1) || '/';
     let path = hash;
     let anchor = null;
@@ -138,6 +156,7 @@ function navigate() {
         const moduleName = path.split('/')[2];
         if (view) {
             view.innerHTML = loadAppModule(moduleName);
+            if (window.PW_I18N) window.PW_I18N.apply(view);
             view.classList.add('view-is-app'); // <-- Applies the CSS rule
 
             // --- Bind Fullscreen Button Logic ---
@@ -161,12 +180,12 @@ function navigate() {
                     if (document.fullscreenElement === appShell) {
                         fsBtn.innerHTML = `
                             <svg class="btn-icon" aria-hidden="true"><use xlink:href="#icon-fullscreen-exit"></use></svg>
-                            <span>Exit Fullscreen</span>
+                            <span>${escapeHtml(pwT('app.exitFullscreen', null, 'Exit Fullscreen'))}</span>
                         `;
                     } else {
                         fsBtn.innerHTML = `
                             <svg class="btn-icon" aria-hidden="true"><use xlink:href="#icon-fullscreen-enter"></use></svg>
-                            <span>Fullscreen</span>
+                            <span>${escapeHtml(pwT('app.fullscreen', null, 'Fullscreen'))}</span>
                         `;
                     }
                 };
@@ -205,6 +224,7 @@ function navigate() {
         if (view) {
             view.innerHTML = renderFunction();
             view.classList.remove('view-is-app');
+            if (window.PW_I18N) window.PW_I18N.apply(view);
         }
         setActive(path);
         resetScrollToTop();
@@ -212,12 +232,17 @@ function navigate() {
 
     // Call binders for specific pages
     if (path === '/docs') { bindDocs(anchor) }
-    if (path === '/about') { bindAbout() }
+    if (path === '/help' || path === '/update' || path === '/about') {
+        bindLocalizedRoutePage(path);
+    } else if (path === '/about') {
+        bindAbout();
+    }
 }
 
 window.addEventListener('hashchange', navigate);
 
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
+    if (window.PW_I18N) await window.PW_I18N.ready;
     // --- CHANGE 3 ---
     // NOW that the page is loaded, we find the elements
     // and assign them to our global variables.
@@ -228,6 +253,7 @@ window.addEventListener('load', () => {
     // --- END OF CHANGE 3 ---
 
     initWelcomeScreen();
+    initLanguagePicker();
     initMobileMenu();
     initLogoLink();
     initFooterToggle();
@@ -262,6 +288,22 @@ function welcomeRoute() {
     return ``;
 }
 
+function initLanguagePicker() {
+    if (!window.PW_I18N) return;
+    document.querySelectorAll('[data-language-select]').forEach((select) => {
+        select.value = currentLocale();
+        select.addEventListener('change', () => {
+            window.PW_I18N.setLocale(select.value);
+        });
+    });
+
+    window.addEventListener('primerweaver:localechange', () => {
+        window.PW_I18N.apply(document);
+        navigate();
+        updateHeaderOffsetVar();
+    });
+}
+
 // --- Mobile Drawer Logic ---
 function initMobileMenu() {
     const menuBtn = document.getElementById('menuBtn');
@@ -276,9 +318,7 @@ function initMobileMenu() {
 
 
     function closeMenu() {
-        menu.classList.remove('is-open');
-        backdrop.classList.remove('is-open');
-        menuBtn.setAttribute('aria-expanded', 'false');
+        closeMobileMenu();
     }
 
     function openMenu() {
@@ -379,7 +419,8 @@ function setActive(path) {
         }
         // --- END ADDED ---
 
-        el.setAttribute('aria-current', active ? 'page' : 'false');
+        if (active) el.setAttribute('aria-current', 'page');
+        else el.removeAttribute('aria-current');
     });
 }
 
@@ -387,21 +428,21 @@ function setActive(path) {
 function loadAppModule(moduleName) {
     // --- Pretty Name Lookup (Still needed for iframe title) ---
     const prettyNameMap = {
-        'qc': 'Primer QC',
-        'workspace': 'Integrated Cloning Workspace',
-        'restriction': 'Restriction Cloning',
+        'qc': getDocLabel('#d-qc'),
+        'workspace': getDocLabel('#d-workspace'),
+        'restriction': getDocLabel('#d-re'),
         'golden-gate': 'Golden Gate Assembly',
-        'gibson': 'Gibson Assembly',
-        'overlap-pcr': 'Overlap PCR',
-        'user': 'USER Cloning',
-        'mutagenesis': 'Mutagenesis',
-        'multiplex-pcr': 'Multiplex PCR'
+        'gibson': getDocLabel('#d-gb'),
+        'overlap-pcr': getDocLabel('#d-opcr'),
+        'user': getDocLabel('#d-user'),
+        'mutagenesis': getDocLabel('#d-muta'),
+        'multiplex-pcr': getDocLabel('#d-mp')
     };
 
     const prettyName = prettyNameMap[moduleName] || moduleName.charAt(0).toUpperCase() + moduleName.slice(1);
 
     // We still point to the app-index.html shell and pass the hash
-    const filePath = `app/app-index.html#${moduleName}`;
+    const filePath = `app/app-index.html?lang=${encodeURIComponent(currentLocale())}#${moduleName}`;
 
     // This HTML is injected into the <main> tag
     return `
@@ -427,8 +468,8 @@ function loadAppModule(moduleName) {
               <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
                 <span style="display: inline-block; width: 18px; height: 18px; line-height: 18px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.8rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
                 <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 400px; padding: 14px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.6; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 99999; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
-                  <strong style="display: block; margin-bottom: 8px; font-size: 0.9rem;">Purpose:</strong>
-                  <p style="margin: 0;">Quality check for PCR primers. Evaluates primer properties including melting temperature (Tm), self-dimer formation, cross-dimer formation, hairpin structures, GC content, 3'-clamp, and homopolymer runs. Helps identify potential issues before PCR experiments.</p>
+                  <strong style="display: block; margin-bottom: 8px; font-size: 0.9rem;">${escapeHtml(pwT('app.purpose', null, 'Purpose:'))}</strong>
+                  <p style="margin: 0;">${escapeHtml(pwT('app.qcPurpose', null, 'Quality check for PCR primers.'))}</p>
                   <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
                 </span>
               </span>`:''}
@@ -436,8 +477,8 @@ function loadAppModule(moduleName) {
               <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
                 <span style="display: inline-block; width: 18px; height: 18px; line-height: 18px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.8rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
                 <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 420px; padding: 14px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.6; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 99999; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
-                  <strong style="display: block; margin-bottom: 8px; font-size: 0.9rem;">Purpose:</strong>
-                  <p style="margin: 0;">Design primers for Overlap Extension PCR (OE-PCR) to join multiple DNA fragments. Primers create overlaps that allow adjacent fragments to anneal and extend, forming seamless junctions. Linker sequences are supported between fragments.</p>
+                  <strong style="display: block; margin-bottom: 8px; font-size: 0.9rem;">${escapeHtml(pwT('app.purpose', null, 'Purpose:'))}</strong>
+                  <p style="margin: 0;">${escapeHtml(pwT('app.overlapPurpose', null, 'Design primers for Overlap Extension PCR (OE-PCR) to join multiple DNA fragments.'))}</p>
                   <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
                 </span>
               </span>`:''}
@@ -445,8 +486,8 @@ function loadAppModule(moduleName) {
               <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
                 <span style="display: inline-block; width: 18px; height: 18px; line-height: 18px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.8rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
                 <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 420px; padding: 14px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.6; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 99999; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
-                  <strong style="display: block; margin-bottom: 8px; font-size: 0.9rem;">Purpose:</strong>
-                  <p style="margin: 0;">Perform site-directed mutagenesis via overlap PCR. Supports single or multiple amino acid or DNA edits (substitutions, insertions, deletions) and designs inner overlap and outer flanking primers with integrated QC (Tm, GC%, hairpin/dimer).</p>
+                  <strong style="display: block; margin-bottom: 8px; font-size: 0.9rem;">${escapeHtml(pwT('app.purpose', null, 'Purpose:'))}</strong>
+                  <p style="margin: 0;">${escapeHtml(pwT('app.mutagenesisPurpose', null, 'Perform site-directed mutagenesis via overlap PCR.'))}</p>
                   <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
                 </span>
               </span>`:''}
@@ -454,8 +495,8 @@ function loadAppModule(moduleName) {
               <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
                 <span style="display: inline-block; width: 18px; height: 18px; line-height: 18px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.8rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
                 <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 420px; padding: 14px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.6; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 99999; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
-                  <strong style="display: block; margin-bottom: 8px; font-size: 0.9rem;">Purpose:</strong>
-                  <p style="margin: 0;">Design multiplex PCR primer pairs for many targets under a shared PCR condition. Includes cross-dimer screening and automated pooling suggestions to reduce primer–primer conflicts.</p>
+                  <strong style="display: block; margin-bottom: 8px; font-size: 0.9rem;">${escapeHtml(pwT('app.purpose', null, 'Purpose:'))}</strong>
+                  <p style="margin: 0;">${escapeHtml(pwT('app.multiplexPurpose', null, 'Design multiplex PCR primer pairs for many targets under a shared PCR condition.'))}</p>
                   <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
                 </span>
               </span>`:''}
@@ -463,8 +504,8 @@ function loadAppModule(moduleName) {
               <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
                 <span style="display: inline-block; width: 18px; height: 18px; line-height: 18px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.8rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
                 <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 420px; padding: 14px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.6; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 99999; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
-                  <strong style="display: block; margin-bottom: 8px; font-size: 0.9rem;">Purpose:</strong>
-                  <p style="margin: 0;">Design primers for restriction enzyme cloning (RE cloning) using one or two enzymes. Generates directional/non-directional cloning primers with enzyme sites and optional extra bases, and provides an in-silico digest/assembly preview.</p>
+                  <strong style="display: block; margin-bottom: 8px; font-size: 0.9rem;">${escapeHtml(pwT('app.purpose', null, 'Purpose:'))}</strong>
+                  <p style="margin: 0;">${escapeHtml(pwT('app.restrictionPurpose', null, 'Design primers for restriction enzyme cloning (RE cloning) using one or two enzymes.'))}</p>
                   <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
                 </span>
               </span>`:''}
@@ -472,8 +513,8 @@ function loadAppModule(moduleName) {
               <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
                 <span style="display: inline-block; width: 18px; height: 18px; line-height: 18px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.8rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
                 <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 420px; padding: 14px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.6; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 99999; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
-                  <strong style="display: block; margin-bottom: 8px; font-size: 0.9rem;">Purpose:</strong>
-                  <p style="margin: 0;">Design Golden Gate assembly primers using Type IIS restriction enzymes. Automatically selects overhangs, checks for internal enzyme sites, and produces assembly-ready primers with optional clamping bases and gel/assembly previews.</p>
+                  <strong style="display: block; margin-bottom: 8px; font-size: 0.9rem;">${escapeHtml(pwT('app.purpose', null, 'Purpose:'))}</strong>
+                  <p style="margin: 0;">${escapeHtml(pwT('app.goldenGatePurpose', null, 'Design Golden Gate assembly primers using Type IIS restriction enzymes.'))}</p>
                   <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
                 </span>
               </span>`:''}
@@ -481,8 +522,8 @@ function loadAppModule(moduleName) {
               <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
                 <span style="display: inline-block; width: 18px; height: 18px; line-height: 18px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.8rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
                 <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 420px; padding: 14px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.6; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 99999; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
-                  <strong style="display: block; margin-bottom: 8px; font-size: 0.9rem;">Purpose:</strong>
-                  <p style="margin: 0;">Design primers for Gibson Assembly. Optimizes overlap regions at each junction and designs core primers for vector and inserts, supporting single or multiple inserts with assembly preview and QC metrics.</p>
+                  <strong style="display: block; margin-bottom: 8px; font-size: 0.9rem;">${escapeHtml(pwT('app.purpose', null, 'Purpose:'))}</strong>
+                  <p style="margin: 0;">${escapeHtml(pwT('app.gibsonPurpose', null, 'Design primers for Gibson Assembly.'))}</p>
                   <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
                 </span>
               </span>`:''}
@@ -490,8 +531,8 @@ function loadAppModule(moduleName) {
               <span class="help-icon" style="position: relative; display: inline-block; cursor: help; z-index: 1; flex-shrink: 0;">
                 <span style="display: inline-block; width: 18px; height: 18px; line-height: 18px; text-align: center; border-radius: 50%; background: #6b7280; color: white; font-size: 0.8rem; font-weight: bold; transition: background 0.2s; position: relative; z-index: 1;">?</span>
                 <span class="help-tooltip" style="position: absolute; top: calc(100% + 10px); left: 0; width: 420px; padding: 14px; background: #1f2937; color: #fff; border-radius: 8px; font-size: 0.85rem; line-height: 1.6; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 99999; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; white-space: normal;">
-                  <strong style="display: block; margin-bottom: 8px; font-size: 0.9rem;">Purpose:</strong>
-                  <p style="margin: 0;">Design primers for USER cloning (Uracil-Specific Excision Reagent). Supports dU-containing primers and overlap-based assembly to create seamless junctions, with automated primer core selection and junction validation.</p>
+                  <strong style="display: block; margin-bottom: 8px; font-size: 0.9rem;">${escapeHtml(pwT('app.purpose', null, 'Purpose:'))}</strong>
+                  <p style="margin: 0;">${escapeHtml(pwT('app.userPurpose', null, 'Design primers for USER cloning (Uracil-Specific Excision Reagent).'))}</p>
                   <span style="position: absolute; top: -6px; left: 20px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #1f2937;"></span>
                 </span>
               </span>`:''}
@@ -499,16 +540,16 @@ function loadAppModule(moduleName) {
             <div class="app-header-buttons">
                 <button id="fullscreen-btn" class="btn ghost app-btn">
                     <svg class="btn-icon" aria-hidden="true"><use xlink:href="#icon-fullscreen-enter"></use></svg>
-                    <span>Fullscreen</span>
+                    <span>${escapeHtml(pwT('app.fullscreen', null, 'Fullscreen'))}</span>
                 </button>
-                <a href="#/tools" class="btn ghost app-btn">&larr; Back to Dashboard</a>
+                <a href="#/tools" class="btn ghost app-btn">&larr; <span>${escapeHtml(pwT('app.back', null, 'Back to Dashboard'))}</span></a>
             </div>
         </nav>
 
         <article class="app-shell-content">
             <iframe 
                 src="${filePath}" 
-                title="${prettyName} Module" 
+                title="${escapeHtml(prettyName)} ${escapeHtml(pwT('app.moduleSuffix', null, 'Module'))}"
                 class="app-iframe">
             </iframe>
         </article>
@@ -519,26 +560,26 @@ function loadAppModule(moduleName) {
 // --- Page Content Functions ---
 function docs() {
     const sidebarLinks = docsList
-        .map(d => `<a href="#" data-doc="${d.id}">${escapeHtml(d.label)}</a>`)
+        .map(d => `<a href="#" data-doc="${d.id}">${escapeHtml(pwT(d.key, null, d.label))}</a>`)
         .join('\n  ');
 
     const mobileMenuLinks = docsList
-        .map(d => `<a href="#" data-doc="${d.id}" role="option">${escapeHtml(d.label)}</a>`)
+        .map(d => `<a href="#" data-doc="${d.id}" role="option">${escapeHtml(pwT(d.key, null, d.label))}</a>`)
         .join('\n        ');
 
     return `
 <div class="info-layout">
 <div class="docs-mobile-nav" id="docsMobileNav">
   <button class="docs-mobile-toggle" id="docsMobileToggle" type="button" aria-haspopup="listbox" aria-expanded="false">
-    <span class="docs-mobile-toggle-label" id="docsMobileLabel">Introduction</span>
+    <span class="docs-mobile-toggle-label" id="docsMobileLabel">${escapeHtml(getDocLabel('#d-intro'))}</span>
     <span class="docs-mobile-toggle-chevron" aria-hidden="true">▾</span>
   </button>
-  <div class="docs-mobile-menu" id="docsMobileMenu" role="listbox" aria-label="Documents">
+  <div class="docs-mobile-menu" id="docsMobileMenu" role="listbox" aria-label="${escapeHtml(pwT('docs.title', null, 'Documents'))}">
         ${mobileMenuLinks}
   </div>
 </div>
 <nav class="info-sidebar" id="doc-nav">
-  <h3>Documents</h3>
+  <h3>${escapeHtml(pwT('docs.title', null, 'Documents'))}</h3>
   ${sidebarLinks}
 </nav>
 
@@ -547,7 +588,39 @@ function docs() {
 </div>`;
 }
 
-function help() {
+function localizedPagePlaceholder(pageName) {
+    return `<section class="card" data-localized-page="${escapeHtml(pageName)}" style="padding:22px 28px"><p>${escapeHtml(pwT('docs.loading', null, 'Loading...'))}</p></section>`;
+}
+
+async function bindLocalizedRoutePage(path) {
+    const pageName = path.replace('/', '');
+    const localeAtStart = currentLocale();
+    if (localeAtStart === 'en') {
+        if (path === '/about') bindAbout();
+        return;
+    }
+
+    try {
+        const response = await fetch(`contents/pages/${localeAtStart}/${pageName}.html`);
+        if (!response.ok) throw new Error(`Failed to load ${pageName}: ${response.status}`);
+        const html = await response.text();
+        if (currentLocale() !== localeAtStart || !view) return;
+        view.innerHTML = html;
+        if (window.PW_I18N) window.PW_I18N.apply(view);
+        if (path === '/about') bindAbout();
+        resetScrollToTop();
+    } catch (error) {
+        console.error('Error loading localized page:', error);
+        const englishRenderers = { '/help': help, '/update': update, '/about': about };
+        if (view && englishRenderers[path]) {
+            view.innerHTML = `<p class="translation-notice">${escapeHtml(pwT('docs.englishNotice', null, 'This page is currently available in English.'))}</p>${englishRenderers[path](true)}`;
+            if (path === '/about') bindAbout();
+        }
+    }
+}
+
+function help(forceEnglish) {
+    if (!forceEnglish && currentLocale() !== 'en') return localizedPagePlaceholder('help');
     return `
 <section class="card" style="padding:22px 28px">
 
@@ -1020,11 +1093,19 @@ function help() {
 `;
 }
 
-function update() {
+function update(forceEnglish) {
+    if (!forceEnglish && currentLocale() !== 'en') return localizedPagePlaceholder('update');
     return `
 <section class="card update-page" style="padding:22px 28px">
 <h2 style="margin-bottom: 8px;">Updates</h2>
 <p class="muted" style="margin-top: 0; margin-bottom: 28px;">Release notes for the PrimerWeaver web server.</p>
+
+<article class="update-entry">
+    <h3 class="update-version">v1.0.6 <span class="update-date muted">October 2026</span></h3>
+    <ol class="update-list update-list-numbered">
+        <li>Added French, Korean, and Chinese language support. The public interface, Help / About / Updates pages, and the Primer QC module are localized; scientific review of translations is ongoing.</li>
+    </ol>
+</article>
 
 <article class="update-entry">
     <h3 class="update-version">v1.0.5 <span class="update-date muted">September 2026</span></h3>
@@ -1068,7 +1149,8 @@ function update() {
 `;
 }
 
-function about() {
+function about(forceEnglish) {
+    if (!forceEnglish && currentLocale() !== 'en') return localizedPagePlaceholder('about');
     return `
 <svg width="0" height="0" style="position:absolute">
 <defs>
@@ -1231,18 +1313,18 @@ function appDashboard() {
 
     <section class="hero">
         <div>
-            <h2>PrimerWeaver App Dashboard</h2>
-            <p class="muted">Select a cloning or analysis module to begin.</p>
+            <h2 data-i18n="dashboard.title">PrimerWeaver App Dashboard</h2>
+            <p class="muted" data-i18n="dashboard.intro">Select a cloning or analysis module to begin.</p>
 
             <div class="grid cols-3" style="margin-top:30px;">
                 <div></div>
                 <div class="card tool-card">
                     <svg class="tool-card-icon" aria-hidden="true"><use xlink:href="#icon-layers"></use></svg>
-                    <h3>Integrated Cloning Workspace</h3>
-                    <p class="small muted">A unified workspace for Golden Gate, Gibson, Restriction, and USER cloning, with shared sequence input and method-specific design settings in one place.</p>
+                    <h3 data-i18n="docs.workspace">Integrated Cloning Workspace</h3>
+                    <p class="small muted" data-i18n="dashboard.workspaceDescription">A unified workspace for Golden Gate, Gibson, Restriction, and USER cloning, with shared sequence input and method-specific design settings in one place.</p>
                     <div class="tool-card-buttons">
-                        <a href="#/docs#d-workspace" class="btn ghost">Read Docs</a>
-                        <a href="#/app/workspace" class="btn">Open App</a>
+                        <a href="#/docs#d-workspace" class="btn ghost" data-i18n="dashboard.readDocs">Read Docs</a>
+                        <a href="#/app/workspace" class="btn" data-i18n="dashboard.openApp">Open App</a>
                     </div>
                 </div>
                 <div></div>
@@ -1251,83 +1333,83 @@ function appDashboard() {
             <div class="grid cols-3" style="margin-top:30px;">
                 <div class="card tool-card">
                     <svg class="tool-card-icon" aria-hidden="true"><use xlink:href="#icon-check"></use></svg>
-                    <h3>Primer QC</h3>
-                    <p class="small muted">Analyze existing primers for Tm, GC, hairpins, and dimers.</p>
+                    <h3 data-i18n="docs.qc">Primer QC</h3>
+                    <p class="small muted" data-i18n="dashboard.qcDescription">Analyze existing primers for Tm, GC, hairpins, and dimers.</p>
                     <div class="tool-card-buttons">
-                        <a href="#/docs#d-qc" class="btn ghost">Read Docs</a>
-                        <a href="#/app/qc" class="btn">Open App</a>
+                        <a href="#/docs#d-qc" class="btn ghost" data-i18n="dashboard.readDocs">Read Docs</a>
+                        <a href="#/app/qc" class="btn" data-i18n="dashboard.openApp">Open App</a>
                     </div>
                 </div>
                 <div class="card tool-card">
                     <svg class="tool-card-icon" aria-hidden="true"><use xlink:href="#icon-beaker"></use></svg>
-                    <h3>Multiplex PCR</h3>
-                    <p class="small muted">Design and sort primers into compatible, non-conflicting pools.</p>
+                    <h3 data-i18n="docs.multiplex">Multiplex PCR</h3>
+                    <p class="small muted" data-i18n="dashboard.multiplexDescription">Design and sort primers into compatible, non-conflicting pools.</p>
                     <div class="tool-card-buttons">
-                        <a href="#/docs#d-mp" class="btn ghost">Read Docs</a>
-                        <a href="#/app/multiplex-pcr" class="btn">Open App</a>
+                        <a href="#/docs#d-mp" class="btn ghost" data-i18n="dashboard.readDocs">Read Docs</a>
+                        <a href="#/app/multiplex-pcr" class="btn" data-i18n="dashboard.openApp">Open App</a>
                     </div>
                 </div>
                 <div class="card tool-card">
                     <svg class="tool-card-icon" aria-hidden="true"><use xlink:href="#icon-merge"></use></svg>
-                    <h3>Overlap PCR</h3>
-                    <p class="small muted">Design primers to stitch two or more DNA fragments together (SOE-PCR).</p>
+                    <h3 data-i18n="docs.overlap">Overlap PCR</h3>
+                    <p class="small muted" data-i18n="dashboard.overlapDescription">Design primers to stitch two or more DNA fragments together (SOE-PCR).</p>
                     <div class="tool-card-buttons">
-                        <a href="#/docs#d-opcr" class="btn ghost">Read Docs</a>
-                        <a href="#/app/overlap-pcr" class="btn">Open App</a>
+                        <a href="#/docs#d-opcr" class="btn ghost" data-i18n="dashboard.readDocs">Read Docs</a>
+                        <a href="#/app/overlap-pcr" class="btn" data-i18n="dashboard.openApp">Open App</a>
                     </div>
                 </div>
                 <div class="card tool-card">
                     <svg class="tool-card-icon" aria-hidden="true"><use xlink:href="#icon-edit"></use></svg>
-                    <h3>Mutagenesis</h3>
-                    <p class="small muted">Generate primers for site-directed mutagenesis.</p>
+                    <h3 data-i18n="docs.mutagenesis">Mutagenesis</h3>
+                    <p class="small muted" data-i18n="dashboard.mutagenesisDescription">Generate primers for site-directed mutagenesis.</p>
                     <div class="tool-card-buttons">
-                        <a href="#/docs#d-muta" class="btn ghost">Read Docs</a>
-                        <a href="#/app/mutagenesis" class="btn">Open App</a>
+                        <a href="#/docs#d-muta" class="btn ghost" data-i18n="dashboard.readDocs">Read Docs</a>
+                        <a href="#/app/mutagenesis" class="btn" data-i18n="dashboard.openApp">Open App</a>
                     </div>
                 </div>
                 <div class="card tool-card">
                     <svg class="tool-card-icon" aria-hidden="true"><use xlink:href="#icon-link"></use></svg>
-                    <h3>Restriction Cloning</h3>
-                    <p class="small muted">Design cloning primers with restriction sites for vector insertion and enzyme-based assembly workflows.</p>
+                    <h3 data-i18n="docs.restriction">Restriction Cloning</h3>
+                    <p class="small muted" data-i18n="dashboard.restrictionDescription">Design cloning primers with restriction sites for vector insertion and enzyme-based assembly workflows.</p>
                     <div class="tool-card-buttons">
-                        <a href="#/docs#d-re" class="btn ghost">Read Docs</a>
-                        <a href="#/app/restriction" class="btn">Open App</a>
+                        <a href="#/docs#d-re" class="btn ghost" data-i18n="dashboard.readDocs">Read Docs</a>
+                        <a href="#/app/restriction" class="btn" data-i18n="dashboard.openApp">Open App</a>
                     </div>
                 </div>
                 <div class="card tool-card">
                     <svg class="tool-card-icon" aria-hidden="true"><use xlink:href="#icon-puzzle"></use></svg>
-                    <h3>Golden Gate Assembly</h3>
-                    <p class="small muted">Design seamless Type IIS assembly workflows for one or multiple inserts with custom overhangs.</p>
+                    <h3 data-i18n="docs.goldenGate">Golden Gate Assembly</h3>
+                    <p class="small muted" data-i18n="dashboard.goldenGateDescription">Design seamless Type IIS assembly workflows for one or multiple inserts with custom overhangs.</p>
                     <div class="tool-card-buttons">
-                        <a href="#/docs#d-gg" class="btn ghost">Read Docs</a>
-                        <a href="#/app/golden-gate" class="btn">Open App</a>
+                        <a href="#/docs#d-gg" class="btn ghost" data-i18n="dashboard.readDocs">Read Docs</a>
+                        <a href="#/app/golden-gate" class="btn" data-i18n="dashboard.openApp">Open App</a>
                     </div>
                 </div>
                 <div class="card tool-card">
                     <svg class="tool-card-icon" aria-hidden="true"><use xlink:href="#icon-beaker"></use></svg>
-                    <h3>Gibson Assembly</h3>
-                    <p class="small muted">Design overlap-based assembly primers for vector and inserts with junction-aware settings.</p>
+                    <h3 data-i18n="docs.gibson">Gibson Assembly</h3>
+                    <p class="small muted" data-i18n="dashboard.gibsonDescription">Design overlap-based assembly primers for vector and inserts with junction-aware settings.</p>
                     <div class="tool-card-buttons">
-                        <a href="#/docs#d-gb" class="btn ghost">Read Docs</a>
-                        <a href="#/app/gibson" class="btn">Open App</a>
+                        <a href="#/docs#d-gb" class="btn ghost" data-i18n="dashboard.readDocs">Read Docs</a>
+                        <a href="#/app/gibson" class="btn" data-i18n="dashboard.openApp">Open App</a>
                     </div>
                 </div>
                 <div class="card tool-card">
                     <svg class="tool-card-icon" aria-hidden="true"><use xlink:href="#icon-layers"></use></svg>
-                    <h3>USER Cloning</h3>
-                    <p class="small muted">Plan USER cloning with uracil-compatible primer design and assembly parameter controls.</p>
+                    <h3 data-i18n="docs.user">USER Cloning</h3>
+                    <p class="small muted" data-i18n="dashboard.userDescription">Plan USER cloning with uracil-compatible primer design and assembly parameter controls.</p>
                     <div class="tool-card-buttons">
-                        <a href="#/docs#d-user" class="btn ghost">Read Docs</a>
-                        <a href="#/app/user" class="btn">Open App</a>
+                        <a href="#/docs#d-user" class="btn ghost" data-i18n="dashboard.readDocs">Read Docs</a>
+                        <a href="#/app/user" class="btn" data-i18n="dashboard.openApp">Open App</a>
                     </div>
                 </div>
                 <div class="card tool-card" style="opacity: 0.6; border-style: dashed;">
                     <svg class="tool-card-icon" aria-hidden="true"><use xlink:href="#icon-loader"></use></svg>
-                    <h3>More is coming...</h3>
-                    <p class="small muted">
+                    <h3 data-i18n="dashboard.more">More is coming...</h3>
+                    <p class="small muted" data-i18n="dashboard.moreDescription">
                         New tools and modules are currently in development.
                     </p>
-                    <a href="#" onclick="return false;" class="btn" style="margin-top: auto; padding: 6px 12px; font-size: 14px; background-color: var(--muted);">Coming Soon</a>
+                    <a href="#" onclick="return false;" class="btn" data-i18n="dashboard.comingSoon" style="margin-top: auto; padding: 6px 12px; font-size: 14px; background-color: var(--muted);">Coming Soon</a>
                 </div>
             </div>
         </div>
@@ -1532,8 +1614,24 @@ async function loadDocumentHTML(filePath) {
      border-radius: 0;
      padding: 0;
      width: 100%;
-     max-width: none;
+     max-width: 100%;
+     min-width: 0;
      margin: 0;
+ }
+
+ #docBody .doc-scope {
+     min-width: 0;
+     max-width: 100%;
+     overflow-wrap: anywhere;
+ }
+
+ #docBody .doc-scope h1,
+ #docBody .doc-scope h2,
+ #docBody .doc-scope p,
+ #docBody .doc-scope li {
+     overflow-wrap: anywhere;
+     word-break: break-word;
+     white-space: normal;
  }
 
  /* Docs: keep media responsive (especially on mobile) */
@@ -1543,6 +1641,7 @@ async function loadDocumentHTML(filePath) {
  #docBody .doc-scope canvas {
      max-width: 100%;
      height: auto;
+     min-width: 0;
  }
 
  /* Prefer full-width screenshots on small screens, overriding inline max-width styles */
@@ -1719,7 +1818,7 @@ async function loadDocumentHTML(filePath) {
         return fullContent;
     } catch (error) {
         console.error('Error loading document:', error);
-        return `<div class="error"><h3>Error Loading Document</h3><p>Could not load the documentation file. Please try again.</p></div>`;
+        return null;
     }
 }
 
@@ -1737,6 +1836,14 @@ const docRoutes = {
     '#d-gg': 'contents/documents/golden_gate_doc.html',
     '#d-gb': 'contents/documents/gibson_doc.html',
 };
+
+function getLocalizedDocumentPath(id) {
+    const locale = currentLocale();
+    const englishPath = docRoutes[id];
+    if (!englishPath || locale === 'en') return englishPath;
+    const fileName = englishPath.split('/').pop();
+    return `contents/documents/${locale}/${fileName}`;
+}
 
 function bindDocs(anchor) {
     const docNav = document.getElementById('doc-nav');
@@ -1756,10 +1863,10 @@ function bindDocs(anchor) {
 
     async function renderDocContent(id) {
         if (!id) id = '#d-intro';
-        const filePath = docRoutes[id];
+        const filePath = getLocalizedDocumentPath(id);
         
         if (!filePath) {
-            if (docBody) docBody.innerHTML = '<p>Document not found.</p>';
+            if (docBody) docBody.innerHTML = `<p>${escapeHtml(pwT('docs.notFound', null, 'Document not found.'))}</p>`;
             resetScrollToTop();
             return;
         }
@@ -1772,11 +1879,25 @@ function bindDocs(anchor) {
 
         // Show loading state
         if (docBody) {
-            docBody.innerHTML = '<p style="text-align:center; padding:40px;">Loading...</p>';
+            docBody.innerHTML = `<p style="text-align:center; padding:40px;">${escapeHtml(pwT('docs.loading', null, 'Loading...'))}</p>`;
         }
         
-        // Fetch and display content
-        const html = await loadDocumentHTML(filePath);
+        const englishPath = docRoutes[id];
+        let html = await loadDocumentHTML(filePath);
+        let usedEnglishFallback = false;
+        if (!html && englishPath && filePath !== englishPath) {
+            html = await loadDocumentHTML(englishPath);
+            usedEnglishFallback = currentLocale() !== 'en';
+        }
+        if (!html) {
+            if (docBody) {
+                docBody.innerHTML = `<div class="error"><h3>${escapeHtml(pwT('docs.errorTitle', null, 'Error Loading Document'))}</h3><p>${escapeHtml(pwT('docs.errorBody', null, 'Could not load the documentation file. Please try again.'))}</p></div>`;
+            }
+            return;
+        }
+        if (usedEnglishFallback) {
+            html = `<p class="translation-notice">${escapeHtml(pwT('docs.englishNotice', null, 'This document is currently available in English.'))}</p>${html}`;
+        }
         if (docBody) {
             docBody.innerHTML = html;
         }
@@ -1927,16 +2048,16 @@ function bindAbout() {
 
         const from = (fromEmail?.value || '').trim();
         const message = (messageEl?.value || '').trim();
-        const subject = `PrimerWeaver Contact${from ? ` (from ${from})` : ''}`;
+        const subject = `${pwT('contact.subject', null, 'PrimerWeaver Contact')}${from ? ` (${pwT('contact.from', null, 'from')} ${from})` : ''}`;
 
         const bodyLines = [
-            from ? `From: ${from}` : '',
+            from ? `${pwT('contact.from', null, 'From')}: ${from}` : '',
             from ? '' : '',
             message || '',
             '',
             '---',
-            `Page: ${location.href}`,
-            `User agent: ${navigator.userAgent}`,
+            `${pwT('contact.page', null, 'Page')}: ${location.href}`,
+            `${pwT('contact.userAgent', null, 'User agent')}: ${navigator.userAgent}`,
         ].filter((line, idx, arr) => !(line === '' && arr[idx - 1] === ''));
 
         const mailtoUrl = `mailto:${recipientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyLines.join('\n'))}`;

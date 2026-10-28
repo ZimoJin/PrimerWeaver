@@ -1,0 +1,468 @@
+<section class="card" style="padding:22px 28px">
+
+<svg width="0" height="0" style="position:absolute">
+    <defs>
+    <symbol id="icon-format" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline>
+    </symbol>
+    <symbol id="icon-fail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line>
+    </symbol>
+    <symbol id="icon-pool" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line>
+    </symbol>
+    <symbol id="icon-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+    </symbol>
+    <symbol id="icon-cite" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+    </symbol>
+    <symbol id="icon-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>
+    </symbol>
+    <symbol id="icon-scissors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle>
+    <line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line>
+    <line x1="8.12" y1="8.12" x2="12" y2="12"></line>
+    </symbol>
+    <symbol id="icon-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+    <polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline>
+    </symbol>
+    <symbol id="icon-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line>
+    <line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line>
+    <line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line>
+    </symbol>
+    <symbol id="icon-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 .57 1.92v.5a2 2 0 0 1-1.73 1l-.25.43a2 2 0 0 1 0 2l.25.43a2 2 0 0 1 1.73 1v.5a2 2 0 0 1-.57 1.92l-.15.1a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-.57-1.92v-.5a2 2 0 0 1 1.73-1l.25-.43a2 2 0 0 1 0 2l-.25-.43a2 2 0 0 1-1.73-1v-.5a2 2 0 0 1 .57-1.92l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+    <circle cx="12" cy="12" r="3"></circle>
+    </symbol>
+    <symbol id="icon-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+    </symbol>
+    <symbol id="icon-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line>
+    </symbol>
+    <symbol id="icon-dna" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 14.899A7 7 0 1 1 15 9.101"></path><path d="M9 9.101A7 7 0 1 1 20 14.899"></path><line x1="4" y1="14.9" x2="9" y2="9.1"></line><line x1="15" y1="14.9" x2="20" y2="9.1"></line><line x1="12" y1="6" x2="12" y2="7"></line><line x1="12" y1="17" x2="12" y2="18"></line><line x1="7" y1="12" x2="8" y2="12"></line><line x1="16" y1="12" x2="17" y2="12"></line>
+    </symbol>
+    <symbol id="icon-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line>
+    </symbol>
+    <symbol id="icon-award" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 17 17 23 15.79 13.88"></polyline>
+    </symbol>
+    </defs>
+</svg>
+
+<h2 style="margin-bottom: 24px;">帮助与常见问题</h2>
+
+<h3 class="faq-section-heading">入门指南</h3>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-user"></use></svg>
+    <details class="faq-content" open>
+    <summary>是否需要登录或付费？</summary>
+    <div>
+        <p>不需要。PrimerWeaver <strong>对学术和商业用途均免费</strong>。源代码依据 MIT 许可证发布。无需登录，也不使用 Cookie，符合 NAR Web Server 指南。</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-lock"></use></svg>
+    <details class="faq-content">
+    <summary>我的序列数据会上传或保存在服务器上吗？</summary>
+    <div>
+        <p><strong>不会。</strong>从引物设计到<i>计算机模拟</i>质量控制，所有计算均 <strong>100% 在您的本地浏览器中</strong>完成（客户端处理）。您的序列绝不会上传、传输或存储到我们的服务器，确保数据完全私密且安全。</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-format"></use></svg>
+    <details class="faq-content">
+    <summary>支持哪些序列格式？</summary>
+    <div>
+        <p>PrimerWeaver 接受 <strong>FASTA</strong> 或<strong>纯文本</strong>格式的标准 DNA 序列。经用户许可后，系统会自动移除数字、空白字符以及非 IUPAC 核苷酸/氨基酸字符。</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-cite"></use></svg>
+    <details class="faq-content">
+    <summary>如何引用本服务器？</summary>
+    <div>
+        <p>若您在研究中使用 PrimerWeaver，请引用以下论文：</p>
+        <p class="reference">Jin, Z., Kim, Y. E., Ignea, C., 2026. PrimerWeaver: An integrated web server for primer design in molecular biology workflows. <em>Nucleic Acids Research</em>, 54, gkag399. <a href="https://doi.org/10.1093/nar/gkag399" target="_blank" rel="noopener noreferrer">https://doi.org/10.1093/nar/gkag399</a></p>
+    </div>
+    </details>
+</div>
+
+<h3 class="faq-section-heading">设计参数与准确性</h3>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-settings"></use></svg>
+    <details class="faq-content">
+    <summary>约束参数（Tm、GC%、发夹、二聚体）分别表示什么？</summary>
+    <div>
+        <p><strong>熔解温度（Tm）：</strong>50% 的引物-靶序列双链发生解链时的温度。PrimerWeaver 使用最近邻法准确计算 Tm。较高的 Tm 有利于特异性，较低的 Tm 可减少非特异性扩增。实际设计中，引物 Tm 通常设为约 55–65 °C。对于成对引物，通常建议 ΔTm 小于 5 °C，以确保退火一致。</p>
+        <p><strong>GC 含量（%）：</strong>引物中鸟嘌呤和胞嘧啶碱基所占的百分比，典型范围为 40–60%。较高的 GC 含量会提高 Tm，但也会增加形成二级结构的风险。</p>
+        <p><strong>最大发夹 ΔG：</strong>引物内部潜在分子内二级结构（发夹）的吉布斯自由能。数值越负，表示发夹越稳定、自退火概率越高。典型阈值为 −3 kcal/mol。</p>
+        <p><strong>最大二聚体 ΔG：</strong>两条引物之间潜在双分子二级结构（二聚体）的吉布斯自由能。数值越负，表示引物间结合越强。典型阈值为：同源二聚体 −6 kcal/mol，异源二聚体 −8 kcal/mol。</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-settings"></use></svg>
+    <details class="faq-content">
+    <summary>PrimerWeaver 如何保证热力学计算的准确性？</summary>
+    <div>
+        <p>PrimerWeaver 采用行业标准的最近邻热力学模型计算 Tm 和二级结构：</p>
+        <ul>
+        <li><strong>Tm 计算：</strong>采用最近邻法（SantaLucia，1998），使用根据实验得到的 DNA 二核苷酸步进 ΔH° 和 ΔS° 值。Tm 的计算公式为：Tm = (ΔH° − T°) / ΔS°。</li>
+        <li><strong>二级结构：</strong>基于 Watson–Crick 碱基配对和堆积相互作用估算吉布斯自由能（ΔG）。发夹和二聚体的 ΔG 值用于预测二级结构稳定性（数值越负，结构越稳定）。</li>
+        <li><strong>跨工具比较：</strong>Tm 和 ΔG 均使用已发表的最近邻参数计算；与其他平台的比较（参见有关 Tm 差异的常见问题）旨在说明不同实现所造成的差异，并非宣称本工具更准确。</li>
+        </ul>
+        <p><strong>注意：</strong>计算得到的 Tm 和 ΔG 仅作为引物设计参考。实际退火行为取决于缓冲液、聚合酶及实验设置；当实验性能至关重要时，请在您自己的 PCR 实验中验证。</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-info"></use></svg>
+    <details class="faq-content">
+    <summary>为什么 Tm 与 SnapGene、Benchling、Multiple Primer Analyzer 或其他工具的结果不同？</summary>
+    <div>
+        <p><strong>我们并不声称 PrimerWeaver 比其他平台更准确。</strong>许多常用工具都采用相同的最近邻热力学框架，但由于具体实现和默认设置不同（例如一价/二价盐浓度、引物浓度），所得 Tm 值可能不同。</p>
+        <p>我们论文中的基准测试（图&nbsp;2；补充表&nbsp;S1）包括与 SnapGene、Benchling 和 Multiple Primer Analyzer 的比较，目的是展示这种<strong>跨平台差异</strong>，而非对工具进行排名。在 PrimerWeaver 中，用户可调整这些参数，使估算结果与自己的 PCR 条件相匹配。</p>
+        <p><strong>实用建议：</strong>将计算得到的 Tm 视为引物设计参考，而非唯一、由实验确定的“真值”。当实验性能至关重要时，请在您自己的实验中验证退火条件。</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-pool"></use></svg>
+    <details class="faq-content">
+    <summary>为什么多重 PCR 分池结果与 PrimerPooler 等工具不同？</summary>
+    <div>
+        <p><strong>我们并不声称 PrimerWeaver 比 PrimerPooler 更准确。</strong>两种工具解决的任务不同：</p>
+        <ul>
+        <li><strong>PrimerWeaver 多重 PCR：</strong>自动完成<strong>引物设计</strong>及兼容性感知分池。分池数量由热力学约束（在设计模式下还包括片段大小/脱靶约束）决定，而非由用户手动设定。</li>
+        <li><strong>PrimerPooler：</strong>将一组<strong>已有</strong>引物划分到不同池中；您可以指定所需的池数，适用于序列固定且需要达到目标反应管数量的情况。</li>
+        </ul>
+        <p>在我们的论文中，基准测试引物由 PrimerWeaver 设计；PrimerPooler 不设计引物，而是以这些序列作为输入。与 PrimerPooler 默认“计算机建议”池数的比较仅反映其默认设置，并不代表指定池数后该工具的能力上限。</p>
+        <p><strong>实用建议：</strong>如需集成式设计和分池建议，请使用 PrimerWeaver。若您已有引物，并需要<strong>用户指定的池数</strong>，可考虑使用 PrimerPooler。在<strong>质量控制模式</strong>下，PrimerWeaver 主要依据热力学因素对已有引物分池（不使用片段大小/脱靶规则）。</p>
+    </div>
+    </details>
+</div>
+
+<h3 class="faq-section-heading">工作流程方法</h3>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-layers"></use></svg>
+    <details class="faq-content">
+    <summary>限制性内切酶克隆与 Golden Gate 有何区别？</summary>
+    <div>
+        <p><strong>限制性内切酶克隆：</strong>使用传统 II 型限制性内切酶（例如 EcoRI、BamHI）在特定识别位点切割 DNA。引物会在插入片段上添加限制性内切酶位点，使其可被切割并连接至经相同酶切的载体。强烈建议在限制性位点两侧添加保护碱基，以确保 PCR 产物能够被高效直接酶切。连接后，限制性内切酶识别位点会保留在载体-插入片段连接处。</p>
+        <p><strong>Golden Gate（IIS 型）：</strong>使用在识别位点外切割 DNA 的 IIS 型酶（例如 BsaI），可在单一反应中无缝、定向组装多个片段。酶识别并切割两侧的“突出端”，使片段按正确顺序自组装，同时避免再次连接。</p>
+        <p><strong>建议：</strong>Golden Gate 更快速、更灵活，适合多片段组装；限制性内切酶克隆则更传统、成熟，适合单片段插入。</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-scissors"></use></svg>
+    <details class="faq-content">
+    <summary>Gibson Assembly 与其他克隆方法有何区别？</summary>
+    <div>
+        <p><strong>Gibson Assembly</strong> 是一种等温体外组装方法，结合了以下三种酶的作用：</p>
+        <ul>
+        <li><strong>外切核酸酶：</strong>在片段末端产生短的单链突出端（通常为 15–30 bp）。</li>
+        <li><strong>DNA 聚合酶：</strong>填补外切核酸酶作用所产生的缺口。</li>
+        <li><strong>DNA 连接酶：</strong>封闭切口，形成连续 DNA。</li>
+        </ul>
+        <p>三种反应在 50°C 下于同一反应管中同时进行，因此快速而高效。PrimerWeaver 设计的引物会为每个片段添加同源突出端（默认为 25 bp）。随后，片段通过重叠区相互“识别”并按顺序组装，无需预先酶切载体或进行中间连接步骤。</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-play"></use></svg>
+    <details class="faq-content">
+    <summary>什么是重叠 PCR（OE-PCR），应如何使用？</summary>
+    <div>
+        <p><strong>重叠 PCR（又称重叠延伸 PCR，OE-PCR）</strong>是一种无需中间载体即可组装多个 DNA 片段或引入特定突变的方法。该方法使用重叠引物，在片段之间形成兼容的突出端。</p>
+        <p><strong>基本流程：</strong></p>
+        <ol style="margin: 0;">
+        <li>第 1 轮：使用外侧引物和含有重叠 3' 区域（重叠区）的内侧引物，分别扩增各片段。</li>
+        <li>第 2 轮：混合所有 PCR 产物；相互重叠的单链区域彼此退火，聚合酶沿重叠区延伸，形成全长融合产物。</li>
+        <li>第 3 轮：加入外侧引物，重新扩增全长产物以提高产量。</li>
+        </ol>
+        <p>该方法非常适合定点突变（在片段连接处引入改变）或在结构域之间构建自定义连接肽。</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-pool"></use></svg>
+    <details class="faq-content">
+    <summary>多重 PCR 分池如何工作？</summary>
+    <div>
+        <p>多重 PCR 模块首先为所有靶标设计最佳引物，然后分析引物间的潜在冲突，并将其划分到不同池中以尽量减少干扰：</p>
+        <p><strong>系统会考虑三类冲突：</strong></p>
+        <ul>
+        <li><strong>交叉二聚体冲突：</strong>引物之间较强的热力学相互作用（ΔG ≤ −6 kcal/mol）可能导致形成引物二聚体，消耗引物并造成扩增失败。二聚体评分较高的引物会被分到不同池中。</li>
+        <li><strong>产物大小冲突：</strong>大小非常接近的 PCR 产物（差值 &lt; 大小容差）在凝胶电泳中可能无法区分。产生相近大小产物的引物会被分到不同池中，以便在凝胶上分辨。</li>
+        <li><strong>脱靶扩增冲突：</strong>若多对引物可扩增同一非靶序列，会在凝胶电泳中产生重叠条带，难以识别正确产物。这类引物会被分配到不同池中。</li>
+        </ul>
+        <p>PrimerWeaver 使用图着色算法，将引物自动分配到<strong>数量最少的兼容池</strong>中，在避免上述冲突的同时实现高效多重扩增。</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-settings"></use></svg>
+    <details class="faq-content">
+    <summary>如何为定点突变设计引物？</summary>
+    <div>
+        <p>PrimerWeaver 的<strong>定点突变</strong>模块采用重叠延伸 PCR（OE-PCR）策略，设计用于引入位点特异性突变的引物。</p>
+        <p><strong>设计方法：</strong>输入野生型序列并指定所需突变（例如 V55A：将第 55 位的缬氨酸替换为丙氨酸）。工具会设计两对位于突变位点两侧的引物。每对引物生成一个在重叠区含有所需突变的 PCR 片段。引物的设计使其含突变的 3' 端彼此互补。</p>
+        <p><strong>关键实验步骤：</strong></p>
+        <ul>
+        <li><strong>第 1 轮：</strong>使用设计好的引物对，以模板分别扩增两个片段。每个片段都包含突变的一部分。</li>
+        <li><strong>第 2 轮（重叠延伸）：</strong>混合两个 PCR 产物；含突变的重叠单链区域彼此退火，聚合酶沿重叠区延伸，生成全长突变产物。</li>
+        <li><strong>第 3 轮：</strong>如有需要，使用外侧引物重新扩增全长产物，以提高产量。</li>
+        <li><strong>验证：</strong>在使用最终构建体之前，通过测序确认突变。</li>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-layers"></use></svg>
+    <details class="faq-content">
+    <summary>如何为多片段组装（USER、Golden Gate 或 Gibson）设计引物？</summary>
+    <div>
+        <p><strong>输入准备：</strong>提供要组装的所有 DNA 片段（例如启动子、CDS、终止子、骨架）。您可以上传或粘贴 FASTA 格式的序列。</p>
+                </ul>
+        <p><strong>对于 USER 克隆：</strong></p>
+        <ul>
+        <li>USER（尿嘧啶特异性切除试剂）克隆使用含尿嘧啶的引物，在 DNA 片段间形成无缝连接。</li>
+        <li>指定重叠区长度（通常为 7–15 bp）。</li>
+        <li>PrimerWeaver 会设计在重叠区特定位置以尿嘧啶取代相应碱基的引物。</li>
+        <li>PCR 后，用 USER 酶混合物处理，使 DNA 在尿嘧啶位置断裂，产生互补的单链突出端。</li>
+        <li>混合各片段后，互补突出端退火形成无缝组装体；通常会在转化后完成修复。</li>
+        </ul>
+
+	<p><strong>对于 Golden Gate：</strong></p>
+        <ul>
+        <li>选择 IIS 型限制性内切酶（例如 BsaI、BsmBI）。</li>
+        <li>PrimerWeaver 会设计在每个片段两侧带有兼容突出端的引物。</li>
+        <li>PCR 后，使用所选酶建立 Golden Gate 组装反应；片段将在单一反应中按正确顺序组装。</li>
+        </ul>
+        <p><strong>对于 Gibson Assembly：</strong></p>
+        <ul>
+	<li>可选：选择插入片段之间的连接序列。</li>
+        <li>指定重叠区长度（通常为 20–30 bp）。</li>
+        <li>PrimerWeaver 在片段末端添加同源序列；各片段通过重叠区，在含 Gibson 组装预混液的单次 50°C 反应中完成组装。</li>
+
+        <p><strong>专业提示：</strong>同时为所有片段设计引物，以确保兼容性和最佳组装比例。</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-list"></use></svg>
+    <details class="faq-content">
+    <summary>如何导出和使用结果？</summary>
+    <div>
+        <p>PrimerWeaver 为引物设计和组装序列提供以下导出选项：</p>
+        <ul>
+        <li><strong>引物文件（FASTA 格式）：</strong>下载为 <code>primers.txt</code>。文件包含所有设计好的引物序列，采用标准 FASTA 格式，每条引物对应一个条目，可直接用于向合成公司订购，或在基因组数据库中进行 BLAST 检索。</li>
+        <li><strong>组装序列：</strong>将最终组装的 DNA 序列（适用于 Golden Gate、Gibson、USER 或 OE-PCR 等组装工作流程）以 FASTA 格式下载。文件包含按正确顺序、通过兼容连接区组装的所有片段。</li>
+        </ul>
+        <p><strong>使用建议：</strong></p>
+        <ul>
+        <li>将 FASTA 文件中的引物序列直接复制到引物订购表单中。</li>
+        <li>开展实验前，将组装序列与设计要求进行比对核验。</li>
+        <li>保存这两个文件，以便记录和复现实验设计。</li>
+        <li>使用 BLAST 验证引物对目标基因组或参考序列的特异性。</li>
+        </ul>
+    </div>
+    </details>
+</div>
+
+<h3 class="faq-section-heading">质量控制与验证</h3>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-list"></use></svg>
+    <details class="faq-content">
+    <summary>如何解读引物质量控制报告中的指标？</summary>
+    <div>
+        <p><strong>引物质量控制</strong>模块对引物对进行计算机模拟分析，以预测潜在问题：</p>
+        <ul>
+        <li><strong>特异性（类似 BLAST）：</strong>PrimerWeaver 在所提供的参考序列（模板）中检索，确保引物主要结合预期靶标。高特异性可减少脱靶扩增。</li>
+        <li><strong>发夹形成：</strong>预测分子内二级结构。若结构过于稳定，引物在 PCR 中可能无法正常延伸。</li>
+        <li><strong>同源二聚体形成：</strong>评估相同引物能否彼此结合；这种结合可能会占用引物，降低 PCR 效率。</li>
+        <li><strong>异源二聚体形成：</strong>检查正向与反向引物之间的交叉反应；稳定的二聚体可能降低 PCR 产量。</li>
+        <li><strong>GC 钳（3' 端）：</strong>理想情况下，引物 3′ 端以 G 或 C 结尾，这有助于提高引物-模板稳定性及延伸效率。PrimerWeaver 会标记以 A 或 T 结尾的引物，因为在某些 PCR 条件下其效率可能较低。</li>
+        <li><strong>同聚物连续序列：</strong>连续 4 个或更多相同碱基（例如“AAAA”）会被标记，因为这类序列会降低特异性，并可能在扩增过程中促进错误引发或滑移。</li>
+        </ul>
+        <p><strong>解读建议：</strong>请仔细检查警告，尤其是在重复序列或低复杂度区域中进行设计时。</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-pool"></use></svg>
+    <details class="faq-content">
+    <summary>如何验证所设计的引物能否在实验中正常工作？</summary>
+    <div>
+        <p>订购引物前，请遵循以下最佳实践：</p>
+        <ul>
+        <li><strong>计算机模拟质量控制：</strong>使用 PrimerWeaver 的质量控制模块检查发夹、二聚体和脱靶结合，并审查所有警告。</li>
+        <li><strong>BLAST 检查：</strong>将正向和反向引物序列复制到 NCBI BLAST，验证它们与靶标高度特异性匹配（e-value &lt; 0.01）。</li>
+        <li><strong>Tm 差异：</strong>确保正向和反向引物的 Tm 相差不超过 3–5°C，以实现均衡的 PCR 扩增。</li>
+        <li><strong>多重性检查：</strong>在多重 PCR 设计中，运行 PrimerWeaver 的二聚体分析，并遵循建议的分池方案。</li>
+        <li><strong>实验优化：</strong>订购引物后，采用梯度 PCR（退火温度 58–62°C）确定最佳温度，并根据需要调整。</li>
+        </ul>
+        <p><strong>提示：</strong>若引物失效，请检查质量控制报告和模板质量，并考虑放宽约束后重新设计。</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-fail"></use></svg>
+    <details class="faq-content">
+    <summary>引物设计失败，常见原因有哪些？</summary>
+    <div>
+        <p>设计失败可能由多种原因造成，通常与约束条件有关：</p>
+        <ul>
+        <li><strong>未找到有效引物：</strong>工具无法找到满足所有约束条件（例如 Tm、GC%、产物大小）的引物对。请尝试扩大 Tm 范围。</li>
+        <li><strong>低复杂度区域：</strong>在复杂度极低的区域（例如“AAAAAAAAAA”）无法设计引物。请考虑调整靶区域或移除模糊碱基。</li>
+        <li><strong>二聚体评分过高：</strong>在多重 PCR 模式下，若某条引物不可避免地与所有其他引物形成高亲和力二聚体，则可能被排除。请尝试减少靶标数量或提高二聚体阈值。</li>
+        <li><strong>模板问题：</strong>请确认模板序列正确，且长度足以覆盖靶区域两侧（通常各需约 50 bp）。</li>
+        </ul>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-scissors"></use></svg>
+    <details class="faq-content">
+    <summary>如果第一组引物失效，可以重新设计吗？</summary>
+    <div>
+        <p>可以！如果设计的引物在实验中无法正常工作：</p>
+        <ol>
+        <li><strong>检查质量控制报告：</strong>查看发夹、二聚体或脱靶结合预测。</li>
+        <li><strong>放宽约束：</strong>尝试扩大 Tm 范围（例如使用 55–65°C，而不是 62–65°C）。</li>
+        <li><strong>核验模板 DNA：</strong>确保 PCR 模板纯净且浓度适宜（标准 50ul 反应中，基因组 DNA 通常为 100–1000 ng，质粒通常为 1–20 ng）。</li>
+        <li><strong>检查试剂：</strong>确认聚合酶活性、dNTP 新鲜度及引物储存条件。</li>
+        <li><strong>优化 PCR 条件：</strong>测试多个退火温度（梯度 PCR）和延伸时间。</li>
+        <li><strong>使用 PrimerWeaver 重新设计：</strong>可沿用原约束条件，或根据失败原因进行调整。PrimerWeaver 通常会返回多组引物对；若首选方案失败，备选方案可能有效。</li>
+        </ol>
+        <p><strong>做好记录：</strong>记录有效的引物组和实验条件，有助于今后的设计。</p>
+    </div>
+    </details>
+</div>
+
+<h3 class="faq-section-heading">技术细节与支持</h3>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-format"></use></svg>
+    <details class="faq-content">
+    <summary>PrimerWeaver 支持哪些参考序列格式和大小？</summary>
+    <div>
+        <p>PrimerWeaver 针对常见分子生物学工作流程进行了优化，支持：</p>
+        <ul>
+        <li><strong>序列格式：</strong>FASTA（多序列或单序列）、DNA 纯文本（大小写均可，忽略空白字符）。</li>
+        <li><strong>典型大小范围：</strong>100 bp 至数十万碱基（主要受浏览器性能限制，目前文件大小上限为 1MB）。</li>
+        <li><strong>蛋白质序列：</strong>不直接支持；请先翻译为 DNA（未内置密码子使用偏好优化，但您可以手动优化）。</li>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-info"></use></svg>
+    <details class="faq-content">
+    <summary>计算要求和浏览器兼容性如何？</summary>
+    <div>
+        <p><strong>浏览器兼容性：</strong>PrimerWeaver 可在任何启用 JavaScript 的现代浏览器中运行：</p>
+        <ul>
+        <li>Chrome 60+（推荐，可获得最佳性能）</li>
+        <li>Firefox 55+</li>
+        <li>Safari 12+</li>
+        <li>Edge 79+</li>
+        </ul>
+        
+        <p><strong>性能建议：</strong></p>
+        <ul>
+        <li>计算主要受 CPU 性能限制；对于大型设计（&gt;100 个片段），旧设备或移动设备可能需要更长时间。</li>
+        <li>关闭其他标签页或应用程序，以释放 CPU 资源。</li>
+        <li>使用最新版本的浏览器，以获得最佳优化效果。</li>
+        </ul>
+        <p><strong>运行缓慢故障排除：</strong>若设计耗时 &gt;30 秒，请简化输入（减少片段数量、缩短序列）后重试。</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-settings"></use></svg>
+    <details class="faq-content">
+    <summary>如何报告问题或提出功能建议？</summary>
+    <div>
+        <p>欢迎您的反馈！如需报告问题或提出改进建议：</p>
+        <ol>
+        <li><strong>使用联系表单：</strong>前往<strong>关于</strong>页面，填写“联系我们”表单，详细说明问题或功能需求。</li>
+        <li><strong>GitHub Issues：</strong>访问 <a href="https://github.com/ZimoJin/PrimerWeaver" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline;">PrimerWeaver GitHub 仓库</a>并创建 Issue（需要免费的 GitHub 账户）。</li>
+        <li><strong>直接发送电子邮件：</strong>联系“关于”页面联系方式中列出的通讯作者。</li>
+        </ol>
+        <p><strong>建议提供以下信息：</strong></p>
+        <ul>
+        <li>重现问题的确切步骤（如适用）。</li>
+        <li>预期行为与实际观察到的行为。</li>
+        <li>浏览器类型和版本（在浏览器的“设置 → 关于”中查看）。</li>
+        <li>相关的示例序列或参数。</li>
+        </ul>
+        <p><strong>响应时间：</strong>对于严重问题，我们力争在 2–3 个工作日内回复。</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-user"></use></svg>
+    <details class="faq-content">
+    <summary>是否提供用于高通量引物设计的批处理或 API？</summary>
+    <div>
+        <p>目前，PrimerWeaver 是一款基于浏览器的单实例工具，针对即时交互式设计工作流程进行了优化。现阶段<strong>没有内置批处理功能或 REST API</strong>。</p>
+        <p><strong>进行多个设计时的替代方案：</strong></p>
+        <ul>
+        <li>打开多个浏览器标签页，并行设计引物（浏览器端计算具有良好的扩展性）。</li>
+        <li>将结果导出为 CSV/JSON，并汇总到主电子表格中。</li>
+        <li>对于超大规模项目，请联系作者讨论定制开发方案。</li>
+        </ul>
+        <p><strong>未来考虑：</strong>模块化 JavaScript 架构支持未来接入 API 或进行后端部署。如有特定的高通量需求，请联系我们。</p>
+    </div>
+    </details>
+</div>
+
+<div class="faq-item">
+    <svg class="faq-icon" aria-hidden="true"><use xlink:href="#icon-award"></use></svg>
+    <details class="faq-content">
+    <summary>PrimerWeaver 如何维护，未来会持续可用吗？</summary>
+    <div>
+        <p><strong>经费与支持：</strong>PrimerWeaver 由麦吉尔大学 Ignea 实验室维护，并持续提供科研和技术支持。</p>
+        <p><strong>更新与维护：</strong></p>
+        <ul>
+        <li>及时部署问题修复。</li>
+        <li>定期发布功能增强（通常每 6 个月一次）。</li>
+        <li>随着标准演进，持续维护浏览器兼容性。</li>
+        </ul>
+        <p><strong>开放科学：</strong>源代码已发布在 GitHub 上，便于社区贡献，并确保该工具不依赖单一机构。若托管服务因任何原因无法使用，用户仍可派生代码并自行托管。</p>
+    </div>
+    </details>
+</div>
+</section>

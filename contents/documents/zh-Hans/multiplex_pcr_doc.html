@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多重 PCR - PrimerWeaver V1.0.6</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #333;
+            background: #f9fafb;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e40af;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2563eb;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            font-size: 1.5em;
+        }
+        h3 {
+            color: #3b82f6;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            font-size: 1.2em;
+        }
+        h4 {
+            color: #60a5fa;
+            margin-top: 1.2em;
+            margin-bottom: 0.6em;
+        }
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 1em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        strong {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c2410c;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .abstract {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+        .abstract p {
+            margin: 0;
+            font-style: italic;
+        }
+        .highlight {
+            background: #fef3c7;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        .section {
+            margin-bottom: 2.5em;
+        }
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background: #fff7ed;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .version-info {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+            margin-top: 3em;
+            padding-top: 2em;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>多重 PCR</h1>
+        
+        <div class="abstract">
+            <p>多重 PCR 模块提供用于设计和验证引物组的综合工具，可在单次反应中同时扩增多个 DNA 靶标序列。该模块将引物设计自动化，并集成热力学分析、交叉二聚体冲突检测、脱靶扩增筛查以及基于图的智能分组策略。统一冲突图综合考虑三个因素——引物–引物热力学相互作用、凝胶上 PCR 产物的大小分辨能力，以及共享脱靶扩增——从而自动将引物划分到互不冲突的反应池中，每个反应池适用于单独的反应管。交互式热图可视化可让用户一目了然地评估引物兼容性。</p>
+        </div>
+
+        <div class="section">
+            <h2>快速入门指南</h2>
+
+	    <ol>
+		<li>在正确的设计模式（从头设计模式或 QC 模式）下，将 FASTA 或纯文本格式的靶标扩增序列或已设计引物序列上传或粘贴到输入框中。必要时核验并调整设计参数。
+
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/multiplex_PCR_demo.png"
+                    style="max-width: 90%; height: auto; border-radius: 8px;"
+                >
+            </div>
+                <li>单击“设计引物”以启动自动引物设计与质量评估。查看引物质控指标、分组建议以及引物–引物相互作用热图。按反应池以 FASTA 格式下载引物并在本地分析。</li>
+
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>多重 PCR 原理</h2>
+            
+            <p>多重 PCR 在单次反应中同时扩增多个 DNA 靶标，可显著提高实验效率和通量。但这一优势也带来了管理反应混合物中复杂相互作用的关键挑战。与单重 PCR 不同，多重反应涉及具有不同热力学性质的多对引物，从而产生许多错误引导、引物二聚体形成和扩增偏倚的机会，必须加以控制。除引物–引物相互作用外，多重 PCR 还需应对不同引物对对共享试剂的竞争，以及因序列相似性或扩增效率不均而产生的非预期引物–靶标和靶标–靶标相互作用。</p>
+
+
+            <h3>主要设计考虑</h3>
+            <ul>
+                <li><strong>引物–引物兼容性：</strong>同一反应池中的所有引物必须尽量减少热力学相互作用。强烈的引物–引物互补，尤其是涉及 3′ 端时，可导致二聚体形成，从而消耗引物并抑制靶标扩增。</li>
+                <li><strong>产物大小可分辨性：</strong>多重反应中的扩增子长度应有足够差异，以便通过凝胶电泳或下游检测方法明确分离和鉴定。应避免将大小极为接近的产物放入同一反应池，以防解读产生歧义。</li>
+                <li><strong>靶标特异性与竞争：</strong>引物必须特异扩增其预期靶标，而不产生共享脱靶产物。引物对之间对试剂的竞争，以及非预期的引物–靶标或靶标–靶标相互作用，可能引入扩增偏倚，须通过谨慎分组加以降低。</li>
+            </ul>
+
+
+        <div class="section">
+            <h2>输入格式</h2>
+
+	    <p><strong>从头设计模式</strong>和<strong>QC 模式</strong>均接受<strong>多序列 FASTA 或纯文本格式</strong>。上传大于 <strong>1 MB</strong> 的文件会由共享的 <strong>MW-22</strong> 导入保护机制阻止。即使低于该硬性限制，处理超大规模输入时用户界面仍可能变得不稳定，因此仍建议每次运行<strong>不超过 500 条序列</strong>。<p>
+
+             <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/multiplex_PCR_input.png"
+                    alt="多重 PCR 输入"
+                    style="max-width: 70%; height: auto; border-radius: 8px;"
+                >
+            </div>
+	    
+           
+            
+        <div class="section">
+            <h2>设计参数</h2>
+            <p>继续操作前，请检查<strong>引物设计参数</strong>，并在必要时进行调整。</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>参数</th>
+            <th>默认值</th>
+            <th>范围</th>
+            <th>说明</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>目标 Tm（°C）</strong></td>
+            <td>55</td>
+            <td>40–75</td>
+            <td>
+                引物<em>模板结合（退火）区</em>的目标熔解温度。
+                引物设计为使 Tm 接近该值。重叠或接头序列不参与
+                Tm 计算。
+            </td>
+        </tr>
+        <tr>
+            <td><strong>ΔTm（°C）</strong></td>
+            <td>2.5</td>
+            <td>0–5</td>
+            <td>
+                同一引物对中正向和反向引物之间允许的
+                最大熔解温度差。
+            </td>
+        </tr>
+        <tr>
+            <td><strong>引物浓度（nM）</strong></td>
+            <td>500</td>
+            <td>50–2000</td>
+            <td>
+                计算机模拟 Tm 计算所采用的有效引物浓度。常用范围：25-1000 nM。
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Na⁺ 浓度（mM）</strong></td>
+            <td>50</td>
+            <td>0–200</td>
+            <td>
+                用于经盐校正的 Tm 计算的单价阳离子浓度。常用范围：10-200 mM。
+
+
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Mg²⁺ 浓度（mM）</strong></td>
+            <td>2.0</td>
+            <td>0–10</td>
+            <td>
+                用于 Tm 计算的二价阳离子浓度。如果反应中不含 Mg²⁺，请设为 0。常用范围：0.5-5 mM。
+
+            </td>
+        </tr>
+        <tr>
+            <td><strong>大小容差（bp）</strong></td>
+            <td>20</td>
+            <td>0–50</td>
+            <td>
+                琼脂糖凝胶电泳可靠分辨所需的最小产物大小差。
+                设为 0 可关闭基于大小的分组（例如用于 qPCR 或测序检测）。
+            </td>
+        </tr>
+        <tr>
+            <td><strong>正向重叠</strong></td>
+            <td>—</td>
+            <td>可选</td>
+            <td>
+                附加到正向引物 5′ 端、用于克隆或组装应用
+                （例如 Gibson 组装）的序列。该区域不参与 Tm 计算。
+            </td>
+        </tr>
+        <tr>
+            <td><strong>反向重叠</strong></td>
+            <td>—</td>
+            <td>可选</td>
+            <td>
+                附加到反向引物 5′ 端、用于克隆或组装应用的序列。
+                该区域不参与 Tm 计算。
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+            
+            <div class="info-box">
+                <strong>关于大小容差的说明：</strong>
+                <ul style="margin: 8px 0 0 20px;">
+                    <li><strong>0 bp：</strong>关闭基于大小的分组（用于 qPCR、测序，或不使用凝胶电泳时）</li>
+                    <li><strong>5 bp：</strong>高分辨率凝胶（2–3% 琼脂糖），可区分非常接近的条带</li>
+                    <li><strong>10–15 bp：</strong>标准凝胶（1–2% 琼脂糖），可可靠区分大多数条带</li>
+                    <li><strong>20 bp：</strong>默认值，适用于常规凝胶电泳</li>
+                </ul>
+            </div>
+            
+            <div class="warning-box">
+                <strong>重要：</strong>在 QC 模式下，由于无法获得 PCR 产物长度信息，基于大小的分组会自动关闭。分组仅依据热力学参数。
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>结果与输出</h2>
+            
+            <p>完成引物设计或质量控制分析后，PrimerWeaver 会生成综合结果，包括带质量指标的引物表、分组建议和交互式可视化。</p>
+            
+            <h3>引物性质表</h3>
+            <p>设计或分析得到的引物对以结构化表格报告，包括引物序列（5′→3′）、长度、GC 含量和熔解温度（Tm）。Tm 值同时显示退火核心区和全长引物，以便评估扩增兼容性。引物质量指标（包括同聚物连续序列、发夹结构、自身二聚体和交叉二聚体形成）会被评估并标记，以突出可能影响 PCR 性能的潜在风险。 </p>
+            
+            
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/multiplex_PCR_table.png"
+                    alt="带质量指标的多重 PCR 引物表"
+                    style="max-width: 70%; height: auto; border-radius: 8px;"
+                >
+            </div>
+        </div>
+
+        <h3>分组建议</h3>
+        <p>在分析所有成对引物相互作用后，模块会推荐一种将引物划分到最少反应管数的最优分组策略。分组结果会说明是否可将全部引物合并到单次反应中，或必须拆分到多次反应中，并解释为何某些引物不能分到同一组。<p>
+    
+        <div style="text-align: center; margin: 2em 0;">
+            <img
+                src="contents/pictures/multiplex_PCR_pooling.png"
+                alt="多重 PCR 分组建议及反应池分配"
+                style="max-width: 70%; height: auto; border-radius: 8px;"
+            >
+        </div>
+        </div>
+
+        <div class="section">
+            <h3>引物-引物二聚体矩阵 </h3>
+            <p>模块会生成交互式热图矩阵，显示各反应池内所有成对引物相互作用。热图用颜色梯度表示基于吉布斯自由能（ΔG）的相互作用强度。当引物被划分到多个反应池时，会为每个反应池单独生成热图。由此可直观确认各反应池内引物仅存在弱或可忽略的相互作用。</p>
+                     
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/multiplex_PCR_heatmap.png"
+                    alt="多重 PCR 引物-引物相互作用热图可视化"
+                    style="max-width: 70%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+           
+        <div class="section">
+            <h2>引物设计算法</h2>
+            
+            <h3>引物设计过程</h3>
+            <p>PrimerWeaver 采用<strong>系统化、以靶标为中心的工作流程</strong>，设计满足<strong>热力学、结构和分组约束</strong>的<strong>多重 PCR 引物</strong>。对于每条靶标序列，算法扫描<strong>5′ 和 3′ 末端</strong>，以识别在指定容差内达到<strong>用户定义目标熔解温度（Tm）</strong>的候选引物结合位点。随后评估候选引物的<strong>固有质量</strong>，包括 GC 含量、同聚物连续序列、发夹形成和自身二聚体倾向。用于下游克隆的可选 5′ 重叠序列在引物选定后附加，且不参与 Tm 计算。对于每对经验证的引物，计算并保留<strong>预期 PCR 产物大小</strong>，供后续分组分析使用。</p>
+	    <p>在<strong>从头设计模式</strong>下，PrimerWeaver 还会使用种子延伸（seed-and-extend）算法进行<strong>脱靶扩增筛查</strong>。潜在非靶标结合事件要求 3′ 种子区完全匹配，同时允许上游 5′ 区存在有限错配。所有可能的非靶标扩增子都会被识别并测定大小。扩增同一非靶标区域或产生无法区分产物的引物对会被标记为冲突，并从同一多重反应池中排除。<strong>QC 模式不进行脱靶分析</strong>，因为未提供模板序列。<p>
+            
+            <h3>热力学建模与相互作用评估</h3>
+            <p>所有熔解温度和相互作用计算均基于<strong>统一最近邻（NN）热力学模型</strong>。引物熔解温度使用序列特异性焓（ΔH°）和熵（ΔS°）参数计算，并对盐浓度和有效引物浓度进行校正。通过计算 PCR 退火温度下潜在双链形成的吉布斯自由能（ΔG）评估自身二聚体和交叉二聚体稳定性，并特别关注 3′ 端互补性，因其对聚合酶延伸的风险最高。</p>
+            <p>基于所有<strong>成对相互作用能量</strong>，PrimerWeaver 推荐一种<strong>最优分组策略</strong>，在避免强热力学冲突的同时将引物划分到<strong>尽可能少的 PCR 反应</strong>中。表现出<strong>稳定引物–引物相互作用、凝胶大小分辨不足</strong>或<strong>共享脱靶扩增</strong>事件的引物对会被分配到不同反应池。最终输出同时报告推荐的分组配置，以及阻止不兼容引物合并的具体约束。<p>
+                       
+                       
+                        
+            
+        </div>
+
+        <div class="section">
+            <h2>警告与边界情况</h2>
+            <p>多重 PCR 模块将共享的 <strong>MW（Message Warning）</strong> 层与围绕靶标数量、重叠尾、脱靶筛查和基于图的分组的多重专用设计约束相结合。部分警告属于纯粹的预检，另一些则说明设计或反应池分配为何会与简单的单靶标 PCR 工作流程不同。</p>
+
+            <h3>一般警告</h3>
+            <p>这些警告主要在设计或 QC 分析开始前生成，反映序列质量、参数质量、输入规模或上传限制方面的问题。</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>类别</th>
+                        <th>触发条件</th>
+                        <th>多重 PCR 模块的当前处理方式</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>阻断性输入提示</strong></td>
+                        <td>缺少靶标序列、QC 模式下缺少引物序列、解析失败或其他无效的必填输入。</td>
+                        <td>模块立即停止，并要求用户在分析继续前更正缺失或无效的输入。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-04</strong><br>规范化后无有效序列</td>
+                        <td>提交的所有靶标序列在规范化后变为空。</td>
+                        <td>用户仍可继续，但所得设计或 QC 输出将为空或缺乏信息价值。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-05</strong><br>已移除非 IUPAC 字符</td>
+                        <td>靶标序列含有不支持的字符。</td>
+                        <td>模块仅使用规范化后的序列继续，并警告有效模板可能与原始输入不同。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-06</strong><br>检测到简并碱基</td>
+                        <td>靶标含有歧义 IUPAC 碱基。</td>
+                        <td>热力学数值根据最稳定的解释进行保守估算，因此 Tm 和 ΔG 值应视为近似值。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-09</strong><br>大规模数据集</td>
+                        <td>提交的靶标条目或引物对数量超过 <strong>500</strong>。</td>
+                        <td>模块会警告浏览器端处理可能变慢或失去响应。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-10 至 MW-15</strong><br>参数范围警告</td>
+                        <td>在设计模式下，Na<sup>+</sup>、Mg<sup>2+</sup>、引物浓度或目标 Tm 超出建议或经验证的热力学范围。</td>
+                        <td>模块仍可继续，但引物优化和热力学解读的可靠性会降低。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-19</strong><br>输入总量较大</td>
+                        <td>输入序列总量变得非常大。</td>
+                        <td>模块会警告在设计、QC 或分组分析期间，浏览器端计算可能变慢。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-22</strong><br>上传文件超过导入限制</td>
+                        <td>上传的靶标或引物文件大于 <strong>1 MB</strong>。</td>
+                        <td>导入会在加载序列前被阻止，用户必须选择较小的文件。</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>设计相关警告</h3>
+            <p>这些警告和边界情况来自多重专用引物设计逻辑、脱靶筛查和最终分组模型。</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>情况</th>
+                        <th>触发条件</th>
+                        <th>多重 PCR 模块的当前处理方式</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>MPX-MW-01</strong><br>一次设计运行中靶标较多</td>
+                        <td>设计模式使用超过 <strong>10 个靶标</strong>。</td>
+                        <td>模块会警告随着面板增大，多重效率和交叉反应风险增加，但仍允许继续设计。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>正向 / 反向重叠长度警告</strong></td>
+                        <td>用户提供的 5′ 重叠尾超出建议的 <strong>15–40 bp</strong> 范围。</td>
+                        <td>模块会发出重叠警告，但仍允许继续设计，并提示极端重叠长度可能降低下游组装稳健性。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>引物定位的最近 Tm 回退</strong></td>
+                        <td>在靶标末端没有候选引物恰好满足所请求的 Tm 窗口。</td>
+                        <td>算法会回退到局部最佳可用引物，而不是立即失败，因此部分报告的引物可能落在理想 Tm 容差之外。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>设计模式执行脱靶筛查，QC 模式不执行</strong></td>
+                        <td>所选工作流程在从头设计与 QC 模式之间切换。</td>
+                        <td>仅设计模式会针对提交的靶标面板评估脱靶扩增；QC 模式下因未提供模板背景，脱靶状态未知。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>QC 模式关闭基于大小的分组逻辑</strong></td>
+                        <td>QC 模式仅使用上传的引物对。</td>
+                        <td>分组建议仅依赖热力学冲突，因为无法获得预期扩增子大小和大小分辨过滤。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>分组基于图且为启发式</strong></td>
+                        <td>许多引物对竞争同一多重反应池。</td>
+                        <td>模块使用冲突图着色将引物分配到各反应池；该方法实用，但不保证在所有情况下都能得到全局最少的反应池数。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>结果级失败靶标</strong></td>
+                        <td>某靶标无法产生有效引物对，或设计得到的引物对与产物长度预期冲突。</td>
+                        <td>受影响靶标会在结果区列为失败，而不是被静默丢弃，以便用户查看其未能纳入面板的原因。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>共享脱靶可拆分反应池</strong></td>
+                        <td>不同引物对扩增同一非预期区域或产生无法区分的产物。</td>
+                        <td>冲突图将这些引物对视为不兼容，即使其直接热力学相互作用较弱，也会将其强制分到不同反应池。</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <p><strong>实际解读：</strong>多重 PCR 中的警告并不总是表示面板失败。最重要的区分是模块处于<strong>设计模式</strong>还是<strong>QC 模式</strong>，因为只有设计模式能够评估脱靶扩增和考虑产物大小的分组。因此，最终解读应将警告列表与失败靶标报告、分组说明以及所选工作流程模式结合起来。</p>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

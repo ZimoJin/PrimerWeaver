@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>引物质控 - PrimerWeaver V1.0.6</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #333;
+            background: #f9fafb;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e40af;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2563eb;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            font-size: 1.5em;
+        }
+        h3 {
+            color: #3b82f6;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            font-size: 1.2em;
+        }
+        h4 {
+            color: #60a5fa;
+            margin-top: 1.2em;
+            margin-bottom: 0.6em;
+        }
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 1em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        strong {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c2410c;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1em 0;
+            width: fit-content;
+        }
+        .code-examples {
+            display: flex;
+            gap: 2em;
+            margin: 1em 0;
+        }
+        .code-example-group {
+            flex: 1;
+            min-width: 0;
+        }
+        .code-example-group h4 {
+            margin-top: 0;
+            margin-bottom: 0.5em;
+        }
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .abstract {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+        .abstract p {
+            margin: 0;
+            font-style: italic;
+        }
+        .highlight {
+            background: #fef3c7;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        .section {
+            margin-bottom: 2.5em;
+        }
+        .warning-box {
+            background: #fff7ed;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .reference {
+            font-size: 0.9em;
+            margin-left: 20px;
+            margin-bottom: 0.5em;
+        }
+        .version-info {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+            margin-top: 3em;
+            padding-top: 2em;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>引物质控</h1>
+        
+        <div class="abstract">
+            <p>引物质控功能适用于常规分子生物学工作流程中的多种实际场景。用户可在订购新寡核苷酸之前，对来自文献、数据库或既往实验的引物序列进行验证，并评估现有引物对的兼容性。该模块还能识别可能导致 PCR 失败的引物特征，帮助排查问题并理解某些引物表现不佳的原因。此外，引物质控功能支持比较多个候选引物以辅助优化，也可作为学习资源，帮助理解引物设计的基本原则及影响 PCR 性能的热力学参数。</p>
+        </div>
+
+        <div class="section">
+            <h2>快速入门指南</h2>
+            
+            <ol>
+                <li>在相应的输入框中上传或粘贴引物序列，并根据需要调整 Na⁺、Mg²⁺、引物浓度和目标 Tm。有关详细的格式要求和参数设置，请参阅下方的详细指南或 QC 模块中的帮助图标。
+                
+                <div style="text-align: center; margin: 2em 0;">
+                    <img
+                        src="contents/pictures/QC_demo.png"
+                        alt="引物质控演示"
+                        style="max-width: 90%; height: auto; border-radius: 8px;"
+                    >
+                </div>
+                </li>
+                
+                                
+                <li>单击“运行 QC”按钮执行质量评估。结果将显示在输出区域，其中包括热力学参数、二级结构形成情况和引物对兼容性。
+
+                </li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>引物质控原理</h2>
+            
+            <p>引物质量控制是 PCR 实验设计和故障排查中的关键环节。高质量引物应能与预期靶标特异性结合，在反应条件下高效退火，并且不易形成非预期的二级结构或引物二聚体。本模块采用最近邻热力学模型、系统化二级结构预测和综合可靠性评分体系，从多个维度评估引物。</p>
+            
+            <h3>主要评估标准</h3>
+            <ul>
+                <li><strong>热力学性质：</strong>采用统一的最近邻热力学参数，并对 Na⁺ 和 Mg²⁺ 离子进行明确的盐校正，以计算熔解温度（Tm）、GC 含量和 3′ 端稳定性。</li>
+                <li><strong>二级结构形成：</strong>模块可识别并评估单条引物内部的发夹结构及引物对之间的二聚体形成，并通过计算吉布斯自由能（ΔG）评估其稳定性和形成可能性。</li>
+                <li><strong>引物对兼容性：</strong>通过综合多项质量指标的可靠性评分，评估正向和反向引物的交叉二聚体形成、熔解温度匹配程度及总体扩增效率。</li>
+                <li><strong>序列质量指标：</strong>评估同聚物连续序列、3′ 端碱基配对强度及 IUPAC 简并碱基的处理情况，以识别非特异性扩增或特异性降低的潜在原因。</li>
+            </ul>
+
+        </div>
+
+        <div class="section">
+            <h2>输入格式</h2>
+            
+            <h3>支持的序列格式</h3>
+            <p>本模块同时接受<strong>多序列 FASTA 和纯文本格式</strong>。共享的 <strong>MW-22</strong> 导入保护机制会阻止上传大于 <strong>1 MB</strong> 的文件。即使文件低于这一硬性限制，处理超大规模输入时用户界面仍可能变得不稳定，因此仍建议每次运行<strong>不超过 500 条序列</strong>。系统同时支持<strong>标准 DNA 碱基（A、T、G、C）和 IUPAC 简并碱基（R、Y、S、W、K、M、B、D、H、V、N）</strong>，并将这些碱基纳入互补配对和热力学计算。经用户确认后，规范化过程中将移除非 IUPAC 字符。含简并碱基的引物会在结果中以星号（*）标记。</p>
+
+		<div style="text-align: center; margin: 2em 0;">
+                    <img
+                        src="contents/pictures/qc_input_format.png"
+                        alt="引物质控输入格式"
+                        style="max-width: 60%; height: auto; border-radius: 8px;"
+                    >
+                </div>
+
+
+            
+            <h3>引物配对识别</h3>
+            <p>本工具可根据灵活的命名约定自动识别引物并进行配对。如果配对存在歧义，报告将标明未配对的引物，并且不执行引物间交叉二聚体检查。支持的命名模式包括：</p>
+            <ul>
+                <li><code>Target1-F / Target1-R</code>（使用连字符）</li>
+                <li><code>Target1_F / Target1_R</code>（使用下划线）</li>
+                <li><code>Target1F / Target1R</code>（无分隔符）</li>
+                <li><code>Target1-Forward / Target1-Reverse</code>（使用完整单词）</li>
+                <li><code>Target1_Forward / Target1_Reverse</code>（完整单词加下划线）</li>
+                <li><code>Target1-fwd / Target1-rev</code>（缩写）</li>
+                <li><code>Target1_FWD / Target1_REV</code>（大写缩写）</li>
+            </ul>
+
+        </div>
+
+        <div class="section">
+            <h2>QC 参数</h2>
+            
+            <p>运行质量控制分析之前，请检查并调整以下参数，使其与您的 PCR 反应条件相符。</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>参数</th>
+                        <th>默认值</th>
+                        <th>范围</th>
+                        <th>说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Na⁺ 浓度（mM）</strong></td>
+                        <td>50</td>
+                        <td>0–200</td>
+                        <td>用于经盐校正的 Tm 计算的单价阳离子浓度。常用范围：10-200 mM。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mg²⁺ 浓度（mM）</strong></td>
+                        <td>2.0</td>
+                        <td>0–10</td>
+                        <td>用于 Tm 计算的二价阳离子浓度。如果反应中不含 Mg²⁺，请设为 0。常用范围：0.5-5 mM。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>引物浓度（nM）</strong></td>
+                        <td>500</td>
+                        <td>50–2000</td>
+                        <td>计算机模拟 Tm 计算所采用的有效引物浓度。常用范围：25-1000 nM。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>目标 Tm（°C）</strong></td>
+                        <td>60</td>
+                        <td>40–75</td>
+                        <td>用于评估的目标熔解温度。将受评引物的 Tm 值与此参考值比较，以评估退火兼容性。常用范围：50-65°C。</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+        <div class="section">
+            <h2>结果与输出</h2>
+            
+            <p>运行 QC 分析后，模块会生成综合结果，对单条引物性质、引物对兼容性和总体可靠性进行评估。</p>
+
+            <p>对于每条引物，工具会显示包含以下内容的综合指标表：</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>指标</th>
+                        <th>说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>引物</strong></td>
+                        <td>引物名称/标签（如含简并碱基，则以 * 标记）</td>
+                    </tr>
+                    <tr>
+                        <td><strong>长度</strong></td>
+                        <td>以核苷酸数表示的引物长度</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GC%</strong></td>
+                        <td>GC 含量百分比（通常以 40–60% 为最佳）</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tm（Δ）</strong></td>
+                        <td>计算得到的熔解温度及其与目标 Tm 的差值（ΔTm）</td>
+                    </tr>
+                    <tr>
+                        <td><strong>3′ 端钳</strong></td>
+                        <td>末端碱基对类型（优选 G/C，A/T 亦可接受）</td>
+                    </tr>
+                    <tr>
+                        <td><strong>同聚物</strong></td>
+                        <td>同聚物连续序列检测状态（正常或偏高）</td>
+                    </tr>
+                    <tr>
+                        <td><strong>发夹</strong></td>
+                        <td>发夹二级结构分类（无、弱、中等、强）</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ΔG（3′ 端 5 bp）</strong></td>
+                        <td>3′ 末端 5 碱基窗口的吉布斯自由能（反映稳定性）</td>
+                    </tr>
+                    <tr>
+                        <td><strong>自身二聚体</strong></td>
+                        <td>自身二聚体形成分类及稳定性</td>
+                    </tr>
+                    <tr>
+                        <td><strong>交叉二聚体</strong></td>
+                        <td>引物对之间的交叉二聚体形成情况（适用于已配对引物）</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            
+            <h3>可靠性评分</h3>
+            <p>综合多项质量指标计算综合评分（0–100）：</p>
+            <ul>
+                <li>单条引物质量评分（正向和反向引物各占 45% 权重）</li>
+                <li>交叉二聚体形成评估（扣分或加分）</li>
+                <li>熔解温度匹配评估（ΔTm &gt; 5°C 时扣分）</li>
+            </ul>
+            
+            <h4>评分分类</h4>
+            <ul>
+                <li><strong>优秀（≥85）：</strong>高质量引物对，可直接用于 PCR</li>
+                <li><strong>可接受（65–84）：</strong>质量良好，仅存在少量问题，通常适用于 PCR</li>
+                <li><strong>有风险（&lt;65）：</strong>检测到明显问题，建议使用前进行复核和优化</li>
+            </ul>
+            
+            <h3>预测的二级结构</h3>
+            <p>检测到二聚体或发夹时，工具会提供结构的可视化比对、计算得到的 ΔG 值、分类等级（无、弱、中等、强），以及可能影响 PCR 性能的 3′ 端相互作用警告标记。</p>
+            
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/qc_2nd_structure.png"
+                    alt="引物质控二级结构及二聚体可视化"
+                    style="max-width: 70%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+        </div>
+
+        <div class="section">
+            <h2>计算方法与算法</h2>
+            
+            <h3>最近邻热力学模型参数</h3>
+        <p>本工具采用 SantaLucia（1998）和 Allawi &amp; SantaLucia（1997）的统一最近邻（NN）参数，并进行起始校正。对于含 IUPAC 简并碱基的序列，QC 引擎会将每个碱基展开为其所有可能的具体碱基，并采用保守的最不利情况假设：对每个二核苷酸步进，选择在 37 °C 下产生最稳定相互作用（最低 ΔG）的组合，以避免低估结合强度。</p>
+        <table>
+                <thead>
+                    <tr>
+                        <th>最近邻</th>
+                        <th>ΔH°（kcal/mol）</th>
+                        <th>ΔS°（cal/mol·K）</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>AA/TT</td>
+                        <td>-7.9</td>
+                        <td>-22.2</td>
+                    </tr>
+                    <tr>
+                        <td>AT/TA</td>
+                        <td>-7.2</td>
+                        <td>-20.4 / -21.3</td>
+                    </tr>
+                    <tr>
+                        <td>CA/TG</td>
+                        <td>-8.5</td>
+                        <td>-22.7</td>
+                    </tr>
+                    <tr>
+                        <td>GT/AC</td>
+                        <td>-8.4</td>
+                        <td>-22.4</td>
+                    </tr>
+                    <tr>
+                        <td>CT/AG</td>
+                        <td>-7.8</td>
+                        <td>-21.0</td>
+                    </tr>
+                    <tr>
+                        <td>GA/TC</td>
+                        <td>-8.2</td>
+                        <td>-22.2</td>
+                    </tr>
+                    <tr>
+                        <td>CG/GC</td>
+                        <td>-10.6 / -9.8</td>
+                        <td>-27.2 / -24.4</td>
+                    </tr>
+                    <tr>
+                        <td>GG/CC</td>
+                        <td>-8.0</td>
+                        <td>-19.9</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3>熔解温度（Tm）计算</h3>
+            <p>采用统一的最近邻热力学模型，并明确支持单价（Na⁺）和二价（Mg²⁺）阳离子的影响。还会根据下述公式，按照寡核苷酸浓度进一步校正引物熔解温度。</p>
+            
+            <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin: 1em 0; text-align: center; font-family: 'Times New Roman', serif; font-size: 1.1em;">
+                <p style="margin: 0;">T<sub>m</sub> = ΔH° / (ΔS° + R × ln(C<sub>T</sub>/4)) - 273.15 + 16.6 × log[Na<sup>+</sup><sub>eq</sub>]</p>
+                <p style="font-size: 0.85em; color: #666; margin-top: 0.5em; margin-bottom: 0;">其中 Na<sup>+</sup><sub>eq</sub> 包含 Mg<sup>2+</sup> 浓度的影响。</p>
+            </div>
+
+            <h3>GC 含量分析</h3>
+            <p>支持 IUPAC 简并碱基代码，根据下述公式计算 GC 含量百分比，并识别 GC 含量欠佳的引物（通常建议为 40-60%）。</p>
+            
+            <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin: 1em 0; text-align: center; font-family: 'Times New Roman', serif; font-size: 1.1em;">
+                <p style="margin: 0;">%GC = [Count(G) + Count(C)] / Total Length × 100</p>
+            </div>
+
+
+            <h3>二级结构分析</h3>
+
+            <h4>自身二聚体检测</h4>
+            <ul>
+                <li>全面扫描潜在的自身二聚体形成</li>
+                <li>计算二聚体结构的吉布斯自由能（ΔG）</li>
+                <li>将二聚体分类为：
+                    <ul>
+                        <li><strong>无</strong>：无显著二聚体形成（ΔG &gt; -3 kcal/mol）</li>
+                        <li><strong>弱</strong>：稳定性中等（-5 &lt; ΔG ≤ -3 kcal/mol）</li>
+                        <li><strong>中等</strong>：稳定性显著（-7 &lt; ΔG ≤ -5 kcal/mol）</li>
+                        <li><strong>强</strong>：稳定性高（ΔG ≤ -7 kcal/mol）</li>
+                    </ul>
+                </li>
+                <li>特别关注 3′ 端相互作用，因为这类相互作用对 PCR 的影响尤其严重</li>
+            </ul>
+
+            <h4>发夹检测</h4>
+            <ul>
+                <li>识别环长度为 3 至 9 个核苷酸的潜在发夹结构</li>
+                <li>根据 SantaLucia（2004）参数纳入环熵罚值</li>
+                <li>计算发夹形成的 ΔG，同时考虑：
+                    <ul>
+                        <li>茎区中的碱基配对</li>
+                        <li>环大小和熵</li>
+                        <li>末端错配</li>
+                    </ul>
+                </li>
+                <li>使用与二聚体相同的能量阈值对发夹进行分类</li>
+            </ul>
+
+            <h4>交叉二聚体分析</h4>
+            <ul>
+                <li>评估正向和反向引物之间形成二聚体的可能性</li>
+                <li>对引物对验证至关重要</li>
+                <li>检测到二聚体结构时提供可视化比对</li>
+                <li>对可能导致引物二聚体伪影的 3′ 端相互作用发出警告</li>
+            </ul>
+
+            <h4>二聚体扫描算法</h4>
+            <ol>
+                <li><strong>滑动窗口法</strong>
+                    <ul>
+                        <li>检查引物序列之间所有可能的比对方式</li>
+                        <li>同时考虑直接方向和反向互补方向</li>
+                        <li>测试含缺口和突出端的比对</li>
+                    </ul>
+                </li>
+                <li><strong>能量计算：</strong>
+                    <ul>
+                        <li>对匹配区域的最近邻 ΔH° 和 ΔS° 值求和</li>
+                        <li>应用盐校正</li>
+                        <li>考虑末端错配和凸环</li>
+                    </ul>
+                </li>
+                <li><strong>3′ 端相互作用检测：</strong>
+                    <ul>
+                        <li>当二聚体相互作用涉及 3′ 端时予以特别标记</li>
+                        <li>由于延伸从 3′ 末端开始，因此这对 PCR 至关重要</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <h3>发夹检测算法</h3>
+            <ol>
+		<li><strong>茎区识别：</strong>
+                    <ul>
+                        <li>搜索引物内部的互补区域</li>
+                        <li>最小茎长度：3 个碱基对</li>
+                        <li>允许内部环和凸环</li>
+                    </ul>
+                </li> 
+		<li><strong>环熵罚值：</strong>
+                    <ul>
+                        <li>应用取决于环大小的熵罚值：
+                            <ul>
+                                <li>3-nt 环：+5.7 kcal/mol</li>
+                                <li>4-nt 环：+5.6 kcal/mol</li>
+                                <li>5-nt 环：+4.9 kcal/mol</li>
+                                <li>6-nt 环：+4.4 kcal/mol</li>
+                                <li>7-9-nt 环：+4.5-4.6 kcal/mol</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li><strong>能量阈值：</strong>
+                    <ul>
+                        <li>ΔG ≤ -3 kcal/mol 的发夹被视为显著</li>
+                        <li>更稳定的发夹（ΔG ≤ -7 kcal/mol）将被标记为严重</li>
+                    </ul>
+                </li> 
+              
+            </ol>
+
+            </ul>
+ 	 
+
+        <h3>其他质量指标</h3>
+
+        <h4>3′ 端稳定性（3′ 端钳）</h4>
+        <ul>
+            <li>评估 3′ 末端碱基对的稳定性</li>
+            <li>优选较强的 G/C 端钳，而非 A/T 端钳</li>
+            <li>由于延伸从 3′ 端开始，因此该指标对 PCR 效率至关重要</li>
+        </ul>
+
+        <h4>同聚物检测</h4>
+        <ul>
+            <li>识别相同碱基的连续序列（默认阈值：连续 4 个碱基）</li>
+            <li>较长的同聚物可能导致滑移和非特异性扩增</li>
+        </ul>
+
+        <h4>IUPAC 简并碱基支持</h4>
+        <ul>
+            <li>全面支持歧义 DNA 碱基</li>
+            <li>Tm 和 ΔG 计算采用最稳定（最不利情况）的变体</li>
+            <li>在结果中以星号（*）明确标记</li>
+        </ul>
+
+        <h3>可靠性评分计算</h3>
+        <p>以 100 分为初始分数，根据各项引物质量指标计算综合评分：</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>规则</th>
+                    <th>扣分</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>GC% 超出 40–60%</td><td>−10</td></tr>
+                <tr><td>长度超出 18–30 bp</td><td>−8</td></tr>
+                <tr><td>无 3′ GC 端钳</td><td>−5</td></tr>
+                <tr><td>同聚物（≥4）</td><td>−8</td></tr>
+                <tr><td>ΔG（3′ 端 5 bp）≤ −9</td><td>−10</td></tr>
+                <tr><td>自身二聚体 = 不良（强/极强）</td><td>−25</td></tr>
+                <tr><td>自身二聚体 = 警告（中等）</td><td>−10</td></tr>
+                <tr><td>发夹 = 不良</td><td>−12</td></tr>
+                <tr><td>发夹 = 警告</td><td>−6</td></tr>
+            </tbody>
+        </table>
+
+        <h4>引物对评分（0–100）</h4>
+        <p>如果两条引物均存在，则按以下公式计算引物对评分：</p>
+        <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin: 1em 0; text-align: center; font-family: 'Times New Roman', serif; font-size: 1.1em;">
+            <p style="margin: 0;">Score<sub>pair</sub> = 0.45 &times; Score<sub>F</sub> + 0.45 &times; Score<sub>R</sub> + pp</p>
+        </div>
+        <p>其中，<code>pp</code> 取决于交叉二聚体分类：</p>
+        <ul>
+            <li>交叉二聚体正常：+10</li>
+            <li>交叉二聚体警告：−10</li>
+            <li>交叉二聚体不良：−25</li>
+        </ul>
+        <p>如果 ΔTm &gt; 5 °C，则 <code>pp -= 10</code>。最终分数限制在 [0, 100] 范围内。</p>
+        </div>
+
+        <div class="section">
+            <h2>警告与边界情况</h2>
+            <p>引物质控模块使用独立的预检警告系统，在分析开始前验证引物列表、配对逻辑、序列规范化和热力学输入范围。模块还会提示若干影响引物对 QC 指标解读的边界情况。</p>
+
+            <h3>一般警告</h3>
+            <p>这些警告主要在 QC 开始前生成，通常表示输入质量、配对质量或模型适用边界方面存在问题。大多数情况下用户仍可继续，但最终评分或引物对指标的含义可能会发生变化。</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>类别</th>
+                        <th>触发条件</th>
+                        <th>引物质控模块的当前处理方式</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>阻断性输入提示</strong></td>
+                        <td>正向和反向引物列表均不含任何可用序列。</td>
+                        <td>模块立即停止，并要求用户提供引物输入后才能运行 QC。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-01 / MW-02</strong><br>仅一侧可用</td>
+                        <td>解析和清理后，仅正向引物或仅反向引物仍可分析。</td>
+                        <td>模块继续执行单引物 QC；交叉二聚体和引物对可靠性等引物对层级指标不可用。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-03</strong><br>引物数量不匹配</td>
+                        <td>正向和反向引物条目数量不同。</td>
+                        <td>模块先尝试按名称配对，再回退至按索引配对，因此某些行可能只能作为不完整或未匹配的引物条目进行评估。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-04</strong><br>规范化后无有效序列</td>
+                        <td>存在引物文本，但规范化后没有有效的 IUPAC 引物。</td>
+                        <td>用户仍可继续，但生成的 QC 输出将为空或缺乏信息价值。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-05</strong><br>已移除非 IUPAC 字符</td>
+                        <td>一条或多条引物序列含有不支持的字符。</td>
+                        <td>模块仅使用规范化后的序列继续，并警告用于热力学计算的实际序列可能与最初粘贴的文本不同。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-06</strong><br>检测到简并碱基</td>
+                        <td>一条或多条引物含有歧义 IUPAC 碱基。</td>
+                        <td>热力学数值根据最稳定的解释进行保守估算，因此报告的 Tm 和 ΔG 应视为近似值。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-07</strong><br>引物名称重复</td>
+                        <td>提交的引物列表中存在重复的引物标签。</td>
+                        <td>模块仍会运行，但配对关系和输出标签可能产生歧义。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-08</strong><br>方向或命名方式疑似异常</td>
+                        <td>引物标签显示正向引物框中可能存在反向引物、反向引物框中可能存在正向引物，或混用了不兼容的命名方式。</td>
+                        <td>模块会警告自动配对结果可能不符合用户的生物学意图。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-09</strong><br>引物集较大</td>
+                        <td>引物总数超过 <strong>500</strong>。</td>
+                        <td>模块会警告浏览器端计算可能变慢或失去响应。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-10 至 MW-15</strong><br>参数范围警告</td>
+                        <td>Na<sup>+</sup>、Mg<sup>2+</sup>、引物浓度或目标 Tm 超出建议或经验证的热力学范围。</td>
+                        <td>模块仍可继续，但在这些条件下，Tm、ΔG 和评分的解读可靠性会降低。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-16</strong><br>结构极其稳定或目标 Tm 极端</td>
+                        <td>请求的目标 Tm 很高，或一条或多条引物形成非常稳定的自身互补结构。</td>
+                        <td>模块会警告计算结果可能对参数高度敏感，并且实验结果难以解读。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-17</strong><br>引物长度跨度较大</td>
+                        <td>提交的引物集中，引物长度差异很大。</td>
+                        <td>模块会警告，对于高度异质的引物集合，不同引物间的可比性和评分一致性可能降低。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-19</strong><br>序列总量较大</td>
+                        <td>规范化后的引物序列总长度非常大。</td>
+                        <td>模块会警告浏览器端 QC 和渲染可能变慢。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-21</strong><br>引物对层级结果大多退化为单引物 QC</td>
+                        <td>相对于提交的引物列表，可构建的有效正向/反向引物对过少。</td>
+                        <td>模块会警告大多数结果将按单引物 QC 而非真正的成对 QC 进行解读。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-22</strong><br>上传文件超过导入限制</td>
+                        <td>上传的引物文件大于 <strong>1 MB</strong>。</td>
+                        <td>导入会在加载序列前被阻止，用户必须选择较小的文件。</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>设计相关警告</h3>
+            <p>这些边界情况与 QC 结果解读、引物对构建及模块所采用的内部热力学启发式方法有关。</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>情况</th>
+                        <th>触发条件</th>
+                        <th>引物质控模块的当前处理方式</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>多序列 FASTA 是预期输入，而非错误</strong></td>
+                        <td>用户以 FASTA 格式提供多条引物。</td>
+                        <td>与单序列模块不同，引物质控专为接受多序列 FASTA 引物列表而设计，因此<strong>此处不使用 MW-20</strong>。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>按名称配对，必要时回退至按索引配对</strong></td>
+                        <td>无法依据命名约定清晰配对引物标签。</td>
+                        <td>模块首先尝试根据推断出的靶标名称和方向匹配引物，再对未解决的条目回退至按索引配对。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>单引物行显示的成对信息较少</strong></td>
+                        <td>引物对中的一条引物缺失或不可用。</td>
+                        <td>交叉二聚体和引物对层级指标将显示为不可用，而不会根据不完整数据进行推断。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>简并引物会被标记，但仍参与评分</strong></td>
+                        <td>引物含有合法的 IUPAC 歧义代码。</td>
+                        <td>结果表会标记这些引物，并采用保守的热力学假设进行评估，而不会直接拒绝。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>发夹和二聚体模型属于启发式模型</strong></td>
+                        <td>在临界能量范围内检测到二级结构。</td>
+                        <td>模块会报告最相关的预测结构，但由于环罚值、凸环和盐效应均为计算近似，湿实验表现可能有所不同。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>预设恢复会回退至系统默认值</strong></td>
+                        <td>已保存的 QC 预设格式错误、不完整或无法从本地存储中获取。</td>
+                        <td>模块会恢复内部默认参数，而不会保留无效的预设值。</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <p><strong>实际解读：</strong>引物质控中的警告并不总是意味着提交的引物不可用。许多警告反映的是序列规范化、配对歧义，或引物对层级 QC 与仅单引物 QC 之间的区别。因此，解读结果时应结合配对状态、交叉二聚体输出和最终评分摘要。</p>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

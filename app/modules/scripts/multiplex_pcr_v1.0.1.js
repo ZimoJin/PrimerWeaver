@@ -5,6 +5,13 @@ import * as Core from './core_v1.0.1.js';
 import * as VIZ from './bio_visuals_v1.0.1.js';
 import { setupAssemblyParameterPresets } from './assembly_parameter_presets_v1.0.1.js';
 
+const t = (key, params, fallback) => (
+  window.PW_I18N ? window.PW_I18N.t(key, params, fallback) : (fallback || key)
+);
+const applyI18n = (root) => {
+  if (window.PW_I18N && root) window.PW_I18N.apply(root);
+};
+
 // ==================== Utility Functions ====================
 
 function $(id) {
@@ -952,7 +959,7 @@ function handleFileUpload(event) {
     parseAndPreviewSequences();
   };
   reader.onerror = function() {
-    showWarning('Failed to read file, please try again.');
+    showWarning(t('ui.failedReadFile', null, 'Failed to read file, please try again.'));
   };
   reader.readAsText(file, 'UTF-8');
 }
@@ -1125,7 +1132,7 @@ function handlePrimerFileUpload(event) {
     parseAndPreviewPrimers();
   };
   reader.onerror = function() {
-    showWarning('Failed to read file, please try again.');
+    showWarning(t('ui.failedReadFile', null, 'Failed to read file, please try again.'));
   };
   reader.readAsText(file);
 }
@@ -1146,7 +1153,7 @@ function onQCAnalysisClick() {
   const content = textarea.value.trim();
   
   if (!content) {
-    showWarning('Please input or upload designed primer pairs.');
+    showWarning(t('multiplex.needPrimers', null, 'Please input or upload designed primer pairs.'));
     return;
   }
   
@@ -1156,7 +1163,7 @@ function onQCAnalysisClick() {
     console.log('Parsed primer pairs:', primerPairs);
 
     if (!primerPairs || primerPairs.length === 0) {
-      showWarning('No valid primer pairs found. Please check the input format.');
+      showWarning(t('multiplex.noValidPairs', null, 'No valid primer pairs found. Please check the input format.'));
       return;
     }
 
@@ -1932,7 +1939,7 @@ function onDesignClick() {
     const content = textarea.value.trim();
     
     if (!content) {
-      showWarning('Please input or upload target sequences.');
+      showWarning(t('multiplex.needTargets', null, 'Please input or upload target sequences.'));
       return;
     }
     
@@ -1940,7 +1947,7 @@ function onDesignClick() {
     const records = Core.parseFASTA(content);
     
     if (records.length === 0) {
-      showWarning('Unable to parse sequences, please ensure input is valid FASTA format.');
+      showWarning(t('multiplex.parseFail', null, 'Unable to parse sequences, please ensure input is valid FASTA format.'));
       return;
     }
     
@@ -1955,7 +1962,7 @@ function onDesignClick() {
     });
     
     if (targets.length < 1) {
-      showWarning('Please add at least 1 target sequence.');
+      showWarning(t('multiplex.needOneTarget', null, 'Please add at least 1 target sequence.'));
       return;
     }
     
@@ -2105,8 +2112,8 @@ function initMultiplexPCRModule(container) {
 
   setupAssemblyParameterPresets(container, {
     scope: 'multiplex-pcr-primer-params',
-    label: 'multiplex PCR primer design parameters',
-    placeholder: 'e.g. Standard multiplex PCR',
+    label: t('multiplex.presetLabel', null, 'multiplex PCR primer design parameters'),
+    placeholder: t('multiplex.presetPlaceholder', null, 'e.g. Standard multiplex PCR'),
     fields: [
       { key: 'targetTm', selector: '#target-tm', defaultValue: '55' },
       { key: 'tmTolerance', selector: '#tm-tolerance', defaultValue: '2.5' },
@@ -2307,7 +2314,7 @@ function initMultiplexPCRModule(container) {
           
           const resp = await fetch(base + 'multiplex_fragment.txt');
           if (!resp.ok) {
-            alert('Failed to load demo sequence.');
+            alert(t('ui.failedDemo', null, 'Failed to load demo sequence.'));
             return;
           }
           const text = await resp.text();
@@ -2320,7 +2327,7 @@ function initMultiplexPCRModule(container) {
           
           const resp = await fetch(base + 'multiplex_primer_pool.txt');
           if (!resp.ok) {
-            alert('Failed to load demo sequence.');
+            alert(t('ui.failedDemo', null, 'Failed to load demo sequence.'));
             return;
           }
           const text = await resp.text();
@@ -2329,7 +2336,7 @@ function initMultiplexPCRModule(container) {
         }
       } catch (e) {
         console.error('Demo Set load error:', e);
-        alert('Failed to load demo sequence.');
+        alert(t('ui.failedDemo', null, 'Failed to load demo sequence.'));
       }
     });
   }
@@ -2417,7 +2424,7 @@ function initMultiplexPCRModule(container) {
         const base = new URL('modules/contents/demo/', window.location.href).toString();
         const resp = await fetch(base + 'multiplex_fragment.txt');
         if (!resp.ok) {
-          alert('Failed to load demo sequence.');
+          alert(t('ui.failedDemo', null, 'Failed to load demo sequence.'));
           return;
         }
         const text = await resp.text();
@@ -2425,7 +2432,7 @@ function initMultiplexPCRModule(container) {
         textarea.dispatchEvent(new Event('input', { bubbles: true }));
       } catch (e) {
         console.error('Target demo load error:', e);
-        alert('Failed to load demo sequence.');
+        alert(t('ui.failedDemo', null, 'Failed to load demo sequence.'));
       }
     });
   }
@@ -2441,7 +2448,7 @@ function initMultiplexPCRModule(container) {
         const base = new URL('modules/contents/demo/', window.location.href).toString();
         const resp = await fetch(base + 'multiplex_primer_pool.txt');
         if (!resp.ok) {
-          alert('Failed to load demo sequence.');
+          alert(t('ui.failedDemo', null, 'Failed to load demo sequence.'));
           return;
         }
         const text = await resp.text();
@@ -2449,7 +2456,7 @@ function initMultiplexPCRModule(container) {
         textarea.dispatchEvent(new Event('input', { bubbles: true }));
       } catch (e) {
         console.error('Primer demo load error:', e);
-        alert('Failed to load demo sequence.');
+        alert(t('ui.failedDemo', null, 'Failed to load demo sequence.'));
       }
     });
   }

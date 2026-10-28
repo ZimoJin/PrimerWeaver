@@ -1,5 +1,13 @@
+const t = (key, params, fallback) => (
+  window.PW_I18N ? window.PW_I18N.t(key, params, fallback) : (fallback || key)
+);
+const applyI18n = (root) => {
+  if (window.PW_I18N && root) window.PW_I18N.apply(root);
+};
+
 const SYSTEM_PRESET_ID = 'system-default';
 const SYSTEM_PRESET_NAME = 'System Default';
+const systemPresetName = () => t('ui.systemDefault', null, SYSTEM_PRESET_NAME);
 
 function ensurePresetStyles() {
   if (document.getElementById('assembly-preset-style-v3')) return;
@@ -247,11 +255,11 @@ function showPresetDialog(container, options) {
   const confirmBtn = modal.querySelector('.assembly-preset-modal-confirm');
   const cancelBtn = modal.querySelector('.assembly-preset-modal-cancel');
 
-  if (titleEl) titleEl.textContent = String(opts.title || 'Preset');
+  if (titleEl) titleEl.textContent = String(opts.title || t('ui.presetDialog', null, 'Preset'));
   if (messageEl) messageEl.textContent = String(opts.message || '');
   if (iconEl) iconEl.textContent = mode === 'input' ? '📝' : '⚠️';
-  if (confirmBtn) confirmBtn.textContent = String(opts.confirmText || 'OK');
-  if (cancelBtn) cancelBtn.textContent = String(opts.cancelText || 'Cancel');
+  if (confirmBtn) confirmBtn.textContent = String(opts.confirmText || t('ui.ok', null, 'OK'));
+  if (cancelBtn) cancelBtn.textContent = String(opts.cancelText || t('ui.cancel', null, 'Cancel'));
   if (errorEl) errorEl.textContent = '';
 
   if (inputEl) {
@@ -381,7 +389,7 @@ function createPresetSnapshot(config, preset) {
   const source = preset || {};
   return {
     id: String(source.id || SYSTEM_PRESET_ID),
-    name: String(source.name || SYSTEM_PRESET_NAME),
+    name: String(source.name || systemPresetName()),
     values: sanitizePresetValues(config.fields, source.values)
   };
 }
@@ -517,7 +525,7 @@ function renderPresetOptions(container, config, selectedPresetId) {
     ? selectedPresetId
     : getResolvedStartupPreset(config).id;
 
-  select.innerHTML = presets.map((preset) => `<option value="${preset.id}">${preset.name}</option>`).join('');
+  select.innerHTML = presets.map((preset) => `<option value="${preset.id}">${preset.id === SYSTEM_PRESET_ID ? systemPresetName() : preset.name}</option>`).join('');
   select.value = resolvedId;
 
   const updateBtn = queryPresetEl(container, config, 'update');
@@ -542,7 +550,7 @@ function buildUserPreset(config, name, values) {
 
 function notifyUnavailable(container, config) {
   if (window.VIZ && typeof window.VIZ.showMWModal === 'function') {
-    window.VIZ.showMWModal(container, `Custom presets are unavailable for ${config.label} because browser local storage is not available.`, () => {}, () => {});
+    window.VIZ.showMWModal(container, t('ui.storageUnavailableFor', {label: config.label}, 'Custom presets are unavailable for {label} because browser local storage is not available.'), () => {}, () => {});
   }
 }
 
@@ -563,7 +571,7 @@ function setupAssemblyParameterPresets(container, options) {
       fields: Array.isArray(options.fields) ? options.fields : []
     }, {
       id: SYSTEM_PRESET_ID,
-      name: SYSTEM_PRESET_NAME,
+      name: systemPresetName(),
       values: options.defaultValues || {}
     }),
     afterApply: options.afterApply
@@ -606,12 +614,12 @@ function setupAssemblyParameterPresets(container, options) {
 
       showPresetDialog(root, {
         mode: 'input',
-        title: 'Save Parameter Preset',
-        message: `Enter a name for this ${config.label} preset.`,
-        placeholder: options.placeholder || 'e.g. Standard assembly settings',
-        confirmText: 'Save',
+        title: t('ui.savePresetTitle', null, 'Save Parameter Preset'),
+        message: t('ui.savePresetMessage', {label: config.label}, 'Enter a name for this {label} preset.'),
+        placeholder: options.placeholder || t('ui.presetPlaceholder', null, 'e.g. Standard assembly settings'),
+        confirmText: t('ui.save', null, 'Save'),
         validate: (value) => {
-          if (!String(value || '').trim()) return 'Please enter a preset name.';
+          if (!String(value || '').trim()) return t('ui.presetNameRequired', null, 'Please enter a preset name.');
           return '';
         },
         onConfirm: (value) => {
@@ -647,9 +655,9 @@ function setupAssemblyParameterPresets(container, options) {
       if (activeId === SYSTEM_PRESET_ID) return;
       const activePreset = getPresetById(config, activeId);
       showPresetDialog(root, {
-        title: 'Delete Parameter Preset',
-        message: `Delete preset "${activePreset ? activePreset.name : activeId}"?`,
-        confirmText: 'Delete',
+        title: t('ui.deletePresetTitle', null, 'Delete Parameter Preset'),
+        message: t('ui.deletePresetMessage', {name: activePreset ? activePreset.name : activeId}, 'Delete preset “{name}”?'),
+        confirmText: t('ui.delete', null, 'Delete'),
         onConfirm: () => {
           const nextPresets = readUserPresets(config).filter((preset) => preset.id !== activeId);
           writeUserPresets(config, nextPresets);

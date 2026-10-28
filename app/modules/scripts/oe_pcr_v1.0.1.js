@@ -210,6 +210,13 @@ function showOEPCRWarningModal(container, message, opts = {}) {
 import * as Core from './core_v1.0.1.js';
 import { CODON_USAGE, getCodonEntries } from './codon_v1.0.1.js';
 
+const t = (key, params, fallback) => (
+  window.PW_I18N ? window.PW_I18N.t(key, params, fallback) : (fallback || key)
+);
+const applyI18n = (root) => {
+  if (window.PW_I18N && root) window.PW_I18N.apply(root);
+};
+
 // ==================== Utility Functions ====================
 
 function $(id) {
@@ -1297,15 +1304,15 @@ function createFragmentRow() {
       <textarea id="frag-seq-${fragmentRowCount}" placeholder="Enter DNA sequence (FASTA format supported)..."></textarea>
       <div class="row end" style="margin-top:6px">
         <input type="file" id="file-frag-${fragmentRowCount}" accept=".fa,.fasta,.fas,.txt,.gb,.gbk,.gbff,.genbank" style="display:none">
-        <button type="button" class="btn demo" id="frag-rc-${fragmentRowCount}">Reverse complement</button>
-        <button class="btn demo" id="frag-demo-${fragmentRowCount}" type="button">Demo</button>
-        <button class="ghost btn" id="frag-upload-${fragmentRowCount}" type="button">Upload</button>
+        <button type="button" class="btn demo" id="frag-rc-${fragmentRowCount}" data-i18n="ui.reverseComplement">Reverse complement</button>
+        <button class="btn demo" id="frag-demo-${fragmentRowCount}" type="button" data-i18n="ui.demo">Demo</button>
+        <button class="ghost btn" id="frag-upload-${fragmentRowCount}" type="button" data-i18n="ui.upload">Upload</button>
       </div>
     </td>
     <td class="linker-column" style="display: ${oeLinkerVisible ? 'table-cell' : 'none'}; width: 30%; position: relative; overflow: hidden;">
       <div style="display: flex; flex-direction: column; gap: 4px; position: relative;">
         <div style="display: flex; gap: 4px; align-items: center;">
-          <input type="text" id="frag-linker-${fragmentRowCount}" placeholder="Linker and tag (optional)" list="linker-suggestions-${fragmentRowCount}" style="flex: 1; min-width: 0;" autocomplete="off">
+          <input type="text" id="frag-linker-${fragmentRowCount}" placeholder="${t('ui.linkerOptional', null, 'Linker and tag (optional)')}" data-i18n-placeholder="ui.linkerOptional" list="linker-suggestions-${fragmentRowCount}" style="flex: 1; min-width: 0;" autocomplete="off">
           <datalist id="linker-suggestions-${fragmentRowCount}">
             <option value="GS">GS</option>
               <option value="GSGS">2x(GS)</option>
@@ -1341,9 +1348,9 @@ function createFragmentRow() {
     </td>
     <td style="white-space: nowrap; vertical-align: top; width: 3%; padding: 4px 2px 4px 4px; text-align: left;">
       <div class="frag-actions" style="width: 100%;">
-        <button class="ghost btn sm up" onclick="moveFragmentRowUp(${fragmentRowCount})" title="Move up" type="button" style="width: 100%; min-width: 0;">▲</button>
-        <button class="ghost btn sm down" onclick="moveFragmentRowDown(${fragmentRowCount})" title="Move down" type="button" style="width: 100%; min-width: 0;">▼</button>
-        <button class="ghost btn sm del" onclick="removeFragmentRow(${fragmentRowCount})" title="Delete" type="button" style="width: 100%; min-width: 0;">✕</button>
+        <button class="ghost btn sm up" onclick="moveFragmentRowUp(${fragmentRowCount})" title="${t('ui.moveUp', null, 'Move up')}" data-i18n-title="ui.moveUp" type="button" style="width: 100%; min-width: 0;">▲</button>
+        <button class="ghost btn sm down" onclick="moveFragmentRowDown(${fragmentRowCount})" title="${t('ui.moveDown', null, 'Move down')}" data-i18n-title="ui.moveDown" type="button" style="width: 100%; min-width: 0;">▼</button>
+        <button class="ghost btn sm del" onclick="removeFragmentRow(${fragmentRowCount})" title="${t('ui.delete', null, 'Delete')}" data-i18n-title="ui.delete" type="button" style="width: 100%; min-width: 0;">✕</button>
       </div>
     </td>
   `;
@@ -1567,13 +1574,13 @@ function renderResults(primerResults, linkers) {
   
   if (!resultsDiv) {
     console.error('results div not found!');
-    alert('Error: Results container not found. Please refresh the page.');
+    alert(t('oepcr.resultsMissing', null, 'Error: Results container not found. Please refresh the page.'));
     return;
   }
   
   if (!contentDiv) {
     console.error('results-content div not found!');
-    alert('Error: Results content container not found. Please refresh the page.');
+    alert(t('oepcr.resultsContentMissing', null, 'Error: Results content container not found. Please refresh the page.'));
     return;
   }
   
@@ -2188,12 +2195,12 @@ function onDesignClick() {
   const tbody = $('fragment-rows');
   if (!tbody) {
     console.error('fragment-rows tbody not found');
-    alert('Error: Fragment table not found. Please refresh the page.');
+    alert(t('oepcr.tableMissing', null, 'Error: Fragment table not found. Please refresh the page.'));
     return;
   }
   const rows = tbody.querySelectorAll('tr');
   if (!rows || rows.length === 0) {
-    alert('No fragments found. Please add at least one fragment.');
+    alert(t('oepcr.noFragmentsFound', null, 'No fragments found. Please add at least one fragment.'));
     return;
   }
 
@@ -2284,7 +2291,7 @@ function onDesignClick() {
   // Check if we have at least 2 valid fragment sequences
   if (fragments.length < 2) {
     const container = document.getElementById('module-content') || document.body;
-    window.VIZ && window.VIZ.showMWModal(container, 'Please input at least 2 fragment sequences for Overlap PCR.');
+    window.VIZ && window.VIZ.showMWModal(container, t('oepcr.needTwoFrags', null, 'Please input at least 2 fragment sequences for Overlap PCR.'));
     return;
   }
   
@@ -2418,7 +2425,7 @@ function onDesignClick() {
 
 function downloadPrimersTXT() {
   if (!window.currentPrimerResults || !Array.isArray(window.currentPrimerResults) || window.currentPrimerResults.length === 0) {
-    alert('No primers available. Please design primers first.');
+    alert(t('ui.noPrimers', null, 'No primers available. Please design primers first.'));
     return;
   }
   
@@ -2457,7 +2464,7 @@ function downloadPrimersTXT() {
 
 function downloadAssembledFASTA() {
   if (!window.currentAssembledSeq) {
-    alert('Assembled sequence is not available. Please design primers first.');
+    alert(t('oepcr.assembledUnavailable', null, 'Assembled sequence is not available. Please design primers first.'));
     return;
   }
   
@@ -2492,8 +2499,8 @@ function initOEPCRModule(container) {
 
   setupAssemblyParameterPresets(root, {
     scope: 'overlap-pcr-primer-params',
-    label: 'overlap PCR primer design parameters',
-    placeholder: 'e.g. Standard overlap PCR',
+    label: t('oepcr.presetLabel', null, 'overlap PCR primer design parameters'),
+    placeholder: t('oepcr.presetPlaceholder', null, 'e.g. Standard overlap PCR'),
     fields: [
       { key: 'coreTm', selector: '#core-tm', defaultValue: '55' },
       { key: 'overlapTm', selector: '#overlap-tm', defaultValue: '55' },

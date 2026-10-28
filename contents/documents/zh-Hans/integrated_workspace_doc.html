@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>集成克隆工作区 - PrimerWeaver V1.0.6</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #333;
+            background: #f9fafb;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e40af;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2563eb;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            font-size: 1.5em;
+        }
+        h3 {
+            color: #3b82f6;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            font-size: 1.2em;
+        }
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 1em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        strong {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c2410c;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .abstract {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+        .abstract p {
+            margin: 0;
+            font-style: italic;
+        }
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background: #fff7ed;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .section {
+            margin-bottom: 2.5em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>集成克隆工作区</h1>
+
+        <div class="abstract">
+            <p>集成克隆工作区为 PrimerWeaver 中的四种克隆流程提供统一前端：限制性内切酶克隆、Golden Gate 组装、Gibson 组装和 USER 克隆。用户无需在各独立模块中反复输入载体和插入片段序列；工作区在顶部保留共享序列层，并在下方呈现所选方法及其专用设计设置与输出。</p>
+        </div>
+
+        <div class="section">
+            <h2>本工作区的用途</h2>
+            <p>本文仅说明<strong>工作区特有的集成层</strong>：共享输入、方法切换、同步、状态持久化，以及工作区级重置或演示行为。<strong>不会</strong>重复各克隆方法的完整设计逻辑。</p>
+
+            <div class="info-box">
+                <strong>各方法专用文档：</strong>
+                <ul style="margin: 8px 0 0 20px;">
+                    <li><a href="#/docs#d-re">限制性内切酶克隆</a></li>
+                    <li><a href="#/docs#d-gg">Golden Gate 组装</a></li>
+                    <li><a href="#/docs#d-gb">Gibson 组装</a></li>
+                    <li><a href="#/docs#d-user">USER 克隆</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>快速入门指南</h2>
+            <ol>
+                <li>在顶部输入区粘贴或上传共享的<strong>载体序列</strong>和<strong>插入片段序列</strong>。这些字段接受 FASTA、纯文本和标准 GenBank 文本文件（<code>.gb</code>、<code>.gbk</code>、<code>.gbff</code>、<code>.genbank</code>），与底层克隆模块相同。</li>
+                <li>从<strong>克隆方法</strong>下拉菜单中选择一种克隆方法。工作区随后会在共享输入下方呈现相应的方法专用界面。</li>
+                <li>在呈现的模块区域中调整方法专用设计参数、预设和可选高级设置，然后按常规方式运行设计。</li>
+                <li>仅在选择方法后再使用<strong>演示数据</strong>；工作区会将该方法自带的演示内容加载到共享区域和已同步的方法窗格中。</li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>工作区架构</h2>
+            <p>工作区是<strong>共享外壳适配器</strong>，而不是第五种克隆算法。它保留一个公共序列输入区，并在其下方动态挂载所选克隆模块。同一时间仅有一个方法窗格处于活动状态，从而避免使用重叠元素 ID 或方法本地界面假设的模块之间发生 DOM 冲突。</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>层级</th>
+                        <th>在工作区中的作用</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>共享顶部输入</strong></td>
+                        <td>保存各克隆方法共用的载体和插入片段序列状态。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>方法选择器</strong></td>
+                        <td>选择在共享输入下方呈现并同步的克隆模块。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>方法窗格</strong></td>
+                        <td>呈现限制性内切酶、Golden Gate、Gibson 或 USER 克隆的原生界面，同时隐藏工作区外壳已提供的重复顶级字段。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>同步层</strong></td>
+                        <td>使共享载体/插入片段状态在工作区外壳与当前活动方法窗格之间保持一致。</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>共享输入与同步</h2>
+            <p>顶部的<strong>载体序列</strong>和<strong>插入片段序列</strong>区域是工作区的规范输入字段。选择某种方法后，工作区会将这些值复制到方法专用 DOM 中，并在用户编辑内容时保持活动窗格同步。</p>
+            <p>因此，用户无需为每个模块手动重新粘贴相同的载体和插入片段序列，即可比较不同克隆策略。如果活动方法修改了已同步的输入字段，共享工作区字段也会更新，从而使方法切换保持一致。</p>
+
+            <div class="warning-box">
+                <p><strong>实际解读：</strong>工作区旨在减少共享序列输入的重复录入，但不会将所有方法专用假设压平为一种通用算法。最终解读仍应依赖所选克隆方法及其自身的下游设置、警告和结果。</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>方法切换行为</h2>
+            <p>切换克隆方法时，默认<strong>不会</strong>清除共享的载体和插入片段草稿。工作区在方法变更过程中保留这些序列，以便用户就同一构建方案比较不同方法。</p>
+            <p>如果新选择的方法所支持的插入片段数量少于先前对共享插入片段面板的解释，工作区会在截断有效插入片段集之前弹出确认提示。这可避免从较宽松的组装方法切换到较严格的方法时，插入片段行被静默丢失。</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>工作区切换行为</th>
+                        <th>当前实现</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>保留共享草稿</strong></td>
+                        <td>在同一会话内切换方法时，载体和插入片段草稿会被保留。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>插入片段容量不匹配检查</strong></td>
+                        <td>切换到插入片段容量较低的方法时，工作区会在丢弃插入片段前发出警告。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>方法专用刷新钩子</strong></td>
+                        <td>活动方法窗格可在同步后请求重绘，例如刷新载体图谱。</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>演示数据与重置</h2>
+            <p>工作区级<strong>演示数据</strong>按钮会识别当前方法。必须先选择克隆方法；否则工作区会显示警告，而不是猜测应加载哪个模块的演示内容。</p>
+            <p>工作区级<strong>重置</strong>按钮比局部方法重置更彻底。它会清除共享工作区草稿并刷新页面，使外壳状态和活动方法窗格都恢复为干净状态。</p>
+        </div>
+
+        <div class="section">
+            <h2>工作区注意事项</h2>
+            <ul>
+                <li>共享顶部输入区有意简化为<strong>载体</strong>加<strong>插入片段</strong>；方法专用的酶、重叠、引物和参数设置仍保留在下方方法窗格中。</li>
+                <li>下方方法窗格中显示的参数预设仍为<strong>方法专用</strong>。工作区统一导航和共享序列输入，但不会将克隆参数预设合并为一种全局预设格式。</li>
+                <li>载体图谱行为、警告和结果解读仍由所选克隆模块负责。</li>
+                <li>最好将工作区理解为建立在四种克隆工具之上的比较与编排层，而不是其方法级文档的替代品。</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

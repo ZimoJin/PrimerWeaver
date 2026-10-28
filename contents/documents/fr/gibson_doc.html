@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assemblage Gibson - PrimerWeaver V1.0.6</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #333;
+            background: #f9fafb;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e40af;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2563eb;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            font-size: 1.5em;
+        }
+        h3 {
+            color: #3b82f6;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            font-size: 1.2em;
+        }
+        h4 {
+            color: #60a5fa;
+            margin-top: 1.2em;
+            margin-bottom: 0.6em;
+        }
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 1em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        strong {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c2410c;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .abstract {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+        .abstract p {
+            margin: 0;
+            font-style: italic;
+        }
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .section {
+            margin-bottom: 2.5em;
+        }
+        .version-info {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+            margin-top: 3em;
+            padding-top: 2em;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Concepteur d’amorces pour l’assemblage Gibson</h1>
+        
+        <div class="abstract">
+            <p>Le module d’assemblage Gibson permet l’assemblage sans cicatrice de plusieurs fragments d’ADN en une seule réaction isotherme en un pot, grâce à une conception rationnelle d’amorces portant des régions de chevauchement complémentaires. Cet outil automatise la création d’amorces avec des séquences de chevauchement optimisées (typiquement 20–30 bp) qui permettent aux enzymes exonucléase, polymérase et ligase d’assembler les fragments d’ADN sans recourir à des sites de restriction. L’assemblage Gibson convient particulièrement au prototypage rapide, à la construction de grands construits multi-fragments et au clonage flexible lorsque des sites de restriction peuvent être indisponibles.</p>
+        </div>
+
+        <div class="section">
+            <h2>Guide de démarrage rapide</h2>
+            <ol>
+		<li>Téléversez ou collez les séquences du vecteur de destination et des inserts (maximum de 6 fragments) au format FASTA ou en texte brut dans les champs correspondants, dans l’ordre d’assemblage souhaité. Choisissez la méthode de linéarisation du vecteur, par enzymes de restriction ou par PCR. Vérifiez le squelette vectoriel détecté automatiquement et ajustez les paramètres de conception si nécessaire.</li>
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/Gibson_demo.png"
+                    style="max-width: 90%; height: auto; border-radius: 8px;"
+                >
+            </div>
+                <li>Cliquez sur « Design Primers » pour générer des amorces intégrant des séquences de surplomb. Examinez le tableau des amorces, le tableau des chevauchements et le schéma d’assemblage prédit. Téléchargez le fichier FASTA assemblé afin de vérifier que l’orientation de l’insert correspond à la conception prévue. Si l’orientation est incorrecte, inversez le complément de la séquence d’insert et régénérez les amorces.</li>
+
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>Principe de l’assemblage Gibson</h2>
+            
+            <p>L’assemblage Gibson est une méthode d’assemblage d’ADN isotherme, en un seul pot, qui permet de joindre sans cicatrice des fragments d’ADN grâce à des régions de <strong>chevauchement homologue</strong>, sans besoin d’enzymes de restriction. Dans une même réaction, une <strong>exonucléase 5′</strong> résecte les extrémités des fragments d’ADN double brin afin de générer des surplombs simple brin 3′ complémentaires, qui s’hybrident spécifiquement entre fragments adjacents. Une <strong>ADN polymérase de haute fidélité</strong> comble ensuite les brèches restantes en utilisant les extrémités 3′ hybridées comme amorces, et une <strong>ADN ligase thermostable</strong> scelle ensuite les entailles du squelette d’ADN. Ensemble, ces activités enzymatiques coordonnées aboutissent à un <strong>assemblage sans cicatrice</strong> de plusieurs fragments d’ADN en une molécule d’ADN double brin continue, ce qui rend l’assemblage Gibson particulièrement adapté à la construction de construits d’ADN grands ou complexes.</p>
+
+
+
+            <h3>Principe de conception des chevauchements</h3>
+            <p>Le succès de l’assemblage Gibson repose sur la conception de régions de chevauchement complémentaires entre fragments d’ADN adjacents. Chaque jonction exige une paire de chevauchements complémentaires en séquence et de longueur suffisante pour permettre une hybridation stable pendant l’assemblage.</p>
+            <ul>
+                <li><strong>Chevauchements complémentaires :</strong> l’extrémité 3′ du fragment i doit être complémentaire de l’extrémité 5′ du fragment i + 1, ce qui assure une hybridation spécifique entre fragments adjacents.</li>
+                <li><strong>Longueur optimale de chevauchement :</strong> des chevauchements de <strong>20–30 bp</strong> suffisent généralement pour la plupart des assemblages, en équilibrant stabilité thermique et longueur d’amorce ; des chevauchements plus longs peuvent améliorer la robustesse pour des construits complexes ou de grande taille.</li>
+                <li><strong>Jonctions sans cicatrice :</strong> comme les chevauchements sont dérivés directement de la séquence native, l’assemblage Gibson produit des <strong>jonctions sans cicatrice</strong> sans introduire de résidus supplémentaires.</li>
+            </ul>
+
+        </div>
+
+        <div class="section">
+            <h2>Format d’entrée</h2>
+	    <p>Les champs vecteur et insert acceptent les fichiers <strong>FASTA</strong>, le <strong>texte ADN brut</strong> ou les fichiers <strong>GenBank</strong> standard (<code>.gb</code>, <code>.gbk</code>, <code>.gbff</code>, <code>.genbank</code>) contenant des blocs <code>LOCUS</code> et <code>ORIGIN</code>. Le nom court du champ <strong>LOCUS</strong> est utilisé comme titre de séquence. Une <strong>seule séquence</strong> est autorisée par champ ; si plusieurs en-têtes FASTA sont détectés, <strong>seule la première séquence</strong> est utilisée. Si vous téléversez une séquence brute sans en-tête <code>&gt;</code>, le <strong>nom de fichier</strong> (sans extension) sert de nom. Les formats binaires propriétaires (p. ex. SnapGene <code>.dna</code>) doivent d’abord être exportés en GenBank ou FASTA. Les noms de fragments issus de FASTA ou de GenBank sont utilisés, le cas échéant, pour nommer les amorces.</p>
+	     <p>PrimerWeaver prend actuellement en charge environ <strong>100 enzymes de restriction de type II intégrées</strong>. Une fois une séquence vectorielle fournie, le système <strong>identifie automatiquement les caractéristiques du vecteur</strong> et affiche les positions de tous les <strong>sites d’enzymes de restriction à coupure unique</strong>. La carte du vecteur peut être tournée afin de faciliter la visualisation de la région de clonage ciblée.</p>
+
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/Gibson_input.png"
+                    alt="Saisie de l’assemblage Gibson"
+                    style="max-width: 60%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+            <h3>Gestion des fragments</h3>
+            <ul>
+                <li><strong>Ajouter/retirer des fragments :</strong> ajoutez plusieurs séquences d’ADN pour un assemblage multi-fragments (2–10 fragments recommandés ; les assemblages plus grands deviennent plus complexes)</li>
+                <li><strong>Réordonner les fragments :</strong> ajustez l’ordre d’assemblage à l’aide des commandes de l’interface ; l’ordre détermine l’architecture du construit final</li>
+                <li><strong>Noms des fragments :</strong> extraits automatiquement des en-têtes FASTA pour une identification claire des amorces ; utilisés dans les rapports de sortie</li>
+                <li><strong>Complément inverse :</strong> inversez le complément de fragments individuels si nécessaire afin de correspondre à l’orientation et au sens d’assemblage souhaités</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Paramètres de conception</h2>
+            
+            <p>Veuillez sélectionner la méthode de linéarisation du vecteur préférée, soit la <strong>digestion par enzyme de restriction de type II</strong>, soit l’<strong>amplification PCR</strong>. Si des enzymes de restriction sont utilisées pour linéariser le vecteur, précisez si les <strong>sites de reconnaissance doivent être conservés ou retirés</strong> dans le construit final. Une fois les enzymes de restriction sélectionnées, le système identifie automatiquement le <strong>fragment le plus long</strong> comme squelette vectoriel de destination par défaut. Si ce fragment ne correspond pas au squelette prévu, vous pouvez sélectionner manuellement le fragment approprié. Avant de poursuivre, veuillez examiner les <strong>paramètres de conception des amorces</strong> et les ajuster si nécessaire.</p>
+            
+            <table>
+  <thead>
+    <tr>
+      <th>Catégorie</th>
+      <th>Paramètre</th>
+      <th>Valeur par défaut</th>
+      <th>Plage</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <!-- Vector linearization -->
+    <tr>
+      <td rowspan="7"><strong>Linéarisation du vecteur</strong></td>
+      <td><strong>Mode de linéarisation</strong></td>
+      <td>Enzyme de restriction</td>
+      <td>Enzyme de restriction / PCR</td>
+      <td>
+        Méthode utilisée pour linéariser le vecteur de destination avant l’assemblage Gibson.
+        Choisissez la digestion par enzyme de restriction ou l’amplification PCR.
+      </td>
+    </tr>
+
+    <tr>
+      <td><strong>Enzyme de restriction 1 / 2</strong></td>
+      <td>—</td>
+      <td>Enzymes de type II intégrées</td>
+      <td>
+        Enzyme de restriction de type II utilisée pour la digestion du vecteur lorsque la
+        linéarisation par restriction est sélectionnée.
+      </td>
+    </tr>
+
+    <tr></tr>
+
+    <tr>
+      <td><strong>Conserver les sites de reconnaissance</strong></td>
+      <td>Oui</td>
+      <td>Oui / Non</td>
+      <td>
+        Indique si les sites de reconnaissance des enzymes de restriction sont conservés ou retirés dans le construit final.
+        (S’ils sont retirés, les jonctions sont conçues de sorte que les sites de reconnaissance ne soient pas régénérés.)
+      </td>
+    </tr>
+
+    <tr>
+      <td><strong>Amorce PCR du vecteur (5′→3′)</strong></td>
+      <td>—</td>
+      <td>Séquence d’ADN</td>
+      <td>
+        Amorce sens et antisens utilisée pour linéariser le vecteur par PCR lorsque la linéarisation PCR est sélectionnée.
+        Les amorces doivent amplifier la région de squelette prévue.
+      </td>
+    </tr>
+
+    <tr></tr>
+
+    <tr>
+      <td><strong>Fragment du squelette vectoriel</strong></td>
+      <td>Fragment le plus long</td>
+      <td>Tout fragment de digestion</td>
+      <td>
+        Squelette du vecteur de destination sélectionné parmi les fragments de digestion (mode restriction) ou le segment amplifié (mode PCR).
+        Le fragment de digestion le plus long est sélectionné par défaut et peut être ajusté manuellement.
+      </td>
+    </tr>
+
+    <!-- Gibson overlap / primer design -->
+    <tr>
+      <td rowspan="6"><strong>Conception des amorces et des chevauchements</strong></td>
+      <td><strong>Longueur de chevauchement (bp)</strong></td>
+      <td>25</td>
+      <td>15–40</td>
+      <td>
+        Longueur du chevauchement homologue entre fragments adjacents pour l’assemblage Gibson.
+        Des chevauchements plus longs augmentent la stabilité mais allongent les amorces.
+      </td>
+    </tr>
+
+    <tr>
+      <td><strong>Tm cible (°C)</strong></td>
+      <td>55</td>
+      <td>40–75</td>
+      <td>
+        Température de fusion cible pour le cœur de liaison au gabarit (hybridation) des amorces PCR.
+        Les régions de chevauchement sont exclues du calcul de Tm.
+      </td>
+    </tr>
+
+    <tr>
+      <td><strong>ΔTm (°C)</strong></td>
+      <td>2.5</td>
+      <td>0–10</td>
+      <td>
+        Différence maximale de température de fusion autorisée entre les amorces sens et antisens d’une même paire.
+      </td>
+    </tr>
+
+    <tr>
+      <td><strong>Concentration d’amorce (nM)</strong></td>
+      <td>500</td>
+      <td>50–2000</td>
+      <td>
+        Concentration effective d’amorce supposée pour le calcul in silico de Tm. Plage habituelle : 25-1000 nM.
+      </td>
+    </tr>
+
+    <tr>
+      <td><strong>Concentration de Na⁺ (mM)</strong></td>
+      <td>50</td>
+      <td>0–200</td>
+      <td>
+       Concentration en cations monovalents utilisée pour le calcul de Tm corrigé selon le sel. Plage habituelle : 10-200 mM.
+      </td>
+    </tr>
+
+    <tr>
+      <td><strong>Concentration de Mg²⁺ (mM)</strong></td>
+      <td>2.0</td>
+      <td>0–10</td>
+      <td>
+        Concentration en cations divalents utilisée pour le calcul de Tm. Indiquez 0 en l’absence de Mg²⁺. Plage habituelle : 0.5-5 mM.
+
+      </td>
+    </tr>
+
+  </tbody>
+</table>
+
+        </div>
+
+        
+        <div class="section">
+            <h2>Résultats et sorties</h2>
+            
+            <p>Après la conception des amorces, le module d’assemblage Gibson génère un ensemble complet de résultats afin de faciliter la validation expérimentale et le clonage en aval.</p>
+
+            <h3>Tableau des amorces</h3>
+	    <p>Les paires d’amorces conçues sont présentées dans un tableau structuré indiquant les séquences d’amorces complètes (5′→3′), la longueur, la teneur en GC et les températures de fusion (Tm). Les valeurs de Tm sont affichées à la fois pour la <strong>région cœur d’hybridation</strong> et pour l’<strong>amorce de pleine longueur</strong>, ce qui permet d’évaluer la compatibilité d’amplification. Les indicateurs de qualité des amorces, notamment les séries homopolymériques, les structures en épingle à cheveux, les auto-dimères et les dimères croisés, sont évalués et signalés afin de mettre en évidence les risques potentiels pour la PCR. Les <strong>régions de chevauchement sont mises en gras</strong> dans les séquences d’amorces pour en faciliter la visualisation.</p>
+
+
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/Gibson_primer_table.png"
+                    alt="Tableau des amorces de l’assemblage Gibson"
+                    style="max-width: 60%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+	    <h3>Schéma d’assemblage et tableau des surplombs</h3>
+	    <p>Un <strong>schéma de plasmide assemblé</strong> est généré afin d’illustrer le flux de clonage, y compris la linéarisation du vecteur, l’incorporation des inserts et l’assemblage plasmidique final. Ce diagramme fournit une vue conceptuelle de l’orientation des fragments et de la structure des jonctions. Un <strong>tableau des chevauchements</strong> affiche la séquence de chevauchement à chaque jonction, confirmant que les fragments adjacents possèdent une région homologue complémentaire. Ce tableau offre une vérification visuelle rapide que l’architecture d’assemblage est correcte et qu’aucun conflit ni mésappariement de surplomb n’est présent.</p>
+            <div class="warning-box">
+                <p><strong>Remarque :</strong> le schéma d’assemblage est uniquement conceptuel et n’est pas à l’échelle. L’interprétation exacte doit s’appuyer sur la séquence assemblée et sur les informations de chevauchement aux jonctions.</p>
+            </div>
+
+
+	   <div style="text-align: center; margin: 2em 0;">
+  		<img
+    			src="contents/pictures/Gibson_assembly_table.png"
+    			style="max-width: 60%; height: auto; border-radius: 8px;"
+  		 >
+	   </div>
+            
+            <h3>Électrophorèse sur gel d’agarose simulée</h3>
+            <p>PrimerWeaver génère une <strong>image de gel d’agarose simulée</strong> afin de prédire les résultats expérimentaux des étapes clés du clonage. Le gel comprend :</p>
+
+            <ul>
+                <li>Un marqueur d’ADN sélectionnable (par défaut : NEB 1 kb Plus DNA Ladder)</li>
+		<li>Le vecteur non digéré</li>
+                <li>Le vecteur linéarisé par digestion ou PCR</li>
+                <li>Les fragments amplifiés par PCR (une piste par fragment, indiquant la taille attendue y compris le chevauchement)</li>
+                <li>Le produit de réaction d’assemblage Gibson (montrant le construit assemblé)</li>
+                
+            </ul>
+            <p>Les tailles de bandes prédites sont annotées à côté du gel, ce qui permet de comparer les tailles de fragments attendues aux résultats expérimentaux et d’identifier rapidement d’éventuels problèmes de clonage.</p>
+
+
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/Gibson_gel.png"
+                    alt="Gel d’agarose simulé pour le flux d’assemblage Gibson"
+                    style="max-width: 60%; height: auto; border-radius: 8px;"
+                >
+            </div>
+        </div>
+
+
+
+        <div class="section">
+            <h2>Algorithme de conception des amorces</h2>
+            
+            <h3>Structure des amorces</h3>
+            <p>Chaque amorce d’assemblage Gibson comporte deux régions fonctionnelles :</p>
+            <ul>
+                <li><strong>Cœur d’hybridation (3′) :</strong> région complémentaire du gabarit qui pilote l’hybridation PCR (conçue dans une fenêtre de recherche de 18-40 bp)</li>
+		<li><strong>Région de chevauchement (5′) :</strong> séquence copiée du contexte de jonction adjacent dans l’assemblage final et ajoutée comme queue d’homologie Gibson (typiquement 20-30 bp). </li>
+            </ul>
+
+            <h3>Processus de conception</h3>
+            <p>PrimerWeaver ne conçoit pas les chevauchements Gibson isolément. Il construit d’abord le <strong>contexte d’assemblage réel</strong>, en extrait ensuite directement les segments de chevauchement, et seulement alors construit les amorces complètes. En pratique, l’algorithme se comprend le plus facilement comme quatre étapes liées.</p>
+
+            <h3>Étape 1. Définir le squelette vectoriel retenu et la séquence assemblée</h3>
+            <p>Si la <strong>linéarisation par enzyme de restriction</strong> est sélectionnée, le module digère le vecteur circulaire in silico, dresse la liste de tous les fragments candidats et utilise le fragment de squelette choisi par l’utilisateur comme pièce vectorielle retenue. Il insère ensuite le bloc d’inserts ordonné dans ce contexte de squelette et conserve ou retire éventuellement la séquence des sites de restriction selon le réglage <strong>conserver les sites</strong>. Dans ce mode, le code suit également un <strong>assemblage brut non tourné</strong> et peut tourner la séquence circulaire affichée afin que l’assemblage rapporté soit plus facile à interpréter, tout en préservant les coordonnées de jonction d’origine pour l’extraction des chevauchements.</p>
+            <p>Si la <strong>linéarisation PCR</strong> est sélectionnée, le module recale les amorces vectorielles fournies sur le vecteur par appariement 3′ ancré, autorise un repli complément inverse / permutation d’amorces si nécessaire, et choisit la meilleure paire d’amplicons valide. La séquence de squelette retenue est alors le produit PCR reconstruit, et le bloc d’inserts ordonné est ajouté dans ce contexte de squelette linéarisé afin de former la séquence assemblée utilisée pour la conception des chevauchements en aval.</p>
+
+            <h3>Étape 2. Déterminer les coordonnées des inserts dans l’assemblage final</h3>
+            <p>Une fois le squelette vectoriel fixé, le module calcule la position de début et de fin de chaque insert dans le construit assemblé. En mode linéarisation enzymatique, ces coordonnées sont recaléés à travers toute rotation circulaire appliquée pour l’affichage ; en mode linéarisation PCR, elles sont accumulées directement le long du squelette linéaire reconstruit. Cette carte de coordonnées est critique, car les chevauchements Gibson sont pris dans le <strong>voisinage de jonction assemblé</strong>, et non devinés indépendamment pour chaque amorce.</p>
+
+            <h3>Étape 3. Concevoir les cœurs d’hybridation sur chaque insert</h3>
+            <p>Pour chaque insert, PrimerWeaver conçoit un cœur sens à partir de l’extrémité 5′ de l’insert et un cœur antisens à partir de l’extrémité 3′. Les longueurs de cœur sont balayées dans une fenêtre de <strong>18-40 bp</strong> et évaluées avec le modèle de Tm des plus proches voisins. Le cœur sélectionné est celui qui satisfait le mieux le comportement de Tm cible sous les réglages actuels de sel / concentration d’amorce ; si aucun choix idéal n’est disponible, l’algorithme recourt au cœur workable le plus proche plutôt que d’abandonner la conception.</p>
+
+            <h3>Étape 4. Extraire les chevauchements Gibson des jonctions d’assemblage et construire les amorces complètes</h3>
+            <p>Une fois les positions des inserts connues, le module extrait le chevauchement de chaque extrémité d’insert à partir de la séquence assemblée elle-même. Le <strong>chevauchement gauche</strong> est pris dans la séquence de jonction immédiatement en amont de l’insert, et le <strong>chevauchement droit</strong> dans la séquence de jonction immédiatement en aval. Pour les extrémités côté vecteur, une logique de sous-séquence circulaire est utilisée si nécessaire afin que les chevauchements puissent traverser l’origine de la vue plasmidique tournée. Pour les jonctions insert–insert, la géométrie de chevauchement dépend de la question de savoir si un lieur optionnel est assez long pour fournir à lui seul le chevauchement complet, ou si le chevauchement doit chevaucher à la fois le lieur et la séquence d’insert voisine.</p>
+            <p>Les amorces complètes sont ensuite assemblées sous la forme <strong>chevauchement 5′ + cœur d’hybridation 3′</strong>. Les amorces sens reçoivent le chevauchement gauche directement, tandis que les amorces antisens reçoivent le complément inverse du chevauchement droit avant d’ajouter le cœur d’hybridation antisens. Ainsi, la paire d’amorces finale amplifie simultanément chaque insert et installe l’homologie exacte requise par le squelette choisi, l’ordre des fragments et la configuration des lieurs.</p>
+            <h3>Logique des cas limites dans l’algorithme</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cas limite algorithmique</th>
+                        <th>Comportement actuel du module Gibson</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Le mode de linéarisation change toute la géométrie</strong></td>
+                        <td>Le mode enzyme de restriction et le mode PCR ne se contentent pas de changer le formulaire de saisie ; ils produisent des séquences de squelette différentes, des systèmes de coordonnées différents et des chemins d’extraction de chevauchement différents. La disposition des chevauchements Gibson dépend donc du mode dès le départ.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>La linéarisation du vecteur ne peut pas être définie proprement</strong></td>
+                        <td>Si la linéarisation enzymatique ou PCR n’aboutit pas à une séquence de squelette retenue valide, l’algorithme s’arrête plutôt que de deviner une architecture de jonction.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>L’orientation de la linéarisation PCR est ambiguë</strong></td>
+                        <td>Si l’interprétation initiale des amorces PCR échoue mais qu’une interprétation complément inverse / amorces permutées réussit, le module adopte automatiquement cette orientation récupérée au lieu d’abandonner immédiatement la conception.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Une sélection de squelette est requise après digestion</strong></td>
+                        <td>Lorsque la digestion de restriction produit plusieurs fragments, l’algorithme ne peut pas poursuivre tant qu’un fragment n’est pas désigné comme squelette retenu. Changer cette sélection change les coordonnées de chevauchement et le jeu d’amorces final.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>La conservation des sites de reconnaissance change la séquence assemblée</strong></td>
+                        <td>Si le flux conserve la séquence des sites de restriction lors de la linéarisation enzymatique, le contexte de squelette assemblé change avant l’extraction des chevauchements ; l’homologie de jonction peut donc différer de la version sans site, sans cicatrice.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>La conception des chevauchements est spécifique des jonctions et consciente du squelette</strong></td>
+                        <td>Les chevauchements ne sont pas assignés comme des queues génériques. Ils sont découpés dans le voisinage de jonction assemblé après que le choix du squelette, l’ordre des inserts et tout placement de lieur sont fixés ; modifier l’un de ces facteurs change donc la solution de chevauchement.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>La longueur du lieur change la géométrie d’extraction des chevauchements</strong></td>
+                        <td>Si un lieur est assez long, l’algorithme peut prendre le chevauchement complet à l’intérieur du lieur. Si le lieur est court ou absent, le chevauchement est réparti sur la séquence voisine afin que l’homologie finale traverse encore la jonction.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>L’affichage plasmidique tourné n’équivaut pas aux coordonnées brutes de chevauchement</strong></td>
+                        <td>En mode linéarisation enzymatique, le plasmide assemblé affiché peut être tourné pour la lisibilité, mais l’extraction des chevauchements doit toujours respecter les coordonnées de jonction brutes avant rotation, afin que les amorces rapportées correspondent à la véritable géométrie d’assemblage.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>La recherche de cœur peut ne pas atteindre exactement une cible idéale</strong></td>
+                        <td>L’algorithme balaye une fenêtre bornée de longueur de cœur et choisit la solution de Tm workable la plus proche. S’il n’existe pas de correspondance parfaite à la Tm cible, il recourt au meilleur cœur disponible au lieu d’échouer d’emblée.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Avertissements et cas limites</h2>
+            <p>Le module d’assemblage Gibson utilise la couche partagée <strong>MW (Message Warning)</strong> pour la validation de prévol lorsqu’elle s’applique, et lève également des erreurs ou notes de conception propres au module lorsque la linéarisation du vecteur, la sélection des fragments ou la génération des chevauchements devient ambiguë.</p>
+
+            <h3>Avertissements généraux</h3>
+            <p>Ces avertissements sont principalement générés avant le début de la conception et indiquent généralement des problèmes de qualité des saisies ou des paramètres. Selon la situation, les utilisateurs peuvent soit réviser la configuration, soit continuer avec les réglages actuels.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Catégorie</th>
+                        <th>Déclencheur</th>
+                        <th>Comportement actuel du module Gibson</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Invites d’entrée bloquantes</strong></td>
+                        <td>Séquence vectorielle manquante, inserts manquants, amorces PCR manquantes en mode linéarisation PCR, noms d’enzymes invalides, ou sélection de squelette invalide.</td>
+                        <td>La conception s’arrête immédiatement et le module indique ce qui doit être corrigé avant qu’une conception valide puisse se poursuivre.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-04</strong><br>Aucune séquence valide après normalisation</td>
+                        <td>Un vecteur ou un insert devient vide après normalisation, car aucun symbole IUPAC d’ADN valide ne demeure.</td>
+                        <td>L’utilisateur peut néanmoins continuer, mais la séquence concernée ne permettra plus une sortie de conception pertinente.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-05</strong><br>Caractères non IUPAC retirés</td>
+                        <td>L’entrée contient des caractères non pris en charge qui sont retirés lors de la normalisation.</td>
+                        <td>Le module poursuit uniquement avec les séquences normalisées et avertit que le gabarit de conception effectif peut avoir changé.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-06</strong><br>Bases dégénérées détectées</td>
+                        <td>Le vecteur ou un insert contient des bases IUPAC ambiguës.</td>
+                        <td>Les valeurs thermodynamiques sont estimées de manière conservative à partir de la variante la plus stable ; les valeurs de Tm et de ΔG peuvent donc représenter une approximation de cas défavorable.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-FRAG-01</strong><br>Fragments insuffisants</td>
+                        <td>Trop peu de fragments d’insert sont fournis pour l’assemblage Gibson.</td>
+                        <td>La couche d’avertissement partagée signale un nombre insuffisant de fragments avant que la conception ne se poursuive.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-OVERLAP-01</strong><br>Longueur de chevauchement hors plage recommandée</td>
+                        <td>La longueur de chevauchement demandée sort de la plage recommandée de <strong>15–40 bp</strong>.</td>
+                        <td>Le module autorise la poursuite de la conception, mais avertit que des chevauchements trop courts peuvent réduire l’efficacité et que des chevauchements trop longs peuvent augmenter l’assemblage hors cible.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-10 à MW-15</strong><br>Avertissements de plage de paramètres</td>
+                        <td>Na<sup>+</sup>, Mg<sup>2+</sup>, la concentration d’amorce ou la Tm cible sort de la plage de modèle recommandée ou validée.</td>
+                        <td>Le module peut néanmoins s’exécuter, mais la prédiction thermodynamique et l’optimisation des amorces peuvent devenir moins fiables.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-19</strong><br>Taille totale d’entrée importante</td>
+                        <td>La taille totale vecteur plus inserts devient suffisamment grande pour solliciter le calcul côté navigateur.</td>
+                        <td>La couche d’avertissement partagée signale que la conception et le rendu côté navigateur peuvent ralentir pour des tailles d’entrée très importantes.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-20</strong><br>Plusieurs en-têtes FASTA dans un même champ</td>
+                        <td>Une zone de texte vecteur ou insert contient plus d’un enregistrement FASTA.</td>
+                        <td>Une boîte de dialogue MW partagée avertit qu’une seule séquence est autorisée par champ. Si l’utilisateur continue, le champ est réduit au <strong>premier enregistrement FASTA</strong> avant de poursuivre la conception.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-22</strong><br>Le fichier téléversé dépasse la limite d’importation</td>
+                        <td>Un fichier vecteur ou insert téléversé est plus grand que <strong>1 MB</strong>.</td>
+                        <td>L’importation est bloquée avant le chargement de la séquence, et l’utilisateur doit choisir un fichier plus petit.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Avertissements de conception</h3>
+            <p>Ces avertissements et cas limites découlent de la logique de conception propre à Gibson, notamment le mode de linéarisation du vecteur, la gestion des fragments et l’interprétation des chevauchements.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cas</th>
+                        <th>Déclencheur</th>
+                        <th>Comportement actuel du module Gibson</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Plafond du nombre d’inserts</strong></td>
+                        <td>Plus de six lignes d’insert sont ajoutées.</td>
+                        <td>L’interface plafonne strictement l’assemblage Gibson à <strong>six inserts</strong> et avertit l’utilisateur lorsque cette limite est atteinte.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>L’aperçu du vecteur n’utilise que la première séquence</strong></td>
+                        <td>Plusieurs enregistrements vectoriels sont présents avant le recadrage de prévol.</td>
+                        <td>L’aperçu de la carte signale que plusieurs séquences ont été trouvées et utilise le <strong>premier enregistrement</strong> pour la visualisation.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>La linéarisation enzymatique exige une topologie de coupure valide</strong></td>
+                        <td>Aucune enzyme n’est sélectionnée, les deux noms d’enzymes sont invalides, les deux enzymes sont identiques, ou le jeu d’enzymes sélectionné n’a aucun site valide dans le vecteur.</td>
+                        <td>La conception est abandonnée avec une erreur descriptive, car un squelette de linéarisation enzymatique valide ne peut pas être défini.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Exigence de sites pour double digestion</strong></td>
+                        <td>Le mode double digestion est choisi, mais l’une des deux enzymes n’a aucun site dans le vecteur.</td>
+                        <td>La conception s’arrête et indique quel site enzymatique est manquant dans le vecteur.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Le fragment de squelette doit être sélectionnable</strong></td>
+                        <td>Aucune liste de fragments n’est disponible après l’analyse enzymatique, ou l’index de fragment sélectionné est invalide.</td>
+                        <td>Le module s’arrête, car la linéarisation enzymatique Gibson exige un fragment de squelette concret à remplacer.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>La linéarisation PCR exige un placement d’amorces valide</strong></td>
+                        <td>Les amorces PCR sens et antisens ne peuvent pas être appariées au vecteur, ou aucun produit PCR valide ne peut être reconstruit.</td>
+                        <td>La conception est abandonnée et l’utilisateur est invité à vérifier ou réviser les amorces PCR.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Repli automatique RC / permutation d’amorces</strong></td>
+                        <td>L’appariement initial des amorces échoue, mais l’orientation complément inverse / permutée réussit.</td>
+                        <td>Le module permute automatiquement l’interprétation des amorces et enregistre une note de conception indiquant qu’une orientation RC a été détectée.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Le fragment de squelette sélectionné remplace tous les autres fragments enzymatiques</strong></td>
+                        <td>Le mode linéarisation enzymatique est utilisé avec un fragment de squelette choisi.</td>
+                        <td>Le fragment sélectionné est traité comme squelette retenu, et tous les autres fragments de digestion sont conceptuellement remplacés par le bloc d’inserts fourni.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>L’option de conservation des sites de reconnaissance change la séquence d’assemblage</strong></td>
+                        <td>L’option <code>keep sites</code> est activée lors de la linéarisation enzymatique.</td>
+                        <td>La séquence des sites de reconnaissance peut être réintroduite autour des jonctions d’inserts dans le construit assemblé, ce qui change la séquence d’assemblage finale par rapport à l’option sans cicatrice.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>La conversion du lieur peut échouer</strong></td>
+                        <td>Un lieur d’acides aminés ne peut pas être converti à l’aide de la table de codons de l’organisme hôte sélectionnée.</td>
+                        <td>La conception s’arrête et signale l’erreur de conversion du lieur pour l’insert concerné.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Le schéma d’assemblage est conceptuel</strong></td>
+                        <td>Toute conception d’assemblage Gibson réussie.</td>
+                        <td>L’image d’assemblage est conceptuelle plutôt qu’à l’échelle ; l’interprétation exacte doit s’appuyer sur la séquence assemblée, le tableau des chevauchements et les résultats d’amorces.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <p><strong>Interprétation pratique :</strong> les avertissements de l’assemblage Gibson n’indiquent pas toujours un échec de conception. Certains reflètent une normalisation de séquence, des limites de nombre de fragments, ou une ambiguïté dans la linéarisation du vecteur et l’orientation des amorces. Les résultats doivent donc être interprétés conjointement avec le fragment de squelette sélectionné, le tableau des chevauchements et la séquence assemblée finale.</p>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

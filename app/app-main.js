@@ -2,6 +2,26 @@
 // Minimal router: render module HTML first, then defer heavy module init to app-module-loader.js.
 
 const moduleContent = document.getElementById('module-content');
+const t = (key, params, fallback) => (
+  window.PW_I18N ? window.PW_I18N.t(key, params, fallback) : (fallback || key)
+);
+
+function ensureI18n() {
+  if (window.PW_I18N) return window.PW_I18N.ready;
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = '../contents/i18n/i18n.js';
+    script.onload = () => {
+      if (!window.PW_I18N) {
+        reject(new Error('Localization runtime did not initialize'));
+        return;
+      }
+      window.PW_I18N.ready.then(resolve, reject);
+    };
+    script.onerror = () => reject(new Error('Failed to load localization runtime'));
+    document.head.appendChild(script);
+  });
+}
 
 const moduleMap = {
   'qc': 'modules/QC_V1.0.1.html',
@@ -61,7 +81,16 @@ function prefetch(href) {
 }
 
 function deferAfterFirstPaint(fn) {
-  window.requestAnimationFrame(() => window.setTimeout(fn, 0));
+  let called = false;
+  const runOnce = () => {
+    if (called) return;
+    called = true;
+    fn();
+  };
+  // Background tabs may pause requestAnimationFrame indefinitely. Keep a timeout
+  // fallback so module controls are initialized even when the iframe starts hidden.
+  window.setTimeout(runOnce, 150);
+  window.requestAnimationFrame(() => window.setTimeout(runOnce, 0));
 }
 
 const moduleScriptMap = {
@@ -91,18 +120,19 @@ function warmupModuleNetwork(moduleName) {
 async function loadModule(moduleName) {
   const path = moduleMap[moduleName];
   if (!path) {
-    moduleContent.innerHTML = '<p>Error: Module not found.</p>';
+    moduleContent.innerHTML = `<p>${t('app.moduleNotFound', null, 'Error: Module not found.')}</p>`;
     return;
   }
 
   warmupModuleNetwork(moduleName);
-  moduleContent.innerHTML = '<p>Loading...</p>';
+  moduleContent.innerHTML = `<p>${t('app.loading', null, 'Loading...')}</p>`;
 
   try {
-    const response = await fetch(path);
+    const response = await fetch(path, { cache: 'no-cache' });
     if (!response.ok) throw new Error('Network response was not ok');
     const html = await response.text();
     moduleContent.innerHTML = html;
+    if (window.PW_I18N) window.PW_I18N.apply(moduleContent);
 
     // UI is now in the DOM; defer heavy JS init until after first paint.
     deferAfterFirstPaint(async () => {
@@ -115,7 +145,7 @@ async function loadModule(moduleName) {
     });
   } catch (e) {
     console.error('Error loading module:', e);
-    moduleContent.innerHTML = '<p>Error loading module.</p>';
+    moduleContent.innerHTML = `<p>${t('app.moduleLoadError', null, 'Error loading module.')}</p>`;
   }
 }
 
@@ -126,5 +156,16 @@ function handleHashChange() {
 }
 
 window.addEventListener('hashchange', handleHashChange);
-handleHashChange();
-registerServiceWorkerAfterFirstPaint();
+
+async function bootstrap() {
+  try {
+    await ensureI18n();
+  } catch (error) {
+    console.error(error);
+  }
+  handleHashChange();
+  registerServiceWorkerAfterFirstPaint();
+}
+
+window.addEventListener('primerweaver:localechange', handleHashChange);
+bootstrap();

@@ -1,3 +1,10 @@
+const t = (key, params, fallback) => (
+  window.PW_I18N ? window.PW_I18N.t(key, params, fallback) : (fallback || key)
+);
+const applyI18n = (root) => {
+  if (window.PW_I18N && root) window.PW_I18N.apply(root);
+};
+
 /**
  * bio_visuals.js
  * Pure rendering logic. 
@@ -508,7 +515,7 @@ export function showMWModal(container, message, onConfirm, onCancel) {
     icon.className = 'mw-warning-icon';
     icon.textContent = '⚠️';
     const title = document.createElement('h3');
-    title.textContent = 'Warning';
+    title.textContent = t('ui.warning', null, 'Warning');
     header.appendChild(icon);
     header.appendChild(title);
 
@@ -523,12 +530,12 @@ export function showMWModal(container, message, onConfirm, onCancel) {
 
     const cancelBtn = document.createElement('button');
     cancelBtn.id = 'mw-cancel-btn';
-    cancelBtn.textContent = 'Cancel';
+    cancelBtn.textContent = t('ui.cancel', null, 'Cancel');
     cancelBtn.className = 'btn ghost';
 
     const confirmBtn = document.createElement('button');
     confirmBtn.id = 'mw-confirm-btn';
-    confirmBtn.textContent = 'OK';
+    confirmBtn.textContent = t('ui.ok', null, 'OK');
     confirmBtn.className = 'btn';
 
     footer.appendChild(cancelBtn);

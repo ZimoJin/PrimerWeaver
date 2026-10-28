@@ -2,6 +2,13 @@ import * as CORE from './core_v1.0.1.js';
 import * as VIZ from './bio_visuals_v1.0.1.js';
 import { setupAssemblyParameterPresets } from './assembly_parameter_presets_v1.0.1.js';
 
+const t = (key, params, fallback) => (
+  window.PW_I18N ? window.PW_I18N.t(key, params, fallback) : (fallback || key)
+);
+const applyI18n = (root) => {
+  if (window.PW_I18N && root) window.PW_I18N.apply(root);
+};
+
 export function initRECloning(container){
   if (typeof window !== 'undefined') {
     window.CORE = CORE;
@@ -12,8 +19,8 @@ export function initRECloning(container){
 
   setupAssemblyParameterPresets(container || document, {
     scope: 'restriction-assembly',
-    label: 'restriction cloning settings',
-    placeholder: 'e.g. Standard restriction cloning',
+    label: t('re.presetLabel', null, 'restriction cloning settings'),
+    placeholder: t('re.presetPlaceholder', null, 'e.g. Standard restriction cloning'),
     fields: [
       { key: 'enzyme1', selector: '#re-enzyme1', defaultValue: '' },
       { key: 'enzyme2', selector: '#re-enzyme2', defaultValue: '' },
@@ -1029,14 +1036,14 @@ function subseqCircular(seq, start, len){
           const base = new URL('modules/contents/demo/', window.location.href).toString();
           const resp = await fetch(base + 'Insert_1.txt');
           if (!resp.ok) {
-            alert('Failed to load demo sequence.');
+            alert(t('ui.failedDemo', null, 'Failed to load demo sequence.'));
             return;
           }
           const text = await resp.text();
           textarea.value = text;
         } catch (e) {
           console.error('Insert demo load error:', e);
-          alert('Failed to load demo sequence.');
+          alert(t('ui.failedDemo', null, 'Failed to load demo sequence.'));
         }
       });
     }
@@ -1058,7 +1065,7 @@ function subseqCircular(seq, start, len){
     const rows = document.querySelectorAll('.insert-row');
     rows.forEach((row, idx) => {
       const label = row.querySelector('.insert-label');
-      label.textContent = `Insert #${idx + 1}:`;
+      label.textContent = t('ui.insertNColon', {n: idx + 1}, 'Insert #{n}:');
       row.setAttribute('data-index', idx);
     });
     insertCount = rows.length;
@@ -1089,24 +1096,25 @@ function subseqCircular(seq, start, len){
     newRow.className = 'insert-row';
     newRow.setAttribute('data-index', insertCount - 1);
     newRow.innerHTML = `
-      <div class="insert-label">Insert #${insertCount}:</div>
+      <div class="insert-label">${t('ui.insertNColon', {n: insertCount}, 'Insert #{n}:')}</div>
       <div class="insert-body">
         <textarea class="insert-seq" placeholder=">insert${insertCount}&#10;ATGCGTAGCTA..."></textarea>
         <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 6px;">
           <div class="row end" style="gap: 6px;">
             <input type="file" class="insert-file" accept=".fa,.fasta,.fas,.txt,.gb,.gbk,.gbff,.genbank" style="display: none;">
-            <button type="button" class="btn demo insert-flip-btn">Reverse complement</button>
-            <button class="btn demo insert-demo-btn" type="button" data-sample="insert">Demo</button>
-            <button class="ghost btn insert-upload-btn" type="button">Upload</button>
+            <button type="button" class="btn demo insert-flip-btn" data-i18n="ui.reverseComplement">Reverse complement</button>
+            <button class="btn demo insert-demo-btn" type="button" data-sample="insert" data-i18n="ui.demo">Demo</button>
+            <button class="ghost btn insert-upload-btn" type="button" data-i18n="ui.upload">Upload</button>
           </div>
         </div>
       </div>
       <div></div>
       <div class="insert-controls">
-        <button class="ghost btn sm remove-insert-btn" type="button" title="Delete" style="display: none;">×</button>
+        <button class="ghost btn sm remove-insert-btn" type="button" title="${t('ui.delete', null, 'Delete')}" data-i18n-title="ui.delete" style="display: none;">×</button>
       </div>
     `;
     container.appendChild(newRow);
+    applyI18n(newRow);
     setupInsertRowListeners(newRow);
     updateInsertNumbers();
     updateInsertControls();
@@ -1201,7 +1209,7 @@ function subseqCircular(seq, start, len){
           const base = new URL('modules/contents/demo/', window.location.href).toString();
           const resp = await fetch(base + 'pESC-His.txt');
           if (!resp.ok) {
-            alert('Failed to load demo sequence.');
+            alert(t('ui.failedDemo', null, 'Failed to load demo sequence.'));
             return;
           }
           const text = await resp.text();
@@ -1210,7 +1218,7 @@ function subseqCircular(seq, start, len){
           calculateAndDisplayVectorFragments();
         } catch (e) {
           console.error('Vector demo load error:', e);
-          alert('Failed to load demo sequence.');
+          alert(t('ui.failedDemo', null, 'Failed to load demo sequence.'));
         }
       });
     }
@@ -1257,7 +1265,7 @@ function subseqCircular(seq, start, len){
           calculateAndDisplayVectorFragments();
         } catch (e) {
           console.error('Demo Set load error:', e);
-          alert('Failed to load demo sequences.');
+          alert(t('ui.failedDemoPlural', null, 'Failed to load demo sequences.'));
         }
       });
     }
@@ -1278,7 +1286,7 @@ function subseqCircular(seq, start, len){
     const canvas = document.getElementById('vector-map-canvas');
     
     if (!vectorText || !canvas) {
-      if (statsDiv) statsDiv.textContent = 'Paste vector sequence above to update preview.';
+      if (statsDiv) statsDiv.textContent = t('ui.pasteVectorPreview', null, 'Paste vector sequence above to update preview.');
       if (canvas) {
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -1295,11 +1303,11 @@ function subseqCircular(seq, start, len){
     try {
       const records = window.CORE.parseFASTA(vectorText);
       if (records.length === 0) {
-        if (statsDiv) statsDiv.textContent = 'Unable to parse vector sequence';
+        if (statsDiv) statsDiv.textContent = t('ui.unableParseVector', null, 'Unable to parse vector sequence');
         return;
       }
       if (records.length > 1 && statsDiv) {
-        statsDiv.textContent = 'Multiple sequences found, using first one';
+        statsDiv.textContent = t('ui.multipleSeqFirst', null, 'Multiple sequences found, using first one');
       }
       
       const vector = records[0];
@@ -1363,7 +1371,7 @@ function subseqCircular(seq, start, len){
       
     } catch (error) {
       console.error('Error updating vector preview:', error);
-      if (statsDiv) statsDiv.textContent = 'Error parsing vector';
+      if (statsDiv) statsDiv.textContent = t('ui.errorParsingVector', null, 'Error parsing vector');
     }
   }
 
@@ -1553,8 +1561,8 @@ function subseqCircular(seq, start, len){
       const vectorRaw = document.getElementById('gg-vector').value || '';
       const frags = collectFragments();
       if(!frags.length){
-        if(window._ggShowModal){ window._ggShowModal('Please add an insert sequence.'); }
-        else { alert('Please add an insert sequence.'); }
+        if(window._ggShowModal){ window._ggShowModal(t('ui.pleaseAddInsert', null, 'Please add an insert sequence.')); }
+        else { alert(t('ui.pleaseAddInsert', null, 'Please add an insert sequence.')); }
         return;
       }
       const insertRaw = frags[0].seq;
@@ -1584,13 +1592,13 @@ function subseqCircular(seq, start, len){
       const vecClean = cleanFasta(vectorRaw);
       const insClean = cleanFasta(insertRaw);
       if(!vecClean){
-        if(window._ggShowModal){ window._ggShowModal('Vector sequence is empty.'); }
-        else { alert('Vector sequence is empty.'); }
+        if(window._ggShowModal){ window._ggShowModal(t('ui.vectorEmpty', null, 'Vector sequence is empty.')); }
+        else { alert(t('ui.vectorEmpty', null, 'Vector sequence is empty.')); }
         return;
       }
       if(!insClean){
-        if(window._ggShowModal){ window._ggShowModal('Insert sequence is empty.'); }
-        else { alert('Insert sequence is empty.'); }
+        if(window._ggShowModal){ window._ggShowModal(t('ui.insertEmpty', null, 'Insert sequence is empty.')); }
+        else { alert(t('ui.insertEmpty', null, 'Insert sequence is empty.')); }
         return;
       }
 
@@ -2150,7 +2158,7 @@ function subseqCircular(seq, start, len){
                 fasta += '>' + rName + '\n' + wrapFasta(rSeq);
               }
             }
-            text = fasta.trim() ? (fasta.trimEnd() + '\n') : 'No primer sequences available.';
+            text = fasta.trim() ? (fasta.trimEnd() + '\n') : t('ui.noPrimerSeqs', null, 'No primer sequences available.');
           } else {
             const node = (container?.querySelector?.('#primer-table')) || document.getElementById('primer-table');
             text = (node && node.innerText) ? node.innerText : 'No primer results';
@@ -2162,8 +2170,8 @@ function subseqCircular(seq, start, len){
           const seq = (window._ggAssembledSeq || '').toUpperCase();
           const name = window._ggAssembledName || 'RE_assembled';
           if(!seq){
-            if(window._ggShowModal){ window._ggShowModal('Assembled plasmid sequence is not available. Please run the design first.'); }
-            else { alert('Assembled plasmid sequence is not available. Please run the design first.'); }
+            if(window._ggShowModal){ window._ggShowModal(t('ui.assembledUnavailableRun', null, 'Assembled plasmid sequence is not available. Please run the design first.')); }
+            else { alert(t('ui.assembledUnavailableRun', null, 'Assembled plasmid sequence is not available. Please run the design first.')); }
             return;
           }
           let fasta = '>' + name + '\n';

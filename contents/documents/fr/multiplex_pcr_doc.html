@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PCR multiplexe - PrimerWeaver V1.0.6</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #333;
+            background: #f9fafb;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e40af;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2563eb;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            font-size: 1.5em;
+        }
+        h3 {
+            color: #3b82f6;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            font-size: 1.2em;
+        }
+        h4 {
+            color: #60a5fa;
+            margin-top: 1.2em;
+            margin-bottom: 0.6em;
+        }
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 1em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        strong {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c2410c;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .abstract {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+        .abstract p {
+            margin: 0;
+            font-style: italic;
+        }
+        .highlight {
+            background: #fef3c7;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        .section {
+            margin-bottom: 2.5em;
+        }
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background: #fff7ed;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .version-info {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+            margin-top: 3em;
+            padding-top: 2em;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PCR multiplexe</h1>
+        
+        <div class="abstract">
+            <p>Le module de PCR multiplexe fournit des outils pour concevoir et valider des jeux d’amorces capables d’amplifier simultanément plusieurs séquences cibles d’ADN dans une même réaction. Il automatise la conception des amorces avec une analyse thermodynamique intégrée, la détection des conflits d’hétérodimères, le dépistage de l’amplification hors cible et des stratégies de regroupement fondées sur des graphes. Un graphe de conflits unifié tient compte de trois facteurs — les interactions thermodynamiques entre amorces, la résolution de taille des produits PCR sur gel, et l’amplification hors cible partagée — afin de répartir automatiquement les amorces en groupes sans conflit, chacun adapté à un tube de réaction distinct. Des visualisations interactives sous forme de cartes de chaleur permettent d’évaluer d’un coup d’œil la compatibilité des amorces.</p>
+        </div>
+
+        <div class="section">
+            <h2>Guide de démarrage rapide</h2>
+
+	    <ol>
+		<li>Téléversez ou collez vos séquences cibles d’amplification ou vos séquences d’amorces déjà conçues au format FASTA ou en texte brut dans les champs d’entrée, en choisissant le mode de conception approprié (mode de conception de novo ou mode CQ). Vérifiez et ajustez les paramètres de conception si nécessaire.
+
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/multiplex_PCR_demo.png"
+                    style="max-width: 90%; height: auto; border-radius: 8px;"
+                >
+            </div>
+                <li>Cliquez sur « Concevoir les amorces » pour lancer la conception automatisée et l’évaluation de la qualité. Examinez les indicateurs de CQ des amorces, les recommandations de regroupement et la carte de chaleur des interactions amorce–amorce. Téléchargez les amorces par groupe au format FASTA et analysez-les localement.</li>
+
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>Principe de la PCR multiplexe</h2>
+            
+            <p>La PCR multiplexe amplifie simultanément plusieurs cibles d’ADN dans une même réaction, ce qui améliore nettement l’efficacité expérimentale et le débit. Cet avantage s’accompagne toutefois de la difficulté de gérer des interactions complexes dans le mélange réactionnel. Contrairement à la PCR simplex, les réactions multiplexes impliquent plusieurs paires d’amorces aux propriétés thermodynamiques diverses, ce qui multiplie les risques d’amorçage erroné, de formation de dimères d’amorces et de biais d’amplification qu’il faut contrôler. Outre les interactions amorce–amorce, la PCR multiplexe doit aussi gérer la compétition entre paires d’amorces pour des réactifs partagés, ainsi que des interactions non voulues amorce–cible et cible–cible liées à la similarité de séquence ou à des efficacités d’amplification inégales.</p>
+
+
+            <h3>Principaux critères de conception</h3>
+            <ul>
+                <li><strong>Compatibilité amorce–amorce :</strong> toutes les amorces d’un même groupe doivent présenter des interactions thermodynamiques minimales. Une forte complémentarité amorce–amorce, surtout aux extrémités 3′, peut conduire à la formation de dimères qui consomment les amorces et inhibent l’amplification de la cible.</li>
+                <li><strong>Discriminabilité de la taille des produits :</strong> les amplicons d’une réaction multiplexe doivent différer suffisamment en longueur pour permettre une séparation et une identification non ambiguës par électrophorèse sur gel ou par des méthodes de détection en aval. Les produits de tailles très proches sont évités dans un même groupe afin de prévenir une interprétation ambiguë.</li>
+                <li><strong>Spécificité des cibles et compétition :</strong> les amorces doivent amplifier spécifiquement leurs cibles prévues sans générer de produits hors cible partagés. La compétition entre paires d’amorces pour les réactifs, ainsi que les interactions non voulues amorce–cible ou cible–cible, peuvent introduire un biais d’amplification et doivent être réduites par un regroupement soigneux.</li>
+            </ul>
+
+
+        <div class="section">
+            <h2>Format d’entrée</h2>
+
+	    <p>Le <strong>mode de conception de novo</strong> et le <strong>mode CQ</strong> acceptent tous deux le <strong>format multi-FASTA ou texte brut</strong>. Les fichiers téléversés de plus de <strong>1 MB</strong> sont bloqués par le contrôle d’importation commun <strong>MW-22</strong>. Même en dessous de cette limite stricte, l’interface utilisateur peut devenir instable lors du traitement d’entrées très volumineuses ; nous recommandons donc de limiter chaque analyse à <strong>500 séquences au maximum</strong>.<p>
+
+             <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/multiplex_PCR_input.png"
+                    alt="Entrée de la PCR multiplexe"
+                    style="max-width: 70%; height: auto; border-radius: 8px;"
+                >
+            </div>
+	    
+           
+            
+        <div class="section">
+            <h2>Paramètres de conception</h2>
+            <p>Avant de poursuivre, veuillez examiner les <strong>paramètres de conception des amorces</strong> et les ajuster si nécessaire.</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Paramètre</th>
+            <th>Valeur par défaut</th>
+            <th>Plage</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Tm cible (°C)</strong></td>
+            <td>55</td>
+            <td>40–75</td>
+            <td>
+                Température de fusion cible pour la <em>région de liaison à la matrice (hybridation)</em> des amorces.
+                Les amorces sont conçues pour avoir une Tm proche de cette valeur. Les séquences de chevauchement ou d’adaptateur sont exclues
+                du calcul de la Tm.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>ΔTm (°C)</strong></td>
+            <td>2.5</td>
+            <td>0–5</td>
+            <td>
+                Différence maximale autorisée de température de fusion entre les amorces sens et antisens au sein
+                d’une même paire d’amorces.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Concentration des amorces (nM)</strong></td>
+            <td>500</td>
+            <td>50–2000</td>
+            <td>
+                Concentration effective des amorces retenue pour le calcul in silico de la Tm. Plage habituelle : 25-1000 nM.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Concentration en Na⁺ (mM)</strong></td>
+            <td>50</td>
+            <td>0–200</td>
+            <td>
+                Concentration en cations monovalents utilisée pour le calcul de la Tm corrigé en fonction des sels. Plage habituelle : 10-200 mM.
+
+
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Concentration en Mg²⁺ (mM)</strong></td>
+            <td>2.0</td>
+            <td>0–10</td>
+            <td>
+                Concentration en cations divalents utilisée pour le calcul de la Tm. Réglez-la sur 0 si la réaction ne contient pas de Mg²⁺. Plage habituelle : 0.5-5 mM.
+
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Tolérance de taille (bp)</strong></td>
+            <td>20</td>
+            <td>0–50</td>
+            <td>
+                Différence minimale de taille des produits requise pour une résolution fiable par électrophorèse sur gel d’agarose.
+                Réglez-la sur 0 pour désactiver le regroupement fondé sur la taille (par exemple pour la qPCR ou les analyses fondées sur le séquençage).
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Chevauchement sens</strong></td>
+            <td>—</td>
+            <td>Facultatif</td>
+            <td>
+                Séquence ajoutée à l’extrémité 5′ des amorces sens pour des applications de clonage ou d’assemblage
+                (par exemple l’assemblage Gibson). Cette région ne participe pas au calcul de la Tm.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Chevauchement antisens</strong></td>
+            <td>—</td>
+            <td>Facultatif</td>
+            <td>
+                Séquence ajoutée à l’extrémité 5′ des amorces antisens pour des applications de clonage ou d’assemblage.
+                Cette région ne participe pas au calcul de la Tm.
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+            
+            <div class="info-box">
+                <strong>Note sur la tolérance de taille :</strong>
+                <ul style="margin: 8px 0 0 20px;">
+                    <li><strong>0 bp :</strong> désactiver le regroupement fondé sur la taille (pour la qPCR, le séquençage, ou lorsque l’électrophorèse sur gel n’est pas utilisée)</li>
+                    <li><strong>5 bp :</strong> gel à haute résolution (agarose 2–3 %), peut distinguer des bandes très proches</li>
+                    <li><strong>10–15 bp :</strong> gel standard (agarose 1–2 %), distingue de façon fiable la plupart des bandes</li>
+                    <li><strong>20 bp :</strong> valeur par défaut, adaptée à l’électrophorèse sur gel de routine</li>
+                </ul>
+            </div>
+            
+            <div class="warning-box">
+                <strong>Important :</strong> en mode CQ, le regroupement fondé sur la taille est automatiquement désactivé, car la longueur des produits PCR n’est pas disponible. Le regroupement repose uniquement sur les paramètres thermodynamiques.
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Résultats et sortie</h2>
+            
+            <p>Après la conception des amorces ou l’analyse de contrôle qualité, PrimerWeaver produit des résultats détaillés comprenant des tableaux d’amorces avec indicateurs de qualité, des recommandations de regroupement et des visualisations interactives.</p>
+            
+            <h3>Tableau des propriétés des amorces</h3>
+            <p>Les paires d’amorces conçues ou analysées sont présentées dans un tableau structuré, comprenant les séquences d’amorces (5′→3′), la longueur, la teneur en GC et les températures de fusion (Tm). Les valeurs de Tm sont affichées à la fois pour la région cœur d’hybridation et pour l’amorce de pleine longueur, afin d’évaluer la compatibilité d’amplification. Les indicateurs de qualité des amorces, notamment les répétitions homopolymériques, les structures en épingle à cheveux, les autodimères et la formation d’hétérodimères, sont évalués et signalés afin de mettre en évidence les risques susceptibles d’affecter les performances de la PCR. </p>
+            
+            
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/multiplex_PCR_table.png"
+                    alt="Tableau des amorces de PCR multiplexe avec indicateurs de qualité"
+                    style="max-width: 70%; height: auto; border-radius: 8px;"
+                >
+            </div>
+        </div>
+
+        <h3>Recommandations de regroupement</h3>
+        <p>Après analyse de toutes les interactions d’amorces deux à deux, le module recommande une stratégie de regroupement optimale qui répartit les amorces dans le plus petit nombre possible de tubes de réaction. Les résultats de regroupement indiquent si toutes les amorces peuvent être combinées dans une seule réaction ou doivent être réparties entre plusieurs réactions, et expliquent pourquoi certaines amorces ne peuvent pas être regroupées.<p>
+    
+        <div style="text-align: center; margin: 2em 0;">
+            <img
+                src="contents/pictures/multiplex_PCR_pooling.png"
+                alt="Recommandations de regroupement de la PCR multiplexe et attribution des groupes"
+                style="max-width: 70%; height: auto; border-radius: 8px;"
+            >
+        </div>
+        </div>
+
+        <div class="section">
+            <h3>Matrice des dimères amorce-amorce </h3>
+            <p>Le module génère des matrices interactives sous forme de cartes de chaleur montrant toutes les interactions d’amorces deux à deux au sein de chaque groupe. La carte de chaleur utilise un dégradé de couleurs pour indiquer la force d’interaction d’après l’énergie libre de Gibbs (ΔG). Lorsque les amorces sont réparties en plusieurs groupes, une carte de chaleur distincte est générée pour chaque groupe. Cela permet de vérifier visuellement que les amorces de chaque groupe n’ont que des interactions faibles ou négligeables.</p>
+                     
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/multiplex_PCR_heatmap.png"
+                    alt="Visualisation de la carte de chaleur des interactions amorce-amorce en PCR multiplexe"
+                    style="max-width: 70%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+           
+        <div class="section">
+            <h2>Algorithme de conception des amorces</h2>
+            
+            <h3>Processus de conception des amorces</h3>
+            <p>PrimerWeaver emploie un <strong>flux de travail systématique, centré sur les cibles</strong>, pour concevoir des <strong>amorces de PCR multiplexe</strong> qui satisfont des <strong>contraintes thermodynamiques, structurales et de regroupement</strong>. Pour chaque séquence cible, l’algorithme parcourt les <strong>extrémités 5′ et 3′</strong> afin d’identifier des sites de liaison candidats qui atteignent la <strong>température de fusion (Tm) cible définie par l’utilisateur</strong> dans la tolérance spécifiée. Les amorces candidates sont ensuite évaluées quant à leur <strong>qualité intrinsèque</strong>, notamment la teneur en GC, les répétitions homopolymériques, la formation d’épingles à cheveux et le potentiel d’autodimères. Des séquences de chevauchement 5′ facultatives pour des applications de clonage en aval sont ajoutées après la sélection des amorces et sont exclues du calcul de la Tm. Pour chaque paire d’amorces validée, la <strong>taille attendue du produit PCR</strong> est calculée et conservée pour l’analyse de regroupement en aval.</p>
+	    <p>En <strong>mode de conception de novo</strong>, PrimerWeaver effectue en outre un <strong>dépistage de l’amplification hors cible</strong> au moyen d’un algorithme de type graine et extension (seed-and-extend). Les événements de liaison non ciblés potentiels exigent une correspondance exacte dans la région graine en 3′, tout en autorisant un nombre limité de mésappariements dans la région 5′ en amont. Tous les amplicons non ciblés possibles sont identifiés et dimensionnés. Les paires d’amorces qui amplifient la même région non ciblée ou génèrent des produits indiscernables sont signalées comme conflictuelles et exclues du même groupe multiplexe. <strong>L’analyse hors cible n’est pas effectuée en mode CQ</strong>, car les séquences matrices ne sont pas fournies.<p>
+            
+            <h3>Modélisation thermodynamique et évaluation des interactions</h3>
+            <p>Tous les calculs de température de fusion et d’interactions reposent sur le <strong>modèle thermodynamique unifié des plus proches voisins (NN)</strong>. Les températures de fusion des amorces sont calculées à partir de paramètres d’enthalpie (ΔH°) et d’entropie (ΔS°) spécifiques de la séquence, avec des corrections pour la concentration en sels et la concentration effective des amorces. La stabilité des autodimères et des hétérodimères est évaluée en calculant l’énergie libre de Gibbs (ΔG) de la formation potentielle de duplex à la température d’hybridation de la PCR, avec un accent particulier sur la complémentarité de l’extrémité 3′, qui présente le risque le plus élevé d’extension par la polymérase.</p>
+            <p>À partir de toutes les <strong>énergies d’interaction deux à deux</strong>, PrimerWeaver recommande une <strong>stratégie de regroupement optimale</strong> qui répartit les amorces dans le <strong>plus petit nombre possible de réactions PCR</strong> tout en évitant les conflits thermodynamiques forts. Les paires d’amorces présentant des <strong>interactions amorce–amorce stables, une résolution de taille sur gel insuffisante</strong> ou des <strong>événements d’amplification hors cible partagés</strong> sont assignées à des groupes distincts. La sortie finale indique à la fois la configuration de regroupement recommandée et les contraintes spécifiques empêchant de combiner des amorces incompatibles.<p>
+                       
+                       
+                        
+            
+        </div>
+
+        <div class="section">
+            <h2>Avertissements et cas limites</h2>
+            <p>Le module de PCR multiplexe combine la couche commune <strong>MW (Message Warning)</strong> avec des contraintes de conception propres au multiplexe concernant le nombre de cibles, les queues de chevauchement, le dépistage hors cible et le regroupement fondé sur des graphes. Certains avertissements sont de purs contrôles préalables, tandis que d’autres expliquent pourquoi une conception ou une attribution de groupe se comporte différemment d’un flux PCR à cible unique.</p>
+
+            <h3>Avertissements généraux</h3>
+            <p>Ces avertissements sont principalement générés avant le début de la conception ou de l’analyse CQ et reflètent des problèmes de qualité des séquences, de qualité des paramètres, de taille des entrées ou de limite de téléversement.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Catégorie</th>
+                        <th>Condition de déclenchement</th>
+                        <th>Comportement actuel du module de PCR multiplexe</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Invites bloquantes liées aux entrées</strong></td>
+                        <td>Séquences cibles manquantes, séquences d’amorces manquantes en mode CQ, échecs d’analyse syntaxique ou autres entrées requises non valides.</td>
+                        <td>Le module s’arrête immédiatement et demande à l’utilisateur de corriger l’entrée manquante ou non valide avant que l’analyse puisse se poursuivre.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-04</strong><br>Aucune séquence valide après normalisation</td>
+                        <td>Toutes les séquences cibles soumises deviennent vides après normalisation.</td>
+                        <td>L’utilisateur peut tout de même poursuivre, mais la conception ou la sortie CQ résultante sera vide ou non informative.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-05</strong><br>Caractères non IUPAC supprimés</td>
+                        <td>Les séquences cibles contiennent des caractères non pris en charge.</td>
+                        <td>Le module poursuit uniquement avec les séquences normalisées et avertit que la matrice effective peut différer de l’entrée d’origine.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-06</strong><br>Bases dégénérées détectées</td>
+                        <td>Les cibles contiennent des bases IUPAC ambiguës.</td>
+                        <td>Les valeurs thermodynamiques sont estimées de manière prudente à partir de l’interprétation la plus stable ; les valeurs de Tm et de ΔG doivent donc être considérées comme des approximations.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-09</strong><br>Grand ensemble de données</td>
+                        <td>Le nombre d’éléments cibles ou de paires d’amorces soumis dépasse <strong>500</strong>.</td>
+                        <td>Le module avertit que le traitement dans le navigateur peut ralentir ou ne plus répondre.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-10 à MW-15</strong><br>Avertissements relatifs aux plages des paramètres</td>
+                        <td>En mode Conception, Na<sup>+</sup>, Mg<sup>2+</sup>, la concentration des amorces ou la Tm cible se situe en dehors des plages thermodynamiques recommandées ou validées.</td>
+                        <td>Le module peut tout de même poursuivre, mais l’optimisation des amorces et l’interprétation thermodynamique deviennent moins fiables.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-19</strong><br>Grande taille totale des séquences</td>
+                        <td>La taille totale des séquences d’entrée devient très importante.</td>
+                        <td>Le module avertit que le calcul dans le navigateur peut ralentir pendant la conception, le CQ ou l’analyse de regroupement.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-22</strong><br>Le téléversement dépasse la limite d’importation</td>
+                        <td>Un fichier de cibles ou d’amorces téléversé dépasse <strong>1 MB</strong>.</td>
+                        <td>L’importation est bloquée avant le chargement des séquences et l’utilisateur doit choisir un fichier plus petit.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Avertissements de conception</h3>
+            <p>Ces avertissements et cas limites découlent de la logique de conception propre au multiplexe, du dépistage hors cible et du modèle final de regroupement.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cas</th>
+                        <th>Condition de déclenchement</th>
+                        <th>Comportement actuel du module de PCR multiplexe</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>MPX-MW-01</strong><br>Nombreuses cibles dans une même conception</td>
+                        <td>Le mode Conception est utilisé avec plus de <strong>10 cibles</strong>.</td>
+                        <td>Le module avertit que l’efficacité multiplexe et les risques de réactivité croisée augmentent à mesure que le panel s’agrandit, mais autorise tout de même la poursuite de la conception.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Avertissement de longueur des chevauchements sens / antisens</strong></td>
+                        <td>Les queues de chevauchement 5′ fournies par l’utilisateur sortent de la plage recommandée de <strong>15–40 bp</strong>.</td>
+                        <td>Le module émet des avertissements de chevauchement mais autorise tout de même la poursuite de la conception, en indiquant que des longueurs de chevauchement extrêmes peuvent réduire la robustesse de l’assemblage en aval.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Recours à la Tm la plus proche pour le placement des amorces</strong></td>
+                        <td>Aucune amorce candidate ne satisfait exactement la fenêtre de Tm demandée à une extrémité de la cible.</td>
+                        <td>L’algorithme se rabat sur la meilleure amorce localement disponible plutôt que d’échouer immédiatement ; certaines amorces rapportées peuvent donc se situer hors de la tolérance de Tm idéale.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Le mode Conception effectue un dépistage hors cible ; le mode CQ ne le fait pas</strong></td>
+                        <td>Le flux de travail sélectionné bascule entre conception de novo et mode CQ.</td>
+                        <td>Seul le mode Conception évalue l’amplification hors cible par rapport au panel de cibles soumis ; en mode CQ, le statut hors cible est inconnu car le contexte matriciel n’est pas fourni.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Le mode CQ désactive la logique de regroupement fondée sur la taille</strong></td>
+                        <td>Le mode CQ est utilisé avec uniquement des paires d’amorces téléversées.</td>
+                        <td>Les recommandations de regroupement reposent uniquement sur les conflits thermodynamiques, car la taille attendue des amplicons et le filtrage par résolution de taille ne sont pas disponibles.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Le regroupement est fondé sur un graphe et heuristique</strong></td>
+                        <td>De nombreuses paires d’amorces concourent pour le même groupe multiplexe.</td>
+                        <td>Le module assigne les amorces aux groupes par coloration d’un graphe de conflits, ce qui est pratique mais n’est pas garanti de produire un nombre de groupes globalement minimal dans tous les cas.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cibles en échec au niveau des résultats</strong></td>
+                        <td>Une cible ne peut pas produire de paire d’amorces valide, ou une paire conçue entre en conflit avec les attentes de longueur de produit.</td>
+                        <td>La cible concernée est listée comme en échec dans la zone de résultats plutôt que d’être omise silencieusement, afin que l’utilisateur puisse examiner pourquoi elle n’a pas pu être incluse dans le panel.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Des hors-cibles partagés peuvent scinder les groupes</strong></td>
+                        <td>Des paires d’amorces différentes amplifient la même région non voulue ou produisent des produits indiscernables.</td>
+                        <td>Le graphe de conflits traite ces paires d’amorces comme incompatibles, les forçant dans des groupes distincts même si leur interaction thermodynamique directe est faible.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <p><strong>Interprétation pratique :</strong> les avertissements en PCR multiplexe n’indiquent pas toujours un panel en échec. La distinction la plus importante est de savoir si le module fonctionne en <strong>mode Conception</strong> ou en <strong>mode CQ</strong>, car seul le mode Conception peut évaluer l’amplification hors cible et le regroupement tenant compte de la taille des produits. L’interprétation finale doit donc combiner la liste des avertissements avec le rapport des cibles en échec, l’explication du regroupement et le mode de flux de travail sélectionné.</p>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

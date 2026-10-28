@@ -4,9 +4,10 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>PrimerWeaver · Integrated Primer Design</title>
+    <title data-i18n="meta.title">PrimerWeaver · Integrated Primer Design</title>
     <meta name="description"
-        content="an integrated web server for primer design in molecular biology workflows." />
+        content="An integrated web server for primer design in molecular biology workflows."
+        data-i18n-content="meta.description" />
     
     <link rel="stylesheet" href="contents/style.css">
 
@@ -14,26 +15,35 @@
 
 <body>
     <div id="welcome-screen">
-        <div class="welcome-corner-text">PrimerWeaver V1.0.3</div>
+        <div class="welcome-corner-text">PrimerWeaver V1.0.6</div>
+        <label class="language-picker welcome-language-picker">
+            <span class="sr-only" data-i18n="language.label">Language</span>
+            <select data-language-select aria-label="Language" data-i18n-aria-label="language.label">
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+                <option value="ko">한국어</option>
+                <option value="zh-Hans">中文</option>
+            </select>
+        </label>
         <div class="app-container">
             <nav class="tab-navigation">
-                <button class="tab-link active" id="start-tab">Start</button>
+                <button class="tab-link active" id="start-tab" data-i18n="welcome.tab">Start</button>
             </nav>
             <main class="tab-content">
                 <div id="start-content" class="content-panel active">
-                    <h1>Welcome to <span class="h1-primer">Primer</span><span class="h1-weaver">Weaver</span>!</h1>
+                    <h1><span data-i18n="welcome.prefix">Welcome to </span><span class="h1-primer">Primer</span><span class="h1-weaver">Weaver</span><span data-i18n="welcome.suffix">!</span></h1>
 
                     <img id="welcome-img" class="welcome-image"
                         src="contents/logo/welcome-image_light.png"
-                        alt="PrimerWeaver workflow diagram">
+                        alt="PrimerWeaver workflow diagram" data-i18n-alt="welcome.imageAlt">
 
-                    <button class="proceed-button">Get Started</button>
+                    <button class="proceed-button" data-i18n="welcome.start">Get Started</button>
                     <div class="acknowledgement-text">
                         <p>
-                            This website is free and open to all users.
+                            <span data-i18n="welcome.free">This website is free and open to all users.</span>
                         </p>
                         <p>
-                            No login is required, and it does not use cookies.
+                            <span data-i18n="welcome.privacy">No login is required, and it does not use cookies.</span>
                         </p>
                     </div>
                 </div>
@@ -41,9 +51,9 @@
         </div>
     </div>
 
-    <header role="banner" aria-label="Primary" id="app-header">
+    <header role="banner" aria-label="Primary" data-i18n-aria-label="nav.primary" id="app-header">
         <div class="nav">
-            <a href="#" class="brand" aria-label="PrimerWeaver Tools" id="brand-logo">
+            <a href="#" class="brand" aria-label="PrimerWeaver Tools" data-i18n-aria-label="nav.brand" id="brand-logo">
                 
                 <img src="contents/logo/logo.png"
                     alt="PrimerWeaver Logo" class="logo-img">
@@ -52,31 +62,41 @@
                     <span class="h1-primer">Primer</span><span class="h1-weaver">Weaver</span>
                 </h1>
             </a>
-            <nav class="menu" aria-label="Main navigation">
-                <a href="#/" data-route="/" aria-current="page">Home</a>
+            <nav class="menu" aria-label="Main navigation" data-i18n-aria-label="nav.main">
+                <a href="#/" data-route="/" aria-current="page" data-i18n="nav.home">Home</a>
                 <div class="dropdown">
-                    <a href="#/docs" data-route="/docs" class="dropdown-toggle">Documents</a>
+                    <a href="#/docs" data-route="/docs" class="dropdown-toggle" data-i18n="nav.documents">Documents</a>
                     <div class="dropdown-content" id="header-doc-nav">
-                        <a href="#/docs#d-intro" data-doc="#d-intro">Introduction</a>
-                        <a href="#/docs#d-qc" data-doc="#d-qc">Primer QC</a>
-                        <a href="#/docs#d-mp" data-doc="#d-mp">Multiplex PCR</a>
-                        <a href="#/docs#d-opcr" data-doc="#d-opcr">Overlap PCR</a>
-                        <a href="#/docs#d-muta" data-doc="#d-muta">Mutagenesis</a>
-                        <a href="#/docs#d-workspace" data-doc="#d-workspace">Integrated Cloning Workspace</a>
-                        <a href="#/docs#d-re" data-doc="#d-re">Restriction Cloning</a>
-                        <a href="#/docs#d-gg" data-doc="#d-gg">Golden Gate</a>
-                        <a href="#/docs#d-gb" data-doc="#d-gb">Gibson Assembly</a>
-                        <a href="#/docs#d-user" data-doc="#d-user">USER Cloning</a>
+                        <a href="#/docs#d-intro" data-doc="#d-intro" data-i18n="docs.introduction">Introduction</a>
+                        <a href="#/docs#d-qc" data-doc="#d-qc" data-i18n="docs.qc">Primer QC</a>
+                        <a href="#/docs#d-mp" data-doc="#d-mp" data-i18n="docs.multiplex">Multiplex PCR</a>
+                        <a href="#/docs#d-opcr" data-doc="#d-opcr" data-i18n="docs.overlap">Overlap PCR</a>
+                        <a href="#/docs#d-muta" data-doc="#d-muta" data-i18n="docs.mutagenesis">Mutagenesis</a>
+                        <a href="#/docs#d-workspace" data-doc="#d-workspace" data-i18n="docs.workspace">Integrated Cloning Workspace</a>
+                        <a href="#/docs#d-re" data-doc="#d-re" data-i18n="docs.restriction">Restriction Cloning</a>
+                        <a href="#/docs#d-gg" data-doc="#d-gg" data-i18n="docs.goldenGate">Golden Gate</a>
+                        <a href="#/docs#d-gb" data-doc="#d-gb" data-i18n="docs.gibson">Gibson Assembly</a>
+                        <a href="#/docs#d-user" data-doc="#d-user" data-i18n="docs.user">USER Cloning</a>
                     </div>
                 </div>
-                <a href="#/help" data-route="/help">FAQs</a>
-                <a href="#/update" data-route="/update">Update</a>
-                <a href="#/about" data-route="/about">About</a>
+                <a href="#/help" data-route="/help" data-i18n="nav.faqs">FAQs</a>
+                <a href="#/update" data-route="/update" data-i18n="nav.update">Update</a>
+                <a href="#/about" data-route="/about" data-i18n="nav.about">About</a>
 
-                <a href="#/tools" data-route="/tools" class="cta">Launch App</a>
+                <a href="#/tools" data-route="/tools" class="cta" data-i18n="nav.launch">Launch App</a>
+
+                <label class="language-picker">
+                    <span class="sr-only" data-i18n="language.label">Language</span>
+                    <select data-language-select aria-label="Language" data-i18n-aria-label="language.label">
+                        <option value="en">English</option>
+                        <option value="fr">Français</option>
+                        <option value="ko">한국어</option>
+                        <option value="zh-Hans">中文</option>
+                    </select>
+                </label>
 
                 <a href="https://github.com/ZimoJin/PrimerWeaver" class="github-link" target="_blank"
-                    rel="noopener noreferrer" aria-label="GitHub Page">
+                    rel="noopener noreferrer" aria-label="GitHub Page" data-i18n-aria-label="nav.github">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="24" height="24"
                         fill="currentColor" style="display: block;">
                         <path
@@ -86,7 +106,7 @@
                 </a>
             </nav>
             <button class="hamburger-button mobile" id="menuBtn" aria-controls="drawer" aria-expanded="false"
-                aria-label="Toggle menu">
+                aria-label="Toggle menu" data-i18n-aria-label="nav.toggle">
                 <span class="hamburger-box">
                     <span class="hamburger-line"></span>
                     <span class="hamburger-line"></span>
@@ -100,7 +120,7 @@
     <main class="wrap" id="view" tabindex="-1">
         </main>
 
-    <footer class="footer small" id="app-footer">
+    <footer class="footer small" id="app-footer" data-i18n="footer.privacy">
         All rights Reserved © Ignea Lab · McGill University · Free for any use · No data will be uploaded, everything is processed in your local browser with JavaScript.
     </footer>
 
@@ -193,6 +213,7 @@
       })();
     </script>
 
+    <script src="contents/i18n/i18n.js"></script>
     <script src="contents/script.js"></script>
 
 </body>

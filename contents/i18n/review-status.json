@@ -1,0 +1,23 @@
+{
+  "en": {
+    "catalog": "source",
+    "sitePages": "source",
+    "qcDocument": "source"
+  },
+  "fr": {
+    "catalog": "ai-draft",
+    "sitePages": "ai-draft",
+    "documents": "ai-draft"
+  },
+  "ko": {
+    "catalog": "ai-draft",
+    "sitePages": "ai-draft",
+    "documents": "ai-draft"
+  },
+  "zh-Hans": {
+    "displayName": "中文",
+    "catalog": "ai-draft",
+    "sitePages": "ai-draft",
+    "documents": "ai-draft"
+  }
+}

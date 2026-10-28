@@ -1,0 +1,99 @@
+<svg width="0" height="0" style="position:absolute">
+<defs>
+    <symbol id="icon-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line>
+    </symbol>
+    
+    <symbol id="icon-status" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline>
+    </symbol>
+    <symbol id="icon-award" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 17 17 23 15.79 13.88"></polyline>
+    </symbol>
+    <symbol id="icon-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline>
+    </symbol>
+</defs>
+</svg>
+
+<section class="grid cols-2">
+<div class="card" style="padding:22px 28px">
+    
+    <div class="about-item">
+    <svg class="about-icon" aria-hidden="true"><use xlink:href="#icon-info"></use></svg>
+    <div class="about-content">
+        <h3>关于 PrimerWeaver</h3>
+        <p class="muted">
+            <strong>PrimerWeaver</strong> 是一个基于浏览器的平台，用于在多种分子生物学工作流程中进行集成式 DNA 引物设计。它为引物质量控制、多重 PCR、重叠延伸、定点突变、限制性内切酶克隆、Golden Gate 组装和同源性导向组装提供简洁高效的操作界面。
+        </p>
+        <p class="muted">
+            PrimerWeaver 注重隐私与便捷性：计算通过 JavaScript 在您的本地浏览器中运行，因此序列仅在设备端处理。
+            核心功能无需登录，也不使用 Cookie。
+        </p>
+    </div>
+    </div>
+    
+    <div class="about-item">
+    <svg class="about-icon" aria-hidden="true"><use xlink:href="#icon-edit"></use></svg>
+    <div class="about-content">
+        <h3>联系我们</h3>
+        <p class="small muted">如需报告问题、提出功能建议或洽谈合作，请使用下方表单，或通过电子邮件联系通讯作者。</p>
+        
+        <form id="contactForm">
+        <label for="c-email">您的电子邮箱（用于回复）</label>
+        <input type="email" id="c-email" required autocomplete="email" />
+        
+        <label for="c-msg">留言</label>
+        <textarea id="c-msg" required placeholder="报告问题、建议新功能……"></textarea>
+        
+        <div class="btn-group">
+            <button class="btn" type="submit">发送留言</button>
+            <button class="btn ghost" type="reset">重置</button>
+        </div>
+        </form>
+    </div>
+    </div>
+
+</div>
+<div class="card" style="padding:22px 28px">
+    <div class="about-item">
+    <svg class="about-icon" aria-hidden="true"><use xlink:href="#icon-award"></use></svg>
+    <div class="about-content">
+        <h3>致谢</h3>
+        <p class="small muted">
+            PrimerWeaver 的热力学计算和质量控制程序基于广泛使用的最近邻模型与已发表参数。
+            我们谨向以下奠基性研究致谢：
+        </p>
+        <ul class="small muted" style="margin-top: 0; padding-left: 20px;">
+            <li>SantaLucia, J. (1998). A unified view of DNA nearest-neighbor thermodynamics. <em>Proc. Natl. Acad. Sci. USA</em>.</li>
+            <li>Allawi, H. T., &amp; SantaLucia, J. (1997). Thermodynamics of internal mismatches in DNA. <em>Biochemistry</em>.</li>
+            <li>SantaLucia, J. (2004). Thermodynamics of DNA structural motifs. <em>Annu. Rev. Biophys. Biomol. Struct.</em>.</li>
+        </ul>
+        <p class="small muted" style="margin-bottom: 0.5em;">
+            若您在学术工作中使用 PrimerWeaver，请引用：
+        </p>
+        <p class="reference">Jin, Z., Kim, Y. E., Ignea, C., 2026. PrimerWeaver: An integrated web server for primer design in molecular biology workflows. <em>Nucleic Acids Research</em>, 54, gkag399. <a href="https://doi.org/10.1093/nar/gkag399" target="_blank" rel="noopener noreferrer">https://doi.org/10.1093/nar/gkag399</a></p>
+        <p class="small muted" style="margin-top: 1em; margin-bottom: 0;">
+            各工作流程模块参考了成熟的分子生物学方法，包括 Golden Gate（Engler <em>et&nbsp;al.</em>）、Gibson Assembly（Gibson <em>et&nbsp;al.</em>）和重叠延伸 PCR（Horton <em>et&nbsp;al.</em>），PrimerWeaver 文档中对此进行了概述。热力学计算亦基于上述最近邻参数。
+        </p>
+    </div>
+    </div>
+    
+    <div class="about-item">
+    <svg class="about-icon" aria-hidden="true"><use xlink:href="#icon-file"></use></svg>
+    <div class="about-content">
+        <h3 id="impressum">服务信息</h3>
+        <p class="small muted">
+        <strong>本服务负责人：</strong><br>
+        Codruta Ignea<br>
+        Ignea 实验室，生物工程系<br>
+	生物与生物医学工程项目<br>
+        麦吉尔大学<br>
+        加拿大魁北克省蒙特利尔<br>
+        <strong>电子邮箱：</strong> codruta.ignea@mcgill.ca
+        </p>
+    </div>
+    </div>
+
+</div>
+</section>

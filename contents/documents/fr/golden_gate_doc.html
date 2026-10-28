@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assemblage Golden Gate - PrimerWeaver V1.0.6</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #333;
+            background: #f9fafb;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e40af;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2563eb;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            font-size: 1.5em;
+        }
+        h3 {
+            color: #3b82f6;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            font-size: 1.2em;
+        }
+        h4 {
+            color: #60a5fa;
+            margin-top: 1.2em;
+            margin-bottom: 0.6em;
+        }
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 1em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        strong {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c2410c;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .abstract {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+        .abstract p {
+            margin: 0;
+            font-style: italic;
+        }
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .section {
+            margin-bottom: 2.5em;
+        }
+        .version-info {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+            margin-top: 3em;
+            padding-top: 2em;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Concepteur d’amorces pour l’assemblage Golden Gate</h1>
+        
+        <div class="abstract">
+            <p>Le module d’assemblage Golden Gate permet de concevoir des amorces pour l’assemblage modulaire sans cicatrice d’ADN à l’aide d’enzymes de restriction de type IIS (typiquement BsaI) et de l’ADN ligase T4. Cet outil automatise la création de surplombs uniques de 4 bp qui permettent d’assembler plusieurs fragments d’ADN dans un ordre et une orientation définis, en une seule réaction en un pot, sans étapes de purification intermédiaires. Golden Gate convient particulièrement aux bibliothèques de parties biologiques standardisées, aux applications de biologie synthétique, à la construction à haut débit de circuits génétiques et aux flux de conception itératifs.</p>
+        </div>
+
+        <div class="section">
+            <h2>Guide de démarrage rapide</h2>
+            <ol>
+                <li>Téléversez ou collez les séquences du vecteur de destination et des inserts (maximum de 6 fragments) au format FASTA ou en texte brut dans les champs correspondants, dans l’ordre d’assemblage souhaité. Sélectionnez l’enzyme Type IIS, vérifiez le squelette vectoriel détecté automatiquement et ajustez les paramètres de conception si nécessaire.</li>
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/GGA_demo.png"
+                    style="max-width: 90%; height: auto; border-radius: 8px;"
+                >
+            </div>
+                <li>Cliquez sur « Design Primers » pour générer des amorces intégrant des séquences de surplomb. Examinez le tableau des amorces, la matrice de compatibilité des surplombs et le schéma d’assemblage prédit. Téléchargez le fichier FASTA assemblé afin de vérifier que l’orientation de l’insert correspond à la conception prévue. Si l’orientation est incorrecte, inversez le complément de la séquence d’insert et régénérez les amorces.</li>
+
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>Principe de l’assemblage Golden Gate</h2>
+            
+            <p>L’assemblage Golden Gate emploie des <strong>enzymes de restriction de type IIS</strong> qui reconnaissent une séquence d’ADN spécifique mais clivent en dehors du site de reconnaissance. Cette propriété unique permet de générer des <strong>surplombs prévisibles et personnalisables</strong> qui rendent possible une <strong>ligation directionnelle et sans cicatrice</strong> de plusieurs fragments d’ADN en une seule réaction. De manière cruciale, les sites de reconnaissance de l’enzyme de restriction sont retirés pendant l’assemblage, ne laissant aucune cicatrice dans le construit final.</p>
+
+
+
+            <h3>Principe de conception des surplombs</h3>
+            <p>La force principale de Golden Gate réside dans la conception de surplombs uniques et non interférents. Chaque jonction de paire de fragments exige un surplomb unique de 4 bp qui n’est présent nulle part ailleurs dans l’assemblage :</p>
+            <ul>
+                <li><strong>Surplombs de 4 bp :</strong> les enzymes Type IIS avec un décalage de 1 bp (p. ex. BsaI) génèrent naturellement des extrémités cohésives de 4 bp, qui offrent une spécificité suffisante tout en conservant la simplicité d’assemblage</li>
+                <li><strong>Assemblage directionnel :</strong> le surplomb sens d’un fragment doit être complémentaire du surplomb antisens du fragment adjacent ; les surplombs non complémentaires ne peuvent pas se liger, ce qui prévient les mauvais assemblages</li>
+                <li><strong>Jonctions sans cicatrice :</strong> après assemblage, les sites de reconnaissance Type IIS flanquant les surplombs sont retirés, ce qui produit des jonctions sans cicatrice entre fragments</li>
+               
+            </ul>
+           
+        </div>
+
+        <div class="section">
+            <h2>Format d’entrée</h2>
+            <p>Les champs vecteur et insert acceptent les fichiers <strong>FASTA</strong>, le <strong>texte ADN brut</strong> ou les fichiers <strong>GenBank</strong> standard (<code>.gb</code>, <code>.gbk</code>, <code>.gbff</code>, <code>.genbank</code>) contenant des blocs <code>LOCUS</code> et <code>ORIGIN</code>. Le nom court du champ <strong>LOCUS</strong> est utilisé comme titre de séquence. Une <strong>seule séquence</strong> est autorisée par champ ; si plusieurs en-têtes FASTA sont détectés, <strong>seule la première séquence</strong> est utilisée. Si vous téléversez une séquence brute sans en-tête <code>&gt;</code>, le <strong>nom de fichier</strong> (sans extension) sert de nom. Les formats binaires propriétaires (p. ex. SnapGene <code>.dna</code>) doivent d’abord être exportés en GenBank ou FASTA.</p>
+             <p>PrimerWeaver prend actuellement en charge <strong>quatre enzymes de restriction Type IIs intégrées</strong>. Une fois une séquence vectorielle fournie, le système <strong>identifie automatiquement les caractéristiques du vecteur</strong> et affiche les positions de tous les <strong>sites d’enzymes de restriction Type IIs</strong>. La carte du vecteur peut être tournée afin de faciliter la visualisation de la région de clonage ciblée. Le <strong>fragment de squelette vectoriel</strong> sélectionné détermine également les surplombs de frontière automatiques de 4 bp utilisés pour l’<strong>extrémité gauche du premier insert</strong> et l’<strong>extrémité droite du dernier insert</strong>.</p>
+
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/GGA_input.png"
+                    style="max-width: 60%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+            <h3>Gestion des fragments</h3>
+            <ul>
+                <li><strong>Ajouter/retirer des fragments :</strong> ajoutez plusieurs séquences d’ADN pour un assemblage multi-fragments (2–10 fragments recommandés ; les assemblages plus grands deviennent plus complexes)</li>
+                <li><strong>Réordonner les fragments :</strong> ajustez l’ordre d’assemblage à l’aide des commandes de l’interface ; l’ordre détermine l’architecture du construit final</li>
+                <li><strong>Noms des fragments :</strong> extraits automatiquement des en-têtes FASTA pour une identification claire des amorces ; utilisés dans les rapports de sortie</li>
+                <li><strong>Complément inverse :</strong> inversez le complément de fragments individuels si nécessaire afin de correspondre à l’orientation et au sens d’assemblage souhaités</li>
+                <li><strong>Saisie de chevauchement interne :</strong> pour chaque jonction interne, des champs appariés <strong>Surplomb gauche/droit (personnalisé, 4 bp)</strong> sont fournis. Ces deux champs reflètent la même valeur de jonction. Laissez-les vides pour que l’algorithme choisisse automatiquement des surplombs dérivés de la séquence, ou saisissez une valeur personnalisée d’<strong>exactement 4 bp</strong> pour remplacer le choix automatique de cette jonction.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Paramètres de conception</h2>
+		
+	    <p>Veuillez sélectionner les enzymes de restriction Type IIs préférées dans la liste déroulante ou rechercher par nom d’enzyme. Une fois les <strong>enzymes de restriction</strong> sélectionnées, le système identifie automatiquement le <strong>fragment de digestion le plus long</strong> comme squelette vectoriel de destination par défaut. Si le fragment le plus long ne correspond pas au squelette vectoriel prévu, vous pouvez sélectionner manuellement un autre fragment. Ce choix de squelette contrôle directement les surplombs de frontière automatiques assignés aux extrémités du <strong>premier</strong> et du <strong>dernier</strong> insert ; ces valeurs de frontière sont toujours prises de l’interprétation du squelette sélectionné, et non d’une saisie manuelle. Veuillez examiner les paramètres de conception des amorces avant de poursuivre, et les modifier si nécessaire.</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Paramètre</th>
+                        <th>Valeur par défaut</th>
+                        <th>Plage</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Enzyme Type IIS</strong></td>
+                        <td>None</td>
+                        <td>BsaI, BsmBI, BbsI, and PaqCI.</td>
+                        <td>Enzyme de restriction de type IIS utilisée pour l’assemblage. Les enzymes diffèrent par leurs séquences de reconnaissance, leurs décalages de coupure et leurs longueurs de surplomb.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tm cible (°C)</strong></td>
+                        <td>55</td>
+                        <td>40–75</td>
+                        <td>Température de fusion cible pour la région de liaison au gabarit des amorces (hors région de surplomb). Influe sur la longueur des amorces et la température d’hybridation PCR.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Conc. d’amorce (nM)</strong></td>
+                        <td>500</td>
+                        <td>50–2000</td>
+                        <td>Concentration effective d’amorce supposée pour le calcul in silico de Tm. Plage habituelle : 25-1000 nM.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Conc. Na⁺ (mM)</strong></td>
+                        <td>50</td>
+                        <td>0–200</td>
+                        <td>Concentration en cations monovalents utilisée pour le calcul de Tm corrigé selon le sel. Plage habituelle : 10-200 mM.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Conc. Mg²⁺ (mM)</strong></td>
+                        <td>2.0</td>
+                        <td>0–10</td>
+                        <td>Concentration en cations divalents utilisée pour le calcul de Tm. Indiquez 0 en l’absence de Mg²⁺. Plage habituelle : 0.5-5 mM.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="section">
+            <h2>Résultats et sorties</h2>
+            
+            <p>Après la conception des amorces, le module d’assemblage Golden Gate génère un ensemble complet de résultats afin de faciliter la validation expérimentale et le clonage en aval.</p>
+
+            <h3>Tableau des amorces</h3>
+	    <p>Les paires d’amorces conçues sont rapportées dans un tableau structuré, indiquant les séquences d’amorces (5′→3′), la longueur, la teneur en GC et les températures de fusion (Tm). Les valeurs de Tm sont affichées à la fois pour la <strong>région cœur d’hybridation</strong> et pour l’<strong>amorce de pleine longueur</strong>, ce qui permet d’évaluer la compatibilité d’amplification. Les indicateurs de qualité des amorces, notamment les séries homopolymériques, les structures en épingle à cheveux, les auto-dimères et les dimères croisés, sont évalués et signalés afin de mettre en évidence les risques potentiels pour la PCR. Les <strong>sites de reconnaissance Type IIS et les séquences de surplomb</strong> sont mis en évidence dans les séquences d’amorces pour plus de clarté.</p>
+
+
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/GGA_primer_table.png"
+                    alt="Tableau des amorces Golden Gate"
+                    style="max-width: 60%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+	    <h3>Schéma d’assemblage et tableau des surplombs</h3>
+	    <p>Un <strong>schéma de plasmide assemblé</strong> est généré afin d’illustrer le flux de clonage, y compris la linéarisation du vecteur, l’incorporation des inserts et l’assemblage plasmidique final. Ce diagramme fournit une vue conceptuelle de l’orientation des fragments et de la structure des jonctions. Un <strong>tableau des chevauchements</strong> affiche les paires de surplombs à chaque jonction, confirmant que les fragments adjacents possèdent des extrémités cohésives complémentaires. Ce tableau offre une vérification visuelle rapide que l’architecture d’assemblage est correcte et qu’aucun conflit ni mésappariement de surplomb n’est présent.</p>
+
+
+	   <div style="text-align: center; margin: 2em 0;">
+  		<img
+    			src="contents/pictures/GGA_assembly_table.png"
+    			style="max-width: 60%; height: auto; border-radius: 8px;"
+  		 >
+	   </div>
+      
+
+            <h3>Électrophorèse sur gel d’agarose simulée</h3>
+	    <p>PrimerWeaver génère une <strong>image de gel d’agarose simulée</strong> afin de prédire les résultats expérimentaux des étapes clés du clonage. Le gel comprend :</p>
+
+            <ul>
+                <li>Un marqueur d’ADN sélectionnable (par défaut : NEB 1 kb Plus DNA Ladder)</li>
+		<li>Le vecteur non digéré</li>
+                <li>Le vecteur digéré par enzyme de restriction Type IIs</li>
+                <li>Les fragments amplifiés par PCR (une piste par fragment, indiquant la taille attendue)</li>
+                <li>Le plasmide assemblé</li>
+            </ul>
+	    <p>Les tailles de bandes prédites sont annotées à côté du gel, ce qui permet de comparer les tailles de fragments attendues aux résultats expérimentaux et d’identifier rapidement d’éventuels problèmes de clonage.</p>
+
+	   <div style="text-align: center; margin: 2em 0;">
+  		<img
+    			src="contents/pictures/GGA_gel.png"
+    			style="max-width: 60%; height: auto; border-radius: 8px;"
+  		 >
+	   </div>
+
+        </div>
+
+	<div class="section">
+            <h2>Algorithme de conception des amorces</h2>
+            
+            <h3>Structure des amorces</h3>
+            <p>Chaque amorce Golden Gate comporte trois régions fonctionnelles :</p>
+            <ul>
+                <li><strong>Cœur d’hybridation (3′) :</strong> région complémentaire du gabarit qui pilote l’hybridation PCR (typiquement 18–30 bp)</li>
+                <li><strong>Région de surplomb (5′) :</strong> contient le site de reconnaissance de restriction Type IIS et une séquence de surplomb personnalisable de 4 bp (typiquement 11~12 bp)</li>
+                <li><strong>Base protectrice (flancs 5′) :</strong> bases courtes en amont du site de restriction afin d’améliorer l’efficacité de digestion (couramment 2–6 nt ; dépend de l’enzyme)</li>
+            </ul>
+
+            <h3>Processus de conception</h3>
+            <p>La conception des amorces Golden Gate dans PrimerWeaver est divisée en trois étapes liées : <strong>interprétation des extrémités du vecteur</strong>, <strong>assignation des surplombs de jonction</strong> et <strong>construction des queues d’amorces pour chaque insert</strong>. Ces étapes sont résumées ci-dessous.</p>
+
+            <h3>Interprétation des extrémités du vecteur</h3>
+            <p>Le vecteur est d’abord normalisé et parcouru pour l’<strong>enzyme de restriction Type IIS</strong> sélectionnée. Contrairement au clonage par restriction standard, Golden Gate exige un contexte vectoriel capable d’exposer des surplombs d’assemblage définis de 4 bp après digestion Type IIS. Le module calcule les fragments de digestion candidats, sélectionne automatiquement le plus long par défaut, et permet à l’utilisateur de remplacer ce choix de squelette. Le fragment de squelette sélectionné sert ensuite à dériver les surplombs vectoriels gauche et droit à partir de la géométrie de coupure de l’enzyme Type IIS choisie. Ces valeurs dérivées du vecteur deviennent les conditions de frontière fixes pour le <strong>surplomb gauche du premier insert</strong> et le <strong>surplomb droit du dernier insert</strong>, et l’interface écrase automatiquement ces deux champs de frontière chaque fois que l’interprétation vecteur/enzyme/squelette change.</p>
+            <p>Si le vecteur ne fournit pas de surplombs d’extrémité utilisables sous cette interprétation, la conception n’échoue pas immédiatement. Le module enregistre plutôt que les extrémités dérivées du vecteur sont indisponibles et recourt à une <strong>règle de jonction sans cicatrice</strong> aux frontières de l’assemblage.</p>
+
+            <h3>Assignation des surplombs de jonction</h3>
+            <p>Après définition des contraintes vectorielles, l’algorithme assigne un surplomb de 4 bp à chaque jonction insert–insert ou vecteur–insert. Pour chaque <strong>jonction interne</strong>, le module vérifie d’abord si l’utilisateur a saisi une valeur de jonction personnalisée dans les champs appariés <strong>Surplomb droit / Surplomb gauche</strong>. Si une valeur personnalisée non vide est présente, elle doit mesurer <strong>exactement 4 bp</strong> et est utilisée directement pour cette jonction. Si les deux champs appariés sont vides, l’algorithme recourt à des candidats dérivés de la séquence, en utilisant typiquement les <strong>4 derniers bp de l’insert amont</strong> et les <strong>4 premiers bp de l’insert aval</strong>. Ces candidats natifs sont filtrés afin de rejeter les surplombs Golden Gate invalides tels que les 4-mères homopolymériques ou palindromiques.</p>
+            <p>Le module évalue ensuite des combinaisons complètes de surplombs de jonction au <strong>niveau de l’assemblage</strong>, et non jonction par jonction. Les jeux de surplombs ne sont acceptés que si le panneau complet demeure unique même après prise en compte des partenaires complément inverse. Lorsqu’une matrice de fidélité est disponible pour l’enzyme sélectionnée, PrimerWeaver classe les combinaisons valides selon la fidélité de ligation prédite et utilise le jeu compatible de score le plus élevé. Si le score de fidélité est indisponible, le module recourt à la première combinaison valide non conflictuelle. Une jonction interne de 4 bp fournie par l’utilisateur agit donc comme une <strong>contrainte fixe</strong> sur le problème global de combinaison des surplombs, et non comme une annotation cosmétique.</p>
+
+            <h3>Construction des queues d’amorces et reconstruction de l’assemblage</h3>
+            <p>Une fois les surplombs gauche et droit de chaque insert fixés, le module conçoit le <strong>cœur d’hybridation</strong> aux extrémités de l’insert, puis construit les amorces complètes en ajoutant le site de reconnaissance Type IIS, des bases espaceuses et les surplombs de 4 bp sélectionnés comme queues 5′ non hybridantes. Au cours de cette étape, PrimerWeaver retire la séquence de chevauchement redondante aux <strong>deux extrémités de l’insert</strong>. À l’extrémité gauche, il retranche toute <strong>duplication suffixe-préfixe</strong> la plus grande entre le surplomb de 4 bp choisi et le début du cœur d’hybridation sens. À l’extrémité droite, il retranche toute duplication la plus grande entre la fin de la séquence d’insert couverte par le cœur de l’amorce antisens et le début du surplomb droit sélectionné. Par exemple, si un surplomb gauche personnalisé se termine par <code>ATG</code> et que le cœur de l’insert commence déjà par <code>ATG</code>, ou si l’insert se termine déjà par <code>AATG</code> et que le surplomb droit choisi commence par <code>AATG</code>, la séquence partagée n’est pas dupliquée dans la queue d’amorce finale. L’amorce Golden Gate complète suit donc cette structure :</p>
+            <p><strong>pince protectrice 5′ + site Type IIS + bases de décalage + surplomb de 4 bp sélectionné + cœur d’hybridation 3′</strong></p>
+            <p>Après construction des amorces, le module reconstruit le plasmide assemblé en combinant le squelette vectoriel digéré avec le bloc d’inserts, selon les positions de coupure vectorielles dérivées et la logique de surplomb de jonction choisie. Lorsque des extrémités dérivées du vecteur sont disponibles, le squelette est réextrait des positions de coupure Type IIS et utilisé comme squelette physique pour la reconstruction de la séquence assemblée. Sinon, le module recourt à un modèle de concaténation sans cicatrice plus simple pour rapporter la longueur de séquence assemblée et la visualisation en aval.</p>
+            <h3>Logique des cas limites dans l’algorithme</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cas limite algorithmique</th>
+                        <th>Comportement actuel du module Golden Gate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Le vecteur a zéro ou un site Type IIS</strong></td>
+                        <td>Le module n’essaie pas une interprétation normale de squelette Golden Gate. Il rapporte plutôt une sortie d’assemblage de type N/A, car le vecteur ne peut pas fournir le contexte de digestion Type IIS à deux côtés nécessaire à un assemblage Golden Gate standard.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Les surplombs d’extrémité dérivés du vecteur ne peuvent pas être récupérés proprement</strong></td>
+                        <td>Si des surplombs d’extrémité vectorielle explicites ne peuvent pas être dérivés, l’algorithme recourt à une règle de frontière sans cicatrice aux première et dernière jonctions, au lieu d’abandonner immédiatement toute la conception.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>L’utilisateur fournit manuellement une jonction interne de 4 bp</strong></td>
+                        <td>Un surplomb interne personnalisé non vide est traité comme un choix de jonction fixe. Les champs d’interface gauche/droit appariés reflètent la même valeur de jonction, et la recherche globale de surplombs doit accommoder cette contrainte de 4 bp présélectionnée.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>La jonction interne personnalisée n’est que partiellement remplie</strong></td>
+                        <td>Si un champ de chevauchement interne est non vide mais n’a pas exactement 4 bp, le module bloque la conception par une boîte de dialogue d’avertissement, plutôt que de deviner ou de compléter silencieusement la jonction.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Aucun surplomb de jonction ne peut être choisi indépendamment</strong></td>
+                        <td>L’algorithme évalue les combinaisons de surplombs sur l’ensemble du panneau d’assemblage, car un surplomb localement acceptable peut encore entrer en conflit avec une autre jonction ou son complément inverse ailleurs dans le construit.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>La matrice de fidélité est indisponible</strong></td>
+                        <td>Le module achève néanmoins la conception en recourant à la première combinaison de surplombs valide non conflictuelle, mais il ne peut plus classer les combinaisons selon la fidélité de ligation prédite.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Le surplomb sélectionné est déjà présent à l’extrémité de l’insert</strong></td>
+                        <td>Lors de la construction des amorces, le module recherche le <strong>plus grand chevauchement partagé</strong> entre le surplomb de 4 bp sélectionné et la séquence d’insert déjà couverte par le cœur d’amorce. Cette évaluation est faite à la <strong>frontière gauche</strong> et à la <strong>frontière droite</strong>, de sorte que la séquence partagée n’est pas dupliquée même lorsqu’une partie seulement du surplomb de 4 bp est déjà présente au début ou à la fin de l’insert.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Des sites Type IIS internes existent dans les inserts</strong></td>
+                        <td>L’algorithme peut néanmoins construire des amorces, mais la conception est signalée, car des sites enzymatiques internes peuvent fragmenter les inserts pendant la digestion et compromettre ainsi la topologie d’assemblage Golden Gate prévue.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>L’ordre des fragments change la solution complète de surplombs</strong></td>
+                        <td>Comme les surplombs de jonction sont assignés à partir du contexte de séquence des fragments voisins, réordonner les inserts ne change pas seulement une jonction, mais le problème global de combinaison des surplombs, et peut produire un jeu d’amorces final différent.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Avertissements et cas limites</h2>
+            <p>Le module d’assemblage Golden Gate utilise le cadre partagé <strong>MW (Message Warning)</strong> pour la validation de prévol et les boîtes de confirmation lorsque la couche de visualisation commune est disponible. Certains avertissements apparaissent avant le début de la conception, tandis que d’autres ne sont interprétés qu’après que le module a inspecté la topologie du vecteur, les sites Type IIS et les combinaisons candidates de surplombs.</p>
+
+            <h3>Avertissements généraux</h3>
+            <p>Ces avertissements proviennent surtout de la validation d’entrée partagée et des contrôles de prévol Golden Gate de haut niveau. Dans la plupart des cas, l’utilisateur peut cliquer sur <strong>Cancel</strong> pour réviser la configuration ou sur <strong>OK</strong> pour continuer.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Catégorie</th>
+                        <th>Déclencheur</th>
+                        <th>Comportement actuel du module GGA</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Invites d’entrée bloquantes</strong></td>
+                        <td>Aucun fragment d’insert n’est fourni, ou aucune enzyme Type IIS n’est sélectionnée.</td>
+                        <td>La conception s’arrête immédiatement et le module demande à l’utilisateur d’ajouter au moins un insert et de choisir une enzyme avant de continuer.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-04</strong><br>Aucune séquence valide après normalisation</td>
+                        <td>Un vecteur ou un insert devient vide après normalisation, car aucun symbole IUPAC d’ADN valide ne demeure.</td>
+                        <td>L’utilisateur peut néanmoins poursuivre, mais la conception deviendra vide ou non informative pour l’entrée concernée.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-05</strong><br>Caractères non IUPAC retirés</td>
+                        <td>L’entrée contient des caractères non pris en charge, y compris potentiellement près d’une région 3′ pertinente pour les amorces.</td>
+                        <td>Le module continue en n’utilisant que la séquence normalisée et avertit que cela peut affecter le comportement des amorces.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-06</strong><br>Bases dégénérées détectées</td>
+                        <td>Le vecteur ou un insert contient des bases IUPAC dégénérées.</td>
+                        <td>Les valeurs thermodynamiques sont estimées de manière conservative à partir de la variante la plus stable ; les valeurs rapportées de Tm et de ΔG peuvent donc être des approximations de cas défavorable.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-10 à MW-15</strong><br>Avertissements de plage de paramètres</td>
+                        <td>Na<sup>+</sup>, Mg<sup>2+</sup>, la concentration d’amorce ou la Tm cible sort de la plage recommandée ou de la fenêtre de validation thermodynamique.</td>
+                        <td>L’utilisateur peut néanmoins continuer, mais la prédiction de Tm et l’optimisation des amorces peuvent devenir moins fiables.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-19</strong><br>Taille totale d’entrée importante</td>
+                        <td>La taille totale vecteur plus inserts devient suffisamment grande pour solliciter le calcul côté navigateur.</td>
+                        <td>Le module avertit que les performances du navigateur peuvent se dégrader pendant la conception et le rendu.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-20</strong><br>Plusieurs en-têtes FASTA dans un même champ</td>
+                        <td>Une zone de texte vecteur ou insert contient plus d’un enregistrement FASTA.</td>
+                        <td>Une boîte de dialogue MW partagée avertit qu’une seule séquence est autorisée par champ. Si l’utilisateur continue, le champ est réduit au <strong>premier enregistrement FASTA</strong> avant de poursuivre la conception.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-22</strong><br>Le fichier téléversé dépasse la limite d’importation</td>
+                        <td>Un fichier vecteur ou insert téléversé est plus grand que <strong>1 MB</strong>.</td>
+                        <td>L’importation est bloquée avant le chargement de la séquence, et l’utilisateur doit choisir un fichier plus petit.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GG-MW-01</strong><br>Sites Type IIS internes dans les inserts</td>
+                        <td>Un ou plusieurs inserts contiennent déjà des sites de reconnaissance pour l’enzyme Golden Gate sélectionnée.</td>
+                        <td>Le module avertit que ces inserts peuvent être coupés pendant l’assemblage et encourage une reconception, une domestication ou un remplacement d’enzyme.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GG-MW-02</strong><br>La longueur du chevauchement interne personnalisé est invalide</td>
+                        <td>Un champ de chevauchement interne personnalisé est non vide, mais sa longueur n’est pas exactement <strong>4 bp</strong>.</td>
+                        <td>Le module lève une boîte de dialogue MW. Laisser le champ vide est autorisé, mais tout chevauchement interne non vide doit mesurer exactement 4 bp avant que la conception puisse continuer.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Avertissements de conception</h3>
+            <p>Ces avertissements et cas limites sont propres à l’algorithme de conception Golden Gate et à l’interprétation des sorties.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cas</th>
+                        <th>Déclencheur</th>
+                        <th>Comportement actuel du module GGA</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Plafond du nombre d’inserts</strong></td>
+                        <td>Plus de six lignes d’insert sont tentées.</td>
+                        <td>L’implémentation actuelle plafonne la conception Golden Gate à <strong>six inserts</strong>. L’interface désactive tout ajout supplémentaire dès que six inserts sont présents, et la logique interne de collecte tronque également aux six premiers inserts non vides.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Le vecteur a moins de deux sites Type IIS sélectionnés</strong></td>
+                        <td>Le vecteur choisi contient zéro ou un site pour l’enzyme sélectionnée.</td>
+                        <td>Le module ne produit pas une conception d’assemblage Golden Gate complète. La sortie est rendue comme <strong>N/A</strong>, et le modèle de gel ne montre que le vecteur non coupé ou un vecteur linéarisé à coupure unique.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Sélection automatique du squelette</strong></td>
+                        <td>Le vecteur contient plusieurs fragments de digestion.</td>
+                        <td>Le module utilise automatiquement le <strong>fragment de digestion le plus long</strong> comme squelette candidat et expose un sélecteur de fragments afin que l’utilisateur puisse vérifier ou remplacer ce choix. Changer le squelette sélectionné recalcule également les surplombs automatiques du premier et du dernier insert.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Les champs de surplomb de frontière ne sont pas modifiables par l’utilisateur</strong></td>
+                        <td>Le surplomb gauche du premier insert et le surplomb droit du dernier insert sont des conditions de frontière dérivées du squelette vectoriel choisi.</td>
+                        <td>Ces deux champs s’affichent comme des valeurs en lecture seule, remplies automatiquement. Si la séquence vectorielle, l’enzyme ou le choix de squelette change, le module les écrase avec les surplombs de frontière nouvellement dérivés.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Les surplombs d’extrémité du vecteur ne sont pas récupérables</strong></td>
+                        <td>Le module ne peut pas dériver de manière fiable les surplombs Type IIS aux extrémités vectorielles choisies.</td>
+                        <td>La conception recourt à une stratégie plus générique de <strong>règle sans cicatrice</strong> aux frontières du vecteur, en utilisant des séquences d’extrémité dérivées des fragments plutôt que des contraintes de surplomb dérivées du vecteur.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Les surplombs de jonction interne sont limités aux candidats, sauf s’ils sont fixés manuellement</strong></td>
+                        <td>Si une jonction interne est laissée vide, l’algorithme ne considère que deux candidats natifs : les <strong>4 derniers bp de l’insert amont</strong> ou les <strong>4 premiers bp de l’insert aval</strong>. Si l’utilisateur fournit un chevauchement interne personnalisé de 4 bp, ce choix manuel remplace la recherche de candidats natifs pour cette jonction.</td>
+                        <td>Cela maintient la conception par défaut minimisée en cicatrices et dérivée de la séquence, tout en permettant aux utilisateurs d’épingler une jonction interne spécifique de 4 bp lorsque l’exige une norme de clonage ou une bibliothèque de parties.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Rejet des 4-mères homopolymériques / palindromiques</strong></td>
+                        <td>Un surplomb candidat est un homopolymère de 4 bp ou un palindrome de 4 bp.</td>
+                        <td>Ce candidat est exclu des combinaisons de surplombs valides, car il est plus sujet à une mal-ligation ou à une ambiguïté.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Aucun jeu unique de jonctions valide trouvé</strong></td>
+                        <td>Aucune combinaison de surplombs ne passe le filtre d’unicité avec les compléments inverses, ou l’optimisation de fidélité ne peut pas identifier un jeu préféré valide.</td>
+                        <td>L’algorithme recourt à un choix de candidat par défaut pour chaque jonction ; une conception peut donc encore être produite même lorsque le jeu de surplombs est sous-optimal.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Score de fidélité indisponible</strong></td>
+                        <td>La matrice de fidélité de ligation ne peut pas être chargée ou calculée pour l’enzyme / le jeu de jonctions sélectionné.</td>
+                        <td>La conception se poursuit néanmoins, mais le panneau de fidélité peut être absent et le jeu de surplombs est choisi sans classement final fondé sur une matrice.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Repli des surplombs premier / dernier</strong></td>
+                        <td>Les contraintes d’extrémité dérivées du vecteur sont indisponibles.</td>
+                        <td>Le surplomb gauche du premier insert recourt à l’<strong>extrémité 5′ de l’insert n° 1</strong>, et le surplomb droit du dernier insert recourt à l’<strong>extrémité 3′ de l’insert terminal</strong>.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Sites enzymatiques internes dans les inserts</strong></td>
+                        <td>L’enzyme Type IIS sélectionnée coupe à l’intérieur d’une ou plusieurs séquences d’insert.</td>
+                        <td>Un avertissement s’affiche, car ces inserts peuvent être fragmentés pendant la réaction Golden Gate, même si des amorces peuvent encore être générées.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Le schéma d’assemblage est conceptuel</strong></td>
+                        <td>Toute conception multi-fragments réussie.</td>
+                        <td>L’image d’assemblage est un schéma conceptuel plutôt qu’un dessin plasmidique à l’échelle ; les utilisateurs doivent s’appuyer sur la sortie de séquence et le tableau des surplombs pour une interprétation exacte.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <p><strong>Interprétation pratique :</strong> dans l’assemblage Golden Gate, un avertissement reflète souvent la <strong>qualité de la topologie ou des surplombs</strong> plutôt qu’un échec complet de conception. Les utilisateurs doivent interpréter les avertissements conjointement avec le <strong>sélecteur de squelette</strong>, le <strong>tableau des surplombs</strong>, la <strong>section de fidélité</strong> optionnelle et la séquence assemblée finale.</p>
+            </div>
+        </div>
+       
+    </div>
+</body>
+</html>

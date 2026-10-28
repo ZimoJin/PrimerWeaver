@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>멀티플렉스 PCR - PrimerWeaver V1.0.6</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #333;
+            background: #f9fafb;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e40af;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2563eb;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            font-size: 1.5em;
+        }
+        h3 {
+            color: #3b82f6;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            font-size: 1.2em;
+        }
+        h4 {
+            color: #60a5fa;
+            margin-top: 1.2em;
+            margin-bottom: 0.6em;
+        }
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 1em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        strong {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c2410c;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .abstract {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+        .abstract p {
+            margin: 0;
+            font-style: italic;
+        }
+        .highlight {
+            background: #fef3c7;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        .section {
+            margin-bottom: 2.5em;
+        }
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background: #fff7ed;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .version-info {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+            margin-top: 3em;
+            padding-top: 2em;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>멀티플렉스 PCR</h1>
+        
+        <div class="abstract">
+            <p>멀티플렉스 PCR 모듈은 단일 반응에서 여러 DNA 표적 서열을 동시에 증폭할 수 있는 프라이머 세트를 설계하고 검증하기 위한 종합 도구를 제공합니다. 이 모듈은 통합 열역학 분석, 교차 다이머 충돌 검출, 비표적 증폭 검사, 그래프 기반 지능형 풀링 전략과 함께 프라이머 설계를 자동화합니다. 통합 충돌 그래프는 프라이머–프라이머 열역학 상호작용, 젤에서의 PCR 산물 크기 분해능, 공유 비표적 증폭의 세 가지 요인을 고려하여 프라이머를 충돌이 없는 풀로 자동 분할하며, 각 풀은 별도의 반응 튜브에 적합합니다. 대화형 히트맵 시각화를 통해 프라이머 호환성을 한눈에 평가할 수 있습니다.</p>
+        </div>
+
+        <div class="section">
+            <h2>빠른 시작 가이드</h2>
+
+	    <ol>
+		<li>올바른 설계 모드(새로 설계 모드 또는 QC 모드)에서 FASTA 또는 일반 텍스트 형식의 표적 증폭 서열이나 기존 설계 프라이머 서열을 입력 필드에 업로드하거나 붙여넣습니다. 필요하면 설계 매개변수를 확인하고 조정합니다.
+
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/multiplex_PCR_demo.png"
+                    style="max-width: 90%; height: auto; border-radius: 8px;"
+                >
+            </div>
+                <li>“프라이머 설계”를 클릭하여 자동 프라이머 설계와 품질 평가를 시작합니다. 프라이머 QC 지표, 풀링 권장 사항, 프라이머–프라이머 상호작용 히트맵을 검토합니다. 풀별로 프라이머를 FASTA 형식으로 내려받아 로컬에서 분석합니다.</li>
+
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>멀티플렉스 PCR 원리</h2>
+            
+            <p>멀티플렉스 PCR은 단일 반응에서 여러 DNA 표적을 동시에 증폭하여 실험 효율과 처리량을 크게 높입니다. 그러나 이 이점에는 반응 혼합물 내 복잡한 상호작용을 관리해야 하는 핵심 과제가 따릅니다. 단일 표적 PCR과 달리 멀티플렉스 반응은 열역학적 특성이 다양한 여러 프라이머 쌍을 포함하므로, 미스프라이밍, 프라이머 다이머 형성, 증폭 편향이 발생할 기회가 많아 세심한 제어가 필요합니다. 프라이머–프라이머 상호작용 외에도 멀티플렉스 PCR은 공유 시약을 둘러싼 서로 다른 프라이머 쌍 간의 경쟁, 그리고 서열 유사성이나 고르지 않은 증폭 효율에서 비롯되는 의도하지 않은 프라이머–표적 및 표적–표적 상호작용에도 대응해야 합니다.</p>
+
+
+            <h3>주요 설계 고려 사항</h3>
+            <ul>
+                <li><strong>프라이머–프라이머 호환성:</strong> 같은 풀의 모든 프라이머는 열역학적 상호작용이 최소화되어야 합니다. 특히 3′ 말단이 관련된 강한 프라이머–프라이머 상보성은 다이머 형성으로 이어져 프라이머를 소모하고 표적 증폭을 억제할 수 있습니다.</li>
+                <li><strong>산물 크기 구분 가능성:</strong> 멀티플렉스 반응 내 증폭산물은 젤 전기영동 또는 하류 검출 방법으로 모호함 없이 분리·식별할 수 있도록 길이가 충분히 달라야 합니다. 크기가 매우 유사한 산물은 해석이 모호해지지 않도록 같은 풀에서 피합니다.</li>
+                <li><strong>표적 특이성과 경쟁:</strong> 프라이머는 공유 비표적 산물을 만들지 않고 의도한 표적만 특이적으로 증폭해야 합니다. 시약을 둘러싼 프라이머 쌍 간 경쟁과 의도하지 않은 프라이머–표적 또는 표적–표적 상호작용은 증폭 편향을 유발할 수 있으므로 신중한 풀링으로 최소화해야 합니다.</li>
+            </ul>
+
+
+        <div class="section">
+            <h2>입력 형식</h2>
+
+	    <p><strong>새로 설계 모드</strong>와 <strong>QC 모드</strong> 모두 <strong>다중 FASTA 또는 일반 텍스트 형식</strong>을 받습니다. <strong>1 MB</strong>보다 큰 업로드 파일은 공통 <strong>MW-22</strong> 가져오기 제한에 의해 차단됩니다. 이 절대 한도보다 작더라도 매우 큰 입력을 처리할 때 사용자 인터페이스가 불안정해질 수 있으므로, 각 실행은 <strong>500개 이하의 서열</strong>로 제한할 것을 권장합니다.<p>
+
+             <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/multiplex_PCR_input.png"
+                    alt="멀티플렉스 PCR 입력"
+                    style="max-width: 70%; height: auto; border-radius: 8px;"
+                >
+            </div>
+	    
+           
+            
+        <div class="section">
+            <h2>설계 매개변수</h2>
+            <p>진행하기 전에 <strong>프라이머 설계 매개변수</strong>를 검토하고 필요하면 조정하십시오.</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>매개변수</th>
+            <th>기본값</th>
+            <th>범위</th>
+            <th>설명</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>목표 Tm (°C)</strong></td>
+            <td>55</td>
+            <td>40–75</td>
+            <td>
+                프라이머의 <em>주형 결합(어닐링) 영역</em>에 대한 목표 용융 온도입니다.
+                프라이머는 이 값에 가까운 Tm을 갖도록 설계됩니다. 오버랩 또는 어댑터 서열은
+                Tm 계산에서 제외됩니다.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>ΔTm (°C)</strong></td>
+            <td>2.5</td>
+            <td>0–5</td>
+            <td>
+                같은 프라이머 쌍 내 정방향 및 역방향 프라이머 사이에 허용되는
+                최대 용융 온도 차이입니다.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>프라이머 농도 (nM)</strong></td>
+            <td>500</td>
+            <td>50–2000</td>
+            <td>
+                in silico Tm 계산에 가정되는 유효 프라이머 농도입니다. 일반적인 범위: 25-1000 nM.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Na⁺ 농도 (mM)</strong></td>
+            <td>50</td>
+            <td>0–200</td>
+            <td>
+                염 보정 Tm 계산에 사용되는 1가 양이온 농도입니다. 일반적인 범위: 10-200 mM.
+
+
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Mg²⁺ 농도 (mM)</strong></td>
+            <td>2.0</td>
+            <td>0–10</td>
+            <td>
+                Tm 계산에 사용되는 2가 양이온 농도입니다. 반응에 Mg²⁺가 없으면 0으로 설정합니다. 일반적인 범위: 0.5-5 mM.
+
+            </td>
+        </tr>
+        <tr>
+            <td><strong>크기 허용치 (bp)</strong></td>
+            <td>20</td>
+            <td>0–50</td>
+            <td>
+                아가로스 젤 전기영동으로 안정적으로 분해하기 위해 필요한 최소 산물 크기 차이입니다.
+                크기 기반 풀링을 끄려면 0으로 설정합니다(예: qPCR 또는 시퀀싱 기반 분석).
+            </td>
+        </tr>
+        <tr>
+            <td><strong>정방향 오버랩</strong></td>
+            <td>—</td>
+            <td>선택</td>
+            <td>
+                클로닝 또는 조립 응용(예: Gibson 조립)을 위해 정방향 프라이머의 5′ 말단에 추가되는 서열입니다.
+                이 영역은 Tm 계산에 참여하지 않습니다.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>역방향 오버랩</strong></td>
+            <td>—</td>
+            <td>선택</td>
+            <td>
+                클로닝 또는 조립 응용을 위해 역방향 프라이머의 5′ 말단에 추가되는 서열입니다.
+                이 영역은 Tm 계산에 참여하지 않습니다.
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+            
+            <div class="info-box">
+                <strong>크기 허용치에 대한 참고:</strong>
+                <ul style="margin: 8px 0 0 20px;">
+                    <li><strong>0 bp:</strong> 크기 기반 풀링 비활성화(qPCR, 시퀀싱, 또는 젤 전기영동을 사용하지 않는 경우)</li>
+                    <li><strong>5 bp:</strong> 고해상도 젤(2–3% 아가로스)로 매우 가까운 밴드를 구분할 수 있음</li>
+                    <li><strong>10–15 bp:</strong> 표준 젤(1–2% 아가로스)로 대부분의 밴드를 안정적으로 구분</li>
+                    <li><strong>20 bp:</strong> 기본값으로, 일상적인 젤 전기영동에 적합</li>
+                </ul>
+            </div>
+            
+            <div class="warning-box">
+                <strong>중요:</strong> QC 모드에서는 PCR 산물 길이 정보를 사용할 수 없으므로 크기 기반 풀링이 자동으로 비활성화됩니다. 풀링은 열역학적 매개변수에만 기반합니다.
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>결과 및 출력</h2>
+            
+            <p>프라이머 설계 또는 품질관리 분석 후 PrimerWeaver는 품질 지표가 포함된 프라이머 표, 풀링 권장 사항, 대화형 시각화를 포함한 종합 결과를 생성합니다.</p>
+            
+            <h3>프라이머 특성 표</h3>
+            <p>설계되거나 분석된 프라이머 쌍은 프라이머 서열(5′→3′), 길이, GC 함량, 용융 온도(Tm)를 포함한 구조화된 표로 보고됩니다. Tm 값은 어닐링 핵심 영역과 전장 프라이머 모두에 대해 표시되어 증폭 호환성을 평가할 수 있습니다. 동종중합체 연속 서열, 헤어핀 구조, 자가 다이머 및 교차 다이머 형성을 포함한 프라이머 품질 지표가 평가되고 표시되어 PCR 성능에 영향을 줄 수 있는 잠재적 위험을 강조합니다. </p>
+            
+            
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/multiplex_PCR_table.png"
+                    alt="품질 지표가 포함된 멀티플렉스 PCR 프라이머 표"
+                    style="max-width: 70%; height: auto; border-radius: 8px;"
+                >
+            </div>
+        </div>
+
+        <h3>풀링 권장 사항</h3>
+        <p>모든 쌍별 프라이머 상호작용을 분석한 후, 모듈은 프라이머를 최소 수의 반응 튜브로 분할하는 최적 풀링 전략을 권장합니다. 풀링 결과는 모든 프라이머를 단일 반응에 결합할 수 있는지 아니면 여러 반응으로 나누어야 하는지를 나타내며, 특정 프라이머를 함께 풀링할 수 없는 이유를 설명합니다.<p>
+    
+        <div style="text-align: center; margin: 2em 0;">
+            <img
+                src="contents/pictures/multiplex_PCR_pooling.png"
+                alt="멀티플렉스 PCR 풀링 권장 사항 및 풀 할당"
+                style="max-width: 70%; height: auto; border-radius: 8px;"
+            >
+        </div>
+        </div>
+
+        <div class="section">
+            <h3>프라이머-프라이머 다이머 행렬 </h3>
+            <p>모듈은 각 풀 내 모든 쌍별 프라이머 상호작용을 보여주는 대화형 히트맵 행렬을 생성합니다. 히트맵은 Gibbs 자유 에너지(ΔG)를 바탕으로 상호작용 강도를 색 기울기로 나타냅니다. 프라이머가 여러 풀로 나뉘면 각 풀에 대해 별도의 히트맵이 생성됩니다. 이를 통해 각 풀 내 프라이머가 약하거나 무시할 수 있는 상호작용만 갖는지 시각적으로 확인할 수 있습니다.</p>
+                     
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/multiplex_PCR_heatmap.png"
+                    alt="멀티플렉스 PCR 프라이머-프라이머 상호작용 히트맵 시각화"
+                    style="max-width: 70%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+           
+        <div class="section">
+            <h2>프라이머 설계 알고리즘</h2>
+            
+            <h3>프라이머 설계 과정</h3>
+            <p>PrimerWeaver는 <strong>열역학적, 구조적, 풀링 제약</strong>을 만족하는 <strong>멀티플렉스 PCR 프라이머</strong>를 설계하기 위해 <strong>체계적이고 표적 중심의 워크플로</strong>를 사용합니다. 각 표적 서열에 대해 알고리즘은 <strong>5′ 및 3′ 말단</strong>을 탐색하여 지정된 허용 범위 내에서 <strong>사용자가 정의한 목표 용융 온도(Tm)</strong>를 달성하는 후보 프라이머 결합 부위를 식별합니다. 이어서 후보 프라이머의 <strong>고유 품질</strong>(GC 함량, 동종중합체 연속 서열, 헤어핀 형성, 자가 다이머 가능성)을 평가합니다. 하류 클로닝 응용을 위한 선택적 5′ 오버랩 서열은 프라이머 선택 후에 추가되며 Tm 계산에서 제외됩니다. 검증된 각 프라이머 쌍에 대해 <strong>예상 PCR 산물 크기</strong>를 계산하여 이후 풀링 분석에 사용합니다.</p>
+	    <p><strong>새로 설계 모드</strong>에서 PrimerWeaver는 시드-앤-익스텐드(seed-and-extend) 알고리즘으로 <strong>비표적 증폭 검사</strong>를 추가로 수행합니다. 잠재적 비표적 결합 사건은 3′ 시드 영역에서 정확한 일치를 요구하며, 상류 5′ 영역에서는 제한된 불일치를 허용합니다. 가능한 모든 비표적 증폭산물을 식별하고 크기를 측정합니다. 같은 비표적 영역을 증폭하거나 구별할 수 없는 산물을 생성하는 프라이머 쌍은 충돌로 표시되어 같은 멀티플렉스 풀에서 제외됩니다. <strong>QC 모드에서는 주형 서열이 제공되지 않으므로 비표적 분석을 수행하지 않습니다</strong>.<p>
+            
+            <h3>열역학 모델링 및 상호작용 평가</h3>
+            <p>모든 용융 온도 및 상호작용 계산은 <strong>통합 최근접 이웃(NN) 열역학 모델</strong>에 기반합니다. 프라이머 용융 온도는 서열 특이적 엔탈피(ΔH°) 및 엔트로피(ΔS°) 매개변수로 계산되며, 염 농도와 유효 프라이머 농도에 대한 보정이 적용됩니다. 자가 다이머 및 교차 다이머 안정성은 PCR 어닐링 온도에서 잠재적 이중나선 형성의 Gibbs 자유 에너지(ΔG)를 계산하여 평가하며, 중합효소 신장 위험이 가장 높은 3′ 말단 상보성에 특히 중점을 둡니다.</p>
+            <p>모든 <strong>쌍별 상호작용 에너지</strong>를 바탕으로 PrimerWeaver는 강한 열역학적 충돌을 피하면서 프라이머를 <strong>가능한 한 적은 수의 PCR 반응</strong>으로 분할하는 <strong>최적 풀링 전략</strong>을 권장합니다. <strong>안정적인 프라이머–프라이머 상호작용, 불충분한 젤 크기 분해능</strong>, 또는 <strong>공유 비표적 증폭</strong> 사건을 보이는 프라이머 쌍은 별도 풀에 할당됩니다. 최종 출력은 권장 풀링 구성과 함께, 호환되지 않는 프라이머를 결합하지 못하게 하는 구체적 제약을 보고합니다.<p>
+                       
+                       
+                        
+            
+        </div>
+
+        <div class="section">
+            <h2>경고 및 예외 사례</h2>
+            <p>멀티플렉스 PCR 모듈은 공통 <strong>MW(Message Warning)</strong> 계층을 표적 수, 오버랩 꼬리, 비표적 검사, 그래프 기반 풀링과 관련된 멀티플렉스 고유 설계 제약과 결합합니다. 일부 경고는 순수 사전 검사이며, 다른 경고는 설계 또는 풀 할당이 단순 단일 표적 PCR 워크플로와 다르게 동작하는 이유를 설명합니다.</p>
+
+            <h3>일반 경고</h3>
+            <p>이러한 경고는 주로 설계 또는 QC 분석이 시작되기 전에 생성되며, 서열 품질, 매개변수 품질, 입력 크기 또는 업로드 한도 문제를 반영합니다.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>범주</th>
+                        <th>발생 조건</th>
+                        <th>멀티플렉스 PCR 모듈의 현재 동작</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>차단 입력 알림</strong></td>
+                        <td>표적 서열 누락, QC 모드에서 프라이머 서열 누락, 파싱 실패 또는 기타 잘못된 필수 입력.</td>
+                        <td>모듈이 즉시 중지되고, 분석을 진행하기 전에 누락되었거나 잘못된 입력을 수정하도록 요청합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-04</strong><br>정규화 후 유효한 서열 없음</td>
+                        <td>제출된 모든 표적 서열이 정규화 후 비어 있게 됩니다.</td>
+                        <td>사용자는 계속 진행할 수 있지만 결과 설계 또는 QC 출력이 비어 있거나 유용한 정보를 제공하지 못합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-05</strong><br>비-IUPAC 문자 제거됨</td>
+                        <td>표적 서열에 지원되지 않는 문자가 포함되어 있습니다.</td>
+                        <td>모듈은 정규화된 서열만으로 진행하며, 유효 주형이 원래 입력과 다를 수 있음을 경고합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-06</strong><br>축퇴 염기 검출됨</td>
+                        <td>표적에 모호성 IUPAC 염기가 포함되어 있습니다.</td>
+                        <td>가장 안정적인 해석을 바탕으로 열역학적 값을 보수적으로 추정하므로, Tm과 ΔG 값은 근사값으로 간주해야 합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-09</strong><br>대규모 데이터 세트</td>
+                        <td>제출된 표적 항목 또는 프라이머 쌍 수가 <strong>500</strong>을 초과합니다.</td>
+                        <td>브라우저 측 처리가 느려지거나 응답하지 않을 수 있음을 경고합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-10~MW-15</strong><br>매개변수 범위 경고</td>
+                        <td>설계 모드에서 Na<sup>+</sup>, Mg<sup>2+</sup>, 프라이머 농도 또는 목표 Tm이 권장되거나 검증된 열역학적 범위를 벗어납니다.</td>
+                        <td>모듈은 계속 진행할 수 있지만 프라이머 최적화와 열역학적 해석의 신뢰도가 낮아집니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-19</strong><br>총 입력 크기가 큼</td>
+                        <td>총 입력 서열 크기가 매우 커집니다.</td>
+                        <td>설계, QC 또는 풀링 분석 중 브라우저 측 계산이 느려질 수 있음을 경고합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-22</strong><br>파일 업로드가 가져오기 제한을 초과함</td>
+                        <td>업로드한 표적 또는 프라이머 파일이 <strong>1 MB</strong>보다 큽니다.</td>
+                        <td>서열을 불러오기 전에 가져오기가 차단되며, 사용자는 더 작은 파일을 선택해야 합니다.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>설계 경고</h3>
+            <p>이러한 경고와 예외 사례는 멀티플렉스 고유의 프라이머 설계 논리, 비표적 검사, 최종 풀링 모델에서 발생합니다.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>사례</th>
+                        <th>발생 조건</th>
+                        <th>멀티플렉스 PCR 모듈의 현재 동작</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>MPX-MW-01</strong><br>한 번의 설계 실행에 표적이 많음</td>
+                        <td>설계 모드에서 <strong>10개 초과 표적</strong>을 사용합니다.</td>
+                        <td>패널이 커질수록 멀티플렉스 효율과 교차 반응 위험이 증가함을 경고하지만, 설계는 계속 진행할 수 있습니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>정방향 / 역방향 오버랩 길이 경고</strong></td>
+                        <td>사용자가 제공한 5′ 오버랩 꼬리가 권장 <strong>15–40 bp</strong> 범위를 벗어납니다.</td>
+                        <td>모듈은 오버랩 경고를 표시하지만 설계는 계속 진행하며, 극단적인 오버랩 길이가 하류 조립 견고성을 떨어뜨릴 수 있음을 알립니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>프라이머 배치를 위한 최근접 Tm 대체</strong></td>
+                        <td>표적 말단에서 요청한 Tm 창을 정확히 만족하는 후보 프라이머가 없습니다.</td>
+                        <td>알고리즘은 즉시 실패하는 대신 국소적으로 가장 적합한 가용 프라이머로 대체하므로, 일부 보고된 프라이머가 이상적인 Tm 허용 범위를 벗어날 수 있습니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>설계 모드는 비표적 검사를 수행하고, QC 모드는 수행하지 않음</strong></td>
+                        <td>선택한 워크플로가 새로 설계와 QC 모드 사이에서 바뀝니다.</td>
+                        <td>설계 모드만 제출된 표적 패널에 대해 비표적 증폭을 평가합니다. QC 모드에서는 주형 맥락이 제공되지 않아 비표적 상태를 알 수 없습니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>QC 모드는 크기 기반 풀링 논리를 비활성화함</strong></td>
+                        <td>업로드된 프라이머 쌍만으로 QC 모드를 사용합니다.</td>
+                        <td>예상 증폭산물 크기와 크기 분해 필터를 사용할 수 없으므로, 풀링 권장 사항은 열역학적 충돌에만 의존합니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>풀링은 그래프 기반이며 휴리스틱임</strong></td>
+                        <td>많은 프라이머 쌍이 같은 멀티플렉스 풀을 놓고 경쟁합니다.</td>
+                        <td>모듈은 충돌 그래프 색칠로 프라이머를 풀에 할당합니다. 이는 실용적이지만 모든 경우에서 전역적으로 최소 풀 수를 보장하지는 않습니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>결과 수준에서 실패한 표적</strong></td>
+                        <td>표적에서 유효한 프라이머 쌍을 얻지 못하거나, 설계된 쌍이 산물 길이 기대와 충돌합니다.</td>
+                        <td>해당 표적은 조용히 삭제되지 않고 결과 영역에 실패로 나열되어, 패널에 포함되지 못한 이유를 검토할 수 있습니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>공유 비표적이 풀을 나눌 수 있음</strong></td>
+                        <td>서로 다른 프라이머 쌍이 같은 의도하지 않은 영역을 증폭하거나 구별할 수 없는 산물을 만듭니다.</td>
+                        <td>충돌 그래프는 해당 프라이머 쌍을 호환되지 않는 것으로 처리하여, 직접적인 열역학 상호작용이 약하더라도 별도 풀로 강제 분리합니다.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <p><strong>실용적 해석:</strong> 멀티플렉스 PCR의 경고가 항상 실패한 패널을 의미하지는 않습니다. 가장 중요한 구분은 모듈이 <strong>설계 모드</strong>인지 <strong>QC 모드</strong>인지입니다. 비표적 증폭과 산물 크기를 고려한 풀링은 설계 모드에서만 평가할 수 있기 때문입니다. 따라서 최종 해석은 경고 목록을 실패한 표적 보고, 풀링 설명, 선택한 워크플로 모드와 함께 결합해야 합니다.</p>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PCR par chevauchement - PrimerWeaver V1.0.6</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #333;
+            background: #f9fafb;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e40af;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2563eb;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            font-size: 1.5em;
+        }
+        h3 {
+            color: #3b82f6;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            font-size: 1.2em;
+        }
+        h4 {
+            color: #60a5fa;
+            margin-top: 1.2em;
+            margin-bottom: 0.6em;
+        }
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 1em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        strong {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c2410c;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .abstract {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+        .abstract p {
+            margin: 0;
+            font-style: italic;
+        }
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .section {
+            margin-bottom: 2.5em;
+        }
+        .version-info {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+            margin-top: 3em;
+            padding-top: 2em;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PCR par chevauchement</h1>
+        
+        <div class="abstract">
+            <p>Le module PCR par chevauchement (ou PCR par extension de chevauchement, OE-PCR) permet l’assemblage sans cicatrice de plusieurs fragments d’ADN grâce à la conception rationnelle d’amorces portant des séquences de chevauchement complémentaires. L’outil conçoit automatiquement les paires d’amorces de chaque fragment, en intégrant les séquences lieuses indiquées par l’utilisateur (ADN ou acides aminés) entre les fragments, tout en optimisant la longueur du chevauchement et la température de fusion afin d’obtenir un assemblage efficace. Cette méthode convient particulièrement à la construction de protéines de fusion, à la jonction d’éléments génétiques modulaires et à la création de séquences chimériques sans recourir à des sites d’enzymes de restriction.</p>
+        </div>
+
+        <div class="section">
+            <h2>Guide de démarrage rapide</h2>
+            
+            <ol>
+                <li>Ajoutez 2 fragments d’ADN ou plus, au format FASTA ou en texte brut, dans l’ordre d’assemblage souhaité. Les noms des fragments sont extraits automatiquement des en-têtes FASTA afin de faciliter leur identification. Vous pouvez éventuellement indiquer des séquences lieuses entre fragments (ADN ou acides aminés), ajuster les paramètres de conception (Tm du cœur, Tm du chevauchement, concentrations salines) et ajouter des séquences 5′ optionnelles aux amorces terminales (par exemple des sites de restriction ou des étiquettes d’affinité).</li>
+                
+                <div style="text-align: center; margin: 2em 0;">
+                    <img
+                        src="contents/pictures/oe_PCR_demo.png"
+                        alt="Interface de saisie des fragments pour l’OE-PCR"
+                        style="max-width: 90%; height: auto; border-radius: 8px;"
+                    >
+                </div>
+                
+                
+                
+                <li>Cliquez sur « Design Primers » pour concevoir automatiquement les paires d’amorces avec des régions de chevauchement optimisées. Examinez les séquences d’amorces, les températures de fusion, les indicateurs de qualité et la séquence assemblée prédite. Téléchargez les résultats au format FASTA.</li>
+                
+
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>Principe de la PCR par chevauchement</h2>
+            
+            <p>La PCR par chevauchement est une technique de biologie moléculaire permettant d’assembler sans cicatrice plusieurs fragments d’ADN grâce à des amorces portant des régions de chevauchement complémentaires. La procédure comporte plusieurs tours de PCR : un premier tour amplifie chaque fragment avec des séquences d’amorces se chevauchant, puis une PCR d’assemblage permet aux fragments chevauchants de s’hybrider et d’être étendus par l’ADN polymérase, ce qui produit un produit continu sans interruption ni séquence supplémentaire aux jonctions.</p>
+
+                        
+            <h3>Principes de conception essentiels</h3>
+            
+            
+            <p>La conception des amorces de PCR par chevauchement suit une <strong>stratégie thermodynamique en deux étapes</strong>, qui reflète les exigences distinctes de l’amplification des fragments et de l’extension par chevauchement :</p>
+            <ul>
+                <li><strong>Région cœur (liaison au gabarit) :</strong> la région complémentaire du gabarit est optimisée pour atteindre une <strong>Tm du cœur</strong> définie par l’utilisateur (généralement 55–65 °C), afin d’assurer une amplification robuste et spécifique de chaque fragment lors de la première PCR.</li>
+                <li><strong>Région de chevauchement (pilotée par l’extension) :</strong> la région de chevauchement est conçue pour permettre une hybridation stable entre produits de PCR adjacents lors de la PCR d’extension, où les fragments chevauchants servent d’amorces les uns pour les autres. La stabilité thermodynamique de cette région détermine directement l’efficacité de l’extension par chevauchement et de la formation du produit de pleine longueur.</li>
+            </ul>
+            <p>En optimisant ces deux régions de manière indépendante, le module permet une amplification fiable des fragments individuels tout en maximisant l’efficacité et la spécificité de l’étape d’extension par chevauchement.</p>
+
+        </div>
+
+        <div class="section">
+            <h2>Format d’entrée</h2>
+            
+            <p>Le module accepte des <strong>séquences d’ADN au format FASTA ou en texte brut</strong>. Plusieurs fragments peuvent être ajoutés successivement et seront assemblés dans l’ordre indiqué par l’utilisateur. <strong>Une seule séquence</strong> est autorisée par champ de saisie ; si plusieurs en-têtes FASTA sont détectés, <strong>seule la première séquence</strong> sera utilisée. </p>
+            
+            <p>Des <strong>séquences de chevauchement personnalisées</strong> optionnelles peuvent être ajoutées aux extrémités 5′ de la première amorce sens et de la dernière amorce antisens. Des <strong>séquences lieuses</strong> optionnelles peuvent être insérées entre les fragments, par exemple des acides aminés (lieurs protéiques, étiquettes d’affinité) ou des séquences nucléotidiques (sites de restriction, espaceurs flexibles, etc.). </p>
+
+                <div style="text-align: center; margin: 2em 0;">
+                    <img
+                        src="contents/pictures/oe_PCR_input.png"
+                        alt="Séquence d’entrée OE-PCR"
+                        style="max-width: 60%; height: auto; border-radius: 8px;"
+                    >
+                </div>
+ <h3>Gestion des fragments</h3>
+            <ul>
+                <li><strong>Ajouter/supprimer des fragments :</strong> ajoutez plusieurs séquences d’ADN pour un assemblage multi-fragments (2–10 fragments recommandés ; les assemblages plus grands deviennent plus complexes)</li>
+                <li><strong>Réordonner les fragments :</strong> ajustez l’ordre d’assemblage à l’aide des commandes de l’interface ; l’ordre détermine l’architecture du construit final</li>
+                <li><strong>Noms des fragments :</strong> extraits automatiquement des en-têtes FASTA pour une identification claire des amorces ; utilisés dans les rapports de sortie</li>
+                <li><strong>Complément inverse :</strong> inversez des fragments individuels si nécessaire afin de correspondre à l’orientation et au sens d’assemblage souhaités</li>
+            </ul>
+        </div>
+
+
+        <div class="section">
+            <h2>Paramètres de conception</h2>
+            
+            <p>Avant de lancer la conception des amorces, vérifiez et ajustez les paramètres suivants afin qu’ils correspondent à vos conditions de PCR et à vos exigences d’assemblage.</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Paramètre</th>
+                        <th>Valeur par défaut</th>
+                        <th>Plage</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Tm des amorces cœur (°C)</strong></td>
+                        <td>55</td>
+                        <td>40–75</td>
+                        <td>Température de fusion cible de la région cœur (liaison au gabarit) des amorces. </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tm de la région de chevauchement (°C)</strong></td>
+                        <td>55</td>
+                        <td>40–75</td>
+                        <td>Température de fusion cible de la région de chevauchement conçue pour l’hybridation fragment–fragment.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Concentration des amorces (nM)</strong></td>
+                        <td>500</td>
+                        <td>50–2000</td>
+                        <td>Concentration effective des amorces retenue pour le calcul in silico de la Tm. Plage habituelle : 25-1000 nM.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Concentration en Na⁺ (mM)</strong></td>
+                        <td>50</td>
+                        <td>0–200</td>
+                        <td>Concentration en cations monovalents utilisée pour le calcul de la Tm corrigé en fonction des sels. Plage habituelle : 10-200 mM.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Concentration en Mg²⁺ (mM)</strong></td>
+                        <td>2.0</td>
+                        <td>0–10</td>
+                        <td>Concentration en cations divalents utilisée pour le calcul de la Tm. Réglez-la sur 0 si la réaction ne contient pas de Mg²⁺. Plage habituelle : 0.5-5 mM.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Séquence terminale sens</strong></td>
+                        <td>—</td>
+                        <td>Optionnel</td>
+                        <td>Séquence d’ADN personnalisée ajoutée à l’extrémité 5′ de l’amorce F1 (sens du premier fragment). Exclue du calcul de la Tm.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Séquence terminale antisens</strong></td>
+                        <td>—</td>
+                        <td>Optionnel</td>
+                        <td>Séquence d’ADN personnalisée ajoutée à l’extrémité 5′ de l’amorce RN (antisens du dernier fragment, complément inverse). Exclue du calcul de la Tm.</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            
+        </div>
+
+        <div class="section">
+            <h2>Résultats et sortie</h2>
+            
+            <p>Après la conception des amorces, le module PCR par chevauchement génère un ensemble complet de résultats destinés à faciliter la validation expérimentale et le clonage en aval. </p>
+            
+            <h3>Tableau des amorces</h3>
+            <p>Les paires d’amorces conçues sont présentées dans un tableau structuré comprenant les séquences complètes (5′→3′), la longueur, la teneur en GC et les températures de fusion (Tm). Les valeurs de Tm sont indiquées à la fois pour la région cœur d’hybridation et pour la région de chevauchement, ce qui permet d’évaluer la compatibilité d’amplification. Les indicateurs de qualité des amorces, notamment les répétitions homopolymériques, les structures en épingle à cheveux, l’auto-dimère et la formation d’hétérodimères, sont évalués et signalés afin de mettre en évidence les risques susceptibles d’affecter les performances de la PCR. Les régions de chevauchement sont mises en gras dans les séquences d’amorces pour en faciliter la visualisation. <p>
+          
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/oe_PCR_output_results.png"
+                    alt="Tableau des résultats de conception d’amorces OE-PCR"
+                    style="max-width: 70%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+            <h3>Séquence assemblée</h3>
+            <p>Le module génère le construit assemblé final prédit, en montrant la séquence concaténée complète avec tous les fragments joints. Les régions de liaison des amorces sont mises en évidence pour la visualisation. Veuillez télécharger le fichier au format FASTA pour la validation de séquence et l’analyse en aval</p>
+            
+        </div>
+
+        <div class="section">
+            <h2>Algorithme de conception des amorces</h2>
+            
+            <h3>Structure des amorces</h3>
+		<p>Chaque amorce de PCR par chevauchement comprend deux régions fonctionnelles :</p>
+		<ul>
+  			<li><strong>Cœur d’hybridation (3′) :</strong> région complémentaire du gabarit qui pilote l’hybridation et l’amplification (généralement 18–30 bp).</li>
+  			<li><strong>Région de chevauchement (5′) :</strong> séquence complémentaire d’un fragment adjacent, introduite via l’amorce et utilisée pour l’hybridation et l’extension fragment–fragment lors de la PCR par chevauchement (généralement 18–30 bp). </li>
+		</ul>
+         
+            <h3>Processus de conception</h3>
+            <p>Lors de la conception des amorces de PCR par chevauchement, le système construit d’abord la <strong>séquence cible assemblée</strong> en concaténant tous les fragments d’entrée selon l’ordre défini par l’utilisateur, y compris les <strong>séquences lieuses</strong> indiquées. Les jonctions entre fragments adjacents sont ensuite identifiées sur cette séquence assemblée, et les <strong>régions de chevauchement sont définies par leurs coordonnées de position</strong> par rapport au construit final, plutôt que par les séquences de fragments indépendantes. Ces régions de chevauchement peuvent recouvrir partiellement ou totalement les séquences lieuses, selon la longueur du lieur et le contexte de la jonction, et ne sont donc <strong>jamais tronquées ni écartées</strong>.</p>
+	     <p>Une fois les positions des jonctions et les limites des chevauchements fixées, le système conçoit le <strong>cœur d’hybridation (région de liaison au gabarit)</strong> de chaque amorce en parcourant la séquence du fragment d’origine correspondante, en amont ou en aval de la jonction. Les longueurs du cœur sont ajustées de manière itérative afin d’atteindre la température de fusion cible tout en respectant les contraintes de contrôle qualité. Enfin, les amorces OE-PCR de pleine longueur sont construites en <strong>concaténant selon les positions</strong> les cœurs d’hybridation optimisés avec les régions de chevauchement qui leur sont assignées, de sorte que chaque amorce introduise le contexte de jonction correct tout en reconstituant fidèlement la séquence cible assemblée lors de l’extension par chevauchement.<p>
+
+            <h3>Logique des cas limites dans l’algorithme</h3>
+            <p>Plusieurs cas limites sont traités directement dans l’algorithme de conception des amorces, plutôt que d’être uniquement présentés comme des avertissements destinés à l’utilisateur. Les branches les plus importantes sont résumées ci-dessous.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cas limite algorithmique</th>
+                        <th>Comportement actuel du module PCR par chevauchement</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Moins de deux fragments valides</strong></td>
+                        <td>Le flux de travail s’arrête avant la construction des amorces. Les lignes vides sont d’abord ignorées, et la conception ne se poursuit que s’il reste au moins <strong>deux fragments non vides</strong>.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Lieur long entre fragments adjacents</strong></td>
+                        <td>Si le lieur est suffisamment long, l’algorithme recherche de préférence le chevauchement <strong>à l’intérieur du lieur lui-même</strong>. La Tm de chevauchement rapportée est alors principalement déterminée par le segment de chevauchement du lieur plutôt que par la queue complète de l’amorce.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Lieur court ou absence de lieur</strong></td>
+                        <td>Si le lieur est court ou absent, la région de chevauchement est construite en combinant la séquence du lieur avec les séquences flanquantes des deux fragments voisins, de sorte que le chevauchement de jonction puisse couvrir un contexte fragment–lieur–fragment plutôt que d’appartenir à une seule région source.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Aucun chevauchement idéal trouvé au réglage de jonction préféré</strong></td>
+                        <td>L’algorithme n’échoue pas immédiatement. Il continue d’examiner d’autres longueurs de chevauchement et d’autres placements locaux de jonction, puis se rabat sur le <strong>meilleur chevauchement disponible selon le score</strong>, fondé sur la proximité de la Tm et une pénalité de longueur, avant d’abandonner.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Extrémités de fragment trop courtes pour la conception du cœur</strong></td>
+                        <td>L’étape de conception du cœur parcourt normalement de manière itérative les longueurs de liaison des amorces vers la Tm cible. Si le contexte de séquence près d’une extrémité de fragment est limité, le module se rabat sur la meilleure séquence terminale disponible, même si la Tm cible idéale ne peut pas être atteinte parfaitement.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>L’assemblage des amorces de connexion dépend de la classe de lieur</strong></td>
+                        <td>La composition interne de <strong>R1</strong> et de <strong>F2</strong> change selon la longueur du lieur : pour les lieurs longs, la queue de chevauchement est dominée par le lieur, alors que pour les lieurs courts ou vides, la queue est répartie entre le lieur et la séquence des fragments voisins.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Séquences terminales optionnelles aux extrémités du construit</strong></td>
+                        <td>Les séquences terminales sens et antisens fournies par l’utilisateur sont ajoutées après la conception du cœur et du chevauchement et sont exclues de l’optimisation thermodynamique. La séquence terminale antisens est intégrée à l’amorce antisens finale dans une orientation compatible avec le complément inverse.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Saisie d’un lieur en acides aminés</strong></td>
+                        <td>Si le lieur est fourni sous forme d’acides aminés, le module assainit d’abord la chaîne d’acides aminés, puis la convertit en ADN selon la table de codons sélectionnée avant le début de la conception du chevauchement. L’algorithme de chevauchement en aval travaille toujours sur une séquence d’ADN, et non sur des symboles d’acides aminés.</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+    </div>
+        <div class="section">
+            <h2>Avertissements et cas limites</h2>
+            <p>Le module PCR par chevauchement utilise la couche partagée <strong>MW (Message Warning)</strong> pour la normalisation des séquences et le contrôle préalable des paramètres, et expose également des cas limites propres à l’OE-PCR lorsque le nombre de fragments, la conversion des lieurs ou les choix de chevauchement terminal nécessitent l’attention de l’utilisateur.</p>
+
+            <h3>Avertissements généraux</h3>
+            <p>Ces avertissements surviennent principalement avant la génération du jeu d’amorces final et indiquent des problèmes de saisie de séquences ou de sélection des paramètres. Dans la plupart des cas, l’utilisateur peut réviser l’entrée ou poursuivre avec les valeurs normalisées.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Catégorie</th>
+                        <th>Condition de déclenchement</th>
+                        <th>Comportement actuel du module PCR par chevauchement</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Invites bloquantes liées aux entrées</strong></td>
+                        <td>Aucun fragment valide n’est fourni, ou moins de <strong>deux fragments non vides</strong> restent après que les lignes vides ont été ignorées.</td>
+                        <td>La conception s’arrête immédiatement et l’utilisateur est invité à fournir suffisamment de séquences de fragments pour l’assemblage.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-04</strong><br>Aucune séquence valide après normalisation</td>
+                        <td>Un fragment devient vide après suppression de l’en-tête FASTA et nettoyage des caractères non IUPAC.</td>
+                        <td>L’utilisateur peut tout de même poursuivre, mais le fragment concerné ne peut plus servir de base à une conception d’amorces pertinente.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-05</strong><br>Caractères non IUPAC supprimés</td>
+                        <td>Des caractères non pris en charge sont présents dans l’entrée d’un fragment.</td>
+                        <td>Le module poursuit uniquement avec l’ADN normalisé et avertit que le gabarit effectif peut différer du texte collé à l’origine.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-06</strong><br>Bases dégénérées détectées</td>
+                        <td>Un ou plusieurs fragments contiennent des bases IUPAC ambiguës.</td>
+                        <td>Les valeurs thermodynamiques sont estimées de manière prudente à partir de la variante la plus stable ; les valeurs de Tm et de ΔG affichées doivent donc être considérées comme des approximations.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-10 à MW-15</strong><br>Avertissements relatifs aux plages des paramètres</td>
+                        <td>Na<sup>+</sup>, Mg<sup>2+</sup>, la concentration des amorces ou la <strong>Tm des amorces cœur</strong> se situe en dehors des plages recommandées ou validées.</td>
+                        <td>Le module peut tout de même poursuivre, mais la prédiction thermodynamique devient moins fiable dans ces conditions.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-19</strong><br>Grande taille totale des séquences</td>
+                        <td>La taille totale des séquences d’entrée, tous fragments confondus, dépasse le seuil d’avertissement partagé côté navigateur.</td>
+                        <td>La couche d’avertissement partagée signale que le calcul peut ralentir pour des tailles d’entrée totales très importantes, mais l’utilisateur peut tout de même poursuivre.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-20</strong><br>Plusieurs en-têtes FASTA dans un même champ</td>
+                        <td>La zone de texte d’un fragment contient plus d’un enregistrement FASTA.</td>
+                        <td>Une boîte de dialogue MW partagée avertit qu’une seule séquence est autorisée par champ. Si l’utilisateur poursuit, le champ est tronqué au <strong>premier enregistrement FASTA</strong> avant que la conception ne continue.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-22</strong><br>Le téléversement dépasse la limite d’importation</td>
+                        <td>Un fichier de fragment téléversé dépasse <strong>1 MB</strong>.</td>
+                        <td>L’importation est bloquée avant le chargement des séquences et l’utilisateur doit choisir un fichier plus petit.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Avertissements de conception</h3>
+            <p>Ces cas limites découlent de la logique de conception propre à l’OE-PCR, en particulier la concaténation des fragments, la conversion des lieurs et le traitement des chevauchements terminaux.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cas</th>
+                        <th>Condition de déclenchement</th>
+                        <th>Comportement actuel du module PCR par chevauchement</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Avertissement sur la longueur du chevauchement terminal</strong></td>
+                        <td>La <strong>séquence terminale sens</strong> ou la <strong>séquence terminale antisens</strong> fournie par l’utilisateur se situe en dehors de la plage recommandée de <strong>15–30 bp</strong>.</td>
+                        <td>Le module affiche une invite MW propre à l’OE-PCR et autorise néanmoins la poursuite de la conception, en avertissant que des chevauchements trop courts peuvent réduire l’efficacité d’assemblage, tandis que des chevauchements trop longs peuvent augmenter la recombinaison non souhaitée.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Le lieur AA contient des symboles non pris en charge</strong></td>
+                        <td>Un lieur d’acides aminés comprend des caractères qui ne sont pas des symboles d’acides aminés valides.</td>
+                        <td>Le module signale les caractères ignorés, propose d’assainir le lieur, puis relance la conception à partir de la séquence d’acides aminés nettoyée.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Échec de conversion du lieur AA</strong></td>
+                        <td>Un lieur d’acides aminés ne peut pas être traduit en ADN avec la table de codons de l’hôte sélectionnée.</td>
+                        <td>La conception s’arrête et signale l’erreur de conversion du lieur afin qu’elle soit corrigée.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Stratégie de chevauchement dépendante de la longueur du lieur</strong></td>
+                        <td>La longueur du lieur de jonction diffère substantiellement entre fragments voisins.</td>
+                        <td>Lorsque le lieur est long, le chevauchement est de préférence conçu à l’intérieur de la séquence du lieur ; lorsque le lieur est court ou absent, le chevauchement couvre le lieur plus les séquences flanquantes des fragments. Cela peut modifier les bases qui contribuent à la Tm de chevauchement rapportée.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Extrémités de fragment très courtes</strong></td>
+                        <td>La séquence gabarit près d’une jonction est trop courte pour permettre le parcours itératif habituel du cœur.</td>
+                        <td>Le module se rabat sur la séquence terminale disponible comme région cœur, ce qui peut réduire la liberté d’optimisation et produire des cœurs d’hybridation plus courts que d’habitude.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Les indicateurs de CQ sont des annotations au niveau des résultats</strong></td>
+                        <td>Des préoccupations de CQ des amorces liées aux épingles à cheveux, dimères, homopolymères ou questions connexes sont détectées après la génération des amorces.</td>
+                        <td>Ces problèmes apparaissent en ligne dans le tableau de résultats plutôt que sous forme de boîtes de dialogue MW autonomes ; l’interprétation finale doit donc inclure les badges de CQ ainsi que la séquence assemblée et la disposition des chevauchements.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <p><strong>Interprétation pratique :</strong> en PCR par chevauchement, les avertissements ne signifient pas nécessairement que la conception des amorces a échoué. De nombreux avertissements reflètent la normalisation des entrées ou des heuristiques de conception. Notez que la <strong>Tm de la région de chevauchement</strong> influence la conception des jonctions, mais que le contrôle de plage MW partagé cible le champ <strong>Tm des amorces cœur</strong>. Les résultats doivent donc être interprétés conjointement avec le tableau de CQ des amorces, la séquence assemblée et le contexte réel fragment/lieur à chaque jonction.</p>
+            </div>
+        </div>
+</body>
+</html>

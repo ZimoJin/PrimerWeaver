@@ -1,5 +1,26 @@
 import * as Core from './core_v1.0.1.js';
 
+const t = (key, params, fallback) => (
+  window.PW_I18N ? window.PW_I18N.t(key, params, fallback) : (fallback || key)
+);
+
+function localizedClassLabel(label) {
+  const raw = String(label || '');
+  const threePrimePrefix = raw.startsWith('3′ ') ? '3′ ' : '';
+  const base = threePrimePrefix ? raw.slice(3) : raw;
+  const keyByLabel = {
+    None: 'qc.none',
+    Weak: 'qc.weak',
+    Moderate: 'qc.moderate',
+    Strong: 'qc.strong',
+    'Very strong': 'qc.veryStrong'
+  };
+  const category = Object.keys(keyByLabel).find((name) => base === name || base.startsWith(name + ' '));
+  if (!category) return raw;
+  const suffix = base.slice(category.length);
+  return threePrimePrefix + t(keyByLabel[category], null, category) + suffix;
+}
+
 // --- CORE CONSTANTS ---
 const comp = { A: "T", T: "A", G: "C", C: "G" };
 const IUPAC_MAP = {
@@ -13,7 +34,7 @@ const QC_PRESET_STORAGE_KEY = "primerweaver_qc_presets_v1";
 const QC_DEFAULT_PRESET_KEY = "primerweaver_qc_default_preset_id_v1";
 const QC_SYSTEM_DEFAULT_PRESET = Object.freeze({
   id: "system-default",
-  name: "System Default",
+  name: t('qc.systemDefault', null, 'System Default'),
   values: Object.freeze({
     na: 50,
     mg: 2.0,
@@ -105,9 +126,9 @@ function qcPair(F, R, thermo) {
 }
 
 function scoreLabel(score) {
-  if (score >= 85) return { txt: "Excellent", cls: "good" };
-  if (score >= 65) return { txt: "Acceptable", cls: "mid" };
-  return { txt: "Risky", cls: "bad" };
+  if (score >= 85) return { txt: t('qc.excellent', null, 'Excellent'), cls: "good" };
+  if (score >= 65) return { txt: t('qc.acceptable', null, 'Acceptable'), cls: "mid" };
+  return { txt: t('qc.risky', null, 'Risky'), cls: "bad" };
 }
 
 
@@ -424,10 +445,8 @@ function buildQCPreflightWarnings(fList, rList, fRaw, rRaw, Na, Mg, conc, target
     if (fValidCount === 0 && rValidCount === 0) {
       warnings.push({
         id: 'MW-04',
-        message:
-          "Warning: No valid primer sequences detected.\n" +
-          "All provided sequences become empty after normalization (only IUPAC DNA codes are kept: A/C/G/T/R/Y/S/W/K/M/B/D/H/V/N).\n\n" +
-          "Click Cancel to check your input or OK to proceed (results will be empty)."
+        message: t('qc.warnings.noValid', null,
+          "Warning: No valid primer sequences detected.\nAll provided sequences become empty after normalization (only IUPAC DNA codes are kept: A/C/G/T/R/Y/S/W/K/M/B/D/H/V/N).\n\nClick Cancel to check your input or OK to proceed (results will be empty).")
       });
       return warnings;
     }
@@ -436,27 +455,19 @@ function buildQCPreflightWarnings(fList, rList, fRaw, rRaw, Na, Mg, conc, target
   // MW-01 / MW-02 variants: only one side effectively usable
   if (fValidCount > 0 && rValidCount === 0) {
     const note = rHasAny
-      ? "Reverse primer input is present but none of the sequences are valid after normalization."
-      : "No reverse primers are provided.";
+      ? t('qc.warnings.reverseInvalid', null, "Reverse primer input is present but none of the sequences are valid after normalization.")
+      : t('qc.warnings.noReverse', null, "No reverse primers are provided.");
     warnings.push({
       id: 'MW-01',
-      message:
-        "Warning: Only forward primers are available for QC.\n" +
-        note + "\n" +
-        "QC will be performed only on forward primers (no cross-dimer / pair-level analysis).\n\n" +
-        "Click Cancel to check your input or OK to proceed."
+      message: t('qc.warnings.onlyForward', { note }, "Warning: Only forward primers are available for QC.\n" + note + "\nQC will be performed only on forward primers (no cross-dimer / pair-level analysis).\n\nClick Cancel to check your input or OK to proceed.")
     });
   } else if (rValidCount > 0 && fValidCount === 0) {
     const note = fHasAny
-      ? "Forward primer input is present but none of the sequences are valid after normalization."
-      : "No forward primers are provided.";
+      ? t('qc.warnings.forwardInvalid', null, "Forward primer input is present but none of the sequences are valid after normalization.")
+      : t('qc.warnings.noForward', null, "No forward primers are provided.");
     warnings.push({
       id: 'MW-02',
-      message:
-        "Warning: Only reverse primers are available for QC.\n" +
-        note + "\n" +
-        "QC will be performed only on reverse primers (no cross-dimer / pair-level analysis).\n\n" +
-        "Click Cancel to check your input or OK to proceed."
+      message: t('qc.warnings.onlyReverse', { note }, "Warning: Only reverse primers are available for QC.\n" + note + "\nQC will be performed only on reverse primers (no cross-dimer / pair-level analysis).\n\nClick Cancel to check your input or OK to proceed.")
     });
   }
 
@@ -464,12 +475,8 @@ function buildQCPreflightWarnings(fList, rList, fRaw, rRaw, Na, Mg, conc, target
   if (fHasAny && rHasAny && fList.length !== rList.length) {
     warnings.push({
       id: 'MW-03',
-      message:
-        `Warning: Primer count mismatch detected.\n` +
-        `Forward primers: ${fList.length}\n` +
-        `Reverse primers: ${rList.length}\n` +
-        "The tool will attempt to pair primers by name. If pairing fails, some primers may be evaluated individually.\n\n" +
-        "Click Cancel to check your input or OK to proceed."
+      message: t('qc.warnings.countMismatch', { forward: fList.length, reverse: rList.length },
+        `Warning: Primer count mismatch detected.\nForward primers: ${fList.length}\nReverse primers: ${rList.length}\nThe tool will attempt to pair primers by name. If pairing fails, some primers may be evaluated individually.\n\nClick Cancel to check your input or OK to proceed.`)
     });
   }
 
@@ -481,15 +488,11 @@ function buildQCPreflightWarnings(fList, rList, fRaw, rRaw, Na, Mg, conc, target
     const examples = [...invalidF, ...invalidR].slice(0, 4).map(p => p.label);
     warnings.push({
       id: 'MW-05',
-      message:
-        "Warning: Non-IUPAC characters were removed from primer sequences.\n" +
-        `Affected primers: ${invalidF.length + invalidR.length}\n` +
-        (examples.length ? `Examples: ${examples.join(', ')}\n` : "") +
-        (invalidAt3.length
-          ? "At least one primer contains invalid characters near the 3' end, which is especially risky for PCR.\n"
-          : "") +
-        "QC will proceed using the normalized sequences only.\n\n" +
-        "Click Cancel to review/correct your input or OK to proceed."
+      message: t('qc.warnings.nonIupac', {
+        count: invalidF.length + invalidR.length,
+        examples: examples.length ? examples.join(', ') : '—',
+        endRisk: invalidAt3.length ? t('qc.warnings.invalidAt3', null, "At least one primer contains invalid characters near the 3′ end, which is especially risky for PCR.") : ''
+      }, "Warning: Non-IUPAC characters were removed from primer sequences.\nAffected primers: " + (invalidF.length + invalidR.length) + "\nExamples: " + examples.join(', ') + "\nQC will proceed using the normalized sequences only.\n\nClick Cancel to review/correct your input or OK to proceed.")
     });
   }
 
@@ -503,12 +506,8 @@ function buildQCPreflightWarnings(fList, rList, fRaw, rRaw, Na, Mg, conc, target
     const examples = degeneratePrimers.slice(0, 4).map(p => p.label);
     warnings.push({
       id: 'MW-06',
-      message:
-        "Warning: Degenerate (IUPAC) bases detected.\n" +
-        `Affected primers: ${degeneratePrimers.length}\n` +
-        (examples.length ? `Examples: ${examples.join(', ')}\n` : "") +
-        "Thermodynamic values (Tm and ΔG) are estimated for the most stable variant (worst-case), which may be conservative.\n\n" +
-        "Click Cancel to confirm/replace degenerate bases or OK to proceed."
+      message: t('qc.warnings.degenerate', { count: degeneratePrimers.length, examples: examples.join(', ') },
+        "Warning: Degenerate (IUPAC) bases detected.\nAffected primers: " + degeneratePrimers.length + "\nExamples: " + examples.join(', ') + "\nThermodynamic values (Tm and ΔG) are estimated for the most stable variant (worst case), which may be conservative.\n\nClick Cancel to confirm/replace degenerate bases or OK to proceed.")
     });
   }
 
@@ -524,11 +523,8 @@ function buildQCPreflightWarnings(fList, rList, fRaw, rRaw, Na, Mg, conc, target
     const examples = dupNames.slice(0, 5);
     warnings.push({
       id: 'MW-07',
-      message:
-        "Warning: Duplicate primer names detected.\n" +
-        "Duplicate headers can cause ambiguous pairing and confusing output.\n" +
-        `Examples: ${examples.join(', ')}\n\n` +
-        "Click Cancel to rename duplicates or OK to proceed."
+      message: t('qc.warnings.duplicateNames', { examples: examples.join(', ') },
+        "Warning: Duplicate primer names detected.\nDuplicate headers can cause ambiguous pairing and confusing output.\nExamples: " + examples.join(', ') + "\n\nClick Cancel to rename duplicates or OK to proceed.")
     });
   }
 
@@ -538,17 +534,14 @@ function buildQCPreflightWarnings(fList, rList, fRaw, rRaw, Na, Mg, conc, target
   const schemes = new Set([...fList, ...rList].map(p => detectNamingScheme(p.label)).filter(s => s !== 'none'));
   if (misplacedF.length || misplacedR.length || schemes.size > 1) {
     const lines = [];
-    if (misplacedF.length) lines.push(`Forward box contains reverse-looking names: ${misplacedF.slice(0, 4).join(', ')}`);
-    if (misplacedR.length) lines.push(`Reverse box contains forward-looking names: ${misplacedR.slice(0, 4).join(', ')}`);
-    if (schemes.size > 1) lines.push(`Mixed naming schemes detected: ${[...schemes].join(', ')}`);
+    if (misplacedF.length) lines.push(t('qc.warnings.misplacedForward', { names: misplacedF.slice(0, 4).join(', ') }, `Forward box contains reverse-looking names: ${misplacedF.slice(0, 4).join(', ')}`));
+    if (misplacedR.length) lines.push(t('qc.warnings.misplacedReverse', { names: misplacedR.slice(0, 4).join(', ') }, `Reverse box contains forward-looking names: ${misplacedR.slice(0, 4).join(', ')}`));
+    if (schemes.size > 1) lines.push(t('qc.warnings.mixedNames', { schemes: [...schemes].join(', ') }, `Mixed naming schemes detected: ${[...schemes].join(', ')}`));
 
     warnings.push({
       id: 'MW-08',
-      message:
-        "Warning: Primer naming may prevent reliable pairing.\n" +
-        lines.join('\n') + "\n" +
-        "The tool will still run, but pairing may not match your intention.\n\n" +
-        "Click Cancel to standardize names or OK to proceed."
+      message: t('qc.warnings.naming', { details: lines.join('\n') },
+        "Warning: Primer naming may prevent reliable pairing.\n" + lines.join('\n') + "\nThe tool will still run, but pairing may not match your intention.\n\nClick Cancel to standardize names or OK to proceed.")
     });
   }
 
@@ -557,11 +550,8 @@ function buildQCPreflightWarnings(fList, rList, fRaw, rRaw, Na, Mg, conc, target
   if (totalPrimers > 500) {
     warnings.push({
       id: 'MW-09',
-      message:
-        "Warning: Large primer set detected.\n" +
-        `Total primers: ${totalPrimers}\n` +
-        "QC may run slowly and could cause the browser tab to become unresponsive.\n\n" +
-        "Click Cancel to reduce your input (e.g., run in batches) or OK to proceed."
+      message: t('qc.warnings.largeSet', { count: totalPrimers },
+        "Warning: Large primer set detected.\nTotal primers: " + totalPrimers + "\nQC may run slowly and could cause the browser tab to become unresponsive.\n\nClick Cancel to reduce your input (e.g., run in batches) or OK to proceed.")
     });
   }
 
@@ -573,67 +563,56 @@ function buildQCPreflightWarnings(fList, rList, fRaw, rRaw, Na, Mg, conc, target
   if (!isFinite(Na) || Na < naMin || Na > naMax) {
     warnings.push({
       id: 'MW-10',
-      message:
-        `Na+ out of range: current ${isFinite(Na) ? Na : 'unset'} mM (recommended ${naMin}–${naMax} mM).\n\n` +
-        "Click Cancel to adjust or OK to proceed (results may be unreliable)."
+      message: t('qc.warnings.sodiumRange', { current: isFinite(Na) ? Na : t('qc.unset', null, 'unset'), min: naMin, max: naMax },
+        `Na+ out of range: current ${isFinite(Na) ? Na : 'unset'} mM (recommended ${naMin}–${naMax} mM).\n\nClick Cancel to adjust or OK to proceed (results may be unreliable).`)
     });
   }
 
   if (!isFinite(Mg) || Mg < mgMin || Mg > mgMax) {
     warnings.push({
       id: 'MW-11',
-      message:
-        `Mg2+ out of range: current ${isFinite(Mg) ? Mg : 'unset'} mM (recommended ${mgMin}–${mgMax} mM).\n` +
-        "Mg2+ strongly affects Tm and structures; keep it within the recommended range.\n\n" +
-        "Click Cancel to adjust or OK to proceed."
+      message: t('qc.warnings.magnesiumRange', { current: isFinite(Mg) ? Mg : t('qc.unset', null, 'unset'), min: mgMin, max: mgMax },
+        `Mg2+ out of range: current ${isFinite(Mg) ? Mg : 'unset'} mM (recommended ${mgMin}–${mgMax} mM).\nMg2+ strongly affects Tm and structures; keep it within the recommended range.\n\nClick Cancel to adjust or OK to proceed.`)
     });
   }
 
   if (!isFinite(conc) || conc < concMin || conc > concMax) {
     warnings.push({
       id: 'MW-12',
-      message:
-        `Primer concentration out of range: current ${isFinite(conc) ? conc : 'unset'} nM (recommended ${concMin}–${concMax} nM).\n\n` +
-        "Click Cancel to adjust or OK to proceed."
+      message: t('qc.warnings.concentrationRange', { current: isFinite(conc) ? conc : t('qc.unset', null, 'unset'), min: concMin, max: concMax },
+        `Primer concentration out of range: current ${isFinite(conc) ? conc : 'unset'} nM (recommended ${concMin}–${concMax} nM).\n\nClick Cancel to adjust or OK to proceed.`)
     });
   }
 
   if (!isFinite(targetTm) || targetTm < tmMin || targetTm > tmMax) {
     warnings.push({
       id: 'MW-13',
-      message:
-        `Target Tm out of range: current ${isFinite(targetTm) ? targetTm : 'unset'} °C (recommended ${tmMin}–${tmMax} °C).\n\n` +
-        "Click Cancel to adjust or OK to proceed."
+      message: t('qc.warnings.targetRange', { current: isFinite(targetTm) ? targetTm : t('qc.unset', null, 'unset'), min: tmMin, max: tmMax },
+        `Target Tm out of range: current ${isFinite(targetTm) ? targetTm : 'unset'} °C (recommended ${tmMin}–${tmMax} °C).\n\nClick Cancel to adjust or OK to proceed.`)
     });
   }
 
   if (isFinite(Mg) && isFinite(Na) && Mg >= 4 && Na >= 150) {
     warnings.push({
       id: 'MW-14',
-      message:
-        "High Mg2+ and Na+ concentrations provided simultaneously.\n" +
-        "Duplex stability may be substantially overestimated by the model.\n\n" +
-        "Click Cancel to adjust or OK to proceed."
+      message: t('qc.warnings.highSalts', null,
+        "High Mg2+ and Na+ concentrations provided simultaneously.\nDuplex stability may be substantially overestimated by the model.\n\nClick Cancel to adjust or OK to proceed.")
     });
   }
 
   if ((isFinite(Na) && Na < 5) || (isFinite(Mg) && Mg > 10) || (isFinite(conc) && conc > 5000)) {
     warnings.push({
       id: 'MW-15',
-      message:
-        "Selected parameters fall outside the validated range of the thermodynamic model.\n" +
-        "Results may not be physically meaningful.\n\n" +
-        "Click Cancel to adjust or OK to proceed."
+      message: t('qc.warnings.modelRange', null,
+        "Selected parameters fall outside the validated range of the thermodynamic model.\nResults may not be physically meaningful.\n\nClick Cancel to adjust or OK to proceed.")
     });
   }
 
   if ((isFinite(targetTm) && targetTm > 85)) {
     warnings.push({
       id: 'MW-16',
-      message:
-        "Extremely high duplex stability detected (very high Target Tm).\n" +
-        "Numerical estimates may be sensitive to small parameter changes.\n\n" +
-        "Click Cancel to adjust or OK to proceed."
+      message: t('qc.warnings.extremeTarget', null,
+        "Extremely high duplex stability detected (very high Target Tm).\nNumerical estimates may be sensitive to small parameter changes.\n\nClick Cancel to adjust or OK to proceed.")
     });
   } else {
     const anyExtremeDG = [...fAnalyses, ...rAnalyses].some(p => {
@@ -646,10 +625,8 @@ function buildQCPreflightWarnings(fList, rList, fRaw, rRaw, Na, Mg, conc, target
     if (anyExtremeDG) {
       warnings.push({
         id: 'MW-16',
-        message:
-          "Extremely high duplex stability detected (ΔG37 < -25 kcal/mol).\n" +
-          "Numerical estimates may be sensitive to small parameter changes.\n\n" +
-          "Click Cancel to adjust or OK to proceed."
+        message: t('qc.warnings.extremeDg', null,
+          "Extremely high duplex stability detected (ΔG37 < -25 kcal/mol).\nNumerical estimates may be sensitive to small parameter changes.\n\nClick Cancel to adjust or OK to proceed.")
       });
     }
   }
@@ -661,10 +638,8 @@ function buildQCPreflightWarnings(fList, rList, fRaw, rRaw, Na, Mg, conc, target
     if (maxLen - minLen >= 15) {
       warnings.push({
         id: 'MW-17',
-        message:
-          "Large variation in primer length detected across the dataset.\n" +
-          "Cross-primer comparability and scoring may be affected.\n\n" +
-          "Click Cancel to adjust or OK to proceed."
+        message: t('qc.warnings.lengthVariation', null,
+          "Large variation in primer length detected across the dataset.\nCross-primer comparability and scoring may be affected.\n\nClick Cancel to adjust or OK to proceed.")
       });
     }
   }
@@ -673,10 +648,8 @@ function buildQCPreflightWarnings(fList, rList, fRaw, rRaw, Na, Mg, conc, target
   if (totalBp > 20000) {
     warnings.push({
       id: 'MW-19',
-      message:
-        "Large total sequence size detected (>20,000 bp).\n" +
-        "Computation may be slow in browser environments.\n\n" +
-        "Click Cancel to adjust or OK to proceed."
+      message: t('qc.warnings.totalSize', null,
+        "Large total sequence size detected (>20,000 bp).\nComputation may be slow in browser environments.\n\nClick Cancel to adjust or OK to proceed.")
     });
   }
 
@@ -720,10 +693,8 @@ function buildQCPreflightWarnings(fList, rList, fRaw, rRaw, Na, Mg, conc, target
     if (minPool > 0 && (pairedByName / minPool) < 0.5) {
       warnings.push({
         id: 'MW-21',
-        message:
-          "Most primers could not be paired reliably and were evaluated individually.\n" +
-          "Pair-level metrics (e.g., cross-dimer, ΔTm) may be incomplete.\n\n" +
-          "Click Cancel to adjust names or OK to proceed."
+        message: t('qc.warnings.pairingIncomplete', null,
+          "Most primers could not be paired reliably and were evaluated individually.\nPair-level metrics (e.g., cross-dimer, ΔTm) may be incomplete.\n\nClick Cancel to adjust names or OK to proceed.")
       });
     }
   }
@@ -751,7 +722,7 @@ function renderResultCard(F, R, pair, index, targetTm){
   }
 
   let html = '<div class="qc-card">';
-  html += '<div class="section-title">Primer pair ' + index + '</div>';
+  html += '<div class="section-title">' + t('qc.pair', { index: index }, 'Primer pair ' + index) + '</div>';
 
   if (global !== null){
     const sl = scoreLabel(global);
@@ -761,15 +732,15 @@ function renderResultCard(F, R, pair, index, targetTm){
       '<div class="score-row">'+
         '<div class="score '+sl.cls+'">'+global+'</div>'+
         '<div>'+
-          '<div class="score-caption">Reliability Score: '+sl.txt+
-          ' · ΔTm: '+dTm+'°C '+badge(tmStatus, tmStatus==="ok"?"OK":"High Diff")+
+          '<div class="score-caption">'+t('qc.reliability', { label: sl.txt }, 'Reliability Score: '+sl.txt)+
+          ' · ΔTm: '+dTm+'°C '+badge(tmStatus, tmStatus==="ok"?t('qc.ok', null, 'OK'):t('qc.highDifference', null, 'High Diff'))+
           '</div>'+
         '</div>'+
       '</div>';
   } else if (anyPrimer){
-    html += '<div class="aside">Only one primer in this pair.</div>';
+    html += '<div class="aside">'+t('qc.onlyOne', null, 'Only one primer in this pair.')+'</div>';
   } else {
-    html += '<div class="aside">No valid primers in this pair.</div>';
+    html += '<div class="aside">'+t('qc.noneValid', null, 'No valid primers in this pair.')+'</div>';
   }
 
   // Per-primer table
@@ -783,19 +754,19 @@ function renderResultCard(F, R, pair, index, targetTm){
          ' <span style="font-size:10px;color:#64748b">('+
          (tmDiff>0?"+":"") + tmDiff +')</span></td>'+
       '<td>'+(p.clamp?badge("ok","G/C"):badge("warn","A/T"))+'</td>'+
-      '<td>'+(p.homopoly?badge("warn","High"):badge("ok","OK"))+'</td>'+
-      '<td>'+badge(p.hpClass.cls,p.hpClass.label)+'</td>'+
+      '<td>'+(p.homopoly?badge("warn",t('qc.high', null, 'High')):badge("ok",t('qc.ok', null, 'OK')))+'</td>'+
+      '<td>'+badge(p.hpClass.cls,localizedClassLabel(p.hpClass.label))+'</td>'+
       '<td>'+(isFinite(p.dg3)?fmt2(p.dg3):"--")+'</td>'+
-      '<td>'+badge(p.selfClass.cls,p.selfClass.label)+'</td>';
+      '<td>'+badge(p.selfClass.cls,localizedClassLabel(p.selfClass.label))+'</td>';
   }
 
   if (anyPrimer){
     let tableHTML =
-      '<div class="section-title">Per-primer metrics</div>'+
+      '<div class="section-title">'+t('qc.metrics', null, 'Per-primer metrics')+'</div>'+
       '<table><thead><tr>'+
-      '<th>Primer</th><th>Len</th><th>GC%</th><th>Tm (Δ)</th>'+
-      '<th>3\' clamp</th><th>Homopoly</th><th>Hairpin</th><th>ΔG(3\' 5bp)</th>'+
-      '<th>Self-dimer</th><th style="text-align:center;">Cross-dimer</th>'+
+      '<th>'+t('qc.primer', null, 'Primer')+'</th><th>'+t('qc.length', null, 'Len')+'</th><th>GC%</th><th>Tm (Δ)</th>'+
+      '<th>'+t('qc.clamp', null, '3′ clamp')+'</th><th>'+t('qc.homopolymer', null, 'Homopolymer')+'</th><th>'+t('qc.hairpin', null, 'Hairpin')+'</th><th>ΔG(3′ 5bp)</th>'+
+      '<th>'+t('qc.selfDimer', null, 'Self-dimer')+'</th><th style="text-align:center;">'+t('qc.crossDimer', null, 'Cross-dimer')+'</th>'+
       '</tr></thead><tbody>';
 
     let crossCellHtml = '';
@@ -803,7 +774,7 @@ function renderResultCard(F, R, pair, index, targetTm){
       const inf = pair && pair.info ? pair.info : {label:"None",cls:"ok"};
       crossCellHtml =
         '<td rowspan="2" style="text-align:center;vertical-align:middle;">'+
-        badge(inf.cls,inf.label)+'</td>';
+        badge(inf.cls,localizedClassLabel(inf.label))+'</td>';
     } else {
       crossCellHtml =
         '<td style="text-align:center;vertical-align:middle;">'+
@@ -832,7 +803,7 @@ function renderResultCard(F, R, pair, index, targetTm){
     // Notes
     const notes = [];
     if (hasF && F.hasIUPAC || hasR && R.hasIUPAC){
-      notes.push('* Contains degenerate (IUPAC) bases; Tm and ΔG are estimated for the most stable variant (worst-case).');
+      notes.push(t('qc.degenerateNote', null, '* Contains degenerate (IUPAC) bases; Tm and ΔG are estimated for the most stable variant (worst case).'));
     }
     if (notes.length){
       tableHTML += '<div class="aside" style="margin-top:4px;">'+notes.join(' ')+'</div>';
@@ -844,8 +815,8 @@ function renderResultCard(F, R, pair, index, targetTm){
   const blocks = [];
   function addDimerBlock(title, info, obj){
     if (!obj) return;
-    const desc = info.label + ' · ΔG ≈ ' + fmt2(obj.dG) + ' kcal/mol' +
-      (obj.touches3 ? ' · <strong style="color:var(--danger)">Touches 3\'</strong>' : '');
+    const desc = localizedClassLabel(info.label) + ' · ΔG ≈ ' + fmt2(obj.dG) + ' kcal/mol' +
+      (obj.touches3 ? ' · <strong style="color:var(--danger)">'+t('qc.touches3', null, 'Touches 3′')+'</strong>' : '');
     blocks.push(
       '<div class="struct-block">' +
         '<div class="aside" style="margin-bottom:4px;"><strong>' +
@@ -857,17 +828,17 @@ function renderResultCard(F, R, pair, index, targetTm){
   }
 
   if (hasF){
-    if (F.selfD) addDimerBlock("Self-dimer ("+F.label+")", F.selfClass, F.selfD);
-    else blocks.push('<div class="struct-block"><div class="aside"><strong>Self-dimer ('+F.label+')</strong>: None detected</div></div>');
+    if (F.selfD) addDimerBlock(t('qc.selfDimer', null, 'Self-dimer')+" ("+F.label+")", F.selfClass, F.selfD);
+    else blocks.push('<div class="struct-block"><div class="aside"><strong>'+t('qc.selfDimer', null, 'Self-dimer')+' ('+F.label+')</strong>: '+t('qc.noneDetected', null, 'None detected')+'</div></div>');
   }
   if (hasR){
-    if (R.selfD) addDimerBlock("Self-dimer ("+R.label+")", R.selfClass, R.selfD);
-    else blocks.push('<div class="struct-block"><div class="aside"><strong>Self-dimer ('+R.label+')</strong>: None detected</div></div>');
+    if (R.selfD) addDimerBlock(t('qc.selfDimer', null, 'Self-dimer')+" ("+R.label+")", R.selfClass, R.selfD);
+    else blocks.push('<div class="struct-block"><div class="aside"><strong>'+t('qc.selfDimer', null, 'Self-dimer')+' ('+R.label+')</strong>: '+t('qc.noneDetected', null, 'None detected')+'</div></div>');
   }
-  if (bothPrimers && pair && pair.dimer) addDimerBlock("Cross-dimer", pair.info, pair.dimer);
+  if (bothPrimers && pair && pair.dimer) addDimerBlock(t('qc.crossDimer', null, 'Cross-dimer'), pair.info, pair.dimer);
 
   if (blocks.length){
-    html += '<div class="section-title">Predicted structures</div>'+blocks.join("");
+    html += '<div class="section-title">'+t('qc.structures', null, 'Predicted structures')+'</div>'+blocks.join("");
   }
 
   html += '</div>'; // end qc-card
@@ -1048,7 +1019,7 @@ function showQCWarningModal(container, message, onConfirm, onCancel) {
     icon.className = 'qc-warning-icon';
     icon.textContent = '⚠️';
     const title = document.createElement('h3');
-    title.textContent = 'Warning';
+    title.textContent = t('qc.warning', null, 'Warning');
     header.appendChild(icon);
     header.appendChild(title);
     
@@ -1063,12 +1034,12 @@ function showQCWarningModal(container, message, onConfirm, onCancel) {
     
     const cancelBtn = document.createElement('button');
     cancelBtn.id = 'qc-warning-cancel-btn';
-    cancelBtn.textContent = 'Cancel';
+    cancelBtn.textContent = t('qc.cancel', null, 'Cancel');
     cancelBtn.className = 'btn ghost';
     
     const confirmBtn = document.createElement('button');
     confirmBtn.id = 'qc-warning-confirm-btn';
-    confirmBtn.textContent = 'OK';
+    confirmBtn.textContent = t('qc.ok', null, 'OK');
     confirmBtn.className = 'btn';
     
     footer.appendChild(cancelBtn);
@@ -1293,7 +1264,7 @@ function ensureQCPresetModal(container) {
     '<div class="qc-preset-modal-content">' +
       '<div class="qc-preset-modal-header">' +
         '<span class="qc-preset-modal-icon">⚠️</span>' +
-        '<h3 id="qc-preset-modal-title">Preset</h3>' +
+        '<h3 id="qc-preset-modal-title">'+t('qc.presetDialog', null, 'Preset')+'</h3>' +
       '</div>' +
       '<div class="qc-preset-modal-body">' +
         '<p id="qc-preset-modal-message"></p>' +
@@ -1301,8 +1272,8 @@ function ensureQCPresetModal(container) {
         '<div id="qc-preset-modal-error" class="qc-preset-modal-error"></div>' +
       '</div>' +
       '<div class="qc-preset-modal-footer">' +
-        '<button id="qc-preset-modal-cancel" class="btn ghost" type="button">Cancel</button>' +
-        '<button id="qc-preset-modal-confirm" class="btn" type="button">OK</button>' +
+        '<button id="qc-preset-modal-cancel" class="btn ghost" type="button">'+t('qc.cancel', null, 'Cancel')+'</button>' +
+        '<button id="qc-preset-modal-confirm" class="btn" type="button">'+t('qc.ok', null, 'OK')+'</button>' +
       '</div>' +
     '</div>';
 
@@ -1324,11 +1295,11 @@ function showQCPresetDialog(container, options) {
   const overlay = modal.querySelector('.qc-preset-modal-overlay');
   const iconEl = modal.querySelector('.qc-preset-modal-icon');
 
-  if (titleEl) titleEl.textContent = String(opts.title || 'Preset');
+  if (titleEl) titleEl.textContent = String(opts.title || t('qc.presetDialog', null, 'Preset'));
   if (messageEl) messageEl.textContent = String(opts.message || '');
   if (iconEl) iconEl.textContent = mode === 'input' ? '📝' : '⚠️';
-  if (confirmBtn) confirmBtn.textContent = String(opts.confirmText || 'OK');
-  if (cancelBtn) cancelBtn.textContent = String(opts.cancelText || 'Cancel');
+  if (confirmBtn) confirmBtn.textContent = String(opts.confirmText || t('qc.ok', null, 'OK'));
+  if (cancelBtn) cancelBtn.textContent = String(opts.cancelText || t('qc.cancel', null, 'Cancel'));
   if (errorEl) errorEl.textContent = '';
 
   if (inputEl) {
@@ -1552,11 +1523,11 @@ function updateQCPresetStatus(container, activePresetId, message) {
   if (!statusEl) return;
 
   if (!isQCLocalStorageAvailable()) {
-    statusEl.textContent = "Custom presets are unavailable because browser local storage is not available.";
+    statusEl.textContent = t('qc.storageUnavailable', null, 'Custom presets are unavailable because browser local storage is not available.');
     return;
   }
 
-  statusEl.textContent = "Saved presets are stored in this browser. Select a preset to load its values, then use Set as Startup Default if you want it to open automatically next time.";
+  statusEl.textContent = t('qc.presetStatus', null, 'Saved presets are stored in this browser. Select a preset to load its values, then use Set as Startup Default if you want it to open automatically next time.');
 }
 
 function renderQCPresetOptions(container, selectedPresetId, message) {
@@ -1619,12 +1590,12 @@ function setupQCPresetControls(container) {
 
       showQCPresetDialog(container, {
         mode: 'input',
-        title: 'Save Parameter Preset',
-        message: 'Enter a name for this Primer QC parameter preset.',
-        placeholder: 'e.g. Standard Taq Buffer',
-        confirmText: 'Save',
+        title: t('qc.savePresetTitle', null, 'Save Parameter Preset'),
+        message: t('qc.savePresetMessage', null, 'Enter a name for this Primer QC parameter preset.'),
+        placeholder: t('qc.presetPlaceholder', null, 'e.g. Standard Taq Buffer'),
+        confirmText: t('qc.save', null, 'Save'),
         validate: (value) => {
-          if (!String(value || '').trim()) return 'Please enter a preset name.';
+          if (!String(value || '').trim()) return t('qc.presetNameRequired', null, 'Please enter a preset name.');
           return '';
         },
         onConfirm: (value) => {
@@ -1674,9 +1645,9 @@ function setupQCPresetControls(container) {
 
       const activePreset = getQCPresetById(activeId);
       showQCPresetDialog(container, {
-        title: 'Delete Parameter Preset',
-        message: 'Delete preset "' + (activePreset ? activePreset.name : activeId) + '"?',
-        confirmText: 'Delete',
+        title: t('qc.deletePresetTitle', null, 'Delete Parameter Preset'),
+        message: t('qc.deletePresetMessage', { name: activePreset ? activePreset.name : activeId }, 'Delete preset "' + (activePreset ? activePreset.name : activeId) + '"?'),
+        confirmText: t('qc.delete', null, 'Delete'),
         onConfirm: () => {
           const nextPresets = readQCUserPresets().filter((preset) => preset.id !== activeId);
           writeQCUserPresets(nextPresets);
@@ -1734,7 +1705,7 @@ function initQC_V4(container) {
 
       if (fList.length === 0 && rList.length === 0){
         showQCWarningModal(container,
-          "Warning: No primers provided.\nPlease enter at least one primer in either input box.",
+          t('qc.noPrimers', null, "Warning: No primers provided.\nPlease enter at least one primer in either input box."),
           () => {},
           () => {}
         );
@@ -1766,8 +1737,8 @@ function initQC_V4(container) {
 
         for (let i = 0; i < pairs.length; i++){
           const pair = pairs[i];
-          const fInfo = pair.forward || { label: "Forward " + (i+1), seq: "" };
-          const rInfo = pair.reverse || { label: "Reverse " + (i+1), seq: "" };
+          const fInfo = pair.forward || { label: t('qc.forward', null, 'Forward') + " " + (i+1), seq: "" };
+          const rInfo = pair.reverse || { label: t('qc.reverse', null, 'Reverse') + " " + (i+1), seq: "" };
 
           const thermo = thermoCtx(Na, Mg, targetTm);
           const F = qcPrimer(fInfo.label, fInfo.seq, Na, Mg, conc, targetTm);

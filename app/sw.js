@@ -3,14 +3,19 @@
 // Goal: speed up repeat visits + module switching by serving assets from Cache Storage.
 
 // Bump cache version to ensure updated assets are picked up immediately.
-const CACHE_NAME = 'primerweaver-app-v1.1.20';
+const CACHE_NAME = 'primerweaver-app-v1.2.5-i18n';
 
 // Keep install lightweight to avoid blocking first load.
 const SHELL_ASSETS = [
   './app-index.html',
   './app-style.css',
   './app-main.js',
-  './app-module-loader.js'
+  './app-module-loader.js',
+  '../contents/i18n/i18n.js',
+  '../contents/i18n/locales/en.json',
+  '../contents/i18n/locales/fr.json',
+  '../contents/i18n/locales/ko.json',
+  '../contents/i18n/locales/zh-Hans.json'
 ];
 
 // Cached after first render (via postMessage), so it doesn't compete with first paint.
@@ -103,8 +108,9 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
 
-  // Only handle app assets (avoid interfering with the main site shell).
-  if (!url.pathname.includes('/app/')) return;
+  // Handle app assets and the shared locale files requested by the controlled app page.
+  const isSharedLocaleAsset = url.pathname.includes('/contents/i18n/');
+  if (!url.pathname.includes('/app/') && !isSharedLocaleAsset) return;
 
   event.respondWith((async () => {
     const cache = await caches.open(CACHE_NAME);
@@ -116,7 +122,8 @@ self.addEventListener('fetch', (event) => {
       req.destination === 'script' ||
       path.endsWith('.html') ||
       path.endsWith('.css') ||
-      path.endsWith('.js');
+      path.endsWith('.js') ||
+      path.endsWith('.json');
 
     // Network-first for HTML/CSS/JS so edits show up immediately (especially during local development).
     if (isCritical) {

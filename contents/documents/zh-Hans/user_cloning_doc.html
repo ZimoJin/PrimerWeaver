@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USER 酶克隆 - PrimerWeaver V1.0.6</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #333;
+            background: #f9fafb;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e40af;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2563eb;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            font-size: 1.5em;
+        }
+        h3 {
+            color: #3b82f6;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            font-size: 1.2em;
+        }
+        h4 {
+            color: #60a5fa;
+            margin-top: 1.2em;
+            margin-bottom: 0.6em;
+        }
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 1em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        strong {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c2410c;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .abstract {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+        .abstract p {
+            margin: 0;
+            font-style: italic;
+        }
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .section {
+            margin-bottom: 2.5em;
+        }
+        .version-info {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+            margin-top: 3em;
+            padding-top: 2em;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>USER 酶克隆引物设计器</h1>
+        
+        <div class="abstract">
+            <p>USER 克隆模块用于设计基于 USER 酶系统（Uracil-Specific Excision Reagent）的定向 DNA 组装引物。该工具可自动在引物的指定位置引入尿嘧啶碱基，这些碱基在室温下被 USER 酶识别并切割，从而产生相容的粘性末端。USER 克隆将限制性内切酶克隆的简便性与定向控制，与无疤痕组装方法的灵活性和效率相结合，为多片段或载体–插入片段克隆提供快速的单管替代方案。</p>
+        </div>
+
+        <div class="section">
+            <h2>快速入门指南</h2>
+            <ol>
+		<li>将目的载体和插入片段序列（最多 3 个片段）以 FASTA 或纯文本格式按所需组装顺序上传或粘贴到相应输入框。提供载体线性化所用的 PCR 引物；含尿嘧啶的引物会自动检测，以用于 USER 兼容设计。核验自动识别的载体骨架，并在必要时调整设计参数。</li>
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/USER_demo.png"
+                    style="max-width: 90%; height: auto; border-radius: 8px;"
+                >
+            </div>
+                <li>单击“设计引物”以生成带有突出端序列的引物。查看引物表、重叠区表和预测组装示意图。下载组装后的 FASTA 文件，确认插入片段方向与预期设计一致。若方向不正确，请将插入片段序列反向互补后重新生成引物。</li>
+
+
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>USER 酶克隆原理</h2>
+            
+            <p>USER（Uracil-Specific Excision Reagent）克隆是一种定向 DNA 组装方法，利用引物中引入的<strong>尿嘧啶（U）残基的位点特异性去除</strong>。在指定位置引入的尿嘧啶碱基由<strong>尿嘧啶 DNA 糖苷酶（UDG）</strong>切除，产生无碱基位点，随后由<strong>核酸内切酶 VIII</strong>切割，从而在片段末端形成互补的<strong>单链突出端</strong>。这些突出端使 DNA 片段能够精确、定向地退火，而最终的缺口修复和链封闭通常由转化后<strong>宿主细胞的 DNA 修复机制</strong>完成，无需体外连接。</p>
+
+            
+
+            <h3>重叠区设计原理</h3>
+            <p>USER 克隆的成功取决于设计短的、接头特异性的重叠区，这些重叠区在含尿嘧啶的引物延伸经 USER 处理后被暴露。在每个片段接头处，需要一对匹配的互补突出端，以确保定向组装以及转化后的无疤痕修复。</p>
+            <ul>
+                <li><strong>互补突出端：</strong>对于每个接头，引物的设计使 USER 处理后在相邻片段末端暴露互补的单链突出端。只有正确匹配的突出端才能退火，从而强制实现预期的片段顺序和方向。</li>
+                <li><strong>最佳突出端长度：</strong>USER 突出端通常为 <strong>7–15</strong> 个核苷酸，为定向组装提供足够的特异性和退火稳定性。在多片段设计中，各接头的突出端应互不相同，以避免交叉退火和错误组装。</li>
+                <li><strong>无疤痕接头：</strong>由于突出端在 USER 处理过程中被去除，且不保留限制性酶切位点，组装后的片段连接时不会引入额外序列。最终的缺口修复和链封闭在体内完成，从而形成无疤痕接头。</li>
+                
+            </ul>
+
+           
+        </div>
+
+        <div class="section">
+            <h2>输入格式</h2>
+            <p>载体和插入片段输入均接受 <strong>FASTA</strong>、<strong>纯 DNA 文本</strong>，或带有 <code>LOCUS</code> 和 <code>ORIGIN</code> 区块的标准 <strong>GenBank</strong> 文件（<code>.gb</code>、<code>.gbk</code>、<code>.gbff</code>、<code>.genbank</code>）。<strong>LOCUS</strong> 中的短名称用作序列标题。每个输入框只允许<strong>一条序列</strong>；若检测到多个 FASTA 标题，将<strong>仅使用第一条序列</strong>。若上传不含 <code>&gt;</code> 标题的纯序列，则使用<strong>文件名</strong>（不含扩展名）作为名称。专有二进制格式（例如 SnapGene <code>.dna</code>）须先导出为 GenBank 或 FASTA。FASTA 或 GenBank 中的片段名称在适用时用于引物命名。</p> 
+	     <p>一旦提供载体序列，系统会<strong>自动识别载体特征</strong>。载体图谱可旋转，以便于查看目标克隆区域。</p>
+
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/USER_input.png"
+                    alt="USER 模块输入"
+                    style="max-width: 60%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+            <h3>片段管理</h3>
+            <ul>
+                <li><strong>添加/移除片段：</strong>添加多条 DNA 序列用于多片段组装（建议 2–10 个片段；更大组装会更复杂）</li>
+                <li><strong>重排片段：</strong>通过界面控件调整组装顺序；顺序决定最终构建体的结构</li>
+                <li><strong>片段名称：</strong>从 FASTA 标题自动提取，便于引物识别；用于输出报告</li>
+                <li><strong>反向互补：</strong>必要时可切换单个片段，以匹配所需方向和组装方向</li>
+            </ul>
+
+
+
+        <div class="section">
+            <h2>设计参数</h2>
+            
+            <p>请提供用于载体线性化的引物对。系统会自动判断输入的载体引物中是否存在尿嘧啶。若未检测到尿嘧啶，系统可在用户确认后，在指定接头处重新设计含尿嘧啶的载体引物。若已存在尿嘧啶，系统将直接使用用户提供的突出端进行引物设计。</p>
+	     <p>一旦提供载体引物对，系统会自动将最长的产物片段识别为默认目的载体骨架。若该片段并非预期骨架，可手动选择合适的片段。继续之前，请检查引物设计参数，并在必要时调整。</p>
+            
+            <!-- USER cloning parameter table (same layout as your Gibson table: Category | Parameter | Default | Range | Description) -->
+<table class="param-table">
+  <thead>
+    <tr>
+      <th>类别</th>
+      <th>参数</th>
+      <th>默认值</th>
+      <th>范围</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <!-- =========================
+         Vector Linearization
+         ========================= -->
+    <tr>
+      <td class="cat" rowspan="4">载体线性化</td>
+      <td><strong>线性化模式</strong></td>
+      <td>PCR</td>
+      <td>PCR</td>
+      <td>用于 USER 克隆前线性化目的载体的方法。USER 克隆采用基于 PCR 的载体线性化，接头由引物定义。</td>
+    </tr>
+
+    <tr>
+      <td><strong>载体 PCR 引物（5′→3′）</strong></td>
+      <td>—</td>
+      <td>DNA 序列</td>
+      <td>用于 PCR 线性化载体骨架的正向和反向引物。引物可含尿嘧啶（U）或标准碱基。</td>
+    </tr>
+
+    <tr>
+      <td><strong>尿嘧啶检测</strong></td>
+      <td>Auto</td>
+      <td>Auto</td>
+      <td>系统自动检测输入载体引物中是否存在尿嘧啶（U），并据此推断 USER 兼容接头。</td>
+    </tr>
+
+    <tr>
+      <td><strong>载体骨架片段</strong></td>
+      <td>最长片段</td>
+      <td>任一 PCR 片段</td>
+      <td>从 PCR 产物中选择的目的载体骨架。默认选择最长扩增片段，可手动调整。</td>
+    </tr>
+
+    <!-- =========================
+         Primer & Overlap Design
+         ========================= -->
+    <tr>
+      <td class="cat" rowspan="6">引物与重叠区设计</td>
+      <td><strong>重叠长度（bp）</strong></td>
+      <td>9</td>
+      <td>6–15</td>
+      <td>USER 处理后暴露的互补重叠区长度。 </td>
+    </tr>
+
+    <tr>
+      <td><strong>目标核心 Tm（°C）</strong></td>
+      <td>55</td>
+      <td>45–70</td>
+      <td>模板结合（退火）核心区的目标熔解温度。尿嘧啶和重叠区不计入 Tm 计算。</td>
+    </tr>
+
+    <tr>
+      <td><strong>ΔTm（°C）</strong></td>
+      <td>2.5</td>
+      <td>0–5</td>
+      <td>正向与反向引物退火核心之间允许的最大熔解温度差。</td>
+    </tr>
+
+    <tr>
+      <td><strong>引物浓度（nM）</strong></td>
+      <td>500</td>
+      <td>50–2000</td>
+      <td>in silico Tm 计算所假定的有效引物浓度。常用范围：25-1000 nM。</td>
+    </tr>
+
+    <tr>
+      <td><strong>Na<sup>+</sup> 浓度（mM）</strong></td>
+      <td>50</td>
+      <td>0–200</td>
+      <td>用于盐校正 Tm 计算的一价阳离子浓度。常用范围：10-200 mM。
+</td>
+    </tr>
+
+    <tr>
+      <td><strong>Mg<sup>2+</sup> 浓度（mM）</strong></td>
+      <td>2.0</td>
+      <td>0–10</td>
+      <td>用于 Tm 计算的二价阳离子浓度。若反应中不含 Mg²⁺，请设为 0。常用范围：0.5-5 mM。</td>
+    </tr>
+  </tbody>
+</table>
+
+        </div>
+
+        <div class="section">
+            <h2>结果与输出</h2>
+            
+	    <p>引物设计完成后，USER 克隆模块会生成一套完整结果，便于实验验证和下游克隆。</p>
+
+
+            <h3>引物表</h3>
+	    <p>设计得到的引物对以结构化表格呈现，包含完整引物序列信息（5′→3′）、长度、GC 含量和熔解温度（Tm）。Tm 值同时显示<strong>退火核心区</strong>和<strong>全长引物</strong>，便于评估扩增兼容性。引物质量指标（包括同聚物连续序列、发卡结构、自二聚体和交叉二聚体形成）会被评估并标记，以突出可能影响 PCR 性能的潜在风险。引物序列中的<strong>重叠区以粗体突出显示</strong>，便于查看。</p>
+
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/USER_primer_tabel.png"
+                    alt="USER 克隆引物表"
+                    style="max-width: 60%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+            <h3>组装示意图与突出端表</h3>
+	    <p>系统会生成<strong>组装质粒示意图</strong>，说明克隆流程，包括载体线性化、插入片段引入和最终质粒组装。该图提供片段方向和接头结构的概念性概览。<strong>重叠区表</strong>显示每个接头处的重叠序列，确认相邻片段具有互补同源区。该表可快速目视核验组装架构是否正确，以及是否存在突出端冲突或不匹配。</p>
+            <div class="warning-box">
+                <p><strong>注意：</strong>组装示意图仅为示意，未按比例绘制。精确解释应以组装序列和接头重叠信息为依据。</p>
+            </div>
+
+
+	   <div style="text-align: center; margin: 2em 0;">
+  		<img
+    			src="contents/pictures/USER_assembly_tabel.png"
+                    	alt="USER 克隆组装表"
+    			style="max-width: 60%; height: auto; border-radius: 8px;"
+  		 >
+	   </div>
+
+
+            <h3>模拟琼脂糖凝胶电泳</h3>
+            <p>PrimerWeaver 会生成<strong>模拟琼脂糖凝胶图像</strong>，以预测关键克隆步骤的实验结果。凝胶包括：</p>
+
+            <ul>
+                <li>可选 DNA 分子量标准（默认：NEB 1 kb Plus DNA Ladder）</li>
+                <li>未酶切载体</li>
+                <li>经 PCR 线性化的载体</li>
+		<li>PCR 扩增片段（每个片段一孔，显示含重叠区的预期大小）</li>
+                <li>USER 克隆产物（显示组装后的构建体）</li>
+            </ul>
+            <p>预测条带大小已标注，便于与实验结果快速比较，并迅速识别酶切效率或组装问题。</p>
+
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/USER_gel.png"
+                    alt="显示 USER 流程的模拟琼脂糖凝胶"
+                    style="max-width: 60%; height: auto; border-radius: 8px;"
+                >
+            </div>
+        </div>
+
+
+        <div class="section">
+            <h2>引物设计算法</h2>
+	    
+	    <h3>引物结构</h3>
+            <p>每条 USER 克隆引物由三个功能区组成：</p>
+            <ul>
+                <li><strong>退火核心（3′）：</strong>驱动 PCR 退火的模板互补区（通常为 18–30 bp）</li>
+		<li><strong>尿嘧啶标记：</strong>位于 USER 化学所用指定切割位置的单个 <strong>U</strong>。</li>
+		<li><strong>重叠区（5′）：</strong>接头特异性序列，USER 处理后成为暴露的粘性末端（通常在用户定义的重叠范围内）。 </li>
+            </ul>
+
+            <h3>设计流程</h3>
+            <p>PrimerWeaver 中的正式 USER 流程假定两条载体线性化引物已作为<strong>含 U 的 USER 引物</strong>提供。在此假定下，算法最好理解为四个阶段：重建 PCR 线性化载体、从所提供引物推导面向载体的 USER 接头、发现插入片段之间的内部 USER 兼容接头，然后围绕这些固定的 USER 尾部构建最终插入片段引物。</p>
+
+            <h3>阶段 1. 从 USER 引物重建 PCR 线性化载体产物</h3>
+            <p>模块首先在<strong>末端 U</strong>处解析每条载体引物。该 U 之前的序列被视为定义 USER 重叠的区段，该 U 之后的序列被视为用于将引物映射回载体的 3′ 核心。利用这些 U 后核心区，代码重建 PCR 线性化载体产物。若直接映射失败，仍会在中止前尝试反向互补 / 引物对调解释。保留的 PCR 产物成为后续所有 USER 接头计算所用的载体骨架。</p>
+
+            <h3>阶段 2. 定义面向载体的 USER 边界</h3>
+            <p>一旦 PCR 产物确定，载体侧 USER 接头直接从用户提供的载体引物推导，而非从零发明。实际上，每条载体引物中末端 U 之前的序列定义了载体边界处预期的粘性末端逻辑，面向插入片段的引物尾部则生成以在切割后匹配这些 USER 边界。这意味着所提供的载体引物不仅是验证输入，也是最终克隆几何的主动边界约束。</p>
+
+            <h3>阶段 3. 在内部插入片段–插入片段接头处搜索 USER 兼容重叠基序</h3>
+            <p>对于相邻插入片段之间的每个内部接头，PrimerWeaver 在该接头附近的插入片段组装中搜索形式为 <strong>A + N{4-13} + T</strong> 的 USER 兼容基序。候选基序按它们在预期接头上的位置、重叠长度与请求设置的接近程度，以及重叠 Tm 与目标重叠行为的接近程度排序。一旦选定合适基序，末端切割位置的 <strong>T</strong> 会在设计的引物尾部中转换为 <strong>U</strong>，从而使 USER 处理暴露预期的粘性末端。</p>
+
+            <h3>阶段 4. 设计模板结合核心并构建完整 USER 引物</h3>
+            <p>每个 USER 尾部固定后，模块从接头向外延伸以设计 3′ 核心结合区。核心长度在有界窗口内扫描，并按计算得到的盐校正 Tm 与目标 Tm 之差评分，因此算法选择<strong>最接近的可用核心</strong>，而不是简单地选择通过阈值的最短核心。最终引物随后组装为<strong>5′ USER 尾部（含 U 切割标记）+ 3′ 模板结合核心</strong>。载体引物大体保留用户输入，而插入片段引物的生成使 USER 处理在整个组装中产生预期的相容末端。</p>
+            <h3>算法中的边界情况逻辑</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>算法边界情况</th>
+                        <th>USER 模块的当前行为</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>两条载体引物都必须定义有效的 USER 几何</strong></td>
+                        <td>正式 USER 算法假定载体线性化引物已定义 USER 边界。若该几何不存在，设计被视为主 USER 流程之外的情况，而不是等效的正常情况。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>仅一条引物含尿嘧啶</strong></td>
+                        <td>混合的 U / 非 U 载体引物对被视为算法上不一致。模块会警告用户，而不是假装这是干净的严格 USER 边界定义。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>USER 引物格式非规范</strong></td>
+                        <td>严格 USER 模式引物应遵循经验证的 <strong>5′ A N{4-13} U core 3′</strong> 结构。该模式之外的引物不会被解释为正常 USER 引物。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>载体线性化引物映射不明确</strong></td>
+                        <td>若载体引物的 3′ 核心结合区无法直接匹配，模块会在中止设计前尝试反向互补和引物对调解释。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>未找到规范的 USER 兼容接头模式</strong></td>
+                        <td>当接头搜索找不到合适的 <strong>A + N{4-13} + T</strong> 模式时，模块回退到手动引入的重叠/U 策略，而不是静默发明规范的 USER 兼容基序。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>核心设计为最近拟合，而非阈值即停</strong></td>
+                        <td>核心结合区通过有界扫描、最小化相对目标设置的 Tm 误差来选择。若不存在理想核心，仍返回最佳可用核心，而不是强制通过干净阈值。</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>警告与边界情况</h2>
+            <p>USER 克隆模块将共享的 <strong>MW（Message Warning）</strong>检查与围绕含尿嘧啶引物、重叠区发现，以及在找不到规范 USER 兼容接头模式时的行为的 USER 专用验证相结合。</p>
+
+            <h3>一般警告</h3>
+            <p>这些警告大多出现在最终设计生成之前，反映序列质量或参数质量问题。</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>类别</th>
+                        <th>触发条件</th>
+                        <th>USER 模块的当前行为</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>阻断性输入提示</strong></td>
+                        <td>缺少载体、缺少插入片段，或缺少载体线性化用 PCR 引物。</td>
+                        <td>设计立即停止，并要求用户在继续前完成所需输入。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-04</strong><br>标准化后无有效序列</td>
+                        <td>载体或插入片段序列在标准化后变为空。</td>
+                        <td>用户仍可继续，但受影响的设计输入将不再支持有意义的输出。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-05</strong><br>已移除非 IUPAC 字符</td>
+                        <td>载体或插入片段序列输入中存在不支持的字符。</td>
+                        <td>模块仅使用标准化后的序列继续，并警告有效设计模板可能与原始文本输入不同。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-06</strong><br>检测到简并碱基</td>
+                        <td>载体或插入片段含有歧义 IUPAC 碱基。</td>
+                        <td>热力学值按最稳定变体保守估算，因此 Tm 和 ΔG 值可能代表最不利情况的近似。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-10 to MW-15</strong><br>参数范围警告</td>
+                        <td>Na<sup>+</sup>、Mg<sup>2+</sup>、引物浓度或目标 Tm 超出推荐或验证的热力学范围。</td>
+                        <td>模块仍可继续，但热力学解释变得不太可靠。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-19</strong><br>总输入规模较大</td>
+                        <td>载体加插入片段的总输入大到足以对浏览器端计算造成压力。</td>
+                        <td>共享警告层报告，对于非常大的总输入规模，浏览器端设计和渲染可能变慢。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-20</strong><br>同一字段中有多个 FASTA 标题</td>
+                        <td>载体或插入片段文本框包含不止一条 FASTA 记录。</td>
+                        <td>共享 MW 对话框警告每个字段只允许一条序列。若用户继续，该字段会在设计继续前被裁剪为<strong>第一条 FASTA 记录</strong>。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-22</strong><br>文件上传超出导入限制</td>
+                        <td>上传的载体或插入片段文件大于 <strong>1 MB</strong>。</td>
+                        <td>在序列加载前阻止导入，用户必须选择更小的文件。</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>设计警告</h3>
+            <p>这些边界情况针对 USER 克隆逻辑，尤其是含尿嘧啶引物的处理以及接头水平的突出端发现。</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>情况</th>
+                        <th>触发条件</th>
+                        <th>USER 模块的当前行为</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>插入片段数量上限</strong></td>
+                        <td>添加了超过三行插入片段。</td>
+                        <td>界面警告 USER 克隆当前最多支持<strong>三个插入片段</strong>。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>载体预览仅使用第一条序列</strong></td>
+                        <td>预检裁剪发生前存在多条载体记录。</td>
+                        <td>载体图谱预览报告发现多条序列，并使用<strong>第一条记录</strong>进行可视化。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>严格 USER 模式要求两条引物都含 U</strong></td>
+                        <td>两条引物都应 USER 兼容，但一条或两条违反所需的含 U 格式。</td>
+                        <td>模块报告 USER 引物格式错误，并要求用户返回引物编辑。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>一条引物含 U，另一条不含</strong></td>
+                        <td>两条 PCR 引物中只有一条含尿嘧啶碱基。</td>
+                        <td>模块显示确认警告，说明两条引物应同时含 U 或同时不含 U。在此混合状态下继续无法被干净地支持，通常会回到修正。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>U 引物格式约束</strong></td>
+                        <td>含 U 引物不满足预期的 <strong>5′ A N{4-13} U core 3′</strong> 规则。</td>
+                        <td>设计会因专用 USER 格式警告而中止，以便用户在继续前重写引物。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>PCR 引物核心在载体中未找到</strong></td>
+                        <td>USER 线性化引物的 3′ 核心结合部分无法匹配到载体序列。</td>
+                        <td>模块首先尝试反向互补 / 引物对调回退，仅在找不到有效映射时才抛出错误。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>未找到有效 PCR 产物</strong></td>
+                        <td>引物位置不足以重建有效的 PCR 线性化载体产物。</td>
+                        <td>设计中止，并要求用户检查引物序列。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>未找到规范 USER 接头模式</strong></td>
+                        <td>在所需 USER 接头周围找不到合适的 <strong>5′AN(4-13)T3′</strong> 模式。</td>
+                        <td>算法回退到带有手动引入额外 U 的默认重叠序列，并明确警告这可能造成<strong>移码风险</strong>。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>结果级重叠警告输出</strong></td>
+                        <td>接头发现成功，但一个或多个重叠搜索步骤报告警告。</td>
+                        <td>这些警告同时显示在重叠区表区域和统一警告框中，以便用户查看受影响的具体引物或接头。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>组装示意图为示意</strong></td>
+                        <td>任何成功的 USER 克隆设计。</td>
+                        <td>组装图像是概念性的，而非长度精确；精确解释应依赖组装序列以及重叠 / USER 接头信息。</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <p><strong>实际解读：</strong>USER 克隆中的警告并不总是意味着设计无法使用。许多警告反映的是引物格式期望或非规范 USER 接头，而非完全失败。因此结果应与重叠区表、警告列表和最终组装序列一并解读。</p>
+            </div>
+        </div>
+
+
+
+    </div>
+</body>
+</html>

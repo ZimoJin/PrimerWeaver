@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gibson 组装 - PrimerWeaver V1.0.6</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #333;
+            background: #f9fafb;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e40af;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2563eb;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            font-size: 1.5em;
+        }
+        h3 {
+            color: #3b82f6;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            font-size: 1.2em;
+        }
+        h4 {
+            color: #60a5fa;
+            margin-top: 1.2em;
+            margin-bottom: 0.6em;
+        }
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 1em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        strong {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c2410c;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .abstract {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+        .abstract p {
+            margin: 0;
+            font-style: italic;
+        }
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .section {
+            margin-bottom: 2.5em;
+        }
+        .version-info {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+            margin-top: 3em;
+            padding-top: 2em;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gibson 组装引物设计器</h1>
+        
+        <div class="abstract">
+            <p>Gibson 组装模块通过设计带有互补重叠区的引物，使多条 DNA 片段能够在单一等温一锅反应中无疤痕组装。该工具可自动创建带有优化重叠序列（通常为 20–30 bp）的引物，使外切酶、聚合酶和连接酶无需依赖限制性酶切位点即可组装 DNA 片段。Gibson 组装特别适合快速原型构建、大型多片段构建体，以及可能无法使用限制性酶切位点的灵活克隆。</p>
+        </div>
+
+        <div class="section">
+            <h2>快速入门指南</h2>
+            <ol>
+		<li>将目的载体和插入片段序列（最多 6 个片段）以 FASTA 或纯文本格式按所需组装顺序上传或粘贴到相应输入框。选择载体线性化方法，限制性内切酶或 PCR。核验自动识别的载体骨架，并在必要时调整设计参数。</li>
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/Gibson_demo.png"
+                    style="max-width: 90%; height: auto; border-radius: 8px;"
+                >
+            </div>
+                <li>单击“设计引物”以生成带有突出端序列的引物。查看引物表、重叠区表和预测组装示意图。下载组装后的 FASTA 文件，确认插入片段方向与预期设计一致。若方向不正确，请将插入片段序列反向互补后重新生成引物。</li>
+
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>Gibson 组装原理</h2>
+            
+            <p>Gibson 组装是一种等温、一锅 DNA 组装方法，通过<strong>同源重叠</strong>区将 DNA 片段无疤痕连接，无需限制性内切酶。在同一反应中，<strong>5′ 外切酶</strong>切除双链 DNA 片段末端，产生互补的 3′ 单链突出端，这些突出端在相邻片段之间特异性退火。随后<strong>高保真 DNA 聚合酶</strong>以退火的 3′ 端为引物填补剩余缺口，<strong>耐热 DNA 连接酶</strong>再封闭 DNA 骨架上的切口。这些协同的酶活性共同实现多条 DNA 片段向连续双链 DNA 分子的<strong>无疤痕组装</strong>，因此 Gibson 组装特别适合构建大型或复杂的 DNA 构建体。</p>
+
+
+
+            <h3>重叠区设计原理</h3>
+            <p>Gibson 组装的成功依赖于相邻 DNA 片段之间互补重叠区的设计。每个接头需要一对序列互补、长度足以在组装过程中支持稳定退火的重叠区。</p>
+            <ul>
+                <li><strong>互补重叠：</strong>片段 i 的 3′ 端必须与片段 i + 1 的 5′ 端互补，以确保相邻片段之间的特异性退火。</li>
+                <li><strong>最佳重叠长度：</strong><strong>20–30 bp</strong> 的重叠通常足以满足大多数组装，在热稳定性与引物长度之间取得平衡；更长的重叠可提高复杂或大型构建体的稳健性。</li>
+                <li><strong>无疤痕接头：</strong>由于重叠直接来自天然序列，Gibson 组装产生<strong>无疤痕接头</strong>，不引入额外残基。</li>
+            </ul>
+
+        </div>
+
+        <div class="section">
+            <h2>输入格式</h2>
+	    <p>载体和插入片段输入均接受 <strong>FASTA</strong>、<strong>纯 DNA 文本</strong>，或带有 <code>LOCUS</code> 和 <code>ORIGIN</code> 区块的标准 <strong>GenBank</strong> 文件（<code>.gb</code>、<code>.gbk</code>、<code>.gbff</code>、<code>.genbank</code>）。<strong>LOCUS</strong> 中的短名称用作序列标题。每个输入框只允许<strong>一条序列</strong>；若检测到多个 FASTA 标题，将<strong>仅使用第一条序列</strong>。若上传不含 <code>&gt;</code> 标题的纯序列，则使用<strong>文件名</strong>（不含扩展名）作为名称。专有二进制格式（例如 SnapGene <code>.dna</code>）须先导出为 GenBank 或 FASTA。FASTA 或 GenBank 中的片段名称在适用时用于引物命名。</p>
+	     <p>PrimerWeaver 目前支持约 <strong>100 种内置 II 型限制性内切酶</strong>。一旦提供载体序列，系统会<strong>自动识别载体特征</strong>，并显示所有<strong>单切限制性酶切位点</strong>的位置。载体图谱可旋转，以便于查看目标克隆区域。</p>
+
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/Gibson_input.png"
+                    alt="Gibson 组装输入"
+                    style="max-width: 60%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+            <h3>片段管理</h3>
+            <ul>
+                <li><strong>添加/移除片段：</strong>添加多条 DNA 序列用于多片段组装（建议 2–10 个片段；更大组装会更复杂）</li>
+                <li><strong>重排片段：</strong>通过界面控件调整组装顺序；顺序决定最终构建体的结构</li>
+                <li><strong>片段名称：</strong>从 FASTA 标题自动提取，便于引物识别；用于输出报告</li>
+                <li><strong>反向互补：</strong>必要时可切换单个片段，以匹配所需方向和组装方向</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>设计参数</h2>
+            
+            <p>请选择首选的载体线性化方法，即<strong>II 型限制性内切酶酶切</strong>或<strong>PCR 扩增</strong>。若使用限制性内切酶线性化载体，请指定最终构建体中<strong>识别位点应保留还是去除</strong>。一旦选择限制性内切酶，系统会自动将<strong>最长片段</strong>识别为默认目的载体骨架。若该片段并非预期骨架，可手动选择合适的片段。继续之前，请检查<strong>引物设计参数</strong>，并在必要时调整。</p>
+            
+            <table>
+  <thead>
+    <tr>
+      <th>类别</th>
+      <th>参数</th>
+      <th>默认值</th>
+      <th>范围</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <!-- Vector linearization -->
+    <tr>
+      <td rowspan="7"><strong>载体线性化</strong></td>
+      <td><strong>线性化模式</strong></td>
+      <td>限制性内切酶</td>
+      <td>限制性内切酶 / PCR</td>
+      <td>
+        在 Gibson 组装前线性化目的载体的方法。
+        选择限制性内切酶酶切或 PCR 扩增。
+      </td>
+    </tr>
+
+    <tr>
+      <td><strong>限制性内切酶 1 / 2</strong></td>
+      <td>—</td>
+      <td>内置 II 型酶</td>
+      <td>
+        选择基于限制性酶切的线性化时，用于载体酶切的
+        II 型限制性内切酶。
+      </td>
+    </tr>
+
+    <tr></tr>
+
+    <tr>
+      <td><strong>保留识别位点</strong></td>
+      <td>是</td>
+      <td>是 / 否</td>
+      <td>
+        指定限制性内切酶识别位点在最终构建体中是保留还是去除。
+        （若去除，接头的设计将使识别位点不被重新生成。）
+      </td>
+    </tr>
+
+    <tr>
+      <td><strong>载体 PCR 引物（5′→3′）</strong></td>
+      <td>—</td>
+      <td>DNA 序列</td>
+      <td>
+        选择 PCR 线性化时，用于 PCR 线性化载体的正向和反向引物。
+        引物应扩增预期的骨架区域。
+      </td>
+    </tr>
+
+    <tr></tr>
+
+    <tr>
+      <td><strong>载体骨架片段</strong></td>
+      <td>最长片段</td>
+      <td>任一酶切片段</td>
+      <td>
+        从酶切片段（限制性酶切模式）或扩增区段（PCR 模式）中选择的目的载体骨架。
+        默认选择最长酶切片段，可手动调整。
+      </td>
+    </tr>
+
+    <!-- Gibson overlap / primer design -->
+    <tr>
+      <td rowspan="6"><strong>引物与重叠区设计</strong></td>
+      <td><strong>重叠长度（bp）</strong></td>
+      <td>25</td>
+      <td>15–40</td>
+      <td>
+        Gibson 组装中相邻片段之间的同源重叠长度。
+        更长的重叠可提高稳定性，但会延长引物。
+      </td>
+    </tr>
+
+    <tr>
+      <td><strong>目标 Tm（°C）</strong></td>
+      <td>55</td>
+      <td>40–75</td>
+      <td>
+        PCR 引物模板结合（退火）核心的目标熔解温度。
+        重叠区不计入 Tm 计算。
+      </td>
+    </tr>
+
+    <tr>
+      <td><strong>ΔTm（°C）</strong></td>
+      <td>2.5</td>
+      <td>0–10</td>
+      <td>
+        同一引物对中正向与反向引物之间允许的最大熔解温度差。
+      </td>
+    </tr>
+
+    <tr>
+      <td><strong>引物浓度（nM）</strong></td>
+      <td>500</td>
+      <td>50–2000</td>
+      <td>
+        in silico Tm 计算所假定的有效引物浓度。常用范围：25-1000 nM。
+      </td>
+    </tr>
+
+    <tr>
+      <td><strong>Na⁺ 浓度（mM）</strong></td>
+      <td>50</td>
+      <td>0–200</td>
+      <td>
+       用于盐校正 Tm 计算的一价阳离子浓度。常用范围：10-200 mM。
+      </td>
+    </tr>
+
+    <tr>
+      <td><strong>Mg²⁺ 浓度（mM）</strong></td>
+      <td>2.0</td>
+      <td>0–10</td>
+      <td>
+        用于 Tm 计算的二价阳离子浓度。若反应中不含 Mg²⁺，请设为 0。常用范围：0.5-5 mM。
+
+      </td>
+    </tr>
+
+  </tbody>
+</table>
+
+        </div>
+
+        
+        <div class="section">
+            <h2>结果与输出</h2>
+            
+            <p>引物设计完成后，Gibson 组装模块会生成一套完整结果，便于实验验证和下游克隆。</p>
+
+            <h3>引物表</h3>
+	    <p>设计得到的引物对以结构化表格呈现，包含完整引物序列信息（5′→3′）、长度、GC 含量和熔解温度（Tm）。Tm 值同时显示<strong>退火核心区</strong>和<strong>全长引物</strong>，便于评估扩增兼容性。引物质量指标（包括同聚物连续序列、发卡结构、自二聚体和交叉二聚体形成）会被评估并标记，以突出可能影响 PCR 性能的潜在风险。引物序列中的<strong>重叠区以粗体突出显示</strong>，便于查看。</p>
+
+
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/Gibson_primer_table.png"
+                    alt="Gibson 组装引物表"
+                    style="max-width: 60%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+	    <h3>组装示意图与突出端表</h3>
+	    <p>系统会生成<strong>组装质粒示意图</strong>，说明克隆流程，包括载体线性化、插入片段引入和最终质粒组装。该图提供片段方向和接头结构的概念性概览。<strong>重叠区表</strong>显示每个接头处的重叠序列，确认相邻片段具有互补同源区。该表可快速目视核验组装架构是否正确，以及是否存在突出端冲突或不匹配。</p>
+            <div class="warning-box">
+                <p><strong>注意：</strong>组装示意图仅为示意，未按比例绘制。精确解释应以组装序列和接头重叠信息为依据。</p>
+            </div>
+
+
+	   <div style="text-align: center; margin: 2em 0;">
+  		<img
+    			src="contents/pictures/Gibson_assembly_table.png"
+    			style="max-width: 60%; height: auto; border-radius: 8px;"
+  		 >
+	   </div>
+            
+            <h3>模拟琼脂糖凝胶电泳</h3>
+            <p>PrimerWeaver 会生成<strong>模拟琼脂糖凝胶图像</strong>，以预测关键克隆步骤的实验结果。凝胶包括：</p>
+
+            <ul>
+                <li>可选 DNA 分子量标准（默认：NEB 1 kb Plus DNA Ladder）</li>
+		<li>未酶切载体</li>
+                <li>经酶切或 PCR 线性化的载体</li>
+                <li>PCR 扩增片段（每个片段一孔，显示含重叠区的预期大小）</li>
+                <li>Gibson 组装反应产物（显示组装后的构建体）</li>
+                
+            </ul>
+            <p>预测条带大小标注在凝胶旁，便于用户将预期片段大小与实验结果比较，并迅速识别潜在克隆问题。</p>
+
+
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/Gibson_gel.png"
+                    alt="Gibson 组装流程的模拟琼脂糖凝胶"
+                    style="max-width: 60%; height: auto; border-radius: 8px;"
+                >
+            </div>
+        </div>
+
+
+
+        <div class="section">
+            <h2>引物设计算法</h2>
+            
+            <h3>引物结构</h3>
+            <p>每条 Gibson 组装引物由两个功能区组成：</p>
+            <ul>
+                <li><strong>退火核心（3′）：</strong>驱动 PCR 退火的模板互补区（在 18-40 bp 搜索窗口内设计）</li>
+		<li><strong>重叠区（5′）：</strong>从最终组装中相邻接头上下文复制并作为 Gibson 同源尾附加的序列（通常为 20-30 bp）。 </li>
+            </ul>
+
+            <h3>设计流程</h3>
+            <p>PrimerWeaver 并不孤立地设计 Gibson 重叠。它首先构建<strong>实际组装上下文</strong>，再从该上下文直接提取重叠区段，然后才构建完整引物。实践中，该算法最容易理解为四个相互衔接的阶段。</p>
+
+            <h3>阶段 1. 定义保留的载体骨架和组装序列</h3>
+            <p>若选择<strong>限制性内切酶线性化</strong>，模块会在计算机中酶切环状载体，列出所有候选片段，并将用户选择的骨架片段作为保留的载体片段。随后将有序插入片段块插入该骨架上下文，并根据<strong>保留位点</strong>设置选择性地保留或去除限制性酶切位点序列。在此模式下，代码还跟踪<strong>未旋转的原始组装</strong>，并可能旋转显示的环状序列，以便报告的组装更易于解释，同时仍保留用于重叠提取的原始接头坐标。</p>
+            <p>若选择<strong>PCR 线性化</strong>，模块通过锚定的 3′ 匹配将用户提供的载体引物映射到载体，必要时允许反向互补 / 引物对调回退，并选择最佳有效扩增产物对。保留的骨架序列即为重建的 PCR 产物，有序插入片段块被追加到该线性化骨架上下文中，形成用于下游重叠设计的组装序列。</p>
+
+            <h3>阶段 2. 确定最终组装中的插入片段坐标</h3>
+            <p>载体骨架固定后，模块计算组装构建体中每个插入片段的起止位置。在酶切线性化模式下，这些坐标会通过为显示而施加的任何环状旋转进行映射；在 PCR 线性化模式下，它们沿重建的线性骨架直接累积。该坐标图至关重要，因为 Gibson 重叠取自<strong>组装后的接头邻域</strong>，而不是为每条引物独立猜测。</p>
+
+            <h3>阶段 3. 在每个插入片段上设计退火核心</h3>
+            <p>对于每个插入片段，PrimerWeaver 从插入片段 5′ 端设计正向核心，从插入片段 3′ 端设计反向核心。核心长度在 <strong>18-40 bp</strong> 窗口内扫描，并用最近邻 Tm 模型评估。所选核心是在当前盐 / 引物浓度设置下最能满足目标 Tm 行为的核心；若没有理想选择，算法回退到最接近的可用核心，而不是放弃设计。</p>
+
+            <h3>阶段 4. 从组装接头提取 Gibson 重叠并构建完整引物</h3>
+            <p>一旦知道插入片段位置，模块便从组装序列本身提取每个插入片段末端的重叠。<strong>左侧重叠</strong>取自插入片段紧邻上游的接头序列，<strong>右侧重叠</strong>取自紧邻下游的接头序列。对于面向载体的末端，必要时使用环状子序列逻辑，使重叠可以跨越旋转质粒视图的原点。对于插入片段–插入片段接头，重叠几何取决于可选接头是否足够长以单独提供完整重叠，还是重叠必须同时跨越接头和相邻插入片段序列。</p>
+            <p>完整引物随后组装为<strong>5′ 重叠 + 3′ 退火核心</strong>。正向引物直接接收左侧重叠，而反向引物在附加反向退火核心之前接收右侧重叠的反向互补。这样，最终引物对同时扩增每个插入片段，并安装所选骨架、片段顺序和接头配置所需的精确同源性。</p>
+            <h3>算法中的边界情况逻辑</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>算法边界情况</th>
+                        <th>Gibson 模块的当前行为</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>线性化模式改变整体几何</strong></td>
+                        <td>限制性内切酶模式和 PCR 模式不仅改变输入表单；它们产生不同的骨架序列、不同的坐标系统和不同的重叠提取路径。因此 Gibson 重叠布局从一开始就依赖于模式。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>无法干净地定义载体线性化</strong></td>
+                        <td>若酶切线性化或 PCR 线性化未能产生有效的保留骨架序列，算法会停止，而不是猜测接头架构。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>PCR 线性化方向不明确</strong></td>
+                        <td>若初始 PCR 引物解释失败，但反向互补 / 引物对调解释成功，模块会自动采用该恢复的方向，而不是立即丢弃设计。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>酶切后需要选择骨架</strong></td>
+                        <td>当限制性酶切产生多个片段时，在指定一个片段为保留骨架之前算法无法继续。更改该选择会改变重叠坐标和最终引物集。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>保留识别位点会改变组装序列</strong></td>
+                        <td>若流程在基于酶切的线性化期间保留限制性酶切位点序列，则在提取重叠之前组装骨架上下文会改变，因此接头同源性可能不同于无位点的无疤痕版本。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>重叠设计针对接头且感知骨架</strong></td>
+                        <td>重叠不是作为通用尾部分配的。它们是在骨架选择、插入片段顺序和任何接头放置固定后，从组装接头邻域切割出来的，因此改变其中任一因素都会改变重叠解。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>接头长度改变重叠提取几何</strong></td>
+                        <td>若接头足够长，算法可以从接头内部取完整重叠。若接头较短或不存在，重叠会跨相邻序列拆分，使最终同源性仍跨越接头。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>旋转后的质粒显示不等于原始重叠坐标</strong></td>
+                        <td>在酶切线性化模式下，显示的组装质粒可能为可读性而旋转，但重叠提取仍须尊重旋转前的原始接头坐标，以便报告的引物匹配真实组装几何。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>核心搜索可能无法精确命中理想目标</strong></td>
+                        <td>算法扫描有界的核心长度窗口，并选择最接近的可用 Tm 解。若不存在完美的目标 Tm 命中，则回退到最佳可用核心，而不是立即失败。</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>警告与边界情况</h2>
+            <p>Gibson 组装模块在适用时使用共享的 <strong>MW（Message Warning）</strong>层进行预检验证，并在载体线性化、片段选择或重叠生成变得不明确时，也会引发模块专用的设计错误或设计说明。</p>
+
+            <h3>一般警告</h3>
+            <p>这些警告主要在设计开始前生成，通常表示输入质量或参数质量问题。根据情况，用户可以修改设置，或使用当前设置继续。</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>类别</th>
+                        <th>触发条件</th>
+                        <th>Gibson 模块的当前行为</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>阻断性输入提示</strong></td>
+                        <td>缺少载体序列、缺少插入片段、PCR 线性化模式下缺少 PCR 引物、酶名称无效，或骨架选择无效。</td>
+                        <td>设计立即停止，模块报告在有效设计继续前必须纠正的内容。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-04</strong><br>标准化后无有效序列</td>
+                        <td>载体或插入片段在标准化后变为空，因为没有剩余有效 IUPAC DNA 符号。</td>
+                        <td>用户仍可继续，但受影响序列将不再支持有意义的设计输出。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-05</strong><br>已移除非 IUPAC 字符</td>
+                        <td>输入包含在标准化过程中被去除的不支持字符。</td>
+                        <td>模块仅使用标准化后的序列继续，并警告有效设计模板可能已改变。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-06</strong><br>检测到简并碱基</td>
+                        <td>载体或插入片段含有歧义 IUPAC 碱基。</td>
+                        <td>热力学值按最稳定变体保守估算，因此 Tm 和 ΔG 值可能代表最不利情况的近似。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-FRAG-01</strong><br>片段不足</td>
+                        <td>为 Gibson 组装提供的插入片段过少。</td>
+                        <td>共享警告层在设计继续前标记片段数量不足。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-OVERLAP-01</strong><br>重叠长度超出推荐范围</td>
+                        <td>请求的重叠长度超出推荐的 <strong>15–40 bp</strong> 范围。</td>
+                        <td>模块允许设计继续，但警告过短的重叠可能降低效率，过长的重叠可能增加脱靶组装。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-10 to MW-15</strong><br>参数范围警告</td>
+                        <td>Na<sup>+</sup>、Mg<sup>2+</sup>、引物浓度或目标 Tm 超出推荐或验证的模型范围。</td>
+                        <td>模块仍可运行，但热力学预测和引物优化可能变得不太可靠。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-19</strong><br>总输入规模较大</td>
+                        <td>载体加插入片段的总输入大到足以对浏览器端计算造成压力。</td>
+                        <td>共享警告层报告，对于非常大的总输入规模，浏览器端设计和渲染可能变慢。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-20</strong><br>同一字段中有多个 FASTA 标题</td>
+                        <td>载体或插入片段文本框包含不止一条 FASTA 记录。</td>
+                        <td>共享 MW 对话框警告每个字段只允许一条序列。若用户继续，该字段会在设计继续前被裁剪为<strong>第一条 FASTA 记录</strong>。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-22</strong><br>文件上传超出导入限制</td>
+                        <td>上传的载体或插入片段文件大于 <strong>1 MB</strong>。</td>
+                        <td>在序列加载前阻止导入，用户必须选择更小的文件。</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>设计警告</h3>
+            <p>这些警告和边界情况来自 Gibson 专用设计逻辑，尤其是载体线性化模式、片段处理和重叠解释。</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>情况</th>
+                        <th>触发条件</th>
+                        <th>Gibson 模块的当前行为</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>插入片段数量上限</strong></td>
+                        <td>添加了超过六行插入片段。</td>
+                        <td>界面将 Gibson 组装硬性限制为<strong>六个插入片段</strong>，并在达到该上限时警告用户。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>载体预览仅使用第一条序列</strong></td>
+                        <td>预检裁剪发生前存在多条载体记录。</td>
+                        <td>图谱预览报告发现多条序列，并使用<strong>第一条记录</strong>进行可视化。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>酶切线性化需要有效的切割拓扑</strong></td>
+                        <td>未选择酶、两个酶名称均无效、两种酶相同，或所选酶组在载体中没有有效位点。</td>
+                        <td>设计因描述性错误而中止，因为无法定义有效的基于酶切的线性化骨架。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>双酶切位点要求</strong></td>
+                        <td>选择双酶切模式，但两种酶中有一种在载体中没有位点。</td>
+                        <td>设计停止，并报告载体中缺少哪一种酶的位点。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>骨架片段必须可选</strong></td>
+                        <td>酶分析后没有片段列表，或所选片段索引无效。</td>
+                        <td>模块停止，因为 Gibson 酶切线性化需要一个具体的骨架片段来替换。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>PCR 线性化需要有效的引物定位</strong></td>
+                        <td>正向和反向 PCR 引物无法匹配到载体，或无法重建有效 PCR 产物。</td>
+                        <td>设计中止，并要求用户核验或修改 PCR 引物。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>自动 RC / 引物对调回退</strong></td>
+                        <td>初始引物匹配失败，但反向互补 / 对调方向成功。</td>
+                        <td>模块自动交换引物解释，并记录一条设计说明，表明检测到 RC 方向。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>所选骨架片段替换所有其他酶切片段</strong></td>
+                        <td>使用酶切线性化模式并选择了骨架片段。</td>
+                        <td>所选片段被视为保留骨架，所有其他酶切片段在概念上被所提供的插入片段块替换。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>保留识别位点选项会改变组装序列</strong></td>
+                        <td>在基于酶切的线性化期间启用 <code>keep sites</code> 选项。</td>
+                        <td>识别位点序列可在组装构建体的插入片段接头周围重新引入，从而使最终组装序列与无疤痕选项不同。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>接头转换可能失败</strong></td>
+                        <td>无法使用所选宿主生物密码子表转换氨基酸接头。</td>
+                        <td>设计停止，并报告受影响插入片段的接头转换错误。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>组装示意图为示意</strong></td>
+                        <td>任何成功的 Gibson 组装设计。</td>
+                        <td>组装图像是概念性的，而非长度精确；精确解释应依赖组装序列、重叠区表和引物结果。</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <p><strong>实际解读：</strong>Gibson 组装中的警告并不总是表示设计失败。一些警告反映序列标准化、片段数量限制，或载体线性化和引物方向的不明确性。因此结果应与所选骨架片段、重叠区表和最终组装序列一并解读。</p>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

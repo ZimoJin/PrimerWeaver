@@ -2,29 +2,29 @@
   <div class="workspace-header-row">
     <div class="workspace-method-controls">
       <div>
-        <label class="aside" for="workspace-method">Cloning method</label>
+        <label class="aside" for="workspace-method" data-i18n="workspace.cloningMethod">Cloning method</label>
         <select id="workspace-method">
-          <option value="">Select a cloning method...</option>
-          <option value="golden-gate">Golden Gate Assembly</option>
-          <option value="gibson">Gibson Assembly</option>
-          <option value="restriction">Restriction Cloning</option>
-          <option value="user">USER Cloning</option>
+          <option value="" data-i18n="workspace.selectMethod">Select a cloning method...</option>
+          <option value="golden-gate" data-i18n="workspace.goldenGate">Golden Gate Assembly</option>
+          <option value="gibson" data-i18n="workspace.gibson">Gibson Assembly</option>
+          <option value="restriction" data-i18n="workspace.restriction">Restriction Cloning</option>
+          <option value="user" data-i18n="workspace.user">USER Cloning</option>
         </select>
       </div>
     </div>
-    <div class="workspace-header-actions">
-      <button class="btn demo" id="workspace-demo-set" type="button">Demo Set</button>
-      <button class="ghost btn" id="workspace-reset-current" type="button">Reset</button>
+    <div class="workspace-header-actions module-primary-actions">
+      <button class="btn demo" id="workspace-demo-set" type="button" data-i18n="ui.demoSet">Demo Set</button>
+      <button class="ghost btn" id="workspace-reset-current" type="button" data-i18n="ui.reset">Reset</button>
     </div>
   </div>
 
   <div id="workspace-placeholder" class="grid cols-2" style="margin-top: 16px;">
     <div>
       <label style="display:flex;align-items:center;gap:8px;">
-        <strong>Vector sequence (FASTA)</strong>
-        <span class="help-icon" tabindex="0" aria-label="Help: Vector sequence">
+        <strong data-i18n="ui.vectorSequence">Vector sequence (FASTA)</strong>
+        <span class="help-icon" tabindex="0" aria-label="Help: Vector sequence" data-i18n-aria-label="ui.helpVector">
           <span>?</span>
-          <span class="help-tooltip">
+          <span class="help-tooltip" data-i18n-html="workspace.vectorHelpHtml">
             <strong style="display:block;margin-bottom:6px;">Vector sequence</strong>
             FASTA (optional <code>&gt;</code>), plain DNA, or GenBank (<code>.gb</code>, <code>.gbk</code>, <code>.gbff</code>, <code>.genbank</code>) with <code>LOCUS</code>/<code>ORIGIN</code>. <strong>LOCUS</strong> is the short name. Upload without a header uses the <strong>file name</strong> as <code>&gt;</code>name. SnapGene <code>.dna</code> is binary—export as GenBank or FASTA first.
           </span>
@@ -33,16 +33,16 @@
       <textarea id="workspace-vector" placeholder=">vector&#10;ATGC..." style="min-height:220px"></textarea>
       <div class="row end" style="margin-top:6px;">
         <input type="file" id="workspace-vector-file" accept=".fa,.fasta,.fas,.txt,.gb,.gbk,.gbff,.genbank" style="display:none">
-        <button class="btn demo" id="workspace-vector-rc" type="button">Reverse complement</button>
-        <button class="ghost btn" id="workspace-vector-upload" type="button">Upload</button>
+        <button class="btn demo" id="workspace-vector-rc" type="button" data-i18n="ui.reverseComplement">Reverse complement</button>
+        <button class="ghost btn" id="workspace-vector-upload" type="button" data-i18n="ui.upload">Upload</button>
       </div>
     </div>
     <div>
       <label style="display:flex;align-items:center;gap:8px;">
-        <strong>Insert sequence (FASTA)</strong>
-        <span class="help-icon" tabindex="0" aria-label="Help: Insert sequence">
+        <strong data-i18n="ui.insertSequence">Insert sequence (FASTA)</strong>
+        <span class="help-icon" tabindex="0" aria-label="Help: Insert sequence" data-i18n-aria-label="ui.helpInsert">
           <span>?</span>
-          <span class="help-tooltip">
+          <span class="help-tooltip" data-i18n-html="workspace.insertHelpHtml">
             <strong style="display:block;margin-bottom:6px;">Insert sequence</strong>
             Same formats as vector (multi-FASTA allowed; GenBank <code>.gb</code>/<code>.gbk</code>/<code>.gbff</code>/<code>.genbank</code>). Uploads without <code>&gt;</code> use the <strong>file name</strong> as the header.
           </span>
@@ -51,8 +51,8 @@
       <textarea id="workspace-insert" placeholder=">insert1&#10;ATGC...&#10;>insert2&#10;ATGC..." style="min-height:220px"></textarea>
       <div class="row end" style="margin-top:6px;">
         <input type="file" id="workspace-insert-file" accept=".fa,.fasta,.fas,.txt,.gb,.gbk,.gbff,.genbank" style="display:none">
-        <button class="btn demo" id="workspace-insert-rc" type="button">Reverse complement</button>
-        <button class="ghost btn" id="workspace-insert-upload" type="button">Upload</button>
+        <button class="btn demo" id="workspace-insert-rc" type="button" data-i18n="ui.reverseComplement">Reverse complement</button>
+        <button class="ghost btn" id="workspace-insert-upload" type="button" data-i18n="ui.upload">Upload</button>
       </div>
     </div>
   </div>

@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clonage par enzyme de restriction - PrimerWeaver V1.0.6</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #333;
+            background: #f9fafb;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e40af;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2563eb;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            font-size: 1.5em;
+        }
+        h3 {
+            color: #3b82f6;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            font-size: 1.2em;
+        }
+        h4 {
+            color: #60a5fa;
+            margin-top: 1.2em;
+            margin-bottom: 0.6em;
+        }
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 1em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        strong {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c2410c;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .abstract {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+        .abstract p {
+            margin: 0;
+            font-style: italic;
+        }
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .section {
+            margin-bottom: 2.5em;
+        }
+        .version-info {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+            margin-top: 3em;
+            padding-top: 2em;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Concepteur d’amorces pour le clonage par enzyme de restriction</h1>
+        
+        <div class="abstract">
+            <p>Le module de clonage par enzyme de restriction permet de concevoir des amorces pour un clonage directionnel à l’aide d’enzymes de restriction. Cet outil automatise la création d’amorces qui ajoutent des sites de restriction aux deux extrémités d’un fragment d’ADN, ce qui permet une insertion directionnelle contrôlée dans des vecteurs digérés. Cette approche classique de clonage reste largement utilisée pour les construits simples et constitue une méthode fiable et économique de construction de plasmides.</p>
+        </div>
+
+        <div class="section">
+            <h2>Guide de démarrage rapide</h2>
+            <ol>
+                <li>Téléversez ou collez les séquences du vecteur de destination et de l’insert dans les champs de saisie correspondants. Sélectionnez le jeu d’enzymes de restriction souhaité, vérifiez le squelette de vecteur détecté automatiquement, et ajustez les paramètres de conception si nécessaire.</li>
+	   <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/re_demo.png"
+                    style="max-width: 90%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+                <li>Cliquez sur « Design Primers » pour générer des amorces portant des sites de restriction ajoutés. Examinez les séquences d’amorces (avec les sites de restriction mis en évidence), les valeurs de Tm et les indicateurs de CQ. Téléchargez le fichier FASTA assemblé afin de vérifier que l’orientation de l’insert correspond à la conception prévue. Si l’orientation est incorrecte, inversez le complément de la séquence de l’insert et régénérez les amorces.</li>
+
+
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>Principe du clonage par enzyme de restriction</h2>
+            
+            <p>Le clonage par enzyme de restriction utilise des <strong>endonucléases de restriction de type II</strong> pour générer des <strong>extrémités cohésives ou franches</strong> compatibles sur l’insert et le vecteur, suivies de la jonction covalente des extrémités d’ADN par la <strong>T4 DNA ligase</strong>. En général, <strong>la ligation à extrémités cohésives est nettement plus efficace que la ligation à extrémités franches</strong>, car les surplombs cohésifs favorisent une hybridation correcte avant la ligation, alors que la ligation à extrémités franches repose uniquement sur des collisions aléatoires des extrémités et est donc moins efficace.</p>
+            <p>La digestion par une seule enzyme utilise une enzyme de restriction pour couper à la fois l’insert et le vecteur. Cette stratégie est simple, mais permet à l’insert de se ligaturer dans l’une ou l’autre orientation et augmente le risque d’autoligation du vecteur, en particulier dans le clonage à extrémités franches. Dans une digestion à une seule enzyme, une <strong>déphosphorylation du vecteur</strong> peut être appliquée pour réduire l’autoligation et améliorer l’efficacité du clonage.</p>
+	    <p>La <strong>double digestion enzymatique</strong> emploie deux enzymes de restriction différentes pour générer des <strong>extrémités non compatibles</strong> à chaque extrémité de l’insert et du vecteur. Cette approche impose un <strong>clonage directionnel</strong>, réduit le bruit de fond dû à l’autoligation du vecteur et produit généralement une efficacité de clonage plus élevée. En conséquence, la double digestion avec des extrémités cohésives est la stratégie privilégiée pour la plupart des applications de clonage par restriction.</p>
+        </div>
+
+        <div class="section">
+            <h2>Format d’entrée</h2>
+            <p>Les entrées vecteur et insert acceptent les fichiers <strong>FASTA</strong>, <strong>texte d’ADN brut</strong> ou <strong>GenBank</strong> standard (<code>.gb</code>, <code>.gbk</code>, <code>.gbff</code>, <code>.genbank</code>) avec des blocs <code>LOCUS</code> et <code>ORIGIN</code>. Le nom court dans <strong>LOCUS</strong> est utilisé comme titre de la séquence. <strong>Une seule séquence</strong> est autorisée par champ de saisie ; si plusieurs en-têtes FASTA sont détectés, <strong>seule la première séquence</strong> sera utilisée. Si vous téléversez une séquence brute sans en-tête <code>&gt;</code>, le <strong>nom du fichier</strong> (sans extension) est utilisé comme nom. Les formats binaires propriétaires (par exemple SnapGene <code>.dna</code>) doivent d’abord être exportés en GenBank ou FASTA. Les noms de fragments issus de FASTA ou de GenBank sont utilisés pour nommer les amorces lorsque cela s’applique.</p>
+            <p>PrimerWeaver prend actuellement en charge environ <strong>100 enzymes de restriction de type II intégrées</strong>. Une fois une séquence de vecteur fournie, le système <strong>identifie automatiquement les caractéristiques du vecteur</strong> et affiche les positions de tous les <strong>sites d’enzymes de restriction à coupure unique</strong>. La carte du vecteur peut être tournée afin de faciliter la visualisation de la région de clonage ciblée.</p>
+
+	<div style="text-align: center; margin: 2em 0;">
+  		<img
+    			src="contents/pictures/re_input.png"
+   			alt="Entrée du module de clonage par enzyme de restriction"
+    			style="max-width: 60%; height: auto; border-radius: 8px;"
+  		 >
+	   </div>
+
+
+
+        <div class="section">
+            <h2>Paramètres de conception</h2>
+		<p>Veuillez sélectionner les enzymes de restriction souhaitées dans la liste déroulante ou rechercher par nom d’enzyme. Une fois <strong>deux enzymes de restriction</strong> sélectionnées, le système identifie automatiquement le <strong>fragment de digestion le plus long</strong> comme squelette du vecteur de destination. Si le fragment le plus long ne correspond pas au squelette de vecteur prévu, vous pouvez sélectionner manuellement le fragment approprié. Veuillez examiner les paramètres de conception des amorces avant de poursuivre, et les modifier si nécessaire.</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Paramètre</th>
+                        <th>Valeur par défaut</th>
+                        <th>Plage</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Enzyme de restriction 1</strong></td>
+                        <td>None</td>
+                        <td>Toute enzyme prise en charge</td>
+                        <td>Site d’enzyme de restriction ajouté à l’extrémité 5' de l’insert.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Enzyme de restriction 2</strong></td>
+                        <td>None</td>
+                        <td>Toute enzyme prise en charge</td>
+                        <td>Site d’enzyme de restriction ajouté à l’extrémité 3' de l’insert.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tm cible (°C)</strong></td>
+                        <td>55</td>
+                        <td>40–75</td>
+                        <td>Température de fusion cible de la région de liaison au gabarit (hors site de restriction).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Conc. d’amorce (nM)</strong></td>
+                        <td>500</td>
+                        <td>50–2000</td>
+                        <td>Concentration effective des amorces retenue pour le calcul in silico de la Tm. Plage habituelle : 25-1000 nM.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Conc. Na⁺ (mM)</strong></td>
+                        <td>50</td>
+                        <td>0–200</td>
+                        <td>Concentration en cations monovalents utilisée pour le calcul de la Tm corrigé en fonction des sels. Plage habituelle : 10-200 mM.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Conc. Mg²⁺ (mM)</strong></td>
+                        <td>2.0</td>
+                        <td>0–10</td>
+                        <td>Concentration en cations divalents utilisée pour le calcul de la Tm. Réglez-la sur 0 si la réaction ne contient pas de Mg²⁺. Plage habituelle : 0.5-5 mM.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Résultats et sortie</h2>
+            <p>Après la conception des amorces, le module de clonage par restriction génère un ensemble complet de résultats destinés à faciliter la validation expérimentale et le clonage en aval.</p>
+
+            <h3>Tableau des amorces</h3>
+            <p>Les paires d’amorces conçues sont présentées dans un tableau structuré, comprenant les séquences d’amorces (5′→3′), la longueur, la teneur en GC et les températures de fusion (Tm). Les valeurs de Tm sont indiquées à la fois pour la <strong>région cœur d’hybridation</strong> et pour l’<strong>amorce de pleine longueur</strong>, ce qui permet d’évaluer la compatibilité d’amplification. Les indicateurs de qualité des amorces, notamment les répétitions homopolymériques, les structures en épingle à cheveux, l’auto-dimère et la formation d’hétérodimères, sont évalués et signalés afin de mettre en évidence les risques susceptibles d’affecter les performances de la PCR. Les <strong>sites de reconnaissance des enzymes de restriction</strong> ajoutés aux amorces sont <strong>mis en gras</strong> dans les séquences d’amorces, tandis que les bases protectrices sont indiquées en italique.</p>
+	
+	   <div style="text-align: center; margin: 2em 0;">
+  		<img
+    			src="contents/pictures/RE_primer_table.png"
+			alt="Tableau des amorces de clonage par enzyme de restriction"
+    			style="max-width: 60%; height: auto; border-radius: 8px;"
+  		 >
+	   </div>
+
+            <h3>Schéma d’assemblage et tableau des extrémités cohésives</h3>
+	    <p>Un <strong>schéma de plasmide assemblé</strong> est généré pour illustrer le flux de clonage, y compris la linéarisation du vecteur, l’incorporation de l’insert et l’assemblage final du plasmide. Ce diagramme fournit une vue d’ensemble conceptuelle de l’orientation des fragments et de la structure des jonctions. Pour les stratégies de clonage par restriction utilisant des extrémités cohésives, un <strong>tableau des extrémités cohésives au niveau des jonctions</strong> est fourni. Ce tableau résume les extrémités cohésives gauche et droite (5′→3′) à chaque jonction de ligation, ce qui permet de confirmer d’un coup d’œil la compatibilité des extrémités et la conception du clonage directionnel.</p>
+
+	   <div style="text-align: center; margin: 2em 0;">
+  		<img
+    			src="contents/pictures/RE_assembly_tabel.png"
+			alt="Sortie d’assemblage du clonage par enzyme de restriction"
+    			style="max-width: 60%; height: auto; border-radius: 8px;"
+  		 >
+	   </div>
+
+            <h3>Électrophorèse sur gel d’agarose simulée</h3>
+	    <p>PrimerWeaver génère une <strong>image de gel d’agarose simulée</strong> afin de prédire les résultats expérimentaux des étapes clés du clonage. Le gel comprend :</p>
+            <ul>
+                <li>Un marqueur d’ADN sélectionnable (par défaut : NEB 1 kb Plus DNA Ladder)</li>
+                <li>Le vecteur non digéré</li>
+                <li>Le vecteur digéré par restriction</li>
+                <li>L’insert amplifié par PCR</li>
+                <li>Le plasmide assemblé</li>
+                <li>Une digestion de restriction diagnostique du plasmide assemblé</li>
+            </ul>
+	    <p>Les tailles de bandes prédites sont annotées à côté du gel, ce qui permet de comparer les tailles de fragments attendues aux résultats expérimentaux et d’identifier rapidement d’éventuels problèmes de clonage.</p>
+
+	   <div style="text-align: center; margin: 2em 0;">
+  		<img
+    			src="contents/pictures/RE_gel.png"
+			alt="Sortie de gel simulé pour le clonage par enzyme de restriction"
+    			style="max-width: 60%; height: auto; border-radius: 8px;"
+  		 >
+	   </div>
+
+        </div>
+
+        <div class="section">
+            <h2>Algorithme de conception des amorces</h2>
+            
+            <h3>Structure des amorces</h3>
+            <p>Chaque amorce comprend trois régions fonctionnelles :</p>
+            <ul>
+                <li><strong>Cœur d’hybridation (3′) :</strong> région complémentaire du gabarit qui pilote l’hybridation PCR (généralement 18–30 bp)</li>
+                <li><strong>Site de restriction :</strong> séquence de reconnaissance de l’enzyme ajoutée pour permettre la digestion/ligation (généralement 6–8 bp)</li>
+                <li><strong>Base protectrice (flancs 5′) :</strong> bases courtes en amont du site de restriction destinées à améliorer l’efficacité de digestion (couramment 2–6 nt ; dépend de l’enzyme)</li>
+            </ul>
+
+            <h3>Processus de conception</h3>
+            <p>La conception du clonage par restriction dans PrimerWeaver est divisée en trois étapes liées : <strong>construction des amorces d’insert</strong>, <strong>interprétation de la digestion du vecteur</strong> et <strong>reconstruction de l’assemblage tenant compte de la ligation</strong>. Ces étapes sont résumées ci-dessous.</p>
+
+            <h3>Construction des amorces d’insert</h3>
+            <p>Le module normalise d’abord la séquence de l’insert et conçoit le <strong>cœur de liaison au gabarit</strong> directement sur les extrémités de l’insert. Le cœur sens est sélectionné à partir de l’extrémité 5′ de l’insert, et le cœur antisens est sélectionné à partir de l’extrémité 3′ comme complément inverse de l’extrémité de l’insert. La longueur du cœur est parcourue de manière itérative jusqu’à ce que la Tm cible soit atteinte ou que la meilleure amorce terminale disponible soit trouvée. Une amorce se terminant par GC en 3′ est préférée lorsqu’elle est disponible.</p>
+            <p>Une fois les cœurs de liaison à l’insert fixés, les amorces complètes sont assemblées comme suit :</p>
+            <p><strong>pince protectrice 5′ + site de restriction + cœur d’hybridation 3′</strong></p>
+            <p>La pince protectrice est générée sous forme d’une courte séquence 5′ non auto-complémentaire destinée à améliorer l’efficacité de digestion, et le site de reconnaissance de l’enzyme sélectionnée est ajouté entre la pince et le cœur d’hybridation. Les calculs thermodynamiques sont donc effectués sur le <strong>cœur de liaison à l’insert</strong>, et non sur la queue de clonage 5′ complète.</p>
+
+            <h3>Digestion du vecteur et sélection du squelette</h3>
+            <p>Le vecteur est traité comme une <strong>molécule circulaire</strong>. Pour chaque enzyme de restriction sélectionnée, le module identifie tous les sites de reconnaissance, les convertit en positions de coupure réelles et énumère tous les fragments de digestion générés sur le squelette circulaire. Le fragment le plus long est utilisé comme candidat squelette par défaut, mais l’utilisateur peut choisir manuellement un autre fragment dans le sélecteur de squelette si plusieurs fragments sont produits.</p>
+            <p>La topologie de digestion est ensuite interprétée à partir des identités enzymatiques présentes aux deux extrémités du fragment de squelette retenu. Cela détermine si le clonage se comporte comme une double digestion directionnelle, une pseudo-digestion unique, ou un scénario de ligation véritablement non directionnel.</p>
+
+            <h3>Ligation et reconstruction de la séquence assemblée</h3>
+            <p>Après le choix du fragment de squelette, le module reconstruit le plasmide assemblé plutôt que de se limiter aux séquences d’amorces. Les restes partiels de sites de reconnaissance laissés aux bords du fragment sont, le cas échéant, retirés du squelette retenu, et l’insert est orienté par rapport au squelette selon l’identité enzymatique aux extrémités gauche et droite du squelette. Dans un clonage directionnel à deux enzymes, l’insert peut être conservé tel quel ou complément inverse afin que les sites enzymatiques portés par les amorces s’alignent sur la topologie réelle du squelette.</p>
+            <p>La séquence assemblée finale est ensuite reconstruite comme suit :</p>
+            <p><strong>squelette tronqué + site de restriction de l’extrémité droite + insert orienté + site de restriction de l’extrémité gauche</strong></p>
+            <p>Cette même interprétation sert à renseigner le tableau des extrémités cohésives de jonction, le résumé du plasmide assemblé et la sortie de digestion diagnostique simulée.</p>
+
+            <h3>Logique des cas limites dans l’algorithme</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cas limite algorithmique</th>
+                        <th>Comportement actuel du module de clonage par restriction</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Aucune des deux enzymes ne coupe le vecteur</strong></td>
+                        <td>Le module ne peut pas définir de squelette de digestion. Au lieu d’inventer une topologie de clonage, il renvoie un résultat explicite de type N/A et signale que les enzymes sélectionnées n’ont aucun site utilisable dans le vecteur.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Une seule enzyme coupe le vecteur</strong></td>
+                        <td>La conception bascule automatiquement en <strong>mode enzyme unique</strong>, en utilisant l’enzyme coupante aux deux extrémités de l’insert. Cela préserve une conception clonable, mais la ligation résultante est non directionnelle et présente un risque plus élevé d’autoligation du vecteur.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Plusieurs sites existent dans le vecteur</strong></td>
+                        <td>Le module calcule tous les fragments de digestion et utilise le fragment le plus long comme squelette retenu par défaut. Si les deux extrémités de ce fragment sont produites par la même enzyme, le squelette est traité comme un squelette <strong>pseudo-enzyme unique</strong>, même dans un montage nominal de double digestion.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>L’insert contient le ou les sites de restriction sélectionnés</strong></td>
+                        <td>La conception des amorces elle-même peut toujours être générée, mais le module signale explicitement que l’insert amplifié peut également être coupé par la combinaison d’enzymes choisie, ce qui modifie l’interprétation pratique du clonage.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>La compatibilité des extrémités cohésives change l’interprétation de la ligation</strong></td>
+                        <td>Si les deux extrémités sont franches, ou si les deux enzymes génèrent des extrémités cohésives identiques, l’assemblage est interprété comme une ligation non directionnelle. Si une extrémité est franche et l’autre cohésive, le module signale tout de même la conception mais la traite comme une topologie de clonage défavorable.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>L’orientation de l’insert dépend de l’identité enzymatique des extrémités du squelette</strong></td>
+                        <td>La séquence assemblée n’est pas créée en collant simplement l’insert après le vecteur. Le module compare les enzymes des extrémités gauche et droite du squelette avec les étiquettes enzymatiques des amorces sens et antisens, et inverse le complément de l’insert si nécessaire afin de maintenir une topologie de ligation interne cohérente.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Avertissements et cas limites</h2>
+            <p>Le module de clonage par restriction utilise le système partagé <strong>MW (Message Warning)</strong> pour la validation préalable et les boîtes de dialogue de confirmation lorsque la couche de visualisation partagée est disponible. Si la couche MW n’est pas disponible, le module se rabat sur les boîtes de dialogue d’alerte/confirmation standard du navigateur. En pratique, les avertissements de ce module se répartissent en deux groupes : les messages d’<strong>avertissement général</strong> hérités de la couche de validation partagée, et les messages d’<strong>avertissement de conception</strong> propres à la logique de clonage par restriction.</p>
+
+            <h3>Avertissements généraux</h3>
+            <p>Ces avertissements sont générés avant le début de la conception et indiquent principalement des problèmes potentiels de qualité des entrées ou des paramètres. La plupart d’entre eux permettent à l’utilisateur de cliquer sur <strong>Cancel</strong> pour réviser les entrées ou sur <strong>OK</strong> pour poursuivre avec les réglages actuels.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Catégorie</th>
+                        <th>Condition de déclenchement</th>
+                        <th>Comportement actuel du module RE</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Invites bloquantes liées aux entrées</strong></td>
+                        <td>Aucune séquence d’insert, aucune séquence de vecteur, séquence d’insert/vecteur normalisée vide, ou sélection d’enzyme manquante.</td>
+                        <td>La conception s’arrête immédiatement et affiche une invite indiquant ce qui doit être fourni avant de continuer.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-04</strong><br>Aucune séquence valide après normalisation</td>
+                        <td>Tous les caractères sont supprimés après normalisation, car aucun symbole d’ADN IUPAC valide ne subsiste.</td>
+                        <td>L’utilisateur peut annuler pour réviser l’entrée ou poursuivre, mais la conception résultante sera vide ou non informative.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-05</strong><br>Caractères non IUPAC supprimés</td>
+                        <td>La séquence contient des caractères non pris en charge, surtout s’ils apparaissent près d’une région 3′ pertinente pour les amorces.</td>
+                        <td>Le module poursuit uniquement avec la séquence normalisée ; les utilisateurs sont avertis que cela peut modifier le comportement de la conception.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-06</strong><br>Bases dégénérées détectées</td>
+                        <td>Le vecteur ou l’insert contient des symboles IUPAC dégénérés.</td>
+                        <td>Les valeurs thermodynamiques sont estimées de manière prudente à partir de la variante la plus stable ; les valeurs de Tm et de ΔG rapportées peuvent donc être des approximations du pire cas.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-10 à MW-13</strong><br>Avertissements relatifs aux plages des paramètres</td>
+                        <td>Na<sup>+</sup>, Mg<sup>2+</sup>, la concentration des amorces ou la Tm cible se situe en dehors de la plage de conception recommandée.</td>
+                        <td>L’utilisateur peut poursuivre, mais la prédiction de Tm et l’optimisation des amorces peuvent devenir moins fiables.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-14</strong><br>Combinaison de sels élevée</td>
+                        <td>Des concentrations élevées de Na<sup>+</sup> et de Mg<sup>2+</sup> sont fournies simultanément.</td>
+                        <td>Le module avertit que la stabilité des duplex peut être surestimée par le modèle.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-15</strong><br>Hors de la plage thermodynamique validée</td>
+                        <td>Les valeurs des paramètres dépassent la plage validée du modèle thermodynamique.</td>
+                        <td>L’utilisateur peut tout de même poursuivre, mais les valeurs de Tm obtenues peuvent ne plus avoir de signification physique.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-19</strong><br>Grande taille totale des séquences</td>
+                        <td>L’entrée totale vecteur plus insert est très volumineuse (&gt; 1 MB).</td>
+                        <td>Le module avertit d’une exécution lente côté navigateur. Il s’agit de l’avertissement de performance pratique le plus pertinent pour le RE ; l’avertissement générique « trop d’éléments » n’est généralement pas déclenché, car le RE traite un vecteur et un insert à la fois.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-20</strong><br>Plusieurs en-têtes FASTA dans un même champ</td>
+                        <td>La zone de texte d’un vecteur ou d’un insert contient plus d’un enregistrement FASTA.</td>
+                        <td>Une boîte de dialogue MW partagée avertit qu’une seule séquence est autorisée par champ. Si l’utilisateur poursuit, le champ est tronqué au <strong>premier enregistrement FASTA</strong> avant que la conception ne continue.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-22</strong><br>Le téléversement dépasse la limite d’importation</td>
+                        <td>Un fichier de vecteur ou d’insert téléversé dépasse <strong>1 MB</strong>.</td>
+                        <td>L’importation est bloquée avant le chargement des séquences et l’utilisateur doit choisir un fichier plus petit.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Avertissements de conception</h3>
+            <p>Ces avertissements proviennent de l’algorithme de clonage par restriction lui-même. Certains s’affichent sous forme de boîtes de dialogue MW de confirmation, car ils modifient l’interprétation de la paire d’enzymes sélectionnée ; d’autres sont ajoutés directement aux panneaux de résultats afin que la conception puisse encore être examinée dans son contexte.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cas</th>
+                        <th>Condition de déclenchement</th>
+                        <th>Comportement actuel du module RE</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Seul le premier insert est utilisé</strong></td>
+                        <td>Plus d’une ligne d’insert est présente dans l’interface.</td>
+                        <td>Le flux de conception RE actuel collecte toutes les lignes d’insert non vides, mais n’utilise que <strong>le premier insert non vide</strong> pour la conception des amorces, la prédiction d’assemblage et la simulation de gel.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Les deux enzymes sélectionnées sont absentes du vecteur</strong></td>
+                        <td>Aucun site de reconnaissance de l’une ou l’autre enzyme sélectionnée n’est trouvé dans le vecteur.</td>
+                        <td>Le module ouvre une boîte de dialogue MW de confirmation. Si l’utilisateur poursuit, les panneaux de sortie affichent <strong>N/A</strong>, aucun plasmide assemblé n’est généré, et le graphique d’assemblage reflète le cas sans coupure.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Un seul site enzymatique trouvé dans le vecteur</strong></td>
+                        <td>Exactement une des deux enzymes sélectionnées coupe le vecteur.</td>
+                        <td>Le module propose un <strong>repli enzyme unique</strong>, en réutilisant l’enzyme coupante aux deux extrémités. Cela permet de poursuivre la conception, mais le clonage devient non directionnel et le risque d’autoligation augmente.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Sites de coupure multiples dans le vecteur</strong></td>
+                        <td>Une ou les deux enzymes sélectionnées coupent le vecteur à plus d’une position.</td>
+                        <td>Le module sélectionne automatiquement le <strong>fragment de digestion le plus long</strong> comme squelette candidat et avertit l’utilisateur de vérifier que le fragment choisi correspond au squelette expérimental prévu. La liste déroulante du squelette peut servir à remplacer le choix automatique.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Squelette de pseudo-digestion unique</strong></td>
+                        <td>Le fragment le plus long est flanqué de la <strong>même enzyme</strong> aux deux extrémités, même si deux enzymes ont été saisies.</td>
+                        <td>Le module avertit que le squelette sélectionné se comporte effectivement comme une digestion à une seule enzyme, de sorte que le clonage est non directionnel et que le bruit de fond du vecteur peut augmenter.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Site enzymatique sélectionné présent dans l’insert</strong></td>
+                        <td>L’insert contient déjà l’un des sites de restriction sélectionnés, ou les deux.</td>
+                        <td>Un avertissement est ajouté à la sortie des extrémités cohésives ou des jonctions, car l’insert peut être coupé involontairement pendant le flux de clonage.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Extrémités cohésives identiques</strong></td>
+                        <td>Les deux enzymes sélectionnées génèrent la même séquence d’extrémité cohésive.</td>
+                        <td>Le module signale la conception comme <strong>non directionnelle</strong> ; l’orientation de l’insert n’est pas imposée et le risque d’autoligation du vecteur est accru.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Les deux extrémités sont franches</strong></td>
+                        <td>Aucune des enzymes sélectionnées ne génère d’extrémité cohésive.</td>
+                        <td>Le module avertit que le clonage à extrémités franches est non directionnel, généralement moins efficace en ligation, et plus sujet aux colonies de fond.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Une extrémité franche et une extrémité cohésive</strong></td>
+                        <td>Une enzyme sélectionnée génère une extrémité franche et l’autre une extrémité cohésive.</td>
+                        <td>Le module signale tout de même une conception, mais étiquette cette combinaison d’enzymes comme généralement <strong>non recommandée</strong> pour le clonage par restriction standard.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Insert très court</strong></td>
+                        <td>La longueur de l’insert est inférieure à <strong>50 bp</strong>.</td>
+                        <td>Un avertissement est ajouté pour rappeler à l’utilisateur que la ligation, le criblage des colonies et la vérification de séquence peuvent être plus difficiles pour des inserts très courts.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Risque élevé d’autoligation du vecteur</strong></td>
+                        <td>Déclenché par des extrémités cohésives identiques, un clonage franc–franc, ou une topologie de squelette pseudo-unique.</td>
+                        <td>Le module recommande explicitement la <strong>déphosphorylation du vecteur</strong> et/ou le choix d’une autre combinaison d’enzymes afin de réduire les colonies de fond.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Incohérence d’orientation après examen de la conception</strong></td>
+                        <td>La sortie assemblée ne correspond pas à l’orientation prévue de l’insert sur le brin supérieur.</td>
+                        <td>L’action corrective recommandée est d’<strong>inverser le complément de la séquence de l’insert</strong> et de relancer la conception, plutôt que de modifier manuellement l’assemblage prédit.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Le diagramme d’assemblage est schématique</strong></td>
+                        <td>Toute conception réussie de clonage par restriction avec un aperçu d’assemblage.</td>
+                        <td>L’image d’assemblage est un schéma conceptuel plutôt qu’une carte plasmidique fidèle aux longueurs ; les utilisateurs doivent s’appuyer sur la séquence assemblée, le tableau des extrémités cohésives et les informations de fragments pour une interprétation exacte.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <p><strong>Interprétation pratique :</strong> un avertissement dans ce module ne signifie pas toujours que la conception est impossible. Certains avertissements indiquent simplement que la paire d’enzymes actuelle fait passer la topologie de clonage du flux idéal d’extrémités cohésives directionnelles à un scénario de repli ou de moindre efficacité. Les utilisateurs doivent donc interpréter les résultats RE conjointement avec le <strong>sélecteur de fragment de squelette</strong>, le <strong>tableau des extrémités cohésives</strong> et l’<strong>aperçu du plasmide assemblé</strong>.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

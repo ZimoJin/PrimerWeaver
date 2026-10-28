@@ -1,6 +1,13 @@
 import * as Core from './core_v1.0.1.js';
 import * as VIZ from './bio_visuals_v1.0.1.js';
 
+const t = (key, params, fallback) => (
+  window.PW_I18N ? window.PW_I18N.t(key, params, fallback) : (fallback || key)
+);
+const applyI18n = (root) => {
+  if (window.PW_I18N && root) window.PW_I18N.apply(root);
+};
+
 const METHOD_CONFIG = {
   'golden-gate': {
     htmlPath: 'modules/Golden_Gate_v1.0.1.html',
@@ -283,7 +290,7 @@ function getLoadingBox(host) {
   if (!box) {
     box = document.createElement('div');
     box.className = 'box workspace-loading-box workspace-pane-hidden';
-    box.innerHTML = '<p class="small muted" style="margin:0;">Loading method workspace...</p>';
+    box.innerHTML = '<p class="small muted" style="margin:0;">' + t('ui.loadingMethod', null, 'Loading method workspace...') + '</p>';
     host.appendChild(box);
   }
   return box;
@@ -564,14 +571,14 @@ function ensureWorkspaceMWModal(container) {
     <div class="mw-modal-content" role="dialog" aria-modal="true" aria-labelledby="mw-modal-title">
       <div class="mw-modal-header">
         <span class="mw-warning-icon">⚠️</span>
-        <h3 id="mw-modal-title">Warning</h3>
+        <h3 id="mw-modal-title">${t('ui.warning', null, 'Warning')}</h3>
       </div>
       <div class="mw-modal-body">
         <p id="mw-message"></p>
       </div>
       <div class="mw-modal-footer">
-        <button type="button" class="btn ghost" id="mw-cancel-btn">Cancel</button>
-        <button type="button" class="btn" id="mw-confirm-btn">OK</button>
+        <button type="button" class="btn ghost" id="mw-cancel-btn">${t('ui.cancel', null, 'Cancel')}</button>
+        <button type="button" class="btn" id="mw-confirm-btn">${t('ui.ok', null, 'OK')}</button>
       </div>
     </div>
   `;
@@ -663,7 +670,7 @@ function triggerActiveMethodButton(container, buttonKey) {
   const method = container.dataset.activeMethod || '';
   const config = METHOD_CONFIG[method];
   if (!config) {
-    showWorkspaceMW(container, 'Please select a cloning method first.');
+    showWorkspaceMW(container, t('ui.selectMethodFirst', null, 'Please select a cloning method first.'));
     return;
   }
 
@@ -675,8 +682,8 @@ function triggerActiveMethodButton(container, buttonKey) {
     : null;
 
   if (!targetButton) {
-    const actionLabel = buttonKey === 'resetButtonSelector' ? 'Reset' : 'Demo Set';
-    showWorkspaceMW(container, `${actionLabel} is not available for the selected cloning method.`);
+    const actionLabel = buttonKey === 'resetButtonSelector' ? t('ui.reset', null, 'Reset') : t('ui.demoSet', null, 'Demo Set');
+    showWorkspaceMW(container, t('ui.actionUnavailable', {action: actionLabel}, '{action} is not available for the selected cloning method.'));
     return;
   }
 
@@ -734,6 +741,7 @@ async function renderMethod(container, method) {
     mount.className = 'workspace-method-pane workspace-pane-hidden';
     mount.dataset.method = method;
     mount.innerHTML = html;
+    applyI18n(mount);
     host.appendChild(mount);
 
     await config.init(mount);
@@ -753,7 +761,7 @@ async function renderMethod(container, method) {
     if (token !== state.renderToken) return;
     loadingBox.classList.add('workspace-pane-hidden');
     setVisibleMethodPane(host, '');
-    host.insertAdjacentHTML('beforeend', '<div class="box workspace-method-error"><p style="margin:0;color:#b91c1c;">Failed to load the selected cloning method.</p></div>');
+    host.insertAdjacentHTML('beforeend', '<div class="box workspace-method-error"><p style="margin:0;color:#b91c1c;">' + t('ui.failedLoadMethod', null, 'Failed to load the selected cloning method.') + '</p></div>');
   }
 }
 

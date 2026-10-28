@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mutagenèse dirigée - PrimerWeaver V1.0.6</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #333;
+            background: #f9fafb;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e40af;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2563eb;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            font-size: 1.5em;
+        }
+        h3 {
+            color: #3b82f6;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            font-size: 1.2em;
+        }
+        h4 {
+            color: #60a5fa;
+            margin-top: 1.2em;
+            margin-bottom: 0.6em;
+        }
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 1em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        strong {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c2410c;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .abstract {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+        .abstract p {
+            margin: 0;
+            font-style: italic;
+        }
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            margin: 1.5em 0;
+            border-radius: 4px;
+        }
+        .section {
+            margin-bottom: 2.5em;
+        }
+        .version-info {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+            margin-top: 3em;
+            padding-top: 2em;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Mutagenèse dirigée</h1>
+        
+        <div class="abstract">
+            <p>Le module de mutagenèse dirigée permet d’introduire de manière précise des mutations ponctuelles, des insertions et des délétions dans une matrice d’ADN en s’appuyant sur la conception d’amorces de PCR par chevauchement. L’outil prend en charge deux approches complémentaires de mutagenèse : la mutagenèse au niveau protéique dans les séquences codantes (avec détection automatique des ORF et optimisation des codons selon les préférences de l’organisme hôte) et l’édition de séquences d’ADN pour n’importe quelle région génomique. Le module conçoit automatiquement des paires d’amorces qui permettent d’assembler efficacement le construit muté par deux réactions de PCR successives.</p>
+        </div>
+
+        <div class="section">
+            <h2>Guide de démarrage rapide</h2>
+            
+            <ol>
+                <li>Téléversez ou collez les séquences d’ADN cibles contenant la région à muter, au format FASTA ou en texte brut, dans les champs de saisie. Choisissez le mode mutation protéique CDS ou le mode édition de séquence d’ADN. En mode mutation protéique CDS, le système détecte automatiquement les cadres de lecture ouverts (ORF) dans les six cadres de lecture et sélectionne l’ORF le plus long comme entrée par défaut ; vous pouvez aussi spécifier manuellement l’ORF souhaité. Les mutations peuvent être définies comme des substitutions, insertions ou délétions d’acides aminés en mode CDS, ou comme des substitutions, insertions ou délétions au niveau de l’ADN en mode ADN. Enfin, ajustez les paramètres de conception si nécessaire avant de poursuivre.
+
+                <div style="text-align: center; margin: 2em 0;">
+                    <img
+                        src="contents/pictures/mutagenesis_demo.png"
+                        alt="Démonstration de la mutagenèse"
+                        style="max-width: 90%; height: auto; border-radius: 8px;"
+                    >
+                </div>
+                </li>
+                
+                <li>Cliquez sur « Design Primers » pour générer les jeux d’amorces mutagènes. Examinez les amorces conçues, les indicateurs de qualité et la séquence mutée prédite. Téléchargez les résultats au format FASTA pour la validation expérimentale.
+                
+
+                </li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>Principe de la mutagenèse dirigée</h2>
+            
+            <p>La mutagenèse dirigée est une technique de biologie moléculaire qui permet d’introduire de manière précise des mutations définies dans un plasmide ou une matrice d’ADN génomique. La stratégie de PCR par chevauchement utilisée par ce module s’appuie sur des amorces mutagènes qui incorporent la modification souhaitée et chevauchent les séquences sauvages flanquantes, ce qui permet d’assembler un construit entièrement muté en deux tours de PCR, sans recourir à des enzymes de restriction ni à une ligation.</p>
+            
+
+            
+            <h3>Principes de conception essentiels</h3>
+            
+            <p>La mutagenèse dirigée par OE-PCR suit une <strong>stratégie à quatre amorces</strong>, comprenant deux amorces externes et deux amorces mutagènes, chacune remplissant un rôle thermodynamique et structural distinct afin de maximiser l’efficacité de la mutagenèse :</p>
+            <ul>
+                <li><strong>Amorces externes (F1, R2) :</strong> amorces flanquantes de type sauvage qui définissent les limites 5′ et 3′ du construit final. F1 se lie en amont du site de mutation, tandis que R2 se lie en aval, ce qui permet d’amplifier le produit muté de pleine longueur. Ces amorces peuvent éventuellement porter des séquences terminales (par exemple des sites de restriction ou des étiquettes d’affinité) pour le clonage en aval.</li>
+                <li><strong>Amorces mutagènes (Fmut, Rmut) :</strong> amorces qui introduisent la mutation souhaitée à leurs <strong>extrémités d’extension 3′</strong>, où l’ADN polymérase initie la synthèse. Chaque amorce mutagène contient une séquence flanquante de type sauvage afin d’assurer une liaison spécifique, et les deux amorces sont conçues pour être complémentaires inverses l’une de l’autre sur une région de chevauchement centrale englobant la mutation. Ce chevauchement permet l’extension des brins et l’assemblage du construit mutant de pleine longueur.</li>
+                <li><strong>Optimisation thermodynamique en deux étapes :</strong> la <strong>région cœur</strong> (segment contenant la mutation) est optimisée pour atteindre une température de fusion cible (généralement 55–60 °C) afin de piloter l’amplification PCR initiale des fragments mutés. La <strong>région de chevauchement</strong> (chevauchement complémentaire inverse entre Fmut et Rmut) est conçue pour permettre une hybridation stable amorce–amorce lors de la PCR d’extension, où les produits de PCR mutés servent d’amorces les uns pour les autres, ce qui permet d’assembler le construit de pleine longueur.</li>
+            </ul>
+            
+        </div>
+
+        <div class="section">
+            <h2>Format d’entrée</h2>
+		<p>Le module accepte des <strong>séquences d’ADN au format FASTA ou en texte brut</strong>. Chaque champ de saisie ne prend en charge qu’une seule séquence ; si plusieurs en-têtes FASTA sont détectés, seule la première séquence sera utilisée. Deux modes de fonctionnement sont pris en charge : <strong>CDS (mutagenèse protéique)</strong> et <strong>ADN (édition nucléotidique)</strong>. </p>
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/mutagenesis_input.png"
+                    alt="Saisie pour la mutagenèse"
+                    style="max-width: 60%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+           <h3>Règles de définition des mutations</h3>
+		<p>Une fois la séquence d’entrée et le mode de mutation sélectionnés, les mutations sont interprétées selon les règles de coordonnées et d’opération suivantes. </p>
+<p>
+Les positions de mutation sont en <strong>base 1</strong> et s’interprètent par rapport à la
+<strong>séquence de référence sélectionnée</strong> :
+</p>
+<ul>
+  <li><strong>Mode CDS (mutation protéique) :</strong> les positions se rapportent à l’ORF traduit sélectionné.</li>
+  <li><strong>Mode édition de séquence d’ADN :</strong> les positions se rapportent à la séquence d’ADN d’entrée.</li>
+</ul>
+
+<p>En mode CDS, utilisez le symbole standard à une lettre <strong><code>*</code></strong> comme nouvel acide aminé pour introduire un codon stop (par exemple, <code>W55*</code>). Les alias <code>STOP</code> et <code>TER</code> sont également acceptés lorsqu’ils sont saisis seuls.</p>
+
+<p>Les opérations suivantes sont prises en charge dans les deux modes :</p>
+<ul>
+  <li><strong>Substitution / remplacement :</strong>
+      remplacer la séquence (ou l’acide aminé) de <em>Start</em> à <em>End</em>
+      par la nouvelle séquence fournie.</li>
+
+  <li><strong>Insertion :</strong>
+      insérer la nouvelle séquence <strong>après la position Start indiquée</strong>
+      (la position End peut rester vide).</li>
+
+  <li><strong>Délétion :</strong>
+      supprimer la séquence (ou les acides aminés) s’étendant de <em>Start</em> à <em>End</em>.</li>
+</ul>
+
+<p>
+Les <strong>séquences de chevauchement 5′</strong> optionnelles, si elles sont fournies, sont ajoutées aux amorces
+pour l’assemblage en aval et <strong>n’affectent ni les coordonnées de mutation ni
+les calculs thermodynamiques</strong>.
+</p>
+
+            
+
+
+        </div>
+
+        <div class="section">
+            <h2>Paramètres de conception</h2>
+            
+            <p>Avant de lancer la conception des amorces mutagènes, vérifiez et ajustez les paramètres suivants afin qu’ils correspondent à vos conditions de PCR et à vos exigences de mutagenèse.</p>
+            
+            <table>
+    <thead>
+        <tr>
+            <th>Paramètre</th>
+            <th>Valeur par défaut</th>
+            <th>Plage</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Tm de l’amorce cœur (°C)</strong></td>
+            <td>55</td>
+            <td>40–75</td>
+            <td>
+                Température de fusion cible de la <strong>région de liaison au gabarit</strong> des amorces mutagènes (Fmut et Rmut).
+             </td>
+        </tr>
+        <tr>
+            <td><strong>Tm de l’amorce de chevauchement (°C)</strong></td>
+            <td>55</td>
+            <td>40–75</td>
+            <td>
+                Température de fusion cible de la <strong>région de chevauchement</strong> partagée
+                entre Fmut et Rmut, où les deux amorces sont complémentaires inverses.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Concentration des amorces (nM)</strong></td>
+            <td>500</td>
+            <td>50–2000</td>
+            <td>
+                Concentration effective des amorces retenue pour le calcul in silico de la Tm. Plage habituelle : 25-1000 nM.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Concentration en Na⁺ (mM)</strong></td>
+            <td>50</td>
+            <td>0–200</td>
+            <td>
+                Concentration en cations monovalents utilisée pour le calcul de la Tm corrigé en fonction des sels. Plage habituelle : 10-200 mM.
+
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Concentration en Mg²⁺ (mM)</strong></td>
+            <td>2.0</td>
+            <td>0–10</td>
+            <td>
+                Concentration en cations divalents utilisée pour le calcul de la Tm. Réglez-la sur 0 si la réaction ne contient pas de Mg²⁺. Plage habituelle : 0.5-5 mM.
+
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Séquence terminale sens</strong></td>
+            <td>—</td>
+            <td>Optionnel</td>
+            <td>
+                Séquence d’ADN personnalisée ajoutée à l’extrémité 5′ de l’amorce externe sens (F1).
+                Cette région est exclue du calcul de la Tm et peut servir à introduire
+                des sites de restriction, des étiquettes d’affinité ou d’autres éléments fonctionnels.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Séquence terminale antisens</strong></td>
+            <td>—</td>
+            <td>Optionnel</td>
+            <td>
+                Séquence d’ADN personnalisée ajoutée à l’extrémité 5′ de l’amorce externe antisens (R2),
+                fournie sous forme de complément inverse. Cette région est exclue du calcul de la Tm.
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+            
+            <div class="info-box">
+                <strong>Remarque sur le choix de l’organisme hôte (mode CDS) :</strong>
+                <p style="margin: 8px 0 0 0;">Lors d’une mutagenèse au niveau protéique, l’organisme hôte sélectionné détermine les préférences de codons utilisées pour traduire les séquences d’acides aminés en ADN. Cela garantit que les amorces conçues utilisent des codons naturellement biaisés vers l’hôte cible, ce qui améliore l’efficacité de traduction et réduit le risque de problèmes d’expression liés aux codons rares.</p>
+            </div>
+
+        </div>
+
+        <div class="section">
+            <h2>Résultats et sortie</h2>
+            
+            <p>Après la conception des amorces, le module de mutagenèse dirigée génère un ensemble complet de résultats pour la validation expérimentale et le clonage en aval. Le module affiche le construit muté de pleine longueur prédit, en montrant la séquence complète avec toutes les modifications incorporées. Le ou les sites de mutation d’origine sont mis en évidence pour en faciliter la visualisation, et la séquence est fournie au format FASTA pour le téléchargement et la validation par rapport à la cible souhaitée.</p>
+            
+            <p>Le module génère quatre séquences d’amorces : F1 (amorce flanquante sauvage 5′), Fmut (amorce mutagène 5′ avec région cœur), Rmut (amorce mutagène 3′ avec région cœur) et R2 (amorce flanquante sauvage 3′). Pour chaque amorce, le tableau affiche les séquences complètes (5′→3′), la longueur, la teneur en GC et les températures de fusion. Les valeurs de Tm sont indiquées séparément pour la région cœur (contenant la mutation) et pour toute région de chevauchement, ce qui permet d’évaluer la spécificité de liaison des amorces et la compatibilité d’amplification. Les indicateurs de contrôle qualité, notamment les répétitions homopolymériques, les structures en épingle à cheveux et la formation d’auto-dimères/hétérodimères, sont évalués et signalés afin d’identifier les risques potentiels.</p>
+            
+            <div style="text-align: center; margin: 2em 0;">
+                <img
+                    src="contents/pictures/mutagenesis_output.png"
+                    alt="Sortie de conception d’amorces pour la mutagenèse"
+                    style="max-width: 70%; height: auto; border-radius: 8px;"
+                >
+            </div>
+
+
+
+
+            
+        </div>
+
+        <div class="section">
+            <h2>Algorithme de conception des amorces</h2>
+                        
+            <h3>Détection et sélection des ORF</h3>
+            <p>Le module parcourt automatiquement la séquence d’entrée dans les six cadres de lecture (trois sur le brin sens et trois sur le brin antisens) afin d’identifier les séquences codantes potentielles. Pour chaque cadre, les ORF sont identifiés comme des séquences commençant par ATG (codon d’initiation) et se terminant par TAA, TAG ou TGA (codons stop). Tous les ORF détectés sont classés par longueur, et l’ORF le plus long est présélectionné. Les utilisateurs peuvent sélectionner manuellement un autre ORF dans la liste classée si la séquence codante visée diffère du cadre le plus long détecté.</p>
+
+            <h3>Stratégie de conception à quatre amorces</h3>
+            <p>Après spécification de la mutation, le module construit quatre amorces selon la stratégie de PCR par chevauchement :</p>
+            <ul>
+		<li><strong>F1 (flanquante sens) :</strong> amorce de type sauvage se liant en amont (5′) de la région mutagène. F1 définit la limite 5′ du produit PCR final et est optimisée pour l’amplification PCR externe. Des séquences terminales 5′ optionnelles (par exemple des sites de restriction ou des étiquettes) peuvent être ajoutées et sont exclues des calculs thermodynamiques.</li>
+                
+                <li><strong>Rmut (mutagène antisens) :</strong> amorce mutagène conçue pour se lier immédiatement en amont (5′) du site de mutation avec la région cœur de l’amorce. Rmut contient une partie de la séquence éditée dans sa région 5′ (région de chevauchement). </li>
+
+                <li><strong>Fmut (mutagène sens) :</strong> amorce mutagène conçue pour se lier immédiatement en aval (3′) du site de mutation avec la région cœur de l’amorce. Fmut contient une partie de la séquence éditée dans sa région 5′ (région de chevauchement).</li>
+
+                <li><strong>R2 (flanquante antisens) :</strong> amorce de type sauvage se liant en aval (3′) de la région mutagène. R2 définit la limite 3′ du produit PCR final et peut porter des séquences terminales 5′ optionnelles (complément inverse), qui ne participent pas aux calculs de Tm.</li>
+            </ul>
+
+            <h3>Repli pour les éditions proximales des extrémités</h3>
+            <p>La stratégie OE-PCR à quatre amorces par défaut suppose que le site de mutation est flanqué, de chaque côté, d’une séquence sauvage suffisante pour prendre en charge deux amorces externes et deux amorces mutagènes. Lorsque la modification demandée est <strong>trop proche de l’une ou l’autre extrémité de la matrice</strong>, cette hypothèse ne tient plus, car un côté ne peut plus fournir un fragment PCR suffisamment long pour une amplification stable.</p>
+            <p>Pour gérer cette situation, le module évalue la longueur de séquence disponible de part et d’autre 5′ et 3′ de l’édition. Si un côté tombe en dessous de l’exigence interne minimale de longueur de fragment (environ <strong>39 nt</strong>), la conception bascule automatiquement vers un <strong>repli PCR à fragment unique</strong> au lieu d’imposer la disposition standard à quatre amorces. Dans ce mode de repli, l’algorithme conserve l’amorce mutagène centrée sur la région éditée et n’utilise que l’amorce flanquante compatible avec l’extrémité du côté qui dispose encore d’un contexte de matrice suffisant.</p>
+            <p>En conséquence, les éditions proches du début de la matrice peuvent produire une conception dominée par <strong>Fmut + R2</strong>, tandis que les éditions proches de la fin peuvent s’appuyer sur <strong>F1 + Rmut</strong>. Dans les cas extrêmes où l’édition elle-même doit être amplifiée directement à partir d’un fragment contraint à l’extrémité, la sortie finale peut effectivement se réduire à une seule paire d’amorces mutagènes. Ce comportement de repli est intentionnel et reflète la limitation physique du placement des amorces près des extrémités de séquence, et non un échec de conception.</p>
+
+           
+
+        </div>
+        <div class="section">
+            <h2>Avertissements et cas limites</h2>
+            <p>Le module de mutagenèse dirigée combine la couche partagée <strong>MW (Message Warning)</strong> avec des replis de conception propres à la mutagenèse. Certains avertissements sont de purs contrôles préalables, tandis que d’autres décrivent comment l’algorithme change de stratégie lorsque les mutations sont proches des extrémités de la matrice ou lorsque l’interprétation de la séquence devient ambiguë.</p>
+
+            <h3>Avertissements généraux</h3>
+            <p>Ces avertissements reflètent principalement des problèmes de qualité des entrées ou des paramètres détectés avant ou pendant la conception. Dans de nombreux cas, l’utilisateur peut poursuivre, mais l’interprétation thermodynamique qui en résulte devient moins fiable.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Catégorie</th>
+                        <th>Condition de déclenchement</th>
+                        <th>Comportement actuel du module de mutagenèse</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Invites bloquantes liées aux entrées</strong></td>
+                        <td>Séquence matrice manquante, aucune définition de mutation/édition, ou préconditions non valides pour le mode sélectionné.</td>
+                        <td>La conception s’arrête immédiatement et l’utilisateur est invité à compléter les entrées requises avant qu’une conception de mutagenèse valide puisse se poursuivre.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-04</strong><br>Aucune séquence valide après normalisation</td>
+                        <td>La matrice devient vide après normalisation, car aucun symbole d’ADN IUPAC valide ne subsiste.</td>
+                        <td>L’utilisateur peut tout de même poursuivre, mais la sortie de mutagenèse qui en résulte n’aura pas de signification.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-05</strong><br>Caractères non IUPAC supprimés</td>
+                        <td>Des caractères non pris en charge sont présents dans l’entrée de la matrice.</td>
+                        <td>Le module poursuit uniquement avec la séquence normalisée et avertit que la matrice de conception effective peut différer du texte collé à l’origine.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-06</strong><br>Bases dégénérées détectées</td>
+                        <td>La matrice contient des bases IUPAC ambiguës.</td>
+                        <td>Les valeurs thermodynamiques sont estimées de manière prudente ; les Tm et ΔG affichées doivent donc être considérées comme des approximations.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-09</strong><br>Lot d’éditions volumineux</td>
+                        <td>En <strong>mode édition d’ADN</strong>, le nombre de lignes d’édition devient très important.</td>
+                        <td>La couche d’avertissement partagée signale que le traitement côté navigateur peut ralentir ou ne plus répondre pour de grands lots d’éditions.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-10 à MW-15</strong><br>Avertissements relatifs aux plages des paramètres</td>
+                        <td>Na<sup>+</sup>, Mg<sup>2+</sup>, la concentration des amorces ou la <strong>Tm de l’amorce cœur</strong> cible se situe en dehors des plages thermodynamiques recommandées ou validées.</td>
+                        <td>Le module peut tout de même poursuivre, mais la prédiction thermodynamique et l’optimisation des amorces deviennent moins fiables.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-19</strong><br>Entrée de matrice volumineuse</td>
+                        <td>La taille totale de l’entrée de matrice dépasse le seuil partagé d’entrée volumineuse. Ce contrôle préalable s’applique à la fois en <strong>mode CDS</strong> et en <strong>mode édition d’ADN</strong>.</td>
+                        <td>Le module avertit que la conception et le rendu peuvent ralentir dans le navigateur, mais l’utilisateur peut tout de même poursuivre.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-20</strong><br>Plusieurs en-têtes FASTA dans un même champ</td>
+                        <td>En <strong>mode CDS</strong> ou en <strong>mode édition d’ADN</strong>, la zone de texte de la matrice contient plus d’un enregistrement FASTA.</td>
+                        <td>Une boîte de dialogue MW partagée avertit qu’une seule séquence est autorisée par champ. Si l’utilisateur poursuit, la matrice est tronquée au <strong>premier enregistrement FASTA</strong> avant que la conception ne continue.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MW-22</strong><br>Le téléversement dépasse la limite d’importation</td>
+                        <td>Le fichier de matrice téléversé dépasse <strong>1 MB</strong>.</td>
+                        <td>Il s’agit d’un MW bloquant dur au stade de l’importation : le fichier est rejeté avant le chargement des séquences et doit être remplacé par un téléversement plus petit.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Avertissements de conception</h3>
+            <p>Ces cas limites sont propres à l’algorithme de mutagenèse, en particulier la distinction entre les modes CDS et édition d’ADN, les mutations proximales des extrémités et l’utilisation optionnelle de chevauchements terminaux.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cas</th>
+                        <th>Condition de déclenchement</th>
+                        <th>Comportement actuel du module de mutagenèse</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Mutation près d’une extrémité de la matrice</strong></td>
+                        <td>Le site d’édition est trop proche de l’extrémité 5′ ou 3′ pour laisser la longueur habituelle de fragment flanquant (minimum interne d’environ <strong>39 nt</strong> d’un côté).</td>
+                        <td>Le module bascule automatiquement de la conception PCR par chevauchement à quatre amorces par défaut vers une stratégie de <strong>PCR à fragment unique</strong> ; la sortie peut donc ne contenir qu’une paire d’amorces mutagènes principale plutôt qu’un jeu complet de quatre amorces.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Avertissement sur la longueur du chevauchement terminal optionnel</strong></td>
+                        <td>La séquence de chevauchement terminal sens ou antisens fournie par l’utilisateur se situe en dehors de la plage recommandée de <strong>15–40 bp</strong>.</td>
+                        <td>Le module affiche une invite MW propre à la mutagenèse mais autorise néanmoins la poursuite de la conception, en avertissant que des chevauchements trop courts peuvent réduire l’efficacité d’assemblage en aval et que des chevauchements trop longs peuvent augmenter l’appariement hors cible.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Aucun CDS détecté avec confiance</strong></td>
+                        <td>En mode CDS, aucun ORF n’est trouvé automatiquement.</td>
+                        <td>Si la matrice nettoyée est suffisamment longue, le module se rabat sur l’utilisation de la séquence normalisée complète comme entrée CDS ; si elle est trop courte, la conception s’arrête et demande une matrice CDS valide.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Application séquentielle de plusieurs éditions</strong></td>
+                        <td>Plusieurs lignes de mutation/édition sont fournies.</td>
+                        <td>Les éditions sont appliquées <strong>dans l’ordre</strong>, et chaque étape de conception ultérieure utilise la matrice déjà modifiée par l’étape précédente. Les positions saisies par l’utilisateur restent ancrées à l’entrée/ORF d’origine et sont projetées sur chaque matrice intermédiaire ; les éditions se chevauchant sont rejetées comme ambiguës.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Comportement de sélection des codons en mode CDS</strong></td>
+                        <td>Les substitutions ou insertions au niveau protéique nécessitent une rétrotraduction en ADN.</td>
+                        <td>Le module utilise les préférences de codons de l’organisme hôte sélectionné ; un acide aminé unique avec un codon explicitement choisi utilise ce codon directement, tandis que les éditions portant plusieurs acides aminés sont développées selon les choix de codons préférés de l’hôte sélectionné.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Construction insuffisante du chevauchement ou du cœur</strong></td>
+                        <td>Le contexte de séquence local ne permet pas une région de chevauchement valide ni une longueur de cœur d’amorce suffisante autour de l’édition demandée.</td>
+                        <td>Le module s’arrête avec une erreur de conception au lieu de produire silencieusement un jeu d’amorces faible, et la définition de la mutation ou le contexte de séquence doit être révisé.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <p><strong>Interprétation pratique :</strong> les avertissements en mutagenèse ne signifient pas nécessairement que la conception a échoué. Si une édition est trop proche d’une extrémité de la matrice, le module peut intentionnellement basculer de la disposition OE-PCR à quatre amorces par défaut vers une stratégie de PCR à fragment unique ; voir moins de quatre amorces peut donc être un résultat attendu plutôt qu’une erreur. L’interprétation finale doit donc tenir compte du mode sélectionné, de l’ordre des mutations, des chevauchements terminaux optionnels, et du fait que le résultat rapporté reflète la conception à quatre amorces par défaut ou une stratégie de repli proximale des extrémités.</p>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
